@@ -34,6 +34,7 @@ abstract class View(
 
     companion object {
         val TODAY = object : View("today") {}
+        val FILTER_ACTIVITY = object : View("filter_activity") {}
         val NEW_ACTIVITY = object : View("new_activity", listOf(Argument.ACTIVITY_ID)) {}
         val SETTINGS = object : View("settings") {}
     }

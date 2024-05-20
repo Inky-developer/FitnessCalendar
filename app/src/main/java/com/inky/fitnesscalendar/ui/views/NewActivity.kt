@@ -20,7 +20,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -43,11 +42,12 @@ import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.Activity
-import com.inky.fitnesscalendar.data.ActivityType
 import com.inky.fitnesscalendar.data.Vehicle
 import com.inky.fitnesscalendar.localization.LocalizationRepository
+import com.inky.fitnesscalendar.ui.components.ActivityTypeSelector
 import com.inky.fitnesscalendar.ui.components.DateTimePicker
 import com.inky.fitnesscalendar.ui.components.DateTimePickerState
+import com.inky.fitnesscalendar.ui.components.OptionGroup
 import com.inky.fitnesscalendar.view_model.NewActivityViewModel
 import kotlinx.coroutines.flow.flowOf
 import java.time.Instant
@@ -91,7 +91,7 @@ fun NewActivity(
         )
     } ?: stringResource(R.string.new_activity)
 
-    var selectedActivity by rememberSaveable { mutableStateOf(activity?.type) }
+    var selectedActivityType by rememberSaveable { mutableStateOf(activity?.type) }
     var selectedVehicle by rememberSaveable { mutableStateOf(activity?.vehicle) }
     val startDateTimePickerState by rememberSaveable {
         mutableStateOf(
@@ -113,12 +113,13 @@ fun NewActivity(
     val scrollState = rememberScrollState()
 
     val formValid =
-        selectedActivity != null && (!selectedActivity!!.hasVehicle || selectedVehicle != null)
+        selectedActivityType != null && (!selectedActivityType!!.hasVehicle || selectedVehicle != null)
 
     // When the start date time changes, move the end date time along as well
     LaunchedEffect(startDateTimePickerState.selectedDateTime) {
         if (endDateTimePickerState.selectedDateTime == endDateTimePickerState.initialDateTime) {
-            endDateTimePickerState.initialDateTime = startDateTimePickerState.selectedDateTime + ChronoUnit.HOURS.duration.toMillis()
+            endDateTimePickerState.initialDateTime =
+                startDateTimePickerState.selectedDateTime + ChronoUnit.HOURS.duration.toMillis()
         }
     }
 
@@ -147,28 +148,14 @@ fun NewActivity(
             ) {
                 OptionGroup(
                     label = stringResource(R.string.select_activity),
-                    selectionLabel = selectedActivity?.nameId?.let { stringResource(it) }
+                    selectionLabel = selectedActivityType?.nameId?.let { stringResource(it) }
                 ) {
-                    for (activities in ActivityType.BY_CLASS.values) {
-                        LazyRow {
-                            items(activities) { activityType ->
-                                FilterChip(
-                                    selected = activityType == selectedActivity,
-                                    onClick = { selectedActivity = activityType },
-                                    label = {
-                                        Text(
-                                            activityType.emoji,
-                                            style = MaterialTheme.typography.headlineMedium
-                                        )
-                                    },
-                                    modifier = Modifier.padding(horizontal = 4.dp)
-                                )
-                            }
-                        }
-                    }
+                    ActivityTypeSelector(
+                        { it == selectedActivityType },
+                        onSelect = { selectedActivityType = it })
                 }
 
-                AnimatedVisibility(selectedActivity?.hasVehicle == true) {
+                AnimatedVisibility(selectedActivityType?.hasVehicle == true) {
                     OptionGroup(
                         label = stringResource(R.string.select_vehicle),
                         selectionLabel = selectedVehicle?.nameId?.let { stringResource(it) }
@@ -207,7 +194,7 @@ fun NewActivity(
                     labelId = R.string.datetime_start
                 )
 
-                AnimatedVisibility(visible = selectedActivity?.hasDuration == true) {
+                AnimatedVisibility(visible = selectedActivityType?.hasDuration == true) {
                     DateTimeInput(
                         state = endDateTimePickerState,
                         localizationRepository = viewModel.localizationRepository,
@@ -224,7 +211,7 @@ fun NewActivity(
                     onClick = {
                         val newActivity = when (activity) {
                             null -> Activity(
-                                type = selectedActivity!!,
+                                type = selectedActivityType!!,
                                 vehicle = selectedVehicle,
                                 description = description,
                                 startTime = startDateTimePickerState.selectedDate(),
@@ -232,7 +219,7 @@ fun NewActivity(
                             )
 
                             else -> activity.copy(
-                                type = selectedActivity!!,
+                                type = selectedActivityType!!,
                                 vehicle = selectedVehicle,
                                 description = description,
                                 startTime = startDateTimePickerState.selectedDate(),
@@ -246,31 +233,6 @@ fun NewActivity(
                     Text(stringResource(R.string.save))
                 }
             }
-        }
-    }
-}
-
-@Composable
-fun OptionGroup(
-    label: String,
-    selectionLabel: String? = null,
-    content: @Composable () -> Unit
-) {
-    Surface(
-        color = MaterialTheme.colorScheme.surfaceContainerHigh,
-        shape = MaterialTheme.shapes.small,
-        modifier = Modifier
-            .padding(vertical = 4.dp)
-            .fillMaxWidth()
-    ) {
-        Column {
-            Text(
-                selectionLabel ?: label,
-                style = MaterialTheme.typography.labelSmall,
-                color = if (selectionLabel != null) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.secondary,
-                modifier = Modifier.padding(start = 4.dp)
-            )
-            content()
         }
     }
 }

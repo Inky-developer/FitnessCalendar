@@ -52,12 +52,14 @@ fun ActivityCard(
 
     val activityName = stringResource(activity.type.nameId)
 
-    val title = "${activity.type.emoji} $activityName"
-    val time = localizationRepository.dateFormatter.formatDate(
-        activity.startTime.time,
-        Locale.getDefault()
-    )!!
-    val timeElapsed = activity.startTime until activity.endTime
+    val title = remember { "${activity.type.emoji} $activityName" }
+    val time = remember {
+        localizationRepository.dateFormatter.formatDate(
+            activity.startTime.time,
+            Locale.getDefault()
+        )!!
+    }
+    val timeElapsed = remember { activity.startTime until activity.endTime }
 
     val haptics = LocalHapticFeedback.current
 
@@ -123,7 +125,6 @@ fun ActivityCard(
             HorizontalDivider()
             Text(
                 activity.description,
-//                maxLines = 3,
                 overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(all = 8.dp)

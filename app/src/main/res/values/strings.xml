@@ -35,4 +35,8 @@
     <string name="select_activity">Select activity…</string>
     <string name="select_vehicle">Select vehicle…</string>
     <string name="activity_note">Note</string>
+    <string name="filter">filter</string>
+    <string name="search_for_activity">Search for activity</string>
+    <string name="no_activities_with_filter">No activities that match the filter</string>
+    <string name="reset_filters">Reset filters</string>
 </resources>

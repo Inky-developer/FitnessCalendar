@@ -1,5 +1,8 @@
 package com.inky.fitnesscalendar.ui.views
 
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -18,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Menu
+import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -35,6 +39,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -55,22 +60,32 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.Activity
+import com.inky.fitnesscalendar.data.ActivityFilter
 import com.inky.fitnesscalendar.ui.components.ActivityCard
 import com.inky.fitnesscalendar.view_model.TodayViewModel
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
+@OptIn(
+    ExperimentalMaterial3Api::class,
+    ExperimentalFoundationApi::class,
+    ExperimentalSharedTransitionApi::class
+)
 @Composable
 fun Today(
     viewModel: TodayViewModel = hiltViewModel(),
+    filter: ActivityFilter,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope,
     isNewActivityOpen: Boolean,
     onNewActivity: () -> Unit,
     onEditActivity: (Activity) -> Unit,
+    onFilter: () -> Unit,
 ) {
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
     val activityListState = rememberLazyListState()
-    val activities by viewModel.repository.getActivities().collectAsState(initial = emptyList())
+    val activities by viewModel.repository.getActivities(filter)
+        .collectAsState(initial = emptyList())
 
     // Detect when a new activity was inserted and scroll to it
     var latestActivity by remember { mutableStateOf(activities.firstOrNull()) }
@@ -124,27 +139,40 @@ fun Today(
         }
     }) {
         Scaffold(topBar = {
-            CenterAlignedTopAppBar(title = { Text(stringResource(R.string.app_name)) },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                ),
-                navigationIcon = {
-                    IconButton(onClick = {
-                        scope.launch {
-                            if (drawerState.isClosed) {
-                                drawerState.open()
-                            } else {
-                                drawerState.close()
+            with(sharedTransitionScope) {
+                CenterAlignedTopAppBar(
+                    title = { Text(stringResource(R.string.today)) },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    ),
+                    navigationIcon = {
+                        IconButton(onClick = {
+                            scope.launch {
+                                if (drawerState.isClosed) {
+                                    drawerState.open()
+                                } else {
+                                    drawerState.close()
+                                }
                             }
+                        }) {
+                            Icon(
+                                imageVector = Icons.Outlined.Menu,
+                                contentDescription = stringResource(R.string.Menu),
+                            )
                         }
-                    }) {
-                        Icon(
-                            imageVector = Icons.Outlined.Menu,
-                            contentDescription = stringResource(R.string.Menu)
-                        )
-                    }
-                })
+                    },
+                    actions = {
+                        IconButton(onClick = { onFilter() }) {
+                            Icon(Icons.Outlined.Search, stringResource(R.string.filter))
+                        }
+                    },
+                    modifier = Modifier.sharedBounds(
+                        rememberSharedContentState(key = "appBar"),
+                        animatedVisibilityScope = animatedContentScope
+                    )
+                )
+            }
         }, floatingActionButton = {
             NewActivityFAB(onClick = {
                 onNewActivity()
@@ -187,8 +215,10 @@ fun Today(
                             .aspectRatio(1f)
                             .align(Alignment.CenterVertically)
                     )
+                    val textId =
+                        if (filter.isEmpty()) R.string.no_activities_yet else R.string.no_activities_with_filter
                     Text(
-                        stringResource(R.string.no_activities_yet),
+                        stringResource(textId),
                         style = MaterialTheme.typography.displaySmall,
                         modifier = Modifier.align(Alignment.CenterVertically)
                     )
@@ -208,8 +238,7 @@ fun NewActivityFAB(onClick: () -> Unit, menuOpen: Boolean) {
         }, label = "fab_rotation"
     )
     FloatingActionButton(
-        onClick = onClick,
-        containerColor = MaterialTheme.colorScheme.primaryContainer
+        onClick = onClick, containerColor = MaterialTheme.colorScheme.primaryContainer
     ) {
         Icon(
             Icons.Filled.Add,
