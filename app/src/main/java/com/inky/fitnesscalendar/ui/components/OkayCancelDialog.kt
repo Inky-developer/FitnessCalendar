@@ -14,17 +14,22 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import com.inky.fitnesscalendar.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OkayCancelDialog(onDismiss: () -> Unit, onOkay: () -> Unit, content: @Composable () -> Unit) {
-    BasicAlertDialog(onDismissRequest = onDismiss) {
+    BasicAlertDialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
         Surface(
             color = MaterialTheme.colorScheme.primaryContainer,
-            shape = MaterialTheme.shapes.extraLarge
+            shape = MaterialTheme.shapes.extraLarge,
+            modifier = Modifier.padding(all = 8.dp)
         ) {
-            Column(modifier = Modifier.padding(all = 8.dp)) {
+            Column {
                 content()
 
                 Row(modifier = Modifier.align(Alignment.End)) {
