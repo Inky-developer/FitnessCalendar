@@ -66,7 +66,7 @@ fun ActivityLog(
 ) {
     val scope = rememberCoroutineScope()
     val activityListState = rememberLazyListState()
-    val activities by viewModel.repository.getActivities(filter)
+    val activities by remember(filter) { viewModel.repository.getActivities(filter) }
         .collectAsState(initial = emptyList())
 
     // Detect when a new activity was inserted and scroll to it
