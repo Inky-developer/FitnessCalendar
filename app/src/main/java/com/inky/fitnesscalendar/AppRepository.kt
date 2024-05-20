@@ -18,7 +18,7 @@ class AppRepository @Inject constructor(
     private val activityDao: ActivityDao,
     val localizationRepository: LocalizationRepository
 ) {
-    fun getActivities(): Flow<List<Activity>> = activityDao.getAll()
+    suspend fun loadAllActivities() = activityDao.loadAllActivities()
 
     fun getActivities(filter: ActivityFilter): Flow<List<Activity>> {
         val searchTypes = filter.text?.let { filterText ->

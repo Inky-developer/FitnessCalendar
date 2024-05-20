@@ -13,7 +13,7 @@ import java.util.Date
 @Dao
 interface ActivityDao {
     @Query("SELECT * FROM Activity ORDER BY start_time DESC")
-    fun getAll(): Flow<List<Activity>>
+    suspend fun loadAllActivities(): List<Activity>
 
     @Query(
         "SELECT * FROM ACTIVITY WHERE " +

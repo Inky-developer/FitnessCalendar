@@ -3,12 +3,20 @@ package com.inky.fitnesscalendar.ui.views
 import android.os.Bundle
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
+import com.inky.fitnesscalendar.R
 
 
-abstract class View(
+enum class View(
+    val nameId: Int,
     private val navId: String,
     private val arguments: List<Argument<*>> = emptyList()
 ) {
+    Today(R.string.today, "today"),
+    FilterActivity(R.string.filter, "filter_activity"),
+    NewActivity(R.string.new_activity, "new_activity", listOf(Argument.ACTIVITY_ID)),
+    ImportExport(R.string.import_export, "import_export"),
+    Settings(R.string.settings, "settings");
+
     fun getPath(): String = if (arguments.isEmpty()) {
         pathTemplate()
     } else {
@@ -30,13 +38,6 @@ abstract class View(
             type = it.type
             nullable = it.nullable
         }
-    }
-
-    companion object {
-        val TODAY = object : View("today") {}
-        val FILTER_ACTIVITY = object : View("filter_activity") {}
-        val NEW_ACTIVITY = object : View("new_activity", listOf(Argument.ACTIVITY_ID)) {}
-        val SETTINGS = object : View("settings") {}
     }
 
     abstract class Argument<T>(

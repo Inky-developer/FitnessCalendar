@@ -3,7 +3,9 @@ package com.inky.fitnesscalendar.ui
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -17,7 +19,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
 import com.inky.fitnesscalendar.data.ActivityFilter
+import com.inky.fitnesscalendar.ui.components.NavigationDrawer
 import com.inky.fitnesscalendar.ui.views.FilterActivity
+import com.inky.fitnesscalendar.ui.views.ImportExport
 import com.inky.fitnesscalendar.ui.views.NewActivity
 import com.inky.fitnesscalendar.ui.views.Today
 import com.inky.fitnesscalendar.ui.views.View
@@ -31,59 +35,92 @@ fun App(viewModel: AppViewModel = hiltViewModel()) {
     val navController = rememberNavController()
     val scope = rememberCoroutineScope()
 
-    var isNewActivityDialogOpen by rememberSaveable { mutableStateOf(false) }
     // TODO: Make saveable
     var filterState by remember { mutableStateOf(ActivityFilter()) }
+    val navigationDrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    val openDrawer = {
+        scope.launch {
+            if (navigationDrawerState.isClosed) {
+                navigationDrawerState.open()
+            } else {
+                navigationDrawerState.close()
+            }
+        }
+        Unit
+    }
+    var currentView by rememberSaveable { mutableStateOf<View?>(null) }
 
-    SharedTransitionLayout {
-        NavHost(navController = navController, startDestination = View.TODAY.getPath()) {
-            composable(View.TODAY.pathTemplate()) {
-                Today(
-                    filter = filterState,
-                    sharedTransitionScope = this@SharedTransitionLayout,
-                    animatedContentScope = this@composable,
-                    onNewActivity = {
-                        navController.navigate(View.NEW_ACTIVITY.getPath(-1))
-                    },
-                    onEditActivity = {
-                        navController.navigate(View.NEW_ACTIVITY.getPath(it.uid ?: -1))
-                    },
-                    onFilter = {
-                        navController.navigate(View.FILTER_ACTIVITY.getPath())
-                    },
-                    isNewActivityOpen = isNewActivityDialogOpen
-                )
+    NavigationDrawer(
+        drawerState = navigationDrawerState,
+        currentView = currentView,
+        onNavigate = {
+            navController.navigate(it.getPath()) {
+                popUpTo(it.getPath()) {
+                    inclusive = true
+                }
             }
-            composable(View.FILTER_ACTIVITY.pathTemplate(), enterTransition = {
-                slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Up)
-            }, exitTransition = {
-                slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Down)
-            }) {
-                FilterActivity(filterState,
-                    onFilterChange = { filterState = it },
-                    sharedTransitionScope = this@SharedTransitionLayout,
-                    animatedContentScope = this@composable,
-                    onBack = { navController.popBackStack() })
+            scope.launch {
+                navigationDrawerState.close()
             }
-            dialog(
-                View.NEW_ACTIVITY.pathTemplate(), arguments = View.NEW_ACTIVITY.navArgs()
-            ) { backStackEntry ->
-                isNewActivityDialogOpen = true
-                val activityId =
-                    backStackEntry.arguments?.let { View.Argument.ACTIVITY_ID.extract(it) }
-                NewActivity(activityId, onSave = {
-                    scope.launch {
-                        viewModel.repository.saveActivity(it)
-                    }
-                    isNewActivityDialogOpen = false
-                    navController.popBackStack()
-                }, onNavigateBack = {
-                    isNewActivityDialogOpen = false
-                    navController.popBackStack()
-                })
-            }
-            composable(View.SETTINGS.pathTemplate()) {
-                Text("Settings")
+        }) {
+        SharedTransitionLayout {
+            NavHost(navController = navController, startDestination = View.Today.getPath()) {
+                composable(View.Today.pathTemplate()) {
+                    currentView = View.Today
+                    Today(
+                        filter = filterState,
+                        sharedTransitionScope = this@SharedTransitionLayout,
+                        animatedContentScope = this@composable,
+                        onOpenDrawer = openDrawer,
+                        onNewActivity = {
+                            navController.navigate(View.NewActivity.getPath(-1))
+                        },
+                        onEditActivity = {
+                            navController.navigate(View.NewActivity.getPath(it.uid ?: -1))
+                        },
+                        onFilter = {
+                            navController.navigate(View.FilterActivity.getPath())
+                        },
+                        isNewActivityOpen = currentView == View.NewActivity
+                    )
+                }
+                composable(View.FilterActivity.pathTemplate(), enterTransition = {
+                    slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Up)
+                }, exitTransition = {
+                    slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Down)
+                }) {
+                    currentView = View.FilterActivity
+                    FilterActivity(filterState,
+                        onFilterChange = { filterState = it },
+                        sharedTransitionScope = this@SharedTransitionLayout,
+                        animatedContentScope = this@composable,
+                        onBack = { navController.popBackStack() })
+                }
+                dialog(
+                    View.NewActivity.pathTemplate(), arguments = View.NewActivity.navArgs()
+                ) { backStackEntry ->
+                    currentView = View.NewActivity
+                    val activityId =
+                        backStackEntry.arguments?.let { View.Argument.ACTIVITY_ID.extract(it) }
+                    NewActivity(activityId, onSave = {
+                        scope.launch {
+                            viewModel.repository.saveActivity(it)
+                        }
+                        navController.popBackStack()
+                    }, onNavigateBack = {
+                        navController.popBackStack()
+                    })
+                }
+                composable(View.ImportExport.pathTemplate()) {
+                    currentView = View.ImportExport
+                    ImportExport(
+                        onOpenDrawer = openDrawer
+                    )
+                }
+                composable(View.Settings.pathTemplate()) {
+                    currentView = View.Settings
+                    Text("Settings")
+                }
             }
         }
     }
