@@ -93,14 +93,14 @@ fun NewActivity(
 
     var selectedActivityType by rememberSaveable { mutableStateOf(activity?.type) }
     var selectedVehicle by rememberSaveable { mutableStateOf(activity?.vehicle) }
-    val startDateTimePickerState by rememberSaveable {
+    val startDateTimePickerState by rememberSaveable(stateSaver = DateTimePickerState.SAVER) {
         mutableStateOf(
             DateTimePickerState(
                 initialDateTime = activity?.startTime?.time ?: Instant.now().toEpochMilli()
             )
         )
     }
-    val endDateTimePickerState by rememberSaveable {
+    val endDateTimePickerState by rememberSaveable(stateSaver = DateTimePickerState.SAVER) {
         mutableStateOf(
             DateTimePickerState(
                 initialDateTime = activity?.endTime?.time

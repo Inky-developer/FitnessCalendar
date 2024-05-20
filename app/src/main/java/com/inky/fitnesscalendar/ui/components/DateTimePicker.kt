@@ -1,7 +1,5 @@
 package com.inky.fitnesscalendar.ui.components
 
-import android.os.Parcel
-import android.os.Parcelable
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TimePicker
@@ -11,6 +9,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.listSaver
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.Date
@@ -20,7 +20,7 @@ enum class DateTimePickerDialogState {
     Closed, Date, Time
 }
 
-class DateTimePickerState(initialDateTime: Long = Instant.now().toEpochMilli()) : Parcelable {
+class DateTimePickerState(initialDateTime: Long = Instant.now().toEpochMilli()) {
     private var _initialDateTime = mutableLongStateOf(initialDateTime)
     private var _selectedDateTime = mutableLongStateOf(initialDateTime)
     private var _dialogState: MutableState<DateTimePickerDialogState> =
@@ -45,10 +45,10 @@ class DateTimePickerState(initialDateTime: Long = Instant.now().toEpochMilli()) 
             _dialogState.value = newState
         }
 
-    constructor(parcel: Parcel) : this() {
-        _initialDateTime = mutableLongStateOf(parcel.readLong())
-        _selectedDateTime = mutableLongStateOf(parcel.readLong())
-        _dialogState = mutableStateOf(DateTimePickerDialogState.entries[parcel.readInt()])
+    private constructor(storedState: List<Any>) : this() {
+        _initialDateTime = mutableLongStateOf(storedState[0] as Long)
+        _selectedDateTime = mutableLongStateOf(storedState[1] as Long)
+        _dialogState = mutableStateOf(DateTimePickerDialogState.entries[storedState[2] as Int])
     }
 
     fun selectedDate(): Date = Date.from(Instant.ofEpochMilli(selectedDateTime))
@@ -65,24 +65,11 @@ class DateTimePickerState(initialDateTime: Long = Instant.now().toEpochMilli()) 
         dialogState = DateTimePickerDialogState.Closed
     }
 
-    override fun writeToParcel(parcel: Parcel, flags: Int) {
-        parcel.writeLong(_initialDateTime.longValue)
-        parcel.writeLong(_selectedDateTime.longValue)
-        parcel.writeInt(_dialogState.value.ordinal)
-    }
-
-    override fun describeContents(): Int {
-        return 0
-    }
-
-    companion object CREATOR : Parcelable.Creator<DateTimePickerState> {
-        override fun createFromParcel(parcel: Parcel): DateTimePickerState {
-            return DateTimePickerState(parcel)
-        }
-
-        override fun newArray(size: Int): Array<DateTimePickerState?> {
-            return arrayOfNulls(size)
-        }
+    companion object {
+        val SAVER: Saver<DateTimePickerState, *> = listSaver(
+            save = { listOf(it.initialDateTime, it.selectedDateTime, it.dialogState.ordinal) },
+            restore = { DateTimePickerState(it) }
+        )
     }
 }
 
