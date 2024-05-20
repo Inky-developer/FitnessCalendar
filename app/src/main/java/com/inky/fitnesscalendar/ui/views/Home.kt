@@ -2,13 +2,15 @@ package com.inky.fitnesscalendar.ui.views
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -22,7 +24,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -31,18 +32,15 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.inky.fitnesscalendar.AppRepository
 import com.inky.fitnesscalendar.R
-import com.inky.fitnesscalendar.data.ActivityFilter
+import com.inky.fitnesscalendar.data.Activity
 import com.inky.fitnesscalendar.data.ActivityStatistics
+import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.CompactActivityCard
 import com.inky.fitnesscalendar.ui.components.NewActivityFAB
 import com.inky.fitnesscalendar.util.Duration
 import com.inky.fitnesscalendar.util.Duration.Companion.until
 import com.inky.fitnesscalendar.view_model.TodayViewModel
-import java.time.Instant
-import java.time.temporal.ChronoUnit
-import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -53,6 +51,11 @@ fun Home(
     onNavigateActivity: () -> Unit,
     onOpenDrawer: () -> Unit
 ) {
+    val weeklyStats by viewModel.weekStats.collectAsState(initial = null)
+    val monthlyStats by viewModel.monthStats.collectAsState(initial = null)
+    val activitiesToday by viewModel.activitiesToday.collectAsState(initial = null)
+    val scrollState = rememberScrollState()
+
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -79,44 +82,27 @@ fun Home(
             NewActivityFAB(onClick = onNewActivity, menuOpen = isNewActivityOpen)
         }
     ) { paddingValues ->
-        Column(modifier = Modifier.padding(paddingValues)) {
-            val filterThisWeek = remember {
-                ActivityFilter(
-                    startRangeDate = Date.from(
-                        Instant.ofEpochMilli(
-                            Instant.now().toEpochMilli() - ChronoUnit.WEEKS.duration.toMillis() * 7
-                        )
-                    )
-                )
-            }
-            val weeklyActivities by viewModel.repository.getActivities(filterThisWeek)
-                .collectAsState(initial = emptyList())
-            val weeklyStats by remember {
-                derivedStateOf { ActivityStatistics(weeklyActivities) }
-            }
-            Statistics(stringResource(R.string.this_week), weeklyStats)
+        Column(
+            modifier = Modifier
+                .padding(paddingValues)
+                .verticalScroll(scrollState)
+        ) {
+            StatisticsIfNotNull(stringResource(R.string.this_week), weeklyStats)
+            StatisticsIfNotNull(stringResource(R.string.this_month), monthlyStats)
 
-            val filterThisMonth = remember {
-                ActivityFilter(
-                    startRangeDate = Date.from(
-                        Instant.ofEpochMilli(
-                            Instant.now().toEpochMilli() - ChronoUnit.MONTHS.duration.toMillis() * 1
-                        )
-                    )
-                )
-            }
-            val monthlyActivities by viewModel.repository.getActivities(filterThisWeek)
-                .collectAsState(initial = emptyList())
-            val monthlyStats by remember {
-                derivedStateOf { ActivityStatistics(monthlyActivities) }
-            }
-            Statistics(stringResource(R.string.this_month), monthlyStats)
-
-            ActivitiesToday(
-                repository = viewModel.repository,
+            ActivitiesTodayOrNull(
+                activities = activitiesToday,
+                localizationRepository = viewModel.repository.localizationRepository,
                 onNavigateActivity = onNavigateActivity
             )
         }
+    }
+}
+
+@Composable
+fun StatisticsIfNotNull(name: String, stats: ActivityStatistics?) {
+    if (stats != null) {
+        Statistics(name = name, stats = stats)
     }
 }
 
@@ -135,59 +121,76 @@ fun Statistics(name: String, stats: ActivityStatistics) {
             style = MaterialTheme.typography.displayLarge,
             modifier = Modifier.padding(horizontal = 8.dp)
         )
-        for ((activityClass, activities) in stats.activitiesByClass) {
-            if (activities.isEmpty()) {
-                continue
-            }
+        if (stats.activities.isNotEmpty()) {
+            for ((activityClass, activities) in stats.activitiesByClass) {
+                if (activities.isEmpty()) {
+                    continue
+                }
 
-            val durationString by remember {
-                derivedStateOf {
+                val durationString = remember(key1 = activities) {
                     Duration(activities.map { it.startTime until it.endTime }
                         .sumOf { it.elapsedMs }).format()
 
                 }
-            }
 
-            Row(
-                modifier = Modifier
-                    .padding(all = 8.dp)
-                    .fillMaxWidth()
-            ) {
-                Text(
-                    activityClass.emoji + stringResource(activityClass.nameId),
-                    modifier = Modifier.weight(1f)
-                )
-                Text(
-                    pluralStringResource(
-                        R.plurals.num_activities,
-                        activities.size,
-                        activities.size
-                    ),
-                    modifier = Modifier.weight(1f)
-                )
-                Row(modifier = Modifier.weight(1f)) {
-                    Icon(
-                        painterResource(R.drawable.outline_timer_24),
-                        stringResource(R.string.time)
+                Row(
+                    modifier = Modifier
+                        .padding(all = 8.dp)
+                        .fillMaxWidth()
+                ) {
+                    Text(
+                        activityClass.emoji + stringResource(activityClass.nameId),
+                        modifier = Modifier.weight(1f)
                     )
-                    Text(durationString)
+                    Text(
+                        pluralStringResource(
+                            R.plurals.num_activities,
+                            activities.size,
+                            activities.size
+                        ),
+                        modifier = Modifier.weight(1f)
+                    )
+                    Row(modifier = Modifier.weight(1f)) {
+                        Icon(
+                            painterResource(R.drawable.outline_timer_24),
+                            stringResource(R.string.time)
+                        )
+                        Text(durationString)
+                    }
                 }
+            }
+        } else {
+            Row(modifier = Modifier.padding(all = 8.dp)) {
+                Icon(Icons.Outlined.Info, stringResource(R.string.info))
+                Text("No activities in this period", modifier = Modifier.padding(start = 4.dp))
             }
         }
     }
 }
 
+@Composable
+fun ActivitiesTodayOrNull(
+    activities: List<Activity>?,
+    localizationRepository: LocalizationRepository,
+    onNavigateActivity: () -> Unit
+) {
+    if (activities != null) {
+        ActivitiesToday(
+            activities = activities,
+            localizationRepository = localizationRepository,
+            onNavigateActivity = onNavigateActivity
+        )
+    }
+}
+
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ActivitiesToday(repository: AppRepository, onNavigateActivity: () -> Unit) {
-    val filterToday = remember { ActivityFilter.atDay(Instant.now()) }
-    val activitiesToday by repository.getActivities(filterToday)
-        .collectAsState(initial = emptyList())
-    val isEmpty by remember {
-        derivedStateOf {
-            activitiesToday.isEmpty()
-        }
-    }
+fun ActivitiesToday(
+    activities: List<Activity>,
+    localizationRepository: LocalizationRepository,
+    onNavigateActivity: () -> Unit
+) {
+    val isEmpty = activities.isEmpty()
 
     AnimatedVisibility(visible = !isEmpty) {
         Card(
@@ -199,21 +202,23 @@ fun ActivitiesToday(repository: AppRepository, onNavigateActivity: () -> Unit) {
                 .padding(all = 8.dp)
                 .fillMaxWidth()
         ) {
-            LazyColumn {
-                stickyHeader {
-                    Text(
-                        stringResource(R.string.today),
-                        color = MaterialTheme.colorScheme.onSecondaryContainer,
-                        style = MaterialTheme.typography.displayLarge,
-                        modifier = Modifier.padding(horizontal = 8.dp)
+            Text(
+                stringResource(R.string.today),
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                style = MaterialTheme.typography.displayLarge,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp)
+                    .background(
+                        MaterialTheme.colorScheme.secondaryContainer,
                     )
-                }
-                items(activitiesToday, key = { it.uid ?: -1 }) { activity ->
-                    CompactActivityCard(
-                        activity = activity,
-                        localizationRepository = repository.localizationRepository
-                    )
-                }
+            )
+
+            for (activity in activities) {
+                CompactActivityCard(
+                    activity = activity,
+                    localizationRepository = localizationRepository
+                )
             }
         }
     }
