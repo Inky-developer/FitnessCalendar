@@ -5,17 +5,14 @@ import android.os.Parcelable
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TimePicker
-import androidx.compose.material3.TimePickerState
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import java.time.Instant
 import java.time.temporal.ChronoUnit
-import java.util.Calendar
 import java.util.Date
 import java.util.TimeZone
 
@@ -97,7 +94,7 @@ fun DateTimePicker(
 ) {
     // TODO: Make the date and time pickers show the correct initial values
     val datePickerState =
-        rememberDatePickerState(initialSelectedDateMillis = state.selectedDateTime)
+        rememberDatePickerState()
     val timePickerState = rememberTimePickerState()
 
     if (state.isOpen()) {

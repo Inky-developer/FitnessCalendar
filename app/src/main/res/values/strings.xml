@@ -41,4 +41,15 @@
     <string name="reset_filters">Reset filters</string>
     <string name="import_export"><![CDATA[Import & Export]]></string>
     <string name="export">Export</string>
+    <string name="activity_log">Activity Log</string>
+    <string name="this_week">This Week</string>
+    <string name="sports">Sports</string>
+    <string name="travel">Travel</string>
+    <string name="other">Other</string>
+    <string name="total_time">⏱ %1$s</string>
+    <string name="this_month">This month</string>
+    <plurals name="num_activities">
+        <item quantity="one">%1d activity</item>
+        <item quantity="other">%1d activities</item>
+    </plurals>
 </resources>

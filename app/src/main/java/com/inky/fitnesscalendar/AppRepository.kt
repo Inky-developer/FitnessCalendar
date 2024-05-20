@@ -1,6 +1,7 @@
 package com.inky.fitnesscalendar
 
 import android.content.Context
+import androidx.compose.runtime.Stable
 import com.inky.fitnesscalendar.data.Activity
 import com.inky.fitnesscalendar.data.ActivityFilter
 import com.inky.fitnesscalendar.data.ActivityType
@@ -13,6 +14,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
+@Stable
 class AppRepository @Inject constructor(
     @ApplicationContext val context: Context,
     private val activityDao: ActivityDao,

@@ -11,6 +11,7 @@ enum class View(
     private val navId: String,
     private val arguments: List<Argument<*>> = emptyList()
 ) {
+    Home(R.string.today, "home"),
     ActivityLog(R.string.activity_log, "activity_log"),
     FilterActivity(R.string.filter, "filter_activity"),
     NewActivity(R.string.new_activity, "new_activity", listOf(Argument.ACTIVITY_ID)),

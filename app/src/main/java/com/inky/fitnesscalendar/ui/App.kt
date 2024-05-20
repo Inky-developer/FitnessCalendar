@@ -20,10 +20,11 @@ import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
 import com.inky.fitnesscalendar.data.ActivityFilter
 import com.inky.fitnesscalendar.ui.components.NavigationDrawer
+import com.inky.fitnesscalendar.ui.views.ActivityLog
 import com.inky.fitnesscalendar.ui.views.FilterActivity
 import com.inky.fitnesscalendar.ui.views.ImportExport
 import com.inky.fitnesscalendar.ui.views.NewActivity
-import com.inky.fitnesscalendar.ui.views.ActivityLog
+import com.inky.fitnesscalendar.ui.views.Home
 import com.inky.fitnesscalendar.ui.views.View
 import com.inky.fitnesscalendar.view_model.AppViewModel
 import kotlinx.coroutines.launch
@@ -49,6 +50,7 @@ fun App(viewModel: AppViewModel = hiltViewModel()) {
         Unit
     }
     var currentView by rememberSaveable { mutableStateOf<View?>(null) }
+    var isNewActivityOpen by rememberSaveable { mutableStateOf(false) }
 
     NavigationDrawer(
         drawerState = navigationDrawerState,
@@ -64,7 +66,18 @@ fun App(viewModel: AppViewModel = hiltViewModel()) {
             }
         }) {
         SharedTransitionLayout {
-            NavHost(navController = navController, startDestination = View.ActivityLog.getPath()) {
+            NavHost(navController = navController, startDestination = View.Home.getPath()) {
+                composable(View.Home.pathTemplate()) {
+                    currentView = View.Home
+                    Home(
+                        isNewActivityOpen = isNewActivityOpen,
+                        onNewActivity = { navController.navigate(View.NewActivity.getPath(-1)) },
+                        onNavigateActivity = {
+                            navController.navigate(View.ActivityLog.getPath())
+                        },
+                        onOpenDrawer = openDrawer
+                    )
+                }
                 composable(View.ActivityLog.pathTemplate()) {
                     currentView = View.ActivityLog
                     ActivityLog(
@@ -81,7 +94,7 @@ fun App(viewModel: AppViewModel = hiltViewModel()) {
                         onFilter = {
                             navController.navigate(View.FilterActivity.getPath())
                         },
-                        isNewActivityOpen = currentView == View.NewActivity
+                        isNewActivityOpen = isNewActivityOpen
                     )
                 }
                 composable(View.FilterActivity.pathTemplate(), enterTransition = {
@@ -100,14 +113,17 @@ fun App(viewModel: AppViewModel = hiltViewModel()) {
                     View.NewActivity.pathTemplate(), arguments = View.NewActivity.navArgs()
                 ) { backStackEntry ->
                     currentView = View.NewActivity
+                    isNewActivityOpen = true
                     val activityId =
                         backStackEntry.arguments?.let { View.Argument.ACTIVITY_ID.extract(it) }
                     NewActivity(activityId, onSave = {
                         scope.launch {
                             viewModel.repository.saveActivity(it)
                         }
+                        isNewActivityOpen = false
                         navController.popBackStack()
                     }, onNavigateBack = {
+                        isNewActivityOpen = false
                         navController.popBackStack()
                     })
                 }
