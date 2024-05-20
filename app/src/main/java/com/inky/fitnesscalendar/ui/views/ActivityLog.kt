@@ -47,7 +47,7 @@ import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.Activity
 import com.inky.fitnesscalendar.data.ActivityFilter
 import com.inky.fitnesscalendar.ui.components.ActivityCard
-import com.inky.fitnesscalendar.view_model.TodayViewModel
+import com.inky.fitnesscalendar.view_model.ActivityLogViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(
@@ -56,8 +56,8 @@ import kotlinx.coroutines.launch
     ExperimentalSharedTransitionApi::class
 )
 @Composable
-fun Today(
-    viewModel: TodayViewModel = hiltViewModel(),
+fun ActivityLog(
+    viewModel: ActivityLogViewModel = hiltViewModel(),
     filter: ActivityFilter,
     sharedTransitionScope: SharedTransitionScope,
     animatedContentScope: AnimatedContentScope,
@@ -85,7 +85,7 @@ fun Today(
     Scaffold(topBar = {
         with(sharedTransitionScope) {
             CenterAlignedTopAppBar(
-                title = { Text(stringResource(R.string.today)) },
+                title = { Text(stringResource(R.string.activity_log)) },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer

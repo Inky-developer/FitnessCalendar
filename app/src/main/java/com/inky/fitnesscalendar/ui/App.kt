@@ -23,7 +23,7 @@ import com.inky.fitnesscalendar.ui.components.NavigationDrawer
 import com.inky.fitnesscalendar.ui.views.FilterActivity
 import com.inky.fitnesscalendar.ui.views.ImportExport
 import com.inky.fitnesscalendar.ui.views.NewActivity
-import com.inky.fitnesscalendar.ui.views.Today
+import com.inky.fitnesscalendar.ui.views.ActivityLog
 import com.inky.fitnesscalendar.ui.views.View
 import com.inky.fitnesscalendar.view_model.AppViewModel
 import kotlinx.coroutines.launch
@@ -64,10 +64,10 @@ fun App(viewModel: AppViewModel = hiltViewModel()) {
             }
         }) {
         SharedTransitionLayout {
-            NavHost(navController = navController, startDestination = View.Today.getPath()) {
-                composable(View.Today.pathTemplate()) {
-                    currentView = View.Today
-                    Today(
+            NavHost(navController = navController, startDestination = View.ActivityLog.getPath()) {
+                composable(View.ActivityLog.pathTemplate()) {
+                    currentView = View.ActivityLog
+                    ActivityLog(
                         filter = filterState,
                         sharedTransitionScope = this@SharedTransitionLayout,
                         animatedContentScope = this@composable,

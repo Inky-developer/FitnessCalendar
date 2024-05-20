@@ -36,7 +36,7 @@ fun NavigationDrawer(
     onNavigate: (View) -> Unit,
     content: @Composable () -> Unit
 ) {
-    val selectableViews = listOf(View.Today, View.ImportExport, View.Settings)
+    val selectableViews = listOf(View.ActivityLog, View.ImportExport, View.Settings)
 
     ModalNavigationDrawer(drawerState = drawerState, drawerContent = {
         ModalDrawerSheet(drawerContainerColor = MaterialTheme.colorScheme.primaryContainer) {

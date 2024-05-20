@@ -7,5 +7,5 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import javax.inject.Inject
 
 @HiltViewModel
-class TodayViewModel @Inject constructor(private val handle: SavedStateHandle, val repository: AppRepository): ViewModel() {
+class ActivityLogViewModel @Inject constructor(private val handle: SavedStateHandle, val repository: AppRepository): ViewModel() {
 }
