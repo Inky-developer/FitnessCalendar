@@ -1,5 +1,7 @@
 package com.inky.fitnesscalendar.data
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -7,12 +9,13 @@ import java.time.ZoneId
 import java.util.Date
 
 
+@Parcelize
 data class ActivityFilter(
     val types: List<ActivityType> = emptyList(),
     val text: String? = null,
     val startRangeDate: Date? = null,
     val endRangeDate: Date? = null
-) {
+) : Parcelable {
     fun isEmpty() = this == ActivityFilter()
 
     companion object {

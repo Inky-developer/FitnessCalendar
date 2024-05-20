@@ -36,8 +36,7 @@ fun App(viewModel: AppViewModel = hiltViewModel()) {
     val navController = rememberNavController()
     val scope = rememberCoroutineScope()
 
-    // TODO: Make saveable
-    var filterState by remember { mutableStateOf(ActivityFilter()) }
+    var filterState by rememberSaveable { mutableStateOf(ActivityFilter()) }
     val navigationDrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val openDrawer = {
         scope.launch {
