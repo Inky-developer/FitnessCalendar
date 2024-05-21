@@ -1,5 +1,8 @@
 package com.inky.fitnesscalendar.ui.components
 
+import androidx.compose.animation.AnimatedContentScope
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -36,12 +39,15 @@ import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.Activity
 import com.inky.fitnesscalendar.localization.LocalizationRepository
+import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.util.Duration.Companion.until
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalSharedTransitionApi::class)
 @Composable
 fun ActivityCard(
     activity: Activity,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope,
     onDelete: () -> Unit,
     onEdit: (Activity) -> Unit,
     localizationRepository: LocalizationRepository,
@@ -59,72 +65,79 @@ fun ActivityCard(
 
     val haptics = LocalHapticFeedback.current
 
-    Card(
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(all = 8.dp)
-            .combinedClickable(
-                onClick = { onEdit(activity) },
-                onLongClick = {
-                    haptics.performHapticFeedback(HapticFeedbackType.LongPress)
-                    showContextMenu = true
-                },
-            ),
-    ) {
-        Text(
-            time,
-            style = MaterialTheme.typography.titleSmall,
-            color = MaterialTheme.colorScheme.secondary,
-            modifier = Modifier
-                .align(Alignment.End)
-                .padding(horizontal = 4.dp)
-        )
-        Text(
-            title,
-            style = MaterialTheme.typography.displayMedium,
-            color = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(horizontal = 4.dp)
-        )
-
-        if (activity.vehicle != null || timeElapsed.elapsedMs > 0) {
-            HorizontalDivider()
-        }
-
-        Row(
-            modifier = Modifier
+    with(sharedTransitionScope) {
+        Card(
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
+            modifier = modifier
                 .fillMaxWidth()
-                .padding(all = 8.dp), horizontalArrangement = Arrangement.SpaceAround
+                .padding(all = 8.dp)
+                .combinedClickable(
+                    onClick = { onEdit(activity) },
+                    onLongClick = {
+                        haptics.performHapticFeedback(HapticFeedbackType.LongPress)
+                        showContextMenu = true
+                    },
+                )
+                .sharedElement(
+                    rememberSharedContentState(key = SharedContentKey.ActivityCard(activity.uid)),
+                    animatedVisibilityScope = animatedContentScope,
+                )
+                .skipToLookaheadSize(),
         ) {
-            if (activity.vehicle != null) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(activity.vehicle.emoji, style = MaterialTheme.typography.bodyLarge)
-                    Text(
-                        stringResource(activity.vehicle.nameId),
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                }
-            }
-
-            if (timeElapsed.elapsedMs > 0) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        painterResource(R.drawable.outline_timer_24),
-                        stringResource(R.string.time)
-                    )
-                    Text(timeElapsed.format(), style = MaterialTheme.typography.bodyLarge)
-                }
-            }
-        }
-
-        if (activity.description.isNotEmpty()) {
-            HorizontalDivider()
             Text(
-                activity.description,
-                overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(all = 8.dp)
+                time,
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.secondary,
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .padding(horizontal = 4.dp)
             )
+            Text(
+                title,
+                style = MaterialTheme.typography.displayMedium,
+                color = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.padding(horizontal = 4.dp)
+            )
+
+            if (activity.vehicle != null || timeElapsed.elapsedMs > 0) {
+                HorizontalDivider()
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(all = 8.dp), horizontalArrangement = Arrangement.SpaceAround
+            ) {
+                if (activity.vehicle != null) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Text(activity.vehicle.emoji, style = MaterialTheme.typography.bodyLarge)
+                        Text(
+                            stringResource(activity.vehicle.nameId),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
+                }
+
+                if (timeElapsed.elapsedMs > 0) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(
+                            painterResource(R.drawable.outline_timer_24),
+                            stringResource(R.string.time)
+                        )
+                        Text(timeElapsed.format(), style = MaterialTheme.typography.bodyLarge)
+                    }
+                }
+            }
+
+            if (activity.description.isNotEmpty()) {
+                HorizontalDivider()
+                Text(
+                    activity.description,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(all = 8.dp)
+                )
+            }
         }
     }
 

@@ -44,6 +44,7 @@ import com.inky.fitnesscalendar.data.Activity
 import com.inky.fitnesscalendar.data.ActivityFilter
 import com.inky.fitnesscalendar.ui.components.ActivityCard
 import com.inky.fitnesscalendar.ui.components.NewActivityFAB
+import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.view_model.ActivityLogViewModel
 import kotlinx.coroutines.launch
 
@@ -101,16 +102,19 @@ fun ActivityLog(
                     }
                 },
                 modifier = Modifier.sharedBounds(
-                    rememberSharedContentState(key = "appBar"),
+                    rememberSharedContentState(key = SharedContentKey.AppBar),
                     animatedVisibilityScope = animatedContentScope
                 )
             )
         }
     }, floatingActionButton = {
         NewActivityFAB(
+            sharedTransitionScope = sharedTransitionScope,
+            animatedContentScope = animatedContentScope,
             onClick = {
                 onNewActivity()
-            }, menuOpen = isNewActivityOpen
+            },
+            menuOpen = isNewActivityOpen,
         )
     }) { innerPadding ->
         LazyColumn(
@@ -121,6 +125,8 @@ fun ActivityLog(
             items(activities, key = { it.uid ?: -1 }) { activity ->
                 ActivityCard(
                     activity,
+                    sharedTransitionScope = sharedTransitionScope,
+                    animatedContentScope = animatedContentScope,
                     onDelete = {
                         scope.launch { viewModel.repository.deleteActivity(activity) }
                     },

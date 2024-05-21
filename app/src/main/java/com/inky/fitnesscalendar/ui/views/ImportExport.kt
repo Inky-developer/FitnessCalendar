@@ -31,6 +31,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
+import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.util.exportCsv
 import com.inky.fitnesscalendar.view_model.ImportExportViewModel
 import kotlinx.coroutines.launch
@@ -61,7 +62,7 @@ fun ImportExport(
                         }
                     },
                     modifier = Modifier.sharedBounds(
-                        rememberSharedContentState(key = "appBar"),
+                        rememberSharedContentState(key = SharedContentKey.AppBar),
                         animatedVisibilityScope = animatedContentScope
                     )
                 )

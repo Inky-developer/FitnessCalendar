@@ -36,6 +36,7 @@ import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityFilter
 import com.inky.fitnesscalendar.ui.components.ActivityTypeSelector
 import com.inky.fitnesscalendar.ui.components.OptionGroup
+import com.inky.fitnesscalendar.ui.util.SharedContentKey
 
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
@@ -64,7 +65,8 @@ fun FilterActivity(
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
                 titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
             ), title = {
-                TextField(filter.text ?: "",
+                TextField(
+                    filter.text ?: "",
                     onValueChange = {
                         onFilterChange(filter.copy(text = it))
                     },
@@ -92,7 +94,7 @@ fun FilterActivity(
                     Icon(Icons.Outlined.Clear, stringResource(R.string.reset_filters))
                 }
             }, modifier = Modifier.sharedBounds(
-                rememberSharedContentState(key = "appBar"),
+                rememberSharedContentState(key = SharedContentKey.AppBar),
                 animatedVisibilityScope = animatedContentScope
             )
             )

@@ -40,6 +40,7 @@ import com.inky.fitnesscalendar.data.ActivityStatistics
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.CompactActivityCard
 import com.inky.fitnesscalendar.ui.components.NewActivityFAB
+import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.util.Duration
 import com.inky.fitnesscalendar.util.Duration.Companion.until
 import com.inky.fitnesscalendar.view_model.TodayViewModel
@@ -62,7 +63,7 @@ fun Home(
 
     Scaffold(
         topBar = {
-            with (sharedTransitionScope) {
+            with(sharedTransitionScope) {
                 CenterAlignedTopAppBar(
                     title = {
                         Text(
@@ -82,14 +83,19 @@ fun Home(
                         }
                     },
                     modifier = Modifier.sharedBounds(
-                        rememberSharedContentState(key = "appBar"),
+                        rememberSharedContentState(key = SharedContentKey.AppBar),
                         animatedVisibilityScope = animatedContentScope
                     )
                 )
             }
         },
         floatingActionButton = {
-            NewActivityFAB(onClick = onNewActivity, menuOpen = isNewActivityOpen)
+            NewActivityFAB(
+                sharedTransitionScope = sharedTransitionScope,
+                animatedContentScope = animatedContentScope,
+                onClick = onNewActivity,
+                menuOpen = isNewActivityOpen
+            )
         }
     ) { paddingValues ->
         Column(
@@ -103,6 +109,8 @@ fun Home(
             ActivitiesTodayOrNull(
                 activities = activitiesToday,
                 localizationRepository = viewModel.repository.localizationRepository,
+                sharedTransitionScope = sharedTransitionScope,
+                animatedContentScope = animatedContentScope,
                 onNavigateActivity = onNavigateActivity
             )
         }
@@ -178,25 +186,33 @@ fun Statistics(name: String, stats: ActivityStatistics) {
     }
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun ActivitiesTodayOrNull(
     activities: List<Activity>?,
     localizationRepository: LocalizationRepository,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope,
     onNavigateActivity: () -> Unit
 ) {
     if (activities != null) {
         ActivitiesToday(
             activities = activities,
             localizationRepository = localizationRepository,
+            sharedTransitionScope = sharedTransitionScope,
+            animatedContentScope = animatedContentScope,
             onNavigateActivity = onNavigateActivity
         )
     }
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun ActivitiesToday(
     activities: List<Activity>,
     localizationRepository: LocalizationRepository,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope,
     onNavigateActivity: () -> Unit
 ) {
     val isEmpty = activities.isEmpty()
@@ -226,7 +242,9 @@ fun ActivitiesToday(
             for (activity in activities) {
                 CompactActivityCard(
                     activity = activity,
-                    localizationRepository = localizationRepository
+                    localizationRepository = localizationRepository,
+                    sharedTransitionScope = sharedTransitionScope,
+                    animatedContentScope = animatedContentScope,
                 )
             }
         }
