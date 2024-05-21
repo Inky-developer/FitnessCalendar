@@ -37,9 +37,8 @@ import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.Activity
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.util.Duration.Companion.until
-import java.util.Locale
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ActivityCard(
     activity: Activity,
@@ -54,10 +53,7 @@ fun ActivityCard(
 
     val title = remember { "${activity.type.emoji} $activityName" }
     val time = remember {
-        localizationRepository.dateFormatter.formatDate(
-            activity.startTime.time,
-            Locale.getDefault()
-        )!!
+        localizationRepository.formatRelativeDate(activity.startTime)
     }
     val timeElapsed = remember { activity.startTime until activity.endTime }
 

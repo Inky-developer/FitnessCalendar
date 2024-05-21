@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -15,9 +14,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.data.Activity
 import com.inky.fitnesscalendar.localization.LocalizationRepository
-import java.util.Locale
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CompactActivityCard(
     activity: Activity,
@@ -28,10 +25,7 @@ fun CompactActivityCard(
 
     val title = remember { "${activity.type.emoji} $activityName" }
     val time = remember {
-        localizationRepository.dateFormatter.formatDate(
-            activity.startTime.time,
-            Locale.getDefault()
-        )!!
+        localizationRepository.formatRelativeDate(activity.startTime)
     }
 
     Card(
