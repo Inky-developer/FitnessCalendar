@@ -1,18 +1,19 @@
 [versions]
-agp = "8.4.0"
-hiltAndroid = "2.48.1"
-hiltNavigationCompose = "1.0.0"
+agp = "8.4.1"
+hiltAndroid = "2.51.1"
+hiltNavigationCompose = "1.2.0"
 kotlin = "1.9.23"
 coreKtx = "1.13.1"
 junit = "4.13.2"
 junitVersion = "1.1.5"
 espressoCore = "3.5.1"
-lifecycleRuntimeKtx = "2.7.0"
+lifecycleRuntimeKtx = "2.8.0"
 activityCompose = "1.9.0"
 composeBom = "2024.05.00"
 compose = "1.7.0-beta01"
 navigationCompose = "2.7.7"
 room = "2.6.1"
+ksp = "1.9.23-1.0.19"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -41,3 +42,5 @@ androidx-animation = { group = "androidx.compose.animation", name = "animation",
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
 jetbrainsKotlinAndroid = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+hilt = { id = "com.google.dagger.hilt.android", version.ref = "hiltAndroid" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
