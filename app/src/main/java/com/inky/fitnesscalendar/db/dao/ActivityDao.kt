@@ -22,8 +22,8 @@ interface ActivityDao {
         "SELECT * FROM ACTIVITY WHERE " +
                 "(type IN (:types) OR :isTypesEmpty) AND" +
                 "(description LIKE :search OR type IN (:searchTypes) OR vehicle IN (:searchVehicles) OR :search IS NULL) AND" +
-                "(start_time >= :start OR :start IS NULL) AND" +
-                "(end_time <= :end OR :end IS NULL) " +
+                "(end_time >= :start OR :start IS NULL) AND" +
+                "(start_time <= :end OR :end IS NULL) " +
                 "ORDER BY start_time DESC"
     )
     fun getFiltered(
