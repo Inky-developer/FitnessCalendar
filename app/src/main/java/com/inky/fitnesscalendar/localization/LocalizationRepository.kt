@@ -2,9 +2,6 @@ package com.inky.fitnesscalendar.localization
 
 import android.content.Context
 import android.text.format.DateFormat
-import androidx.compose.material3.CalendarLocale
-import androidx.compose.material3.DatePickerDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import com.inky.fitnesscalendar.util.Duration.Companion.until
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.time.Instant
@@ -16,10 +13,9 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-@OptIn(ExperimentalMaterial3Api::class)
 class LocalizationRepository @Inject constructor(@ApplicationContext context: Context) {
-    val dateFormatter = DatePickerDefaults.dateFormatter()
     val timeFormatter: java.text.DateFormat = DateFormat.getTimeFormat(context)
+    val dateFormatter: java.text.DateFormat = DateFormat.getMediumDateFormat(context)
 
     fun formatRelativeDate(date: Date, now: Date = Date.from(Instant.now())): String {
         val duration = date until now
@@ -35,9 +31,6 @@ class LocalizationRepository @Inject constructor(@ApplicationContext context: Co
         }
 
         // For farther in the past, just format the date itself
-        return dateFormatter.formatDate(
-            date.toInstant().toEpochMilli(),
-            CalendarLocale.getDefault()
-        ) ?: "-"
+        return dateFormatter.format(date.toInstant().toEpochMilli())
     }
 }

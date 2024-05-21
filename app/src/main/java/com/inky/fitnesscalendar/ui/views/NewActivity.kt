@@ -12,7 +12,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CalendarLocale
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -237,7 +236,6 @@ fun NewActivity(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ColumnScope.DateTimeInput(
     state: DateTimePickerState,
@@ -247,10 +245,7 @@ fun ColumnScope.DateTimeInput(
     val dateTimeStr by remember {
         derivedStateOf {
             val date = Date.from(Instant.ofEpochMilli(state.selectedDateTime))
-            val startDateStr = localizationRepository.dateFormatter.formatDate(
-                date.time,
-                CalendarLocale.getDefault()
-            )!!
+            val startDateStr = localizationRepository.dateFormatter.format(date.time)
             val startTimeStr = localizationRepository.timeFormatter.format(date)
 
             startDateStr to startTimeStr

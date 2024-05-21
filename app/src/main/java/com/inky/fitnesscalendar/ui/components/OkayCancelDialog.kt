@@ -21,8 +21,7 @@ import com.inky.fitnesscalendar.R
 @Composable
 fun OkayCancelDialog(onDismiss: () -> Unit, onOkay: () -> Unit, content: @Composable () -> Unit) {
     BasicAlertDialog(
-        onDismissRequest = onDismiss,
-        properties = DialogProperties(usePlatformDefaultWidth = false)
+        onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
         Surface(
             color = MaterialTheme.colorScheme.primaryContainer,
@@ -34,11 +33,17 @@ fun OkayCancelDialog(onDismiss: () -> Unit, onOkay: () -> Unit, content: @Compos
 
                 Row(modifier = Modifier.align(Alignment.End)) {
                     TextButton(onClick = onDismiss) {
-                        Text(stringResource(R.string.cancel))
+                        Text(
+                            stringResource(R.string.cancel),
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
                     }
 
                     TextButton(onClick = onOkay) {
-                        Text(stringResource(R.string.ok))
+                        Text(
+                            stringResource(R.string.ok),
+                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                        )
                     }
                 }
             }

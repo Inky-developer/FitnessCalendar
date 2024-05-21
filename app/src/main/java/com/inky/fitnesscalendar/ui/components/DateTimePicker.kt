@@ -1,20 +1,25 @@
 package com.inky.fitnesscalendar.ui.components
 
+import android.icu.util.Calendar
+import android.text.format.DateFormat
 import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.TimePicker
-import androidx.compose.material3.rememberDatePickerState
-import androidx.compose.material3.rememberTimePickerState
+import androidx.compose.material3.TimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.listSaver
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalContext
 import java.time.Instant
-import java.time.temporal.ChronoUnit
+import java.time.ZoneId
 import java.util.Date
-import java.util.TimeZone
 
 enum class DateTimePickerDialogState {
     Closed, Date, Time
@@ -79,10 +84,11 @@ fun DateTimePicker(
     state: DateTimePickerState,
     content: @Composable () -> Unit,
 ) {
-    // TODO: Make the date and time pickers show the correct initial values
+    // TODO: The initialDateTime seems to be wrong, as the calendar sometimes starts on the wrong day
     val datePickerState =
-        rememberDatePickerState()
-    val timePickerState = rememberTimePickerState()
+        rememberDatePickerStateKeyed(state.initialDateTime)
+
+    val timePickerState = rememberTimePickerStateKeyed(state.initialDateTime)
 
     if (state.isOpen()) {
         OkayCancelDialog(
@@ -101,10 +107,13 @@ fun DateTimePicker(
                         // Update the selected date
                         val selectedDate = datePickerState.selectedDateMillis
                         if (selectedDate != null) {
-                            state.selectedDateTime = Instant.ofEpochMilli(selectedDate)
-                                .plus(timePickerState.hour.toLong(), ChronoUnit.HOURS).plus(
-                                    timePickerState.minute.toLong(), ChronoUnit.MINUTES
-                                ).toEpochMilli().withTimezoneCorrected()
+                            val localDateTime =
+                                Instant.ofEpochMilli(selectedDate).atZone(ZoneId.of("UTC"))
+                                    .toLocalDateTime().plusHours(timePickerState.hour.toLong())
+                                    .plusMinutes(timePickerState.minute.toLong())
+                            state.selectedDateTime =
+                                localDateTime.atZone(ZoneId.systemDefault()).toInstant()
+                                    .toEpochMilli()
                         }
                     }
                 }
@@ -126,8 +135,36 @@ fun DateTimePicker(
     content()
 }
 
+// TODO: This does not remember with saveable which it should
+// However, the current api from compose is incredibly limiting and it would be very annoying to implement it.
+// Maybe support for this use case gets added in the future.
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+fun rememberDatePickerStateKeyed(initialSelectedDateMillis: Long): DatePickerState {
+    val locale = LocalConfiguration.current.locales[0]
+    return remember(key1 = initialSelectedDateMillis) {
+        DatePickerState(
+            initialSelectedDateMillis = initialSelectedDateMillis,
+            locale = locale
+        )
+    }
+}
 
-private fun Long.withTimezoneCorrected(): Long {
-    val timezoneOffset = TimeZone.getDefault().getOffset(this)
-    return this - timezoneOffset
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun rememberTimePickerStateKeyed(initialDateTime: Long): TimePickerState {
+    val context = LocalContext.current
+    return rememberSaveable(context, initialDateTime, saver = TimePickerState.Saver()) {
+        val calendar = Calendar.getInstance().apply {
+            time = Date.from(Instant.ofEpochMilli(initialDateTime))
+        }
+        val initialMinute = calendar.get(Calendar.MINUTE)
+        val initialHour = calendar.get(Calendar.HOUR)
+        val is24Hour = DateFormat.is24HourFormat(context)
+        TimePickerState(
+            initialHour = initialHour,
+            initialMinute = initialMinute,
+            is24Hour = is24Hour
+        )
+    }
 }
