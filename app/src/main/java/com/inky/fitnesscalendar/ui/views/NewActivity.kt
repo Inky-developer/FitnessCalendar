@@ -15,7 +15,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -116,7 +115,7 @@ fun NewActivity(
 
     // When the start date time changes, move the end date time along as well
     LaunchedEffect(startDateTimePickerState.selectedDateTime) {
-        if (endDateTimePickerState.selectedDateTime == endDateTimePickerState.initialDateTime) {
+        if (endDateTimePickerState.selectedDateTime == endDateTimePickerState.initialDateTime && startDateTimePickerState.selectedDateTime != startDateTimePickerState.initialDateTime) {
             endDateTimePickerState.initialDateTime =
                 startDateTimePickerState.selectedDateTime + ChronoUnit.HOURS.duration.toMillis()
         }

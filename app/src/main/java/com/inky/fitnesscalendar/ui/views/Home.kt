@@ -189,7 +189,6 @@ fun ActivitiesTodayOrNull(
     }
 }
 
-@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun ActivitiesToday(
     activities: List<Activity>,
