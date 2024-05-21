@@ -62,13 +62,24 @@ fun App(viewModel: AppViewModel = hiltViewModel()) {
             scope.launch {
                 navigationDrawerState.close()
             }
-        }) {
+        }
+    ) {
         SharedTransitionLayout {
-            NavHost(navController = navController, startDestination = View.Home.getPath()) {
-                composable(View.Home.pathTemplate()) {
+            NavHost(
+                navController = navController,
+                startDestination = View.Home.getPath(),
+            ) {
+
+                composable(
+                    View.Home.pathTemplate(),
+                    enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.End) },
+                    exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Start) }
+                ) {
                     currentView = View.Home
                     Home(
                         isNewActivityOpen = isNewActivityOpen,
+                        sharedTransitionScope = this@SharedTransitionLayout,
+                        animatedContentScope = this@composable,
                         onNewActivity = { navController.navigate(View.NewActivity.getPath(-1)) },
                         onNavigateActivity = {
                             navController.navigate(View.ActivityLog.getPath())
@@ -128,6 +139,8 @@ fun App(viewModel: AppViewModel = hiltViewModel()) {
                 composable(View.ImportExport.pathTemplate()) {
                     currentView = View.ImportExport
                     ImportExport(
+                        sharedTransitionScope = this@SharedTransitionLayout,
+                        animatedContentScope = this@composable,
                         onOpenDrawer = openDrawer
                     )
                 }

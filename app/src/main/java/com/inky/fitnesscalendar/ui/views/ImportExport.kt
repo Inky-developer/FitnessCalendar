@@ -1,6 +1,9 @@
 package com.inky.fitnesscalendar.ui.views
 
+import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -32,10 +35,12 @@ import com.inky.fitnesscalendar.util.exportCsv
 import com.inky.fitnesscalendar.view_model.ImportExportViewModel
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
 fun ImportExport(
     viewModel: ImportExportViewModel = hiltViewModel(),
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope,
     onOpenDrawer: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
@@ -43,18 +48,24 @@ fun ImportExport(
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = { Text(stringResource(R.string.import_export)) },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                ),
-                navigationIcon = {
-                    IconButton(onClick = onOpenDrawer) {
-                        Icon(Icons.Outlined.Menu, stringResource(R.string.Menu))
-                    }
-                }
-            )
+            with(sharedTransitionScope) {
+                CenterAlignedTopAppBar(
+                    title = { Text(stringResource(R.string.import_export)) },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    ),
+                    navigationIcon = {
+                        IconButton(onClick = onOpenDrawer) {
+                            Icon(Icons.Outlined.Menu, stringResource(R.string.Menu))
+                        }
+                    },
+                    modifier = Modifier.sharedBounds(
+                        rememberSharedContentState(key = "appBar"),
+                        animatedVisibilityScope = animatedContentScope
+                    )
+                )
+            }
         }
     ) { paddingValues ->
         val context = LocalContext.current

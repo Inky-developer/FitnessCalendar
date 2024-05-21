@@ -1,6 +1,9 @@
 package com.inky.fitnesscalendar.ui.views
 
+import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -41,11 +44,13 @@ import com.inky.fitnesscalendar.util.Duration
 import com.inky.fitnesscalendar.util.Duration.Companion.until
 import com.inky.fitnesscalendar.view_model.TodayViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
 @Composable
 fun Home(
     viewModel: TodayViewModel = hiltViewModel(),
     isNewActivityOpen: Boolean,
+    sharedTransitionScope: SharedTransitionScope,
+    animatedContentScope: AnimatedContentScope,
     onNewActivity: () -> Unit,
     onNavigateActivity: () -> Unit,
     onOpenDrawer: () -> Unit
@@ -57,25 +62,31 @@ fun Home(
 
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        stringResource(R.string.app_name),
-                    )
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                ),
-                navigationIcon = {
-                    IconButton(onClick = onOpenDrawer) {
-                        Icon(
-                            imageVector = Icons.Outlined.Menu,
-                            contentDescription = stringResource(R.string.Menu),
+            with (sharedTransitionScope) {
+                CenterAlignedTopAppBar(
+                    title = {
+                        Text(
+                            stringResource(R.string.app_name),
                         )
-                    }
-                },
-            )
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    ),
+                    navigationIcon = {
+                        IconButton(onClick = onOpenDrawer) {
+                            Icon(
+                                imageVector = Icons.Outlined.Menu,
+                                contentDescription = stringResource(R.string.Menu),
+                            )
+                        }
+                    },
+                    modifier = Modifier.sharedBounds(
+                        rememberSharedContentState(key = "appBar"),
+                        animatedVisibilityScope = animatedContentScope
+                    )
+                )
+            }
         },
         floatingActionButton = {
             NewActivityFAB(onClick = onNewActivity, menuOpen = isNewActivityOpen)
