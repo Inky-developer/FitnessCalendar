@@ -51,11 +51,11 @@ fun ActivityCard(
 
     val activityName = stringResource(activity.type.nameId)
 
-    val title = remember { "${activity.type.emoji} $activityName" }
-    val time = remember {
+    val title = remember(activity) { "${activity.type.emoji} $activityName" }
+    val time = remember(activity) {
         localizationRepository.formatRelativeDate(activity.startTime)
     }
-    val timeElapsed = remember { activity.startTime until activity.endTime }
+    val timeElapsed = remember(activity) { activity.startTime until activity.endTime }
 
     val haptics = LocalHapticFeedback.current
 

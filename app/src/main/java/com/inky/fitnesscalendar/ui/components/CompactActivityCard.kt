@@ -23,8 +23,8 @@ fun CompactActivityCard(
 ) {
     val activityName = stringResource(activity.type.nameId)
 
-    val title = remember { "${activity.type.emoji} $activityName" }
-    val time = remember {
+    val title = remember(activity) { "${activity.type.emoji} $activityName" }
+    val time = remember(activity) {
         localizationRepository.formatRelativeDate(activity.startTime)
     }
 
