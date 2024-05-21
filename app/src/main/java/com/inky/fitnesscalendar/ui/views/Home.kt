@@ -1,9 +1,7 @@
 package com.inky.fitnesscalendar.ui.views
 
-import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -41,6 +39,7 @@ import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.CompactActivityCard
 import com.inky.fitnesscalendar.ui.components.NewActivityFAB
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
+import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.util.Duration
 import com.inky.fitnesscalendar.util.Duration.Companion.until
 import com.inky.fitnesscalendar.view_model.TodayViewModel
@@ -50,8 +49,6 @@ import com.inky.fitnesscalendar.view_model.TodayViewModel
 fun Home(
     viewModel: TodayViewModel = hiltViewModel(),
     isNewActivityOpen: Boolean,
-    sharedTransitionScope: SharedTransitionScope,
-    animatedContentScope: AnimatedContentScope,
     onNewActivity: () -> Unit,
     onNavigateActivity: () -> Unit,
     onOpenDrawer: () -> Unit
@@ -63,36 +60,29 @@ fun Home(
 
     Scaffold(
         topBar = {
-            with(sharedTransitionScope) {
-                CenterAlignedTopAppBar(
-                    title = {
-                        Text(
-                            stringResource(R.string.app_name),
-                        )
-                    },
-                    colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                    ),
-                    navigationIcon = {
-                        IconButton(onClick = onOpenDrawer) {
-                            Icon(
-                                imageVector = Icons.Outlined.Menu,
-                                contentDescription = stringResource(R.string.Menu),
-                            )
-                        }
-                    },
-                    modifier = Modifier.sharedBounds(
-                        rememberSharedContentState(key = SharedContentKey.AppBar),
-                        animatedVisibilityScope = animatedContentScope
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        stringResource(R.string.app_name),
                     )
-                )
-            }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                ),
+                navigationIcon = {
+                    IconButton(onClick = onOpenDrawer) {
+                        Icon(
+                            imageVector = Icons.Outlined.Menu,
+                            contentDescription = stringResource(R.string.Menu),
+                        )
+                    }
+                },
+                modifier = Modifier.sharedBounds(SharedContentKey.AppBar)
+            )
         },
         floatingActionButton = {
             NewActivityFAB(
-                sharedTransitionScope = sharedTransitionScope,
-                animatedContentScope = animatedContentScope,
                 onClick = onNewActivity,
                 menuOpen = isNewActivityOpen
             )
@@ -109,8 +99,6 @@ fun Home(
             ActivitiesTodayOrNull(
                 activities = activitiesToday,
                 localizationRepository = viewModel.repository.localizationRepository,
-                sharedTransitionScope = sharedTransitionScope,
-                animatedContentScope = animatedContentScope,
                 onNavigateActivity = onNavigateActivity
             )
         }
@@ -186,21 +174,16 @@ fun Statistics(name: String, stats: ActivityStatistics) {
     }
 }
 
-@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun ActivitiesTodayOrNull(
     activities: List<Activity>?,
     localizationRepository: LocalizationRepository,
-    sharedTransitionScope: SharedTransitionScope,
-    animatedContentScope: AnimatedContentScope,
     onNavigateActivity: () -> Unit
 ) {
     if (activities != null) {
         ActivitiesToday(
             activities = activities,
             localizationRepository = localizationRepository,
-            sharedTransitionScope = sharedTransitionScope,
-            animatedContentScope = animatedContentScope,
             onNavigateActivity = onNavigateActivity
         )
     }
@@ -211,8 +194,6 @@ fun ActivitiesTodayOrNull(
 fun ActivitiesToday(
     activities: List<Activity>,
     localizationRepository: LocalizationRepository,
-    sharedTransitionScope: SharedTransitionScope,
-    animatedContentScope: AnimatedContentScope,
     onNavigateActivity: () -> Unit
 ) {
     val isEmpty = activities.isEmpty()
@@ -243,8 +224,6 @@ fun ActivitiesToday(
                 CompactActivityCard(
                     activity = activity,
                     localizationRepository = localizationRepository,
-                    sharedTransitionScope = sharedTransitionScope,
-                    animatedContentScope = animatedContentScope,
                 )
             }
         }

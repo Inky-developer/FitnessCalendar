@@ -1,8 +1,5 @@
 package com.inky.fitnesscalendar.ui.views
 
-import androidx.compose.animation.AnimatedContentScope
-import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardActions
@@ -37,15 +34,14 @@ import com.inky.fitnesscalendar.data.ActivityFilter
 import com.inky.fitnesscalendar.ui.components.ActivityTypeSelector
 import com.inky.fitnesscalendar.ui.components.OptionGroup
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
+import com.inky.fitnesscalendar.ui.util.sharedBounds
 
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilterActivity(
     filter: ActivityFilter,
     onFilterChange: (ActivityFilter) -> Unit,
-    sharedTransitionScope: SharedTransitionScope,
-    animatedContentScope: AnimatedContentScope,
     onBack: () -> Unit
 ) {
     // Show keyboard when the user opens this view
@@ -60,45 +56,40 @@ fun FilterActivity(
     }
 
     val appBar = @Composable {
-        with(sharedTransitionScope) {
-            TopAppBar(colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-            ), title = {
-                TextField(
-                    filter.text ?: "",
-                    onValueChange = {
-                        onFilterChange(filter.copy(text = it))
-                    },
-                    placeholder = { Text(stringResource(R.string.search_for_activity)) },
-                    colors = TextFieldDefaults.colors(
-                        unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                        focusedContainerColor = MaterialTheme.colorScheme.primaryContainer
-                    ),
-                    singleLine = true,
-                    modifier = Modifier.focusRequester(focusRequester),
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                    keyboardActions = KeyboardActions(onSearch = { onBack() })
+        TopAppBar(colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+        ), title = {
+            TextField(
+                filter.text ?: "",
+                onValueChange = {
+                    onFilterChange(filter.copy(text = it))
+                },
+                placeholder = { Text(stringResource(R.string.search_for_activity)) },
+                colors = TextFieldDefaults.colors(
+                    unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                    focusedContainerColor = MaterialTheme.colorScheme.primaryContainer
+                ),
+                singleLine = true,
+                modifier = Modifier.focusRequester(focusRequester),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                keyboardActions = KeyboardActions(onSearch = { onBack() })
+            )
+        }, navigationIcon = {
+            IconButton(onClick = { onBack() }) {
+                Icon(
+                    Icons.AutoMirrored.Outlined.ArrowBack,
+                    stringResource(R.string.back),
                 )
-            }, navigationIcon = {
-                IconButton(onClick = { onBack() }) {
-                    Icon(
-                        Icons.AutoMirrored.Outlined.ArrowBack,
-                        stringResource(R.string.back),
-                    )
-                }
-            }, actions = {
-                IconButton(
-                    onClick = { onFilterChange(ActivityFilter()) }, enabled = !filter.isEmpty()
-                ) {
-                    Icon(Icons.Outlined.Clear, stringResource(R.string.reset_filters))
-                }
-            }, modifier = Modifier.sharedBounds(
-                rememberSharedContentState(key = SharedContentKey.AppBar),
-                animatedVisibilityScope = animatedContentScope
-            )
-            )
-        }
+            }
+        }, actions = {
+            IconButton(
+                onClick = { onFilterChange(ActivityFilter()) }, enabled = !filter.isEmpty()
+            ) {
+                Icon(Icons.Outlined.Clear, stringResource(R.string.reset_filters))
+            }
+        }, modifier = Modifier.sharedBounds(SharedContentKey.AppBar)
+        )
     }
     Scaffold(
         topBar = appBar, containerColor = MaterialTheme.colorScheme.surface

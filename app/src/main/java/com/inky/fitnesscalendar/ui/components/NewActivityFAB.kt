@@ -1,8 +1,5 @@
 package com.inky.fitnesscalendar.ui.components
 
-import androidx.compose.animation.AnimatedContentScope
-import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -15,12 +12,11 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.stringResource
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
+import com.inky.fitnesscalendar.ui.util.renderInSharedTransitionScopeOverlay
+import com.inky.fitnesscalendar.ui.util.sharedElement
 
-@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 fun NewActivityFAB(
-    sharedTransitionScope: SharedTransitionScope,
-    animatedContentScope: AnimatedContentScope,
     onClick: () -> Unit,
     menuOpen: Boolean
 ) {
@@ -31,22 +27,17 @@ fun NewActivityFAB(
             0f
         }, label = "fab_rotation"
     )
-    with(sharedTransitionScope) {
-        FloatingActionButton(
-            onClick = onClick,
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            modifier = Modifier
-                .sharedElement(
-                    rememberSharedContentState(key = SharedContentKey.NewActivityFAB),
-                    animatedVisibilityScope = animatedContentScope
-                )
-                .renderInSharedTransitionScopeOverlay()
-        ) {
-            Icon(
-                Icons.Filled.Add,
-                stringResource(R.string.action_new_activity),
-                modifier = Modifier.rotate(angle.value)
-            )
-        }
+    FloatingActionButton(
+        onClick = onClick,
+        containerColor = MaterialTheme.colorScheme.primaryContainer,
+        modifier = Modifier
+            .sharedElement(SharedContentKey.NewActivityFAB)
+            .renderInSharedTransitionScopeOverlay()
+    ) {
+        Icon(
+            Icons.Filled.Add,
+            stringResource(R.string.action_new_activity),
+            modifier = Modifier.rotate(angle.value)
+        )
     }
 }

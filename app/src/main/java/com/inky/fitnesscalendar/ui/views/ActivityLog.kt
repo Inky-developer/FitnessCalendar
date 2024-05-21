@@ -1,9 +1,5 @@
 package com.inky.fitnesscalendar.ui.views
 
-import androidx.compose.animation.AnimatedContentScope
-import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.SharedTransitionScope
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -45,20 +41,15 @@ import com.inky.fitnesscalendar.data.ActivityFilter
 import com.inky.fitnesscalendar.ui.components.ActivityCard
 import com.inky.fitnesscalendar.ui.components.NewActivityFAB
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
+import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.view_model.ActivityLogViewModel
 import kotlinx.coroutines.launch
 
-@OptIn(
-    ExperimentalMaterial3Api::class,
-    ExperimentalFoundationApi::class,
-    ExperimentalSharedTransitionApi::class
-)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActivityLog(
     viewModel: ActivityLogViewModel = hiltViewModel(),
     filter: ActivityFilter,
-    sharedTransitionScope: SharedTransitionScope,
-    animatedContentScope: AnimatedContentScope,
     isNewActivityOpen: Boolean,
     onOpenDrawer: () -> Unit,
     onNewActivity: () -> Unit,
@@ -81,36 +72,29 @@ fun ActivityLog(
 
 
     Scaffold(topBar = {
-        with(sharedTransitionScope) {
-            CenterAlignedTopAppBar(
-                title = { Text(stringResource(R.string.activity_log)) },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                ),
-                navigationIcon = {
-                    IconButton(onClick = onOpenDrawer) {
-                        Icon(
-                            imageVector = Icons.Outlined.Menu,
-                            contentDescription = stringResource(R.string.Menu),
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(onClick = { onFilter() }) {
-                        Icon(Icons.Outlined.Search, stringResource(R.string.filter))
-                    }
-                },
-                modifier = Modifier.sharedBounds(
-                    rememberSharedContentState(key = SharedContentKey.AppBar),
-                    animatedVisibilityScope = animatedContentScope
-                )
-            )
-        }
+        CenterAlignedTopAppBar(
+            title = { Text(stringResource(R.string.activity_log)) },
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+            ),
+            navigationIcon = {
+                IconButton(onClick = onOpenDrawer) {
+                    Icon(
+                        imageVector = Icons.Outlined.Menu,
+                        contentDescription = stringResource(R.string.Menu),
+                    )
+                }
+            },
+            actions = {
+                IconButton(onClick = { onFilter() }) {
+                    Icon(Icons.Outlined.Search, stringResource(R.string.filter))
+                }
+            },
+            modifier = Modifier.sharedBounds(SharedContentKey.AppBar)
+        )
     }, floatingActionButton = {
         NewActivityFAB(
-            sharedTransitionScope = sharedTransitionScope,
-            animatedContentScope = animatedContentScope,
             onClick = {
                 onNewActivity()
             },
@@ -125,14 +109,12 @@ fun ActivityLog(
             items(activities, key = { it.uid ?: -1 }) { activity ->
                 ActivityCard(
                     activity,
-                    sharedTransitionScope = sharedTransitionScope,
-                    animatedContentScope = animatedContentScope,
                     onDelete = {
                         scope.launch { viewModel.repository.deleteActivity(activity) }
                     },
                     onEdit = onEditActivity,
                     localizationRepository = viewModel.repository.localizationRepository,
-                    modifier = Modifier.animateItemPlacement()
+                    modifier = Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null)
                 )
             }
         }
