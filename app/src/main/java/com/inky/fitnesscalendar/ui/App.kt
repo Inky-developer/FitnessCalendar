@@ -9,7 +9,6 @@ import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -22,9 +21,9 @@ import com.inky.fitnesscalendar.data.ActivityFilter
 import com.inky.fitnesscalendar.ui.components.NavigationDrawer
 import com.inky.fitnesscalendar.ui.views.ActivityLog
 import com.inky.fitnesscalendar.ui.views.FilterActivity
+import com.inky.fitnesscalendar.ui.views.Home
 import com.inky.fitnesscalendar.ui.views.ImportExport
 import com.inky.fitnesscalendar.ui.views.NewActivity
-import com.inky.fitnesscalendar.ui.views.Home
 import com.inky.fitnesscalendar.ui.views.View
 import com.inky.fitnesscalendar.view_model.AppViewModel
 import kotlinx.coroutines.launch

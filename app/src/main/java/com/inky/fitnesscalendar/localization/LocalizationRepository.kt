@@ -12,5 +12,5 @@ import javax.inject.Singleton
 class LocalizationRepository @Inject constructor(@ApplicationContext context: Context) {
     @OptIn(ExperimentalMaterial3Api::class)
     val dateFormatter = DatePickerDefaults.dateFormatter()
-    val timeFormatter = DateFormat.getTimeFormat(context)
+    val timeFormatter: java.text.DateFormat = DateFormat.getTimeFormat(context)
 }

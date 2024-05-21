@@ -1,7 +1,6 @@
 package com.inky.fitnesscalendar.ui.views
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -183,7 +182,6 @@ fun ActivitiesTodayOrNull(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ActivitiesToday(
     activities: List<Activity>,
