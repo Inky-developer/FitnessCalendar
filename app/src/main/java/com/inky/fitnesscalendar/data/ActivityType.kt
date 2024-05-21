@@ -16,7 +16,7 @@ enum class ActivityType(
     WorkCommute(
         ActivityClass.Travel,
         nameId = R.string.activity_commute_home_to_work,
-        emoji = "💼",
+        emoji = "🏢",
         hasVehicle = true
     ),
     HomeCommute(
@@ -25,6 +25,7 @@ enum class ActivityType(
         emoji = "🏡",
         hasVehicle = true
     ),
+    Work(ActivityClass.Work, nameId = R.string.work, emoji = "💼"),
     Note(ActivityClass.Other, nameId = R.string.activity_note, emoji = "📓", hasDuration = false);
 
     companion object {
