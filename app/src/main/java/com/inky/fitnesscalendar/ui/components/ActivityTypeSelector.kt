@@ -19,7 +19,7 @@ fun ActivityTypeSelector(
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier) {
-        for (activities in ActivityType.BY_CLASS.values) {
+        for (activities in ActivityType.BY_ROW) {
             LazyRow {
                 items(activities) { activityType ->
                     FilterChip(

@@ -26,11 +26,19 @@ enum class ActivityType(
         hasVehicle = true
     ),
     Work(ActivityClass.Work, nameId = R.string.work, emoji = "💼"),
-    Note(ActivityClass.Other, nameId = R.string.activity_note, emoji = "📓", hasDuration = false);
+    Note(ActivityClass.Other, nameId = R.string.activity_note, emoji = "📓", hasDuration = false),
+    Gaming(ActivityClass.Gaming, nameId = R.string.gaming, emoji = "🎮"),
+    Other(ActivityClass.Other, nameId = R.string.other, emoji = "🏷️");
 
     companion object {
-        val BY_CLASS: Map<ActivityClass, List<ActivityType>> =
-            ActivityType.entries.groupBy { it.activityClass }
+        // A grouping of activity types into rows, where each row contains similar activities
+        val BY_ROW: List<List<ActivityType>> = ActivityType.entries.groupBy {
+            when (it.activityClass) {
+                ActivityClass.Sports -> 0
+                ActivityClass.Travel -> 1
+                ActivityClass.Gaming, ActivityClass.Work, ActivityClass.Other -> 2
+            }
+        }.map { (_, types) -> types }.toList()
 
     }
 }
