@@ -25,6 +25,12 @@ enum class ActivityType(
         emoji = "🏡",
         hasVehicle = true
     ),
+    Travel(
+        ActivityClass.Travel,
+        nameId = R.string.travel,
+        emoji = "🗺️",
+        hasVehicle = true
+    ),
     Work(ActivityClass.Work, nameId = R.string.work, emoji = "💼"),
     Note(ActivityClass.Other, nameId = R.string.activity_note, emoji = "📓", hasDuration = false),
     Gaming(ActivityClass.Gaming, nameId = R.string.gaming, emoji = "🎮"),
