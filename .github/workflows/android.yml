@@ -29,3 +29,8 @@ jobs:
         STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
         KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
       run: ./gradlew assembleRelease
+    - name: Upload release apk
+      uses: actions/upload-artifact@v4
+      with:
+        name: apk_release
+        path: app/build/outputs/apk/release/app-release.apk
