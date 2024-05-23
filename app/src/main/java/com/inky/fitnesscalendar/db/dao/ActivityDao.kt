@@ -3,20 +3,22 @@ package com.inky.fitnesscalendar.db.dao
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Query
+import androidx.room.Transaction
 import androidx.room.Upsert
 import com.inky.fitnesscalendar.data.Activity
 import com.inky.fitnesscalendar.data.ActivityType
+import com.inky.fitnesscalendar.data.Recording
 import com.inky.fitnesscalendar.data.Vehicle
 import kotlinx.coroutines.flow.Flow
 import java.util.Date
 
 @Dao
-interface ActivityDao {
+abstract class ActivityDao {
     @Query("SELECT * FROM Activity ORDER BY start_time DESC")
-    suspend fun loadActivities(): List<Activity>
+    abstract suspend fun loadActivities(): List<Activity>
 
     @Query("SELECT * FROM Activity ORDER BY start_time DESC")
-    fun getActivities(): Flow<List<Activity>>
+    abstract fun getActivities(): Flow<List<Activity>>
 
     @Query(
         "SELECT * FROM ACTIVITY WHERE " +
@@ -26,7 +28,7 @@ interface ActivityDao {
                 "(start_time <= :end OR :end IS NULL) " +
                 "ORDER BY start_time DESC"
     )
-    fun getFiltered(
+    abstract fun getFiltered(
         types: List<ActivityType>,
         isTypesEmpty: Boolean,
         search: String?,
@@ -37,12 +39,21 @@ interface ActivityDao {
     ): Flow<List<Activity>>
 
     @Query("SELECT * FROM ACTIVITY WHERE uid=(:id)")
-    fun get(id: Int): Flow<Activity>
+    abstract fun get(id: Int): Flow<Activity>
 
     @Upsert
-    suspend fun save(activity: Activity)
+    abstract suspend fun save(activity: Activity)
 
     @Delete
-    suspend fun delete(activity: Activity)
+    abstract suspend fun delete(activity: Activity)
+
+    @Delete
+    abstract suspend fun deleteRecording(recording: Recording)
+
+    @Transaction
+    open suspend fun stopRecording(recording: Recording, activity: Activity) {
+        deleteRecording(recording)
+        save(activity)
+    }
 
 }

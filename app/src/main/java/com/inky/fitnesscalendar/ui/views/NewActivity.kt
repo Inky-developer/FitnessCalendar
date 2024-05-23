@@ -7,15 +7,12 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -40,12 +37,11 @@ import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.Activity
-import com.inky.fitnesscalendar.data.Vehicle
 import com.inky.fitnesscalendar.localization.LocalizationRepository
-import com.inky.fitnesscalendar.ui.components.ActivityTypeSelector
+import com.inky.fitnesscalendar.ui.components.ActivitySelector
+import com.inky.fitnesscalendar.ui.components.ActivitySelectorState
 import com.inky.fitnesscalendar.ui.components.DateTimePicker
 import com.inky.fitnesscalendar.ui.components.DateTimePickerState
-import com.inky.fitnesscalendar.ui.components.OptionGroup
 import com.inky.fitnesscalendar.view_model.NewActivityViewModel
 import kotlinx.coroutines.flow.flowOf
 import java.time.Instant
@@ -81,7 +77,6 @@ fun NewActivity(
     onSave: (Activity) -> Unit,
     onNavigateBack: () -> Unit
 ) {
-    val vehicles = remember { Vehicle.entries.toList() }
     val title = activity?.type?.let {
         stringResource(
             R.string.edit_activity,
@@ -144,37 +139,11 @@ fun NewActivity(
                     .weight(1f, fill = false)
                     .verticalScroll(scrollState)
             ) {
-                OptionGroup(
-                    label = stringResource(R.string.select_activity),
-                    selectionLabel = selectedActivityType?.nameId?.let { stringResource(it) }
-                ) {
-                    ActivityTypeSelector(
-                        { it == selectedActivityType },
-                        onSelect = { selectedActivityType = it })
-                }
-
-                AnimatedVisibility(selectedActivityType?.hasVehicle == true) {
-                    OptionGroup(
-                        label = stringResource(R.string.select_vehicle),
-                        selectionLabel = selectedVehicle?.nameId?.let { stringResource(it) }
-                    ) {
-                        LazyRow {
-                            items(vehicles) {
-                                FilterChip(
-                                    selected = selectedVehicle == it,
-                                    onClick = { selectedVehicle = it },
-                                    label = {
-                                        Text(
-                                            it.emoji,
-                                            style = MaterialTheme.typography.headlineMedium
-                                        )
-                                    },
-                                    modifier = Modifier.padding(horizontal = 4.dp)
-                                )
-                            }
-                        }
-                    }
-                }
+                ActivitySelector(
+                    ActivitySelectorState(selectedActivityType, selectedVehicle),
+                    onActivityType = { selectedActivityType = it },
+                    onVehicle = { selectedVehicle = it }
+                )
 
                 TextField(
                     value = description,

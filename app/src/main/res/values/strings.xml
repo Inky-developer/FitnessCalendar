@@ -46,6 +46,11 @@
     <string name="this_month">This Month</string>
     <string name="work">Work</string>
     <string name="gaming">Gaming</string>
+    <string name="record">Record</string>
+    <string name="record_activity">Record Activity</string>
+    <string name="record_activity_type">Record %1s</string>
+    <string name="recording">Recording</string>
+    <string name="abort">Abort</string>
     <plurals name="num_activities">
         <item quantity="one">%1d activity</item>
         <item quantity="other">%1d activities</item>

@@ -28,6 +28,7 @@ import com.inky.fitnesscalendar.ui.views.FilterActivity
 import com.inky.fitnesscalendar.ui.views.Home
 import com.inky.fitnesscalendar.ui.views.ImportExport
 import com.inky.fitnesscalendar.ui.views.NewActivity
+import com.inky.fitnesscalendar.ui.views.RecordActivity
 import com.inky.fitnesscalendar.ui.views.View
 import com.inky.fitnesscalendar.view_model.AppViewModel
 import kotlinx.coroutines.launch
@@ -84,6 +85,7 @@ fun App(viewModel: AppViewModel = hiltViewModel()) {
                         Home(
                             isNewActivityOpen = isNewActivityOpen,
                             onNewActivity = { navController.navigate(View.NewActivity.getPath(-1)) },
+                            onRecordActivity = { navController.navigate(View.RecordActivity.getPath()) },
                             onNavigateActivity = {
                                 navController.navigate(View.ActivityLog.getPath())
                             },
@@ -144,6 +146,20 @@ fun App(viewModel: AppViewModel = hiltViewModel()) {
                             isNewActivityOpen = false
                             navController.popBackStack()
                         }
+                    )
+                }
+                dialog(
+                    View.RecordActivity.pathTemplate(), arguments = View.RecordActivity.navArgs()
+                ) {
+                    currentView = View.RecordActivity
+                    RecordActivity(
+                        onStart = {
+                            scope.launch {
+                                viewModel.repository.startRecording(it)
+                            }
+                            navController.popBackStack()
+                        },
+                        onNavigateBack = { navController.popBackStack() }
                     )
                 }
                 composable(View.ImportExport.pathTemplate()) {

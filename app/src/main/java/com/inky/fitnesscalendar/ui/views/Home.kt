@@ -1,8 +1,8 @@
 package com.inky.fitnesscalendar.ui.views
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.Card
@@ -18,15 +19,21 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -35,6 +42,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.Activity
 import com.inky.fitnesscalendar.data.ActivityStatistics
+import com.inky.fitnesscalendar.data.Recording
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.CompactActivityCard
 import com.inky.fitnesscalendar.ui.components.NewActivityFAB
@@ -42,57 +50,74 @@ import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.util.Duration
 import com.inky.fitnesscalendar.util.Duration.Companion.until
-import com.inky.fitnesscalendar.view_model.TodayViewModel
+import com.inky.fitnesscalendar.view_model.HomeViewModel
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalSharedTransitionApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Home(
-    viewModel: TodayViewModel = hiltViewModel(),
+    viewModel: HomeViewModel = hiltViewModel(),
     isNewActivityOpen: Boolean,
     onNewActivity: () -> Unit,
+    onRecordActivity: () -> Unit,
     onNavigateActivity: () -> Unit,
     onOpenDrawer: () -> Unit
 ) {
     val weeklyStats by viewModel.weekStats.collectAsState(initial = null)
     val monthlyStats by viewModel.monthStats.collectAsState(initial = null)
     val activitiesToday by viewModel.activitiesToday.collectAsState(initial = null)
+    val recordings by viewModel.recordings.collectAsState(initial = emptyList())
+    val recordingInProgress by viewModel.recordingInProgress.collectAsState(initial = false)
     val scrollState = rememberScrollState()
 
-    Scaffold(
-        topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        stringResource(R.string.app_name),
-                    )
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                ),
-                navigationIcon = {
-                    IconButton(onClick = onOpenDrawer) {
-                        Icon(
-                            imageVector = Icons.Outlined.Menu,
-                            contentDescription = stringResource(R.string.Menu),
-                        )
-                    }
-                },
-                modifier = Modifier.sharedBounds(SharedContentKey.AppBar)
+    Scaffold(topBar = {
+        CenterAlignedTopAppBar(title = {
+            Text(
+                stringResource(R.string.app_name),
             )
-        },
-        floatingActionButton = {
-            NewActivityFAB(
-                onClick = onNewActivity,
-                menuOpen = isNewActivityOpen
-            )
-        }
-    ) { paddingValues ->
+        }, colors = TopAppBarDefaults.topAppBarColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+        ), navigationIcon = {
+            IconButton(onClick = onOpenDrawer) {
+                Icon(
+                    imageVector = Icons.Outlined.Menu,
+                    contentDescription = stringResource(R.string.Menu),
+                )
+            }
+        }, actions = {
+            IconButton(
+                enabled = !recordingInProgress,
+                onClick = { onRecordActivity() },
+                colors = IconButtonDefaults.iconButtonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = contentColorFor(MaterialTheme.colorScheme.primary)
+                )
+            ) {
+                Icon(Icons.Filled.PlayArrow, stringResource(R.string.record))
+            }
+        }, modifier = Modifier.sharedBounds(SharedContentKey.AppBar)
+        )
+    }, floatingActionButton = {
+        NewActivityFAB(
+            onClick = onNewActivity, menuOpen = isNewActivityOpen
+        )
+    }) { paddingValues ->
         Column(
             modifier = Modifier
                 .padding(paddingValues)
                 .verticalScroll(scrollState)
         ) {
+
+            AnimatedVisibility(visible = recordingInProgress) {
+                Recordings(
+                    recordings = recordings,
+                    localizationRepository = viewModel.repository.localizationRepository,
+                    onAbort = { viewModel.abortRecording(it) },
+                    onSave = { viewModel.saveRecording(it) }
+
+                )
+            }
+
             StatisticsIfNotNull(stringResource(R.string.this_week), weeklyStats)
             StatisticsIfNotNull(stringResource(R.string.this_month), monthlyStats)
 
@@ -101,6 +126,69 @@ fun Home(
                 localizationRepository = viewModel.repository.localizationRepository,
                 onNavigateActivity = onNavigateActivity
             )
+        }
+    }
+}
+
+@Composable
+fun Recordings(
+    recordings: List<Recording>,
+    localizationRepository: LocalizationRepository,
+    onAbort: (Recording) -> Unit,
+    onSave: (Recording) -> Unit
+) {
+    Card(
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer),
+        modifier = Modifier
+            .padding(all = 8.dp)
+            .fillMaxWidth()
+    ) {
+        for (recording in recordings) {
+            RecordingStatus(
+                recording,
+                localizationRepository,
+                onAbort = { onAbort(recording) },
+                onSave = { onSave(recording) }
+            )
+        }
+    }
+}
+
+@Composable
+fun RecordingStatus(
+    recording: Recording,
+    localizationRepository: LocalizationRepository,
+    onAbort: () -> Unit,
+    onSave: () -> Unit
+) {
+    val timeString by remember {
+        derivedStateOf {
+            localizationRepository.formatRelativeDate(
+                recording.startTime
+            )
+        }
+    }
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .padding(all = 8.dp)
+            .fillMaxWidth()
+    ) {
+        Row {
+            Icon(
+                painterResource(R.drawable.record_24),
+                stringResource(R.string.recording),
+                tint = Color.Red
+            )
+            Text(stringResource(recording.type.nameId))
+        }
+        Text(timeString)
+        TextButton(onClick = onAbort) {
+            Text(stringResource(R.string.abort))
+        }
+        TextButton(onClick = onSave) {
+            Text(stringResource(R.string.save))
         }
     }
 }
@@ -150,11 +238,8 @@ fun Statistics(name: String, stats: ActivityStatistics) {
                     )
                     Text(
                         pluralStringResource(
-                            R.plurals.num_activities,
-                            activities.size,
-                            activities.size
-                        ),
-                        modifier = Modifier.weight(1f)
+                            R.plurals.num_activities, activities.size, activities.size
+                        ), modifier = Modifier.weight(1f)
                     )
                     Row(modifier = Modifier.weight(1f)) {
                         Icon(
@@ -199,11 +284,9 @@ fun ActivitiesToday(
 
     AnimatedVisibility(visible = !isEmpty) {
         Card(
-            onClick = onNavigateActivity,
-            colors = CardDefaults.cardColors(
+            onClick = onNavigateActivity, colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.secondaryContainer,
-            ),
-            modifier = Modifier
+            ), modifier = Modifier
                 .padding(all = 8.dp)
                 .fillMaxWidth()
         ) {

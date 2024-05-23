@@ -15,6 +15,7 @@ enum class View(
     ActivityLog(R.string.activity_log, "activity_log"),
     FilterActivity(R.string.filter, "filter_activity"),
     NewActivity(R.string.new_activity, "new_activity", listOf(Argument.ACTIVITY_ID)),
+    RecordActivity(R.string.record_activity, "record_activity"),
     ImportExport(R.string.import_export, "import_export"),
     Settings(R.string.settings, "settings");
 

@@ -5,8 +5,10 @@ import androidx.compose.runtime.Stable
 import com.inky.fitnesscalendar.data.Activity
 import com.inky.fitnesscalendar.data.ActivityFilter
 import com.inky.fitnesscalendar.data.ActivityType
+import com.inky.fitnesscalendar.data.Recording
 import com.inky.fitnesscalendar.data.Vehicle
 import com.inky.fitnesscalendar.db.dao.ActivityDao
+import com.inky.fitnesscalendar.db.dao.RecordingDao
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
@@ -18,6 +20,7 @@ import javax.inject.Singleton
 class AppRepository @Inject constructor(
     @ApplicationContext val context: Context,
     private val activityDao: ActivityDao,
+    private val recordingDao: RecordingDao,
     val localizationRepository: LocalizationRepository
 ) {
     suspend fun loadAllActivities() = activityDao.loadActivities()
@@ -34,8 +37,8 @@ class AppRepository @Inject constructor(
             }
         } ?: emptyList()
 
-        val searchVehicles = filter.text?.let {filterText ->
-            Vehicle.entries.filter {vehicle ->
+        val searchVehicles = filter.text?.let { filterText ->
+            Vehicle.entries.filter { vehicle ->
                 context.getString(vehicle.nameId).contains(filterText, ignoreCase = true)
             }
         } ?: emptyList()
@@ -60,4 +63,17 @@ class AppRepository @Inject constructor(
     }
 
     fun getActivity(id: Int) = activityDao.get(id)
+
+    suspend fun startRecording(recording: Recording) {
+        recordingDao.insert(recording)
+    }
+
+    fun getRecordings() = recordingDao.getRecordings()
+
+    suspend fun deleteRecording(recording: Recording) = recordingDao.delete(recording)
+
+    suspend fun endRecording(recording: Recording) {
+        val activity = recording.toActivity()
+        activityDao.stopRecording(recording, activity)
+    }
 }
