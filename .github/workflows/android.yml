@@ -22,8 +22,8 @@ jobs:
         distribution: 'temurin'
         cache: gradle
 
-    - name: Build with Gradle
-      uses: gradle/actions@v3.3.2
+    - name: Setup gradle
+      uses: gradle/actions/setup-gradle@v3
     - name: Create release app with gradle
       env:
         STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
