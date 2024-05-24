@@ -85,7 +85,7 @@ fun RecordActivity(
                 TextButton(enabled = enabled, onClick = {
                     val recording = Recording(
                         type = activityType!!,
-                        vehicle = vehicle!!,
+                        vehicle = vehicle,
                         startTime = Date.from(Instant.now())
                     )
                     onStart(recording)
