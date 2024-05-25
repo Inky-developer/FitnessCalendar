@@ -22,7 +22,6 @@ class HomeViewModel @Inject constructor(val repository: AppRepository) : ViewMod
     val monthStats = loadMonthStats()
     val activitiesToday = repository.getActivities(ActivityFilter.atDay(Instant.now()))
     val recordings = repository.getRecordings()
-    val recordingInProgress = recordings.map { it.isNotEmpty() }
 
     fun abortRecording(recording: Recording) {
         viewModelScope.launch(Dispatchers.IO) {

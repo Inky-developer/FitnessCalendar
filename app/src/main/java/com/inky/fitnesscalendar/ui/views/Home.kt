@@ -1,6 +1,7 @@
 package com.inky.fitnesscalendar.ui.views
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -30,7 +31,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -65,8 +68,7 @@ fun Home(
     val weeklyStats by viewModel.weekStats.collectAsState(initial = null)
     val monthlyStats by viewModel.monthStats.collectAsState(initial = null)
     val activitiesToday by viewModel.activitiesToday.collectAsState(initial = null)
-    val recordings by viewModel.recordings.collectAsState(initial = emptyList())
-    val recordingInProgress by viewModel.recordingInProgress.collectAsState(initial = false)
+    val recordings by viewModel.recordings.collectAsState(initial = null)
     val scrollState = rememberScrollState()
 
     Scaffold(topBar = {
@@ -86,7 +88,6 @@ fun Home(
             }
         }, actions = {
             IconButton(
-                enabled = !recordingInProgress,
                 onClick = { onRecordActivity() },
                 colors = IconButtonDefaults.iconButtonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
@@ -108,14 +109,16 @@ fun Home(
                 .verticalScroll(scrollState)
         ) {
 
-            AnimatedVisibility(visible = recordingInProgress) {
-                Recordings(
-                    recordings = recordings,
-                    localizationRepository = viewModel.repository.localizationRepository,
-                    onAbort = { viewModel.abortRecording(it) },
-                    onSave = { viewModel.saveRecording(it) }
+            if (recordings != null) {
+                AnimatedVisibility(visible = recordings?.isNotEmpty() ?: false) {
+                    Recordings(
+                        recordings = recordings ?: emptyList(),
+                        localizationRepository = viewModel.repository.localizationRepository,
+                        onAbort = { viewModel.abortRecording(it) },
+                        onSave = { viewModel.saveRecording(it) }
 
-                )
+                    )
+                }
             }
 
             StatisticsIfNotNull(stringResource(R.string.this_week), weeklyStats)
@@ -161,6 +164,16 @@ fun RecordingStatus(
     onAbort: () -> Unit,
     onSave: () -> Unit
 ) {
+    val visibilityState = remember { MutableTransitionState(false).apply { targetState = true } }
+    var shouldSave by remember { mutableStateOf(false) }
+
+    if (visibilityState.isIdle && !visibilityState.currentState) {
+        when (shouldSave) {
+            true -> onSave()
+            false -> onAbort()
+        }
+    }
+
     val timeString by remember {
         derivedStateOf {
             localizationRepository.formatRelativeDate(
@@ -168,27 +181,37 @@ fun RecordingStatus(
             )
         }
     }
-    Row(
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .padding(all = 8.dp)
-            .fillMaxWidth()
-    ) {
-        Row {
-            Icon(
-                painterResource(R.drawable.record_24),
-                stringResource(R.string.recording),
-                tint = Color.Red
-            )
-            Text(stringResource(recording.type.nameId))
-        }
-        Text(timeString)
-        TextButton(onClick = onAbort) {
-            Text(stringResource(R.string.abort))
-        }
-        TextButton(onClick = onSave) {
-            Text(stringResource(R.string.save))
+    AnimatedVisibility(visibleState = visibilityState) {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier
+                .padding(all = 8.dp)
+                .fillMaxWidth()
+        ) {
+            Row(modifier = Modifier.weight(1f)) {
+                Icon(
+                    painterResource(R.drawable.record_24),
+                    stringResource(R.string.recording),
+                    tint = Color.Red
+                )
+                Text(stringResource(recording.type.nameId))
+            }
+            Text(timeString, modifier = Modifier.weight(0.5f))
+            Row {
+                TextButton(onClick = {
+                    visibilityState.targetState = false
+                    shouldSave = false
+                }) {
+                    Text(stringResource(R.string.abort))
+                }
+                TextButton(onClick = {
+                    visibilityState.targetState = false
+                    shouldSave = true
+                }) {
+                    Text(stringResource(R.string.save))
+                }
+            }
         }
     }
 }
