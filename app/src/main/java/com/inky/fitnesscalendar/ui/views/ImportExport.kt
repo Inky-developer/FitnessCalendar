@@ -1,9 +1,12 @@
 package com.inky.fitnesscalendar.ui.views
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.Button
@@ -51,7 +54,9 @@ fun ImportExport(
     var exporting by remember { mutableStateOf(false) }
     val importing by viewModel.importing.collectAsState(initial = false)
     var importData by remember { mutableStateOf("") }
+
     val snackbarHostState = remember { SnackbarHostState() }
+    val scrollState = rememberScrollState()
 
     LaunchedEffect(null) {
         viewModel.toastMessage.collect {
@@ -78,7 +83,7 @@ fun ImportExport(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
     ) { paddingValues ->
         val context = LocalContext.current
-        Column(modifier = Modifier.padding(paddingValues)) {
+        Column(modifier = Modifier.verticalScroll(state = scrollState).padding(paddingValues)) {
             Button(
                 enabled = !exporting,
                 onClick = {
