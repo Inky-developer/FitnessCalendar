@@ -28,6 +28,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -37,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -53,6 +55,7 @@ import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.util.Duration
 import com.inky.fitnesscalendar.util.Duration.Companion.until
+import com.inky.fitnesscalendar.util.showRecordingNotification
 import com.inky.fitnesscalendar.view_model.HomeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -70,6 +73,16 @@ fun Home(
     val activitiesToday by viewModel.activitiesToday.collectAsState(initial = null)
     val recordings by viewModel.recordings.collectAsState(initial = null)
     val scrollState = rememberScrollState()
+
+    val context = LocalContext.current
+    LaunchedEffect(recordings) {
+        for (recording in recordings ?: emptyList()) {
+            if (recording.uid == null) {
+                continue
+            }
+            context.showRecordingNotification(recording.uid, recording.type)
+        }
+    }
 
     Scaffold(topBar = {
         CenterAlignedTopAppBar(title = {

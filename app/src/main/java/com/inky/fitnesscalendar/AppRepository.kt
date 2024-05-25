@@ -10,6 +10,7 @@ import com.inky.fitnesscalendar.data.Vehicle
 import com.inky.fitnesscalendar.db.dao.ActivityDao
 import com.inky.fitnesscalendar.db.dao.RecordingDao
 import com.inky.fitnesscalendar.localization.LocalizationRepository
+import com.inky.fitnesscalendar.util.hideRecordingNotification
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
@@ -70,9 +71,13 @@ class AppRepository @Inject constructor(
 
     fun getRecordings() = recordingDao.getRecordings()
 
-    suspend fun deleteRecording(recording: Recording) = recordingDao.delete(recording)
+    suspend fun deleteRecording(recording: Recording) {
+        recording.uid?.let { context.hideRecordingNotification(it) }
+        recordingDao.delete(recording)
+    }
 
     suspend fun endRecording(recording: Recording) {
+        recording.uid?.let { context.hideRecordingNotification(it) }
         val activity = recording.toActivity()
         activityDao.stopRecording(recording, activity)
     }

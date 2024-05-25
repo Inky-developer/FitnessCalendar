@@ -50,9 +50,11 @@
     <string name="record">Record</string>
     <string name="record_activity">Record Activity</string>
     <string name="record_activity_type">Record %1s</string>
+    <string name="recording_activity_type">Recording %1s</string>
     <string name="recording">Recording</string>
     <string name="abort">Abort</string>
     <string name="enter_import_data">Enter import data…</string>
+    <string name="recordings">Recordings</string>
     <plurals name="num_activities">
         <item quantity="one">%1d activity</item>
         <item quantity="other">%1d activities</item>

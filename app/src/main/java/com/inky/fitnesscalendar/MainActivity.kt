@@ -1,9 +1,14 @@
 package com.inky.fitnesscalendar
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -19,6 +24,8 @@ class MainActivity : ComponentActivity() {
 
         super.onCreate(savedInstanceState)
 
+        requestNotificationPermission()
+
         setContent {
             FitnessCalendarTheme {
                 // A surface container using the 'background' color from the theme
@@ -29,6 +36,23 @@ class MainActivity : ComponentActivity() {
                     App()
                 }
             }
+        }
+    }
+
+    private fun requestNotificationPermission() {
+        if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) == PackageManager.PERMISSION_GRANTED) {
+            return
+        }
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val locationPermissionRequest =
+                registerForActivityResult(ActivityResultContracts.RequestPermission()) { result ->
+                    if (!result) {
+                        Toast.makeText(this, "You suck", Toast.LENGTH_LONG).show()
+                    }
+                }
+
+            locationPermissionRequest.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
     }
 }
