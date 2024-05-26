@@ -1,7 +1,7 @@
 package com.inky.fitnesscalendar.util
 
 fun readCSV(data: String): List<Map<String, String?>> {
-    val lines = data.split("\n")
+    val lines = data.replace("\r\n", "\n").split("\n")
     if (lines.isEmpty()) {
         return emptyList()
     }
@@ -11,6 +11,6 @@ fun readCSV(data: String): List<Map<String, String?>> {
 
     val headers = header.split(",")
     return rows.map { row ->
-        headers.zip(row.split(",").map { if (it.isEmpty()) null else it }).toMap()
+        headers.zip(row.split(",").map { it.ifEmpty { null } }).toMap()
     }
 }

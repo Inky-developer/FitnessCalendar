@@ -2,11 +2,14 @@ package com.inky.fitnesscalendar.util
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import com.inky.fitnesscalendar.data.Activity
 import com.inky.fitnesscalendar.data.ActivityType
 import com.inky.fitnesscalendar.data.Vehicle
 import java.time.Instant
 import java.util.Date
+
+const val TAG = "import_export"
 
 fun Context.exportCsv(activities: List<Activity>) {
     val csvData = CSVWriter(listOf("uid", "type", "vehicle", "description", "start", "end")) {
@@ -26,6 +29,7 @@ fun Context.exportCsv(activities: List<Activity>) {
 
 fun importCsv(rawData: String): List<Activity> {
     val data = readCSV(rawData)
+    Log.i(TAG, "Data to import: $data")
     return data.mapNotNull { row -> getActivity(row) }
 }
 
