@@ -80,7 +80,7 @@ fun Home(
             if (recording.uid == null) {
                 continue
             }
-            context.showRecordingNotification(recording.uid, recording.type)
+            context.showRecordingNotification(recording.uid, recording.type, recording.startTime.time)
         }
     }
 

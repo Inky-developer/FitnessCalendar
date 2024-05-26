@@ -13,7 +13,7 @@ import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityType
 import java.util.Locale
 
-fun Context.showRecordingNotification(recordingId: Int, recordingType: ActivityType) {
+fun Context.showRecordingNotification(recordingId: Int, recordingType: ActivityType, startTimeMs: Long) {
     if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
         return
     }
@@ -39,6 +39,9 @@ fun Context.showRecordingNotification(recordingId: Int, recordingType: ActivityT
         setOnlyAlertOnce(true)
         setOngoing(true)
         setCategory(NotificationCompat.CATEGORY_SERVICE)
+        setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
+        setUsesChronometer(true)
+        setWhen(startTimeMs)
         setContentTitle(title)
         setSmallIcon(R.drawable.outline_timer_24)
         setContentIntent(pendingIntent)
