@@ -1,7 +1,7 @@
 package com.inky.fitnesscalendar.ui.views
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -32,9 +32,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -58,6 +56,8 @@ import com.inky.fitnesscalendar.util.Duration.Companion.until
 import com.inky.fitnesscalendar.util.showRecordingNotification
 import com.inky.fitnesscalendar.view_model.HomeViewModel
 
+const val TAG = "HOME"
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Home(
@@ -80,7 +80,12 @@ fun Home(
             if (recording.uid == null) {
                 continue
             }
-            context.showRecordingNotification(recording.uid, recording.type, recording.startTime.time)
+            Log.d(TAG, "Notification for $recording")
+            context.showRecordingNotification(
+                recording.uid,
+                recording.type,
+                recording.startTime.time
+            )
         }
     }
 
@@ -177,16 +182,6 @@ fun RecordingStatus(
     onAbort: () -> Unit,
     onSave: () -> Unit
 ) {
-    val visibilityState = remember { MutableTransitionState(false).apply { targetState = true } }
-    var shouldSave by remember { mutableStateOf(false) }
-
-    if (visibilityState.isIdle && !visibilityState.currentState) {
-        when (shouldSave) {
-            true -> onSave()
-            false -> onAbort()
-        }
-    }
-
     val timeString by remember {
         derivedStateOf {
             localizationRepository.formatRelativeDate(
@@ -194,36 +189,28 @@ fun RecordingStatus(
             )
         }
     }
-    AnimatedVisibility(visibleState = visibilityState) {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .padding(all = 8.dp)
-                .fillMaxWidth()
-        ) {
-            Row(modifier = Modifier.weight(1f)) {
-                Icon(
-                    painterResource(R.drawable.record_24),
-                    stringResource(R.string.recording),
-                    tint = Color.Red
-                )
-                Text(stringResource(recording.type.nameId))
+    Row(
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .padding(all = 8.dp)
+            .fillMaxWidth()
+    ) {
+        Row(modifier = Modifier.weight(1f)) {
+            Icon(
+                painterResource(R.drawable.record_24),
+                stringResource(R.string.recording),
+                tint = Color.Red
+            )
+            Text(stringResource(recording.type.nameId))
+        }
+        Text(timeString, modifier = Modifier.weight(0.5f))
+        Row {
+            TextButton(onClick = onAbort) {
+                Text(stringResource(R.string.abort))
             }
-            Text(timeString, modifier = Modifier.weight(0.5f))
-            Row {
-                TextButton(onClick = {
-                    visibilityState.targetState = false
-                    shouldSave = false
-                }) {
-                    Text(stringResource(R.string.abort))
-                }
-                TextButton(onClick = {
-                    visibilityState.targetState = false
-                    shouldSave = true
-                }) {
-                    Text(stringResource(R.string.save))
-                }
+            TextButton(onClick = onSave) {
+                Text(stringResource(R.string.save))
             }
         }
     }

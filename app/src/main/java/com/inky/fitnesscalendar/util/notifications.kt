@@ -10,10 +10,15 @@ import android.content.pm.PackageManager
 import androidx.core.app.NotificationCompat
 import com.inky.fitnesscalendar.MainActivity
 import com.inky.fitnesscalendar.R
+import com.inky.fitnesscalendar.broadcast_receiver.NotificationBroadcastReceiver
 import com.inky.fitnesscalendar.data.ActivityType
 import java.util.Locale
 
-fun Context.showRecordingNotification(recordingId: Int, recordingType: ActivityType, startTimeMs: Long) {
+fun Context.showRecordingNotification(
+    recordingId: Int,
+    recordingType: ActivityType,
+    startTimeMs: Long
+) {
     if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
         return
     }
@@ -31,11 +36,24 @@ fun Context.showRecordingNotification(recordingId: Int, recordingType: ActivityT
         R.string.recording_activity_type,
         getString(recordingType.nameId).lowercase(Locale.getDefault())
     )
+
     val launchIntent = Intent(this, MainActivity::class.java)
     val pendingIntent =
         PendingIntent.getActivity(this, 0, launchIntent, PendingIntent.FLAG_IMMUTABLE)
+
+
+    val cancelIntent = notificationBroadcastIntent {
+        action = ACTION_CANCEL
+        putExtra(EXTRA_RECORDING_ID, recordingId)
+    }
+
+    val saveIntent = notificationBroadcastIntent {
+        action = ACTION_SAVE
+        putExtra(EXTRA_RECORDING_ID, recordingId)
+    }
+
     val builder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_RECORD).apply {
-        setPriority(NotificationCompat.PRIORITY_DEFAULT)
+        setPriority(NotificationCompat.PRIORITY_MAX)
         setOnlyAlertOnce(true)
         setOngoing(true)
         setCategory(NotificationCompat.CATEGORY_SERVICE)
@@ -45,6 +63,8 @@ fun Context.showRecordingNotification(recordingId: Int, recordingType: ActivityT
         setContentTitle(title)
         setSmallIcon(R.drawable.outline_timer_24)
         setContentIntent(pendingIntent)
+        addAction(R.drawable.ic_notification_cancel, getString(R.string.abort), cancelIntent)
+        addAction(R.drawable.ic_notification_save, getString(R.string.save), saveIntent)
     }
     notificationManager.notify(recordingId, builder.build())
 }
@@ -53,4 +73,16 @@ fun Context.hideRecordingNotification(recordingId: Int) {
     val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
     notificationManager.cancel(recordingId)
+}
+
+private fun Context.notificationBroadcastIntent(body: Intent.() -> Unit): PendingIntent {
+    val intent = Intent(this, NotificationBroadcastReceiver::class.java).apply {
+        body()
+    }
+    val pendingIntent = PendingIntent.getBroadcast(
+        this, 0, intent,
+        PendingIntent.FLAG_IMMUTABLE
+    )
+
+    return pendingIntent
 }

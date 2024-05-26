@@ -1,6 +1,7 @@
 package com.inky.fitnesscalendar
 
 import android.content.Context
+import android.util.Log
 import androidx.compose.runtime.Stable
 import com.inky.fitnesscalendar.data.Activity
 import com.inky.fitnesscalendar.data.ActivityFilter
@@ -15,6 +16,8 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
+
+const val TAG = "AppRepository"
 
 @Singleton
 @Stable
@@ -71,12 +74,16 @@ class AppRepository @Inject constructor(
 
     fun getRecordings() = recordingDao.getRecordings()
 
+    suspend fun getRecording(uid: Int) = recordingDao.getById(uid)
+
     suspend fun deleteRecording(recording: Recording) {
+        Log.d(TAG, "Deleting $recording")
         recording.uid?.let { context.hideRecordingNotification(it) }
         recordingDao.delete(recording)
     }
 
     suspend fun endRecording(recording: Recording) {
+        Log.d(TAG, "Ending recording $recording")
         recording.uid?.let { context.hideRecordingNotification(it) }
         val activity = recording.toActivity()
         activityDao.stopRecording(recording, activity)
