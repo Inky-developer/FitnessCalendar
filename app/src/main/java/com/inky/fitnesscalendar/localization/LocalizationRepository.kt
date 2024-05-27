@@ -17,6 +17,16 @@ class LocalizationRepository @Inject constructor(@ApplicationContext context: Co
     val timeFormatter: java.text.DateFormat = DateFormat.getTimeFormat(context)
     val dateFormatter: java.text.DateFormat = DateFormat.getMediumDateFormat(context)
 
+    fun formatDuration(date: Date, now: Date = Date.from(Instant.now())): String {
+        val duration = date until now
+
+        if (duration.elapsedMs < ChronoUnit.DAYS.duration.toMillis()) {
+            return duration.format()
+        }
+
+        return formatRelativeDate(date, now)
+    }
+
     fun formatRelativeDate(date: Date, now: Date = Date.from(Instant.now())): String {
         val duration = date until now
 

@@ -7,15 +7,18 @@ data class Duration(val elapsedMs: Long) {
     fun format(): String {
         val hours = TimeUnit.MILLISECONDS.toHours(elapsedMs)
         val minutes = TimeUnit.MILLISECONDS.toMinutes(elapsedMs - TimeUnit.HOURS.toMillis(hours))
+        val seconds = TimeUnit.MILLISECONDS.toSeconds(
+            elapsedMs - TimeUnit.HOURS.toMillis(hours) - TimeUnit.MINUTES.toMillis(minutes)
+        )
         val builder = StringBuilder()
         if (hours > 0) {
-            builder.append("${hours}h")
+            builder.append("${hours}h ")
         }
         if (minutes > 0) {
-            builder.append("${minutes}m")
+            builder.append("${minutes}m ")
         }
-        if (hours == 0L && minutes == 0L) {
-            return "0s"
+        if (hours == 0L && minutes <= 10L) {
+            builder.append("${seconds}s ")
         }
 
 

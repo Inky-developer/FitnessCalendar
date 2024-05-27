@@ -49,6 +49,7 @@ import com.inky.fitnesscalendar.data.Recording
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.CompactActivityCard
 import com.inky.fitnesscalendar.ui.components.NewActivityFAB
+import com.inky.fitnesscalendar.ui.components.Timer
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.util.Duration
@@ -165,12 +166,15 @@ fun Recordings(
             .fillMaxWidth()
     ) {
         for (recording in recordings) {
-            RecordingStatus(
-                recording,
-                localizationRepository,
-                onAbort = { onAbort(recording) },
-                onSave = { onSave(recording) }
-            )
+            Timer { time ->
+                RecordingStatus(
+                    recording,
+                    localizationRepository,
+                    time,
+                    onAbort = { onAbort(recording) },
+                    onSave = { onSave(recording) }
+                )
+            }
         }
     }
 }
@@ -179,14 +183,18 @@ fun Recordings(
 fun RecordingStatus(
     recording: Recording,
     localizationRepository: LocalizationRepository,
+    currentTimeMs: Long,
     onAbort: () -> Unit,
     onSave: () -> Unit
 ) {
     val timeString by remember {
         derivedStateOf {
-            localizationRepository.formatRelativeDate(
-                recording.startTime
-            )
+            localizationRepository.formatRelativeDate(recording.startTime)
+        }
+    }
+    val durationString by remember(currentTimeMs) {
+        derivedStateOf {
+            localizationRepository.formatDuration(recording.startTime)
         }
     }
     Row(
@@ -196,7 +204,7 @@ fun RecordingStatus(
             .padding(all = 8.dp)
             .fillMaxWidth()
     ) {
-        Row(modifier = Modifier.weight(1f)) {
+        Row(modifier = Modifier.weight(0.75f)) {
             Icon(
                 painterResource(R.drawable.record_24),
                 stringResource(R.string.recording),
@@ -205,6 +213,7 @@ fun RecordingStatus(
             Text(stringResource(recording.type.nameId))
         }
         Text(timeString, modifier = Modifier.weight(0.5f))
+        Text(durationString, modifier = Modifier.weight(0.5f))
         Row {
             TextButton(onClick = onAbort) {
                 Text(stringResource(R.string.abort))
