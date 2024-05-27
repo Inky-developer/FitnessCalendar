@@ -66,6 +66,8 @@ class AppRepository @Inject constructor(
         activityDao.delete(activity)
     }
 
+    suspend fun loadMostRecentActivities(n: Int) = activityDao.loadMostRecentActivities(n)
+
     fun getActivity(id: Int) = activityDao.get(id)
 
     suspend fun startRecording(recording: Recording) {

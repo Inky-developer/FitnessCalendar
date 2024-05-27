@@ -6,7 +6,6 @@ import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.material3.DrawerValue
-import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -29,6 +28,7 @@ import com.inky.fitnesscalendar.ui.views.Home
 import com.inky.fitnesscalendar.ui.views.ImportExport
 import com.inky.fitnesscalendar.ui.views.NewActivity
 import com.inky.fitnesscalendar.ui.views.RecordActivity
+import com.inky.fitnesscalendar.ui.views.Settings
 import com.inky.fitnesscalendar.ui.views.View
 import com.inky.fitnesscalendar.view_model.AppViewModel
 import kotlinx.coroutines.launch
@@ -81,7 +81,7 @@ fun App(viewModel: AppViewModel = hiltViewModel()) {
                     exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Start) }
                 ) {
                     currentView = View.Home
-                    provideSharedContent(sharedContentScope = this@SharedTransitionLayout) {
+                    ProvideSharedContent(sharedContentScope = this@SharedTransitionLayout) {
                         Home(
                             isNewActivityOpen = isNewActivityOpen,
                             onNewActivity = { navController.navigate(View.NewActivity.getPath(-1)) },
@@ -95,7 +95,7 @@ fun App(viewModel: AppViewModel = hiltViewModel()) {
                 }
                 composable(View.ActivityLog.pathTemplate()) {
                     currentView = View.ActivityLog
-                    provideSharedContent(sharedContentScope = this@SharedTransitionLayout) {
+                    ProvideSharedContent(sharedContentScope = this@SharedTransitionLayout) {
                         ActivityLog(
                             filter = filterState,
                             onOpenDrawer = openDrawer,
@@ -118,7 +118,7 @@ fun App(viewModel: AppViewModel = hiltViewModel()) {
                     slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Down)
                 }) {
                     currentView = View.FilterActivity
-                    provideSharedContent(sharedContentScope = this@SharedTransitionLayout) {
+                    ProvideSharedContent(sharedContentScope = this@SharedTransitionLayout) {
                         FilterActivity(
                             filterState,
                             onFilterChange = { filterState = it },
@@ -164,7 +164,7 @@ fun App(viewModel: AppViewModel = hiltViewModel()) {
                 }
                 composable(View.ImportExport.pathTemplate()) {
                     currentView = View.ImportExport
-                    provideSharedContent(sharedContentScope = this@SharedTransitionLayout) {
+                    ProvideSharedContent(sharedContentScope = this@SharedTransitionLayout) {
                         ImportExport(
                             onOpenDrawer = openDrawer
                         )
@@ -172,8 +172,8 @@ fun App(viewModel: AppViewModel = hiltViewModel()) {
                 }
                 composable(View.Settings.pathTemplate()) {
                     currentView = View.Settings
-                    provideSharedContent(sharedContentScope = this@SharedTransitionLayout) {
-                        Text("Settings")
+                    ProvideSharedContent(sharedContentScope = this@SharedTransitionLayout) {
+                        Settings()
                     }
                 }
             }
@@ -190,16 +190,16 @@ class SharedTransitionData(
     val animatedContentScope get() = _animatedContentScope!!
 }
 
-val SharedTransition = compositionLocalOf { SharedTransitionData(null, null) }
+val localSharedTransition = compositionLocalOf { SharedTransitionData(null, null) }
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun AnimatedContentScope.provideSharedContent(
+fun AnimatedContentScope.ProvideSharedContent(
     sharedContentScope: SharedTransitionScope,
     content: @Composable () -> Unit
 ) {
     CompositionLocalProvider(
-        value = SharedTransition provides SharedTransitionData(
+        value = localSharedTransition provides SharedTransitionData(
             sharedContentScope,
             this
         )

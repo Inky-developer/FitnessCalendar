@@ -37,6 +37,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.Activity
+import com.inky.fitnesscalendar.di.ActivityTypeDecisionTree
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivitySelector
 import com.inky.fitnesscalendar.ui.components.ActivitySelectorState
@@ -84,7 +85,11 @@ fun NewActivity(
         )
     } ?: stringResource(R.string.new_activity)
 
-    var selectedActivityType by rememberSaveable { mutableStateOf(activity?.type) }
+    var selectedActivityType by rememberSaveable {
+        mutableStateOf(
+            activity?.type ?: ActivityTypeDecisionTree.decisionTree?.classifyNow()
+        )
+    }
     var selectedVehicle by rememberSaveable { mutableStateOf(activity?.vehicle) }
     val startDateTimePickerState by rememberSaveable(stateSaver = DateTimePickerState.SAVER) {
         mutableStateOf(

@@ -23,9 +23,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.inky.fitnesscalendar.R
-import com.inky.fitnesscalendar.data.ActivityType
 import com.inky.fitnesscalendar.data.Recording
 import com.inky.fitnesscalendar.data.Vehicle
+import com.inky.fitnesscalendar.di.ActivityTypeDecisionTree
 import com.inky.fitnesscalendar.ui.components.ActivitySelector
 import com.inky.fitnesscalendar.ui.components.ActivitySelectorState
 import java.time.Instant
@@ -36,7 +36,7 @@ fun RecordActivity(
     onStart: (Recording) -> Unit,
     onNavigateBack: () -> Unit
 ) {
-    var activityType by remember { mutableStateOf<ActivityType?>(null) }
+    var activityType by remember { mutableStateOf(ActivityTypeDecisionTree.decisionTree?.classifyNow()) }
     var vehicle by remember { mutableStateOf<Vehicle?>(null) }
 
     val context = LocalContext.current
