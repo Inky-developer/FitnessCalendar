@@ -253,7 +253,7 @@ fun Statistics(name: String, stats: ActivityStatistics) {
                     continue
                 }
 
-                val durationString = remember(key1 = activities) {
+                val durationString = remember(activities) {
                     Duration(activities.map { it.startTime until it.endTime }
                         .sumOf { it.elapsedMs }).format()
 

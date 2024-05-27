@@ -29,6 +29,9 @@ import androidx.compose.ui.unit.sp
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.ui.views.View
 
+
+val selectableViews = listOf(View.Home, View.ActivityLog, View.ImportExport, View.Settings)
+
 @Composable
 fun NavigationDrawer(
     drawerState: DrawerState,
@@ -36,7 +39,6 @@ fun NavigationDrawer(
     onNavigate: (View) -> Unit,
     content: @Composable () -> Unit
 ) {
-    val selectableViews = listOf(View.Home, View.ActivityLog, View.ImportExport, View.Settings)
 
     ModalNavigationDrawer(drawerState = drawerState, drawerContent = {
         ModalDrawerSheet(drawerContainerColor = MaterialTheme.colorScheme.primaryContainer) {
