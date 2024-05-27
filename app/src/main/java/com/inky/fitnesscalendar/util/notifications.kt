@@ -7,6 +7,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.os.Build
 import androidx.core.app.NotificationCompat
 import com.inky.fitnesscalendar.MainActivity
 import com.inky.fitnesscalendar.R
@@ -19,7 +20,7 @@ fun Context.showRecordingNotification(
     recordingType: ActivityType,
     startTimeMs: Long
 ) {
-    if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU && checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
         return
     }
 
@@ -42,14 +43,12 @@ fun Context.showRecordingNotification(
         PendingIntent.getActivity(this, 0, launchIntent, PendingIntent.FLAG_IMMUTABLE)
 
 
-    val cancelIntent = notificationBroadcastIntent {
+    val cancelIntent = notificationBroadcastIntent(recordingId) {
         action = ACTION_CANCEL
-        putExtra(EXTRA_RECORDING_ID, recordingId)
     }
 
-    val saveIntent = notificationBroadcastIntent {
+    val saveIntent = notificationBroadcastIntent(recordingId) {
         action = ACTION_SAVE
-        putExtra(EXTRA_RECORDING_ID, recordingId)
     }
 
     val builder = NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_RECORD).apply {
@@ -75,13 +74,14 @@ fun Context.hideRecordingNotification(recordingId: Int) {
     notificationManager.cancel(recordingId)
 }
 
-private fun Context.notificationBroadcastIntent(body: Intent.() -> Unit): PendingIntent {
+private fun Context.notificationBroadcastIntent(recordingId: Int, body: Intent.() -> Unit): PendingIntent {
     val intent = Intent(this, NotificationBroadcastReceiver::class.java).apply {
         body()
+        putExtra(EXTRA_RECORDING_ID, recordingId)
     }
     val pendingIntent = PendingIntent.getBroadcast(
-        this, 0, intent,
-        PendingIntent.FLAG_IMMUTABLE
+        this, recordingId, intent,
+        PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_ONE_SHOT
     )
 
     return pendingIntent
