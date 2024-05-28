@@ -13,15 +13,15 @@ enum class ActivityType(
     Cycling(ActivityClass.Sports, nameId = R.string.activity_cycling, emoji = "🚴"),
     Running(ActivityClass.Sports, nameId = R.string.activity_running, emoji = "🏃"),
     KungFu(ActivityClass.Sports, nameId = R.string.activity_kung_fu, emoji = "🥋"),
-    WorkCommute(
+    UniversityCommute(
         ActivityClass.Travel,
-        nameId = R.string.activity_commute_home_to_work,
+        nameId = R.string.activity_commute_home_to_university,
         emoji = "🏢",
         hasVehicle = true
     ),
     HomeCommute(
         ActivityClass.Travel,
-        nameId = R.string.activity_commute_work_to_home,
+        nameId = R.string.activity_commute_university_to_home,
         emoji = "🏡",
         hasVehicle = true
     ),

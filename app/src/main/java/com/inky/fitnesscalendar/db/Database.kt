@@ -11,7 +11,10 @@ import com.inky.fitnesscalendar.db.dao.ActivityDao
 import com.inky.fitnesscalendar.db.dao.RecordingDao
 import com.inky.fitnesscalendar.util.DATABASE_NAME
 
-@Database(entities = [Activity::class, Recording::class], version = 1)
+@Database(
+    version = 2,
+    entities = [Activity::class, Recording::class],
+)
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
     abstract fun activityDao(): ActivityDao
@@ -29,6 +32,9 @@ abstract class AppDatabase : RoomDatabase() {
         }
 
         private fun buildDatabase(context: Context) =
-            Room.databaseBuilder(context, AppDatabase::class.java, DATABASE_NAME).build()
+            Room
+                .databaseBuilder(context, AppDatabase::class.java, DATABASE_NAME)
+                .addMigrations(MIGRATION_1_2)
+                .build()
     }
 }
