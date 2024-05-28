@@ -1,6 +1,5 @@
 package com.inky.fitnesscalendar.ui.components
 
-import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -42,7 +41,7 @@ import com.inky.fitnesscalendar.ui.util.sharedElement
 import com.inky.fitnesscalendar.ui.util.skipToLookaheadSize
 import com.inky.fitnesscalendar.util.Duration.Companion.until
 
-@OptIn(ExperimentalFoundationApi::class, ExperimentalSharedTransitionApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ActivityCard(
     activity: Activity,
@@ -59,6 +58,7 @@ fun ActivityCard(
     val time = remember(activity) {
         localizationRepository.formatRelativeDate(activity.startTime)
     }
+    val description = remember(activity) { activity.description }
     val timeElapsed = remember(activity) { activity.startTime until activity.endTime }
 
     val haptics = LocalHapticFeedback.current
@@ -123,10 +123,10 @@ fun ActivityCard(
             }
         }
 
-        if (activity.description.isNotEmpty()) {
+        if (description.isNotEmpty()) {
             HorizontalDivider()
             Text(
-                activity.description,
+                description,
                 overflow = TextOverflow.Ellipsis,
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier.padding(all = 8.dp)
