@@ -190,6 +190,7 @@ class SharedTransitionData(
     val animatedContentScope get() = _animatedContentScope!!
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 val localSharedTransition = compositionLocalOf { SharedTransitionData(null, null) }
 
 @OptIn(ExperimentalSharedTransitionApi::class)
