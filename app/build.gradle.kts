@@ -5,6 +5,11 @@ plugins {
     alias(libs.plugins.ksp)
     id("kotlin-parcelize")
     alias(libs.plugins.compose.compiler)
+    alias(libs.plugins.room)
+}
+
+room {
+    schemaDirectory("$projectDir/schemas")
 }
 
 android {
