@@ -208,9 +208,13 @@ fun RecordingStatus(
             Icon(
                 painterResource(R.drawable.record_24),
                 stringResource(R.string.recording),
-                tint = Color.Red
+                tint = Color.Red,
+                modifier = Modifier.align(Alignment.CenterVertically)
             )
-            Text(stringResource(recording.type.nameId))
+            Text(
+                stringResource(recording.type.nameId),
+                modifier = Modifier.align(Alignment.CenterVertically)
+            )
         }
         Text(timeString, modifier = Modifier.weight(0.5f))
         Text(durationString, modifier = Modifier.weight(0.5f))
