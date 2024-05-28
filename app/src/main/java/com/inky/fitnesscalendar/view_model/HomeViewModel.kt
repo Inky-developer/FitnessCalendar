@@ -39,7 +39,7 @@ class HomeViewModel @Inject constructor(val repository: AppRepository) : ViewMod
         val filter = ActivityFilter(
             startRangeDate = Date.from(
                 Instant.ofEpochMilli(
-                    Instant.now().toEpochMilli() - ChronoUnit.WEEKS.duration.toMillis() * 7
+                    Instant.now().toEpochMilli() - ChronoUnit.WEEKS.duration.toMillis()
                 )
             )
         )
