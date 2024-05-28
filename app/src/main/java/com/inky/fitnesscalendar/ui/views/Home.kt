@@ -140,7 +140,7 @@ fun Home(
                 }
             }
 
-            StatisticsIfNotNull(stringResource(R.string.this_week), weeklyStats)
+            StatisticsIfNotNull(stringResource(R.string.last_seven_days), weeklyStats)
             StatisticsIfNotNull(stringResource(R.string.this_month), monthlyStats)
 
             ActivitiesTodayOrNull(

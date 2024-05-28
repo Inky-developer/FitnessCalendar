@@ -41,6 +41,7 @@
     <string name="import_activities">Import</string>
     <string name="activity_log">Activity Log</string>
     <string name="this_week">This Week</string>
+    <string name="last_seven_days">7 Days</string>
     <string name="sports">Sports</string>
     <string name="travel">Travel</string>
     <string name="other">Other</string>
