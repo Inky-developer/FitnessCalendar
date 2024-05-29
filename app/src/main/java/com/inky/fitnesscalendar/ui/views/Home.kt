@@ -204,7 +204,7 @@ fun RecordingStatus(
             .padding(all = 8.dp)
             .fillMaxWidth()
     ) {
-        Row(modifier = Modifier.weight(0.75f)) {
+        Row(modifier = Modifier.padding(end = 8.dp)) {
             Icon(
                 painterResource(R.drawable.record_24),
                 stringResource(R.string.recording),
