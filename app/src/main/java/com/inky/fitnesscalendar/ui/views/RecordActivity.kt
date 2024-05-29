@@ -66,6 +66,7 @@ fun RecordActivity(
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
+                        .padding(horizontal=8.dp)
                 )
                 HorizontalDivider()
             }
