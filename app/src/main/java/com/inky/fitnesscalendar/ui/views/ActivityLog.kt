@@ -1,16 +1,25 @@
 package com.inky.fitnesscalendar.ui.views
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyItemScope
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Clear
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Search
@@ -18,6 +27,7 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.InputChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -51,6 +61,7 @@ fun ActivityLog(
     viewModel: ActivityLogViewModel = hiltViewModel(),
     filter: ActivityFilter,
     isNewActivityOpen: Boolean,
+    onEditFilter: (ActivityFilter) -> Unit,
     onOpenDrawer: () -> Unit,
     onNewActivity: () -> Unit,
     onEditActivity: (Activity) -> Unit,
@@ -101,50 +112,109 @@ fun ActivityLog(
             menuOpen = isNewActivityOpen,
         )
     }) { innerPadding ->
-        LazyColumn(
-            state = activityListState,
-            modifier = Modifier.padding(innerPadding),
-            contentPadding = PaddingValues(bottom = 128.dp),
+        Column(
+            modifier = Modifier.padding(innerPadding)
         ) {
-            items(activities, key = { it.uid ?: -1 }) { activity ->
-                ActivityCard(
-                    activity,
-                    onDelete = {
-                        scope.launch { viewModel.repository.deleteActivity(activity) }
-                    },
-                    onEdit = onEditActivity,
-                    localizationRepository = viewModel.repository.localizationRepository,
-                    modifier = Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null)
-                )
-            }
-        }
-
-        if (activities.isEmpty()) {
-            Row(
-                horizontalArrangement = Arrangement.Center,
-                modifier = Modifier
-                    .padding(innerPadding)
-                    .padding(vertical = 8.dp)
-                    .fillMaxSize()
-            ) {
-                Icon(
-                    Icons.Outlined.Info,
-                    stringResource(R.string.info),
-                    tint = MaterialTheme.colorScheme.primary,
+            AnimatedVisibility(visible = !filter.isEmpty()) {
+                Box(
                     modifier = Modifier
-                        .padding(horizontal = 8.dp)
-                        .width(32.dp)
-                        .aspectRatio(1f)
-                        .align(Alignment.CenterVertically)
-                )
-                val textId =
-                    if (filter.isEmpty()) R.string.no_activities_yet else R.string.no_activities_with_filter
-                Text(
-                    stringResource(textId),
-                    style = MaterialTheme.typography.displaySmall,
-                    modifier = Modifier.align(Alignment.CenterVertically)
-                )
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.primaryContainer)
+                        .padding(all = 8.dp)
+                ) {
+                    FilterInformation(filter = filter, onChange = onEditFilter)
+                }
+            }
+            if (activities.isEmpty()) {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier
+                        .padding(innerPadding)
+                        .padding(vertical = 8.dp)
+                        .fillMaxSize()
+                ) {
+                    Icon(
+                        Icons.Outlined.Info,
+                        stringResource(R.string.info),
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier
+                            .padding(horizontal = 8.dp)
+                            .width(32.dp)
+                            .aspectRatio(1f)
+                            .align(Alignment.CenterVertically)
+                    )
+                    val textId =
+                        if (filter.isEmpty()) R.string.no_activities_yet else R.string.no_activities_with_filter
+                    Text(
+                        stringResource(textId),
+                        style = MaterialTheme.typography.displaySmall,
+                        modifier = Modifier.align(Alignment.CenterVertically)
+                    )
+                }
+            } else {
+                LazyColumn(
+                    state = activityListState,
+                    contentPadding = PaddingValues(bottom = 128.dp),
+                ) {
+                    items(activities, key = { it.uid ?: -1 }) { activity ->
+                        ActivityCard(
+                            activity,
+                            onDelete = {
+                                scope.launch { viewModel.repository.deleteActivity(activity) }
+                            },
+                            onEdit = onEditActivity,
+                            localizationRepository = viewModel.repository.localizationRepository,
+                            modifier = Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null)
+                        )
+                    }
+                }
             }
         }
     }
+}
+
+@Composable
+private fun FilterInformation(filter: ActivityFilter, onChange: (ActivityFilter) -> Unit) {
+    val listState = rememberLazyListState()
+    LazyRow(state = listState) {
+        if (filter.text != null) {
+            item {
+                FilterChip(
+                    onClick = { onChange(filter.copy(text = null)) },
+                    label = { Text(filter.text) },
+                    leadingIcon = { Icon(Icons.Outlined.Edit, stringResource(R.string.text)) }
+                )
+            }
+        }
+        items(filter.types) { type ->
+            FilterChip(
+                onClick = { onChange(filter.copy(types = filter.types.filter { it != type })) },
+                leadingIcon = { Text(type.emoji, style = MaterialTheme.typography.titleLarge) },
+                label = {
+                    Text(
+                        stringResource(type.nameId),
+                        style = MaterialTheme.typography.labelLarge
+                    )
+                },
+            )
+        }
+    }
+}
+
+@Composable
+private fun LazyItemScope.FilterChip(
+    leadingIcon: @Composable () -> Unit,
+    label: @Composable () -> Unit,
+    onClick: () -> Unit
+) {
+    InputChip(
+        selected = false,
+        onClick = onClick,
+        label = label,
+        leadingIcon = leadingIcon,
+        trailingIcon = { Icon(Icons.Outlined.Clear, stringResource(R.string.clear)) },
+        modifier = Modifier
+            .padding(horizontal = 4.dp)
+            .animateItem()
+    )
 }

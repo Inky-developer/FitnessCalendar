@@ -108,6 +108,9 @@ fun App(viewModel: AppViewModel = hiltViewModel()) {
                             onFilter = {
                                 navController.navigate(View.FilterActivity.getPath())
                             },
+                            onEditFilter = {
+                                filterState = it
+                            },
                             isNewActivityOpen = isNewActivityOpen
                         )
                     }
