@@ -26,6 +26,7 @@ import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.Recording
 import com.inky.fitnesscalendar.data.Vehicle
 import com.inky.fitnesscalendar.di.ActivityTypeDecisionTree
+import com.inky.fitnesscalendar.di.ActivityTypeOrder
 import com.inky.fitnesscalendar.ui.components.ActivitySelector
 import com.inky.fitnesscalendar.ui.components.ActivitySelectorState
 import java.time.Instant
@@ -66,13 +67,15 @@ fun RecordActivity(
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
-                        .padding(horizontal=8.dp)
+                        .padding(horizontal = 8.dp)
                 )
                 HorizontalDivider()
             }
 
             ActivitySelector(
                 ActivitySelectorState(activityType, vehicle),
+                activityRows = ActivityTypeOrder.getRows()
+                    .map { it.filter { type -> type.hasDuration } },
                 onActivityType = { activityType = it },
                 onVehicle = { vehicle = it },
                 modifier = Modifier.padding(all = 8.dp)

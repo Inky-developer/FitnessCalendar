@@ -8,7 +8,6 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.data.ActivityType
@@ -16,13 +15,11 @@ import com.inky.fitnesscalendar.di.ActivityTypeOrder
 
 @Composable
 fun ActivityTypeSelector(
+    modifier: Modifier = Modifier,
+    activityRows: List<List<ActivityType>> = ActivityTypeOrder.getRows(),
     isSelected: (ActivityType) -> Boolean,
     onSelect: (ActivityType) -> Unit,
-    modifier: Modifier = Modifier
 ) {
-    val activityRows = remember {
-        ActivityTypeOrder.instance?.typesByRow ?: ActivityType.BY_ROW
-    }
     Column(modifier = modifier) {
         for (activities in activityRows) {
             LazyRow {

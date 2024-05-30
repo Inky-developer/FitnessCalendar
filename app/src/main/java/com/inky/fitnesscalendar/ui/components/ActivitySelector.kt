@@ -16,15 +16,17 @@ import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityType
 import com.inky.fitnesscalendar.data.Vehicle
+import com.inky.fitnesscalendar.di.ActivityTypeOrder
 
 data class ActivitySelectorState(val activityType: ActivityType?, val vehicle: Vehicle?)
 
 @Composable
 fun ActivitySelector(
     state: ActivitySelectorState,
+    modifier: Modifier = Modifier,
+    activityRows: List<List<ActivityType>> = ActivityTypeOrder.getRows(),
     onActivityType: (ActivityType) -> Unit,
     onVehicle: (Vehicle) -> Unit,
-    modifier: Modifier = Modifier
 ) {
     val vehicles = remember { Vehicle.entries.toList() }
 
@@ -33,7 +35,11 @@ fun ActivitySelector(
             label = stringResource(R.string.select_activity),
             selectionLabel = state.activityType?.nameId?.let { stringResource(it) },
         ) {
-            ActivityTypeSelector({ it == state.activityType }, onSelect = onActivityType)
+            ActivityTypeSelector(
+                activityRows = activityRows,
+                isSelected = { it == state.activityType },
+                onSelect = onActivityType
+            )
         }
 
         AnimatedVisibility(state.activityType?.hasVehicle == true) {

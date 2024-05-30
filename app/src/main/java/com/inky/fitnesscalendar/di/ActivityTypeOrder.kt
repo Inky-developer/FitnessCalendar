@@ -13,6 +13,8 @@ class ActivityTypeOrder(val typesByRow: List<List<ActivityType>>) {
             instance = ActivityTypeOrder(rows)
         }
 
+        fun getRows() = instance?.typesByRow ?: ActivityType.BY_ROW
+
         var instance: ActivityTypeOrder? = null
     }
 }
