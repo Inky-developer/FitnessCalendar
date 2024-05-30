@@ -19,10 +19,11 @@ data class ActivityFilter(
     fun isEmpty() = this == ActivityFilter()
 
     companion object {
+        // Let days start at 2 am
         fun atDay(instant: Instant): ActivityFilter {
             val day = LocalDateTime.ofInstant(instant, ZoneId.systemDefault())
-            val startOfToday = day.with(LocalTime.MIN)
-            val endOfToday = day.with(LocalTime.MAX)
+            val startOfToday = day.with(LocalTime.MIN).plusHours(2)
+            val endOfToday = day.with(LocalTime.MAX).plusHours(2)
 
             return ActivityFilter(
                 startRangeDate = Date.from(startOfToday.atZone(ZoneId.systemDefault()).toInstant()),
