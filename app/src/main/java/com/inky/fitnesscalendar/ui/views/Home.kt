@@ -252,7 +252,7 @@ fun Statistics(name: String, stats: ActivityStatistics) {
             modifier = Modifier.padding(horizontal = 8.dp)
         )
         if (stats.activities.isNotEmpty()) {
-            for ((activityClass, activities) in stats.activitiesByClass) {
+            for ((activityCategory, activities) in stats.activitiesByCategory) {
                 if (activities.isEmpty()) {
                     continue
                 }
@@ -269,7 +269,7 @@ fun Statistics(name: String, stats: ActivityStatistics) {
                         .fillMaxWidth()
                 ) {
                     Text(
-                        activityClass.emoji + stringResource(activityClass.nameId),
+                        activityCategory.emoji + stringResource(activityCategory.nameId),
                         modifier = Modifier.weight(1f)
                     )
                     Text(
