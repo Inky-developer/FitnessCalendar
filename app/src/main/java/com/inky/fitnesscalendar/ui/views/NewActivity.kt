@@ -31,18 +31,24 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.Activity
+import com.inky.fitnesscalendar.data.ActivityType
+import com.inky.fitnesscalendar.data.Feel
 import com.inky.fitnesscalendar.di.ActivityTypeDecisionTree
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivitySelector
 import com.inky.fitnesscalendar.ui.components.ActivitySelectorState
 import com.inky.fitnesscalendar.ui.components.DateTimePicker
 import com.inky.fitnesscalendar.ui.components.DateTimePickerState
+import com.inky.fitnesscalendar.ui.components.FeelSelector
+import com.inky.fitnesscalendar.ui.components.OptionGroup
 import com.inky.fitnesscalendar.view_model.NewActivityViewModel
 import kotlinx.coroutines.flow.flowOf
 import java.time.Instant
@@ -63,9 +69,19 @@ fun NewActivity(
 
 
     if (activityId == null) {
-        NewActivity(activity = null, onSave = onSave, onNavigateBack = onNavigateBack)
+        NewActivity(
+            activity = null,
+            localizationRepository = viewModel.localizationRepository,
+            onSave = onSave,
+            onNavigateBack = onNavigateBack
+        )
     } else if (activity.value != null) {
-        NewActivity(activity = activity.value, onSave = onSave, onNavigateBack = onNavigateBack)
+        NewActivity(
+            activity = activity.value,
+            localizationRepository = viewModel.localizationRepository,
+            onSave = onSave,
+            onNavigateBack = onNavigateBack
+        )
     } else {
         CircularProgressIndicator()
     }
@@ -74,7 +90,7 @@ fun NewActivity(
 @Composable
 fun NewActivity(
     activity: Activity?,
-    viewModel: NewActivityViewModel = hiltViewModel(),
+    localizationRepository: LocalizationRepository,
     onSave: (Activity) -> Unit,
     onNavigateBack: () -> Unit
 ) {
@@ -107,6 +123,8 @@ fun NewActivity(
         )
     }
     var description by rememberSaveable { mutableStateOf(activity?.description ?: "") }
+
+    var feel by rememberSaveable { mutableStateOf<Feel?>(activity?.feel) }
 
     val scrollState = rememberScrollState()
 
@@ -150,6 +168,17 @@ fun NewActivity(
                     onVehicle = { selectedVehicle = it }
                 )
 
+                AnimatedVisibility(visible = selectedActivityType?.hasFeel() == true) {
+                    OptionGroup(label = stringResource(R.string.select_feel)) {
+                        FeelSelector(
+                            feel = feel,
+                            onChange = { feel = it },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .align(Alignment.CenterHorizontally)
+                        )
+                    }
+                }
                 TextField(
                     value = description,
                     onValueChange = { description = it },
@@ -162,16 +191,17 @@ fun NewActivity(
 
                 DateTimeInput(
                     state = startDateTimePickerState,
-                    localizationRepository = viewModel.localizationRepository,
+                    localizationRepository = localizationRepository,
                     labelId = R.string.datetime_start
                 )
 
                 AnimatedVisibility(visible = selectedActivityType?.hasDuration == true) {
                     DateTimeInput(
                         state = endDateTimePickerState,
-                        localizationRepository = viewModel.localizationRepository,
+                        localizationRepository = localizationRepository,
                         labelId = R.string.datetime_end
                     )
+
                 }
             }
 
@@ -187,7 +217,8 @@ fun NewActivity(
                                 vehicle = selectedVehicle,
                                 description = description,
                                 startTime = startDateTimePickerState.selectedDate(),
-                                endTime = endDateTimePickerState.selectedDate()
+                                endTime = endDateTimePickerState.selectedDate(),
+                                feel = feel,
                             )
 
                             else -> activity.copy(
@@ -195,7 +226,8 @@ fun NewActivity(
                                 vehicle = selectedVehicle,
                                 description = description,
                                 startTime = startDateTimePickerState.selectedDate(),
-                                endTime = endDateTimePickerState.selectedDate()
+                                endTime = endDateTimePickerState.selectedDate(),
+                                feel = feel
                             )
                         }
                         onSave(newActivity)
@@ -248,4 +280,16 @@ fun ColumnScope.DateTimeInput(
             )
         }
     }
+}
+
+@Preview
+@Composable
+fun NewActivityPreview() {
+    val context = LocalContext.current
+    val activity = Activity(type = ActivityType.Bouldering, startTime = Date.from(Instant.now()))
+    NewActivity(
+        activity = activity,
+        localizationRepository = LocalizationRepository(context),
+        onSave = {},
+        onNavigateBack = {})
 }

@@ -36,6 +36,8 @@ enum class ActivityType(
     Gaming(ActivityCategory.Gaming, nameId = R.string.gaming, emoji = "🎮"),
     Other(ActivityCategory.Other, nameId = R.string.other, emoji = "🏷️");
 
+    fun hasFeel() = hasDuration
+
     companion object {
         // A grouping of activity types into rows, where each row contains similar activities
         val BY_ROW: List<List<ActivityType>> = ActivityType.entries.groupBy {

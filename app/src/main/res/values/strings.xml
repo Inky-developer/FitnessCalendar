@@ -69,6 +69,10 @@
     <string name="last_month">Last Month</string>
     <string name="last_year">Last Year</string>
     <string name="date_range">Date Range</string>
+    <string name="feel_good">Good</string>
+    <string name="feel_bad">Bad</string>
+    <string name="feel_ok">Ok</string>
+    <string name="select_feel">Select Feel…</string>
     <plurals name="num_activities">
         <item quantity="one">%1d activity</item>
         <item quantity="other">%1d activities</item>

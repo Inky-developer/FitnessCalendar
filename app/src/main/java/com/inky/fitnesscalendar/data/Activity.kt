@@ -13,6 +13,7 @@ data class Activity(
     @ColumnInfo(name = "description") val description: String = "",
     @ColumnInfo(name = "start_time") val startTime: Date,
     @ColumnInfo(name = "end_time") val endTime: Date = startTime,
+    @ColumnInfo(name = "feel") val feel: Feel? = null,
 ) {
     fun clean() = copy(
         vehicle = if (type.hasVehicle) vehicle else null,

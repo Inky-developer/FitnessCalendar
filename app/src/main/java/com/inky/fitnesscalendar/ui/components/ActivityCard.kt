@@ -112,6 +112,10 @@ fun ActivityCard(
                 }
             }
 
+            if (activity.feel != null) {
+                Text(activity.feel.emoji, style = MaterialTheme.typography.bodyLarge)
+            }
+
             if (timeElapsed.elapsedMs > 0) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(

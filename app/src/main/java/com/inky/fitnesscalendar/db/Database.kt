@@ -1,6 +1,7 @@
 package com.inky.fitnesscalendar.db
 
 import android.content.Context
+import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -12,8 +13,11 @@ import com.inky.fitnesscalendar.db.dao.RecordingDao
 import com.inky.fitnesscalendar.util.DATABASE_NAME
 
 @Database(
-    version = 2,
+    version = 3,
     entities = [Activity::class, Recording::class],
+    autoMigrations = [
+        AutoMigration(from = 2, to = 3)
+    ]
 )
 @TypeConverters(Converters::class)
 abstract class AppDatabase : RoomDatabase() {
