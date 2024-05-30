@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityCategory
 import com.inky.fitnesscalendar.data.ActivityFilter
+import com.inky.fitnesscalendar.data.DateRangeOption
 import com.inky.fitnesscalendar.ui.components.ActivityTypeSelector
 import com.inky.fitnesscalendar.ui.components.OptionGroup
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
@@ -147,6 +148,27 @@ fun FilterActivity(
                                 Text(
                                     category.emoji,
                                     style = MaterialTheme.typography.headlineMedium
+                                )
+                            },
+                            modifier = Modifier.padding(all = 4.dp)
+                        )
+                    }
+                }
+            }
+
+            OptionGroup(
+                label = stringResource(R.string.select_date),
+                modifier = Modifier.padding(all = 8.dp)
+            ) {
+                LazyRow {
+                    items(DateRangeOption.entries) { range ->
+                        FilterChip(
+                            selected = filter.range == range,
+                            onClick = { onFilterChange(filter.copy(range = range)) },
+                            label = {
+                                Text(
+                                    stringResource(range.nameId),
+                                    style = MaterialTheme.typography.headlineSmall
                                 )
                             },
                             modifier = Modifier.padding(all = 4.dp)

@@ -1,0 +1,26 @@
+package com.inky.fitnesscalendar.data
+
+import com.inky.fitnesscalendar.R
+
+
+enum class DateRangeOption(val nameId: Int) {
+    Today(R.string.today),
+    Yesterday(R.string.yesterday),
+    SevenDays(R.string.last_seven_days),
+    LastWeek(R.string.last_week),
+    ThirtyDays(R.string.last_thirty_days),
+    LastMonth(R.string.last_month),
+    Year(R.string.year),
+    LastYear(R.string.last_year);
+
+    fun getDateRange() = when (this) {
+        Today -> DateRange.atDay(0)
+        Yesterday -> DateRange.atDay(-1)
+        SevenDays -> DateRange.lastDays(7)
+        LastWeek -> DateRange.lastDays(14, 7)
+        ThirtyDays -> DateRange.lastDays(30)
+        LastMonth -> DateRange.lastDays(60, 30)
+        Year -> DateRange.lastDays(365)
+        LastYear -> DateRange.lastDays(365 * 2, 365)
+    }
+}

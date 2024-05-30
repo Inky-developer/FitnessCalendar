@@ -49,6 +49,8 @@ class AppRepository @Inject constructor(
 
         val categoryTypes = ActivityType.entries.filter { it.activityCategory in filter.categories }
 
+        val rangeDate = filter.range?.getDateRange()
+
         return activityDao.getFiltered(
             filter.types,
             filter.types.isEmpty(),
@@ -57,8 +59,8 @@ class AppRepository @Inject constructor(
             filter.text?.let { "%$it%" },
             searchTypes,
             searchVehicles,
-            filter.startRangeDate,
-            filter.endRangeDate
+            rangeDate?.start,
+            rangeDate?.end
         )
     }
 

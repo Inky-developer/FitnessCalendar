@@ -61,6 +61,14 @@
     <string name="clear">Clear</string>
     <string name="text">Text</string>
     <string name="select_category">Select category…</string>
+    <string name="select_date">Select date…</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="last_thirty_days">30 Days</string>
+    <string name="year">Year</string>
+    <string name="last_week">Last Week</string>
+    <string name="last_month">Last Month</string>
+    <string name="last_year">Last Year</string>
+    <string name="date_range">Date Range</string>
     <plurals name="num_activities">
         <item quantity="one">%1d activity</item>
         <item quantity="other">%1d activities</item>

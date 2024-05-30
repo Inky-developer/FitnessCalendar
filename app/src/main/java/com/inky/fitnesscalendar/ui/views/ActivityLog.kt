@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Clear
+import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Menu
@@ -183,6 +184,20 @@ private fun FilterInformation(filter: ActivityFilter, onChange: (ActivityFilter)
                     onClick = { onChange(filter.copy(text = null)) },
                     label = { Text(filter.text) },
                     leadingIcon = { Icon(Icons.Outlined.Edit, stringResource(R.string.text)) }
+                )
+            }
+        }
+        if (filter.range != null) {
+            item {
+                FilterChip(
+                    onClick = { onChange(filter.copy(range = null)) },
+                    label = { Text(stringResource(filter.range.nameId)) },
+                    leadingIcon = {
+                        Icon(
+                            Icons.Outlined.DateRange,
+                            stringResource(R.string.date_range)
+                        )
+                    }
                 )
             }
         }
