@@ -186,6 +186,18 @@ private fun FilterInformation(filter: ActivityFilter, onChange: (ActivityFilter)
                 )
             }
         }
+        items(filter.categories) { category ->
+            FilterChip(
+                onClick = { onChange(filter.copy(categories = filter.categories.filter { it != category })) },
+                leadingIcon = { Text(category.emoji, style = MaterialTheme.typography.titleLarge) },
+                label = {
+                    Text(
+                        stringResource(category.nameId),
+                        style = MaterialTheme.typography.labelLarge
+                    )
+                }
+            )
+        }
         items(filter.types) { type ->
             FilterChip(
                 onClick = { onChange(filter.copy(types = filter.types.filter { it != type })) },

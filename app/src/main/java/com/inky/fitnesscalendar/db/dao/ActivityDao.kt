@@ -26,6 +26,7 @@ abstract class ActivityDao {
     @Query(
         "SELECT * FROM ACTIVITY WHERE " +
                 "(type IN (:types) OR :isTypesEmpty) AND" +
+                "(type in (:categoryTypes) or :isCategoryTypesEmpty) AND" +
                 "(description LIKE :search OR type IN (:searchTypes) OR vehicle IN (:searchVehicles) OR :search IS NULL) AND" +
                 "(end_time >= :start OR :start IS NULL) AND" +
                 "(start_time <= :end OR :end IS NULL) " +
@@ -34,6 +35,8 @@ abstract class ActivityDao {
     abstract fun getFiltered(
         types: List<ActivityType>,
         isTypesEmpty: Boolean,
+        categoryTypes: List<ActivityType>,
+        isCategoryTypesEmpty: Boolean,
         search: String?,
         searchTypes: List<ActivityType>,
         searchVehicles: List<Vehicle>,

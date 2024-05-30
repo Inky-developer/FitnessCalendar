@@ -47,9 +47,13 @@ class AppRepository @Inject constructor(
             }
         } ?: emptyList()
 
+        val categoryTypes = ActivityType.entries.filter { it.activityCategory in filter.categories }
+
         return activityDao.getFiltered(
             filter.types,
             filter.types.isEmpty(),
+            categoryTypes,
+            categoryTypes.isEmpty(),
             filter.text?.let { "%$it%" },
             searchTypes,
             searchVehicles,

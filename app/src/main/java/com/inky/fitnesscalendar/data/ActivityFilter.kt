@@ -12,6 +12,7 @@ import java.util.Date
 @Parcelize
 data class ActivityFilter(
     val types: List<ActivityType> = emptyList(),
+    val categories: List<ActivityCategory> = emptyList(),
     val text: String? = null,
     val startRangeDate: Date? = null,
     val endRangeDate: Date? = null

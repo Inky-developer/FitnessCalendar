@@ -2,12 +2,15 @@ package com.inky.fitnesscalendar.ui.views
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -30,6 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.R
+import com.inky.fitnesscalendar.data.ActivityCategory
 import com.inky.fitnesscalendar.data.ActivityFilter
 import com.inky.fitnesscalendar.ui.components.ActivityTypeSelector
 import com.inky.fitnesscalendar.ui.components.OptionGroup
@@ -98,9 +102,11 @@ fun FilterActivity(
             val context = LocalContext.current
             val selectionLabel =
                 if (filter.types.isEmpty()) null else filter.types.joinToString(", ") {
-                    context.getString(
-                        it.nameId
-                    )
+                    context.getString(it.nameId)
+                }
+            val categorySelectionLabel =
+                if (filter.categories.isEmpty()) null else filter.categories.joinToString(", ") {
+                    context.getString(it.nameId)
                 }
             OptionGroup(
                 label = stringResource(R.string.select_activity),
@@ -119,6 +125,35 @@ fun FilterActivity(
                     })
             }
 
+            OptionGroup(
+                label = stringResource(R.string.select_category),
+                selectionLabel = categorySelectionLabel,
+                modifier = Modifier.padding(all = 8.dp)
+            ) {
+                LazyRow {
+                    items(ActivityCategory.entries) { category ->
+                        FilterChip(
+                            selected = filter.categories.contains(category),
+                            onClick = {
+                                val oldSelection = filter.categories
+                                val newSelection =
+                                    oldSelection.filter { it != category }.toMutableList()
+                                if (newSelection.size == oldSelection.size) {
+                                    newSelection.add(category)
+                                }
+                                onFilterChange(filter.copy(categories = newSelection))
+                            },
+                            label = {
+                                Text(
+                                    category.emoji,
+                                    style = MaterialTheme.typography.headlineMedium
+                                )
+                            },
+                            modifier = Modifier.padding(all = 4.dp)
+                        )
+                    }
+                }
+            }
         }
     }
 }
