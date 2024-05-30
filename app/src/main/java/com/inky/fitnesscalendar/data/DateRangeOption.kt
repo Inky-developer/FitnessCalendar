@@ -6,9 +6,9 @@ import com.inky.fitnesscalendar.R
 enum class DateRangeOption(val nameId: Int) {
     Today(R.string.today),
     Yesterday(R.string.yesterday),
-    SevenDays(R.string.last_seven_days),
+    SevenDays(R.string.week),
     LastWeek(R.string.last_week),
-    ThirtyDays(R.string.last_thirty_days),
+    ThirtyDays(R.string.month),
     LastMonth(R.string.last_month),
     Year(R.string.year),
     LastYear(R.string.last_year);
