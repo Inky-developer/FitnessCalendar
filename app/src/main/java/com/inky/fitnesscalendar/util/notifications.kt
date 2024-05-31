@@ -13,7 +13,6 @@ import com.inky.fitnesscalendar.MainActivity
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.broadcast_receiver.NotificationBroadcastReceiver
 import com.inky.fitnesscalendar.data.ActivityType
-import java.util.Locale
 
 fun Context.showRecordingNotification(
     recordingId: Int,
@@ -33,10 +32,7 @@ fun Context.showRecordingNotification(
     )
     notificationManager.createNotificationChannel(channel)
 
-    val title = getString(
-        R.string.recording_activity_type,
-        getString(recordingType.nameId).lowercase(Locale.getDefault())
-    )
+    val title = getString(recordingType.nameId)
 
     val launchIntent = Intent(this, MainActivity::class.java)
     val pendingIntent =
@@ -74,7 +70,10 @@ fun Context.hideRecordingNotification(recordingId: Int) {
     notificationManager.cancel(recordingId)
 }
 
-private fun Context.notificationBroadcastIntent(recordingId: Int, body: Intent.() -> Unit): PendingIntent {
+private fun Context.notificationBroadcastIntent(
+    recordingId: Int,
+    body: Intent.() -> Unit
+): PendingIntent {
     val intent = Intent(this, NotificationBroadcastReceiver::class.java).apply {
         body()
         putExtra(EXTRA_RECORDING_ID, recordingId)
