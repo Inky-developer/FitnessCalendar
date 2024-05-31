@@ -21,14 +21,8 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
@@ -49,17 +43,6 @@ fun FilterActivity(
     onFilterChange: (ActivityFilter) -> Unit,
     onBack: () -> Unit
 ) {
-    // Show keyboard when the user opens this view
-    val windowInfo = LocalWindowInfo.current
-    val focusRequester = remember { FocusRequester() }
-    LaunchedEffect(windowInfo) {
-        snapshotFlow { windowInfo.isWindowFocused }.collect { isWindowFocused ->
-            if (isWindowFocused) {
-                focusRequester.requestFocus()
-            }
-        }
-    }
-
     val appBar = @Composable {
         TopAppBar(colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -76,7 +59,6 @@ fun FilterActivity(
                     focusedContainerColor = MaterialTheme.colorScheme.primaryContainer
                 ),
                 singleLine = true,
-                modifier = Modifier.focusRequester(focusRequester),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
                 keyboardActions = KeyboardActions(onSearch = { onBack() })
             )
