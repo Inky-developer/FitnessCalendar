@@ -27,6 +27,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.painterResource
@@ -36,8 +37,6 @@ import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.Activity
 import com.inky.fitnesscalendar.localization.LocalizationRepository
-import com.inky.fitnesscalendar.ui.util.SharedContentKey
-import com.inky.fitnesscalendar.ui.util.sharedElement
 import com.inky.fitnesscalendar.ui.util.skipToLookaheadSize
 import com.inky.fitnesscalendar.util.Duration.Companion.until
 
@@ -48,7 +47,9 @@ fun ActivityCard(
     onDelete: () -> Unit,
     onEdit: (Activity) -> Unit,
     localizationRepository: LocalizationRepository,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    containerColor: Color = MaterialTheme.colorScheme.surfaceContainerLow,
+    contentColor: Color = MaterialTheme.colorScheme.primary
 ) {
     var showContextMenu by remember { mutableStateOf(false) }
 
@@ -64,7 +65,7 @@ fun ActivityCard(
     val haptics = LocalHapticFeedback.current
 
     Card(
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainerLow),
+        colors = CardDefaults.cardColors(containerColor = containerColor),
         modifier = modifier
             .fillMaxWidth()
             .padding(all = 8.dp)
@@ -75,7 +76,6 @@ fun ActivityCard(
                     showContextMenu = true
                 },
             )
-            .sharedElement(SharedContentKey.ActivityCard(activity.uid))
             .skipToLookaheadSize(),
     ) {
         Text(
@@ -89,7 +89,7 @@ fun ActivityCard(
         Text(
             title,
             style = MaterialTheme.typography.displayMedium,
-            color = MaterialTheme.colorScheme.primary,
+            color = contentColor,
             modifier = Modifier.padding(horizontal = 4.dp)
         )
 

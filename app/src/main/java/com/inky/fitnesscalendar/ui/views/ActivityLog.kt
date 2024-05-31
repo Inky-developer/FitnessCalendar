@@ -53,6 +53,7 @@ import com.inky.fitnesscalendar.ui.components.ActivityCard
 import com.inky.fitnesscalendar.ui.components.NewActivityFAB
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.sharedBounds
+import com.inky.fitnesscalendar.ui.util.sharedElement
 import com.inky.fitnesscalendar.view_model.ActivityLogViewModel
 import kotlinx.coroutines.launch
 
@@ -165,7 +166,9 @@ fun ActivityLog(
                             },
                             onEdit = onEditActivity,
                             localizationRepository = viewModel.repository.localizationRepository,
-                            modifier = Modifier.animateItem(fadeInSpec = null, fadeOutSpec = null)
+                            modifier = Modifier
+                                .animateItem(fadeInSpec = null, fadeOutSpec = null)
+                                .sharedElement(SharedContentKey.ActivityCard(activity.uid))
                         )
                     }
                 }

@@ -33,6 +33,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -47,15 +48,18 @@ import com.inky.fitnesscalendar.data.Activity
 import com.inky.fitnesscalendar.data.ActivityStatistics
 import com.inky.fitnesscalendar.data.Recording
 import com.inky.fitnesscalendar.localization.LocalizationRepository
+import com.inky.fitnesscalendar.ui.components.ActivityCard
 import com.inky.fitnesscalendar.ui.components.CompactActivityCard
 import com.inky.fitnesscalendar.ui.components.NewActivityFAB
 import com.inky.fitnesscalendar.ui.components.Timer
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.sharedBounds
+import com.inky.fitnesscalendar.ui.util.sharedElement
 import com.inky.fitnesscalendar.util.Duration
 import com.inky.fitnesscalendar.util.Duration.Companion.until
 import com.inky.fitnesscalendar.util.showRecordingNotification
 import com.inky.fitnesscalendar.view_model.HomeViewModel
+import kotlinx.coroutines.launch
 
 const val TAG = "HOME"
 
@@ -65,6 +69,7 @@ fun Home(
     viewModel: HomeViewModel = hiltViewModel(),
     isNewActivityOpen: Boolean,
     onNewActivity: () -> Unit,
+    onEditActivity: (Activity) -> Unit,
     onRecordActivity: () -> Unit,
     onNavigateActivity: () -> Unit,
     onOpenDrawer: () -> Unit
@@ -72,8 +77,11 @@ fun Home(
     val weeklyStats by viewModel.weekStats.collectAsState(initial = null)
     val monthlyStats by viewModel.monthStats.collectAsState(initial = null)
     val activitiesToday by viewModel.activitiesToday.collectAsState(initial = null)
+    val recentActivity by viewModel.mostRecentActivity.collectAsState(initial = null)
     val recordings by viewModel.recordings.collectAsState(initial = null)
     val scrollState = rememberScrollState()
+
+    val scope = rememberCoroutineScope()
 
     val context = LocalContext.current
     LaunchedEffect(recordings) {
@@ -139,6 +147,13 @@ fun Home(
                     )
                 }
             }
+
+            RecentActivityOrNull(
+                recentActivity,
+                viewModel.repository.localizationRepository,
+                onDelete = { scope.launch { viewModel.repository.deleteActivity(it) } },
+                onEdit = onEditActivity,
+            )
 
             StatisticsIfNotNull(stringResource(R.string.last_seven_days), weeklyStats)
             StatisticsIfNotNull(stringResource(R.string.this_month), monthlyStats)
@@ -320,9 +335,11 @@ fun ActivitiesToday(
 
     AnimatedVisibility(visible = !isEmpty) {
         Card(
-            onClick = onNavigateActivity, colors = CardDefaults.cardColors(
+            onClick = onNavigateActivity,
+            colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.secondaryContainer,
-            ), modifier = Modifier
+            ),
+            modifier = Modifier
                 .padding(all = 8.dp)
                 .fillMaxWidth()
         ) {
@@ -342,8 +359,42 @@ fun ActivitiesToday(
                 CompactActivityCard(
                     activity = activity,
                     localizationRepository = localizationRepository,
+                    modifier = Modifier.sharedElement(SharedContentKey.ActivityCard(activity.uid))
                 )
             }
         }
     }
+}
+
+@Composable
+fun RecentActivityOrNull(
+    activity: Activity?,
+    localizationRepository: LocalizationRepository,
+    onDelete: (Activity) -> Unit,
+    onEdit: (Activity) -> Unit
+) {
+    if (activity != null) {
+        RecentActivity(
+            activity,
+            localizationRepository,
+            { onDelete(activity) },
+            { onEdit(activity) })
+    }
+}
+
+@Composable
+fun RecentActivity(
+    activity: Activity,
+    localizationRepository: LocalizationRepository,
+    onDelete: () -> Unit,
+    onEdit: (Activity) -> Unit,
+) {
+    ActivityCard(
+        activity = activity,
+        localizationRepository = localizationRepository,
+        onDelete = onDelete,
+        onEdit = onEdit,
+        containerColor = MaterialTheme.colorScheme.primaryContainer,
+        contentColor = contentColorFor(MaterialTheme.colorScheme.primaryContainer)
+    )
 }

@@ -14,8 +14,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.data.Activity
 import com.inky.fitnesscalendar.localization.LocalizationRepository
-import com.inky.fitnesscalendar.ui.util.SharedContentKey
-import com.inky.fitnesscalendar.ui.util.sharedElement
 import com.inky.fitnesscalendar.ui.util.skipToLookaheadSize
 
 @Composable
@@ -36,7 +34,6 @@ fun CompactActivityCard(
         modifier = modifier
             .fillMaxWidth()
             .padding(all = 8.dp)
-            .sharedElement(SharedContentKey.ActivityCard(activity.uid))
             .skipToLookaheadSize(),
     ) {
         Text(

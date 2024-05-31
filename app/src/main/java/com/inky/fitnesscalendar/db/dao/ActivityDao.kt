@@ -20,6 +20,9 @@ abstract class ActivityDao {
     @Query("SELECT * FROM Activity ORDER BY start_time DESC LIMIT :n")
     abstract suspend fun loadMostRecentActivities(n: Int): List<Activity>
 
+    @Query("SELECT * FROM Activity ORDER BY start_time DESC LIMIT 1")
+    abstract fun getMostRecentActivity(): Flow<Activity?>
+
     @Query("SELECT * FROM Activity ORDER BY start_time DESC")
     abstract fun getActivities(): Flow<List<Activity>>
 

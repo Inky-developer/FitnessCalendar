@@ -7,11 +7,14 @@ import com.inky.fitnesscalendar.data.ActivityFilter
 import com.inky.fitnesscalendar.data.ActivityStatistics
 import com.inky.fitnesscalendar.data.DateRangeOption
 import com.inky.fitnesscalendar.data.Recording
+import com.inky.fitnesscalendar.util.Duration.Companion.until
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
+import java.time.Instant
+import java.util.Date
 import javax.inject.Inject
 
 @HiltViewModel
@@ -19,6 +22,13 @@ class HomeViewModel @Inject constructor(val repository: AppRepository) : ViewMod
     val weekStats = loadWeekStats()
     val monthStats = loadMonthStats()
     val activitiesToday = repository.getActivities(ActivityFilter(range = DateRangeOption.Today))
+    val mostRecentActivity = repository.getMostRecentActivity().map { activity ->
+        if (activity?.let { it.endTime.until(Date.from(Instant.now())).elapsedHours < 2.0 } == true) {
+            activity
+        } else {
+            null
+        }
+    }
     val recordings = repository.getRecordings()
 
     fun abortRecording(recording: Recording) {

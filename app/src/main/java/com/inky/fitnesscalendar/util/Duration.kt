@@ -1,9 +1,13 @@
 package com.inky.fitnesscalendar.util
 
+import java.time.temporal.ChronoUnit
 import java.util.Date
 import java.util.concurrent.TimeUnit
 
 data class Duration(val elapsedMs: Long) {
+    val elapsedHours
+        get() = elapsedMs.toDouble() / ChronoUnit.HOURS.duration.toMillis().toDouble()
+
     fun format(): String {
         val hours = TimeUnit.MILLISECONDS.toHours(elapsedMs)
         val minutes = TimeUnit.MILLISECONDS.toMinutes(elapsedMs - TimeUnit.HOURS.toMillis(hours))

@@ -64,6 +64,8 @@ class AppRepository @Inject constructor(
         )
     }
 
+    fun getMostRecentActivity() = activityDao.getMostRecentActivity()
+
     suspend fun saveActivity(activity: Activity) {
         activityDao.save(activity.clean())
     }

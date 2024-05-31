@@ -85,6 +85,9 @@ fun App(viewModel: AppViewModel = hiltViewModel()) {
                         Home(
                             isNewActivityOpen = isNewActivityOpen,
                             onNewActivity = { navController.navigate(View.NewActivity.getPath(-1)) },
+                            onEditActivity = {
+                                navController.navigate(View.NewActivity.getPath(it.uid ?: -1))
+                            },
                             onRecordActivity = { navController.navigate(View.RecordActivity.getPath()) },
                             onNavigateActivity = {
                                 navController.navigate(View.ActivityLog.getPath())
