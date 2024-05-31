@@ -9,11 +9,16 @@ import java.util.Date
 
 data class DateRange(val start: Date, val end: Date) {
     companion object {
+        // Specifies by how many hours offset a day starts.
+        // E.g. A value of 2 means that the day goes from 2 am to 2 am next day
+        private const val DAY_START_OFFSET_HOURS = 2L
+
         // Let days start at 2 am
         fun atDay(offsetDays: Long, instant: Instant = Instant.now()): DateRange {
             val day = LocalDateTime.ofInstant(instant, ZoneId.systemDefault()).plusDays(offsetDays)
-            val startOfToday = day.with(LocalTime.MIN).plusHours(2)
-            val endOfToday = day.with(LocalTime.MAX).plusHours(2)
+                .minusHours(DAY_START_OFFSET_HOURS)
+            val startOfToday = day.with(LocalTime.MIN).plusHours(DAY_START_OFFSET_HOURS)
+            val endOfToday = day.with(LocalTime.MAX).plusHours(DAY_START_OFFSET_HOURS)
 
             return DateRange(
                 start = Date.from(startOfToday.atZone(ZoneId.systemDefault()).toInstant()),
