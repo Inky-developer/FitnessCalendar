@@ -1,6 +1,7 @@
 package com.inky.fitnesscalendar.ui.views
 
 import android.util.Log
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -158,8 +159,8 @@ fun Home(
             StatisticsIfNotNull(stringResource(R.string.last_seven_days), weeklyStats)
             StatisticsIfNotNull(stringResource(R.string.this_month), monthlyStats)
 
-            ActivitiesTodayOrNull(
-                activities = activitiesToday,
+            ActivitiesToday(
+                activities = activitiesToday ?: emptyList(),
                 localizationRepository = viewModel.repository.localizationRepository,
                 onNavigateActivity = onNavigateActivity
             )
@@ -311,56 +312,68 @@ fun Statistics(name: String, stats: ActivityStatistics) {
 }
 
 @Composable
-fun ActivitiesTodayOrNull(
-    activities: List<Activity>?,
-    localizationRepository: LocalizationRepository,
-    onNavigateActivity: () -> Unit
-) {
-    if (activities != null) {
-        ActivitiesToday(
-            activities = activities,
-            localizationRepository = localizationRepository,
-            onNavigateActivity = onNavigateActivity
-        )
-    }
-}
-
-@Composable
 fun ActivitiesToday(
     activities: List<Activity>,
     localizationRepository: LocalizationRepository,
     onNavigateActivity: () -> Unit
 ) {
-    val isEmpty = activities.isEmpty()
 
-    AnimatedVisibility(visible = !isEmpty) {
-        Card(
-            onClick = onNavigateActivity,
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.secondaryContainer,
-            ),
+    Card(
+        onClick = onNavigateActivity,
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.secondaryContainer,
+        ),
+        modifier = Modifier
+            .padding(all = 8.dp)
+            .fillMaxWidth()
+    ) {
+        Text(
+            stringResource(R.string.today),
+            color = MaterialTheme.colorScheme.onSecondaryContainer,
+            style = MaterialTheme.typography.displayLarge,
             modifier = Modifier
-                .padding(all = 8.dp)
                 .fillMaxWidth()
-        ) {
-            Text(
-                stringResource(R.string.today),
-                color = MaterialTheme.colorScheme.onSecondaryContainer,
-                style = MaterialTheme.typography.displayLarge,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp)
-                    .background(
-                        MaterialTheme.colorScheme.secondaryContainer,
-                    )
-            )
-
-            for (activity in activities) {
-                CompactActivityCard(
-                    activity = activity,
-                    localizationRepository = localizationRepository,
-                    modifier = Modifier.sharedElement(SharedContentKey.ActivityCard(activity.uid))
+                .padding(horizontal = 8.dp)
+                .background(
+                    MaterialTheme.colorScheme.secondaryContainer,
                 )
+        )
+
+        AnimatedContent(
+            targetState = activities.isEmpty(),
+            label = "ActivitiesToday"
+        ) { noActivities ->
+            when (noActivities) {
+                true -> {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(all = 8.dp)
+                    ) {
+                        Icon(
+                            Icons.Outlined.Info,
+                            stringResource(R.string.info),
+                            modifier = Modifier.padding(end = 8.dp),
+                            tint = MaterialTheme.colorScheme.secondary
+                        )
+                        Text(
+                            stringResource(R.string.no_activities_yet),
+                            style = MaterialTheme.typography.titleLarge,
+                            color = MaterialTheme.colorScheme.secondary
+                        )
+                    }
+                }
+
+                false -> {
+                    for (activity in activities) {
+                        CompactActivityCard(
+                            activity = activity,
+                            localizationRepository = localizationRepository,
+                            modifier = Modifier.sharedElement(SharedContentKey.ActivityCard(activity.uid))
+                        )
+                    }
+                }
             }
         }
     }
