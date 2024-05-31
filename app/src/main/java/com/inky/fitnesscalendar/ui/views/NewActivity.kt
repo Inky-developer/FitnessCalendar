@@ -169,7 +169,9 @@ fun NewActivity(
                 )
 
                 AnimatedVisibility(visible = selectedActivityType?.hasFeel() == true) {
-                    OptionGroup(label = stringResource(R.string.select_feel)) {
+                    OptionGroup(
+                        label = stringResource(R.string.select_feel),
+                        selectionLabel = feel?.let { stringResource(it.nameId) }) {
                         FeelSelector(
                             feel = feel,
                             onChange = { feel = it },
