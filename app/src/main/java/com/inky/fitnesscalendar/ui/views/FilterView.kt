@@ -140,13 +140,21 @@ fun FilterView(
 
             OptionGroup(
                 label = stringResource(R.string.select_date),
+                selectionLabel = filter.range?.nameId?.let { stringResource(it) },
                 modifier = Modifier.padding(all = 8.dp)
             ) {
                 LazyRow {
                     items(DateRangeOption.entries) { range ->
                         FilterChip(
                             selected = filter.range == range,
-                            onClick = { onFilterChange(filter.copy(range = range)) },
+                            onClick = {
+                                val newRange = if (filter.range == range) {
+                                    null
+                                } else {
+                                    range
+                                }
+                                onFilterChange(filter.copy(range = newRange))
+                            },
                             label = {
                                 Text(
                                     stringResource(range.nameId),
