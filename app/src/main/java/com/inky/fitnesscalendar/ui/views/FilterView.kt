@@ -38,7 +38,7 @@ import com.inky.fitnesscalendar.ui.util.sharedBounds
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FilterActivity(
+fun FilterView(
     filter: ActivityFilter,
     onFilterChange: (ActivityFilter) -> Unit,
     onBack: () -> Unit

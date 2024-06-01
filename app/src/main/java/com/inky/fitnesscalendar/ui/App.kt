@@ -23,7 +23,7 @@ import androidx.navigation.compose.rememberNavController
 import com.inky.fitnesscalendar.data.ActivityFilter
 import com.inky.fitnesscalendar.ui.components.NavigationDrawer
 import com.inky.fitnesscalendar.ui.views.ActivityLog
-import com.inky.fitnesscalendar.ui.views.FilterActivity
+import com.inky.fitnesscalendar.ui.views.FilterView
 import com.inky.fitnesscalendar.ui.views.Home
 import com.inky.fitnesscalendar.ui.views.ImportExport
 import com.inky.fitnesscalendar.ui.views.NewActivity
@@ -125,7 +125,7 @@ fun App(viewModel: AppViewModel = hiltViewModel()) {
                 }) {
                     currentView = View.FilterActivity
                     ProvideSharedContent(sharedContentScope = this@SharedTransitionLayout) {
-                        FilterActivity(
+                        FilterView(
                             filterState,
                             onFilterChange = { filterState = it },
                             onBack = { navController.popBackStack() }
