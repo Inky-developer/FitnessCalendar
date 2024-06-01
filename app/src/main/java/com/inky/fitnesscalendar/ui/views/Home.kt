@@ -99,38 +99,46 @@ fun Home(
         }
     }
 
-    Scaffold(topBar = {
-        CenterAlignedTopAppBar(title = {
-            Text(
-                stringResource(R.string.app_name),
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = {
+                    Text(
+                        stringResource(R.string.app_name),
+                    )
+                },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                ),
+                navigationIcon = {
+                    IconButton(onClick = onOpenDrawer) {
+                        Icon(
+                            imageVector = Icons.Outlined.Menu,
+                            contentDescription = stringResource(R.string.Menu),
+                        )
+                    }
+                },
+                actions = {
+                    IconButton(
+                        onClick = { onRecordActivity() },
+                        colors = IconButtonDefaults.iconButtonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = contentColorFor(MaterialTheme.colorScheme.primary)
+                        )
+                    ) {
+                        Icon(Icons.Filled.PlayArrow, stringResource(R.string.record))
+                    }
+                },
+                modifier = Modifier.sharedBounds(SharedContentKey.AppBar)
             )
-        }, colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-        ), navigationIcon = {
-            IconButton(onClick = onOpenDrawer) {
-                Icon(
-                    imageVector = Icons.Outlined.Menu,
-                    contentDescription = stringResource(R.string.Menu),
-                )
-            }
-        }, actions = {
-            IconButton(
-                onClick = { onRecordActivity() },
-                colors = IconButtonDefaults.iconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = contentColorFor(MaterialTheme.colorScheme.primary)
-                )
-            ) {
-                Icon(Icons.Filled.PlayArrow, stringResource(R.string.record))
-            }
-        }, modifier = Modifier.sharedBounds(SharedContentKey.AppBar)
-        )
-    }, floatingActionButton = {
-        NewActivityFAB(
-            onClick = onNewActivity, menuOpen = isNewActivityOpen
-        )
-    }) { paddingValues ->
+        },
+        floatingActionButton = {
+            NewActivityFAB(
+                onClick = onNewActivity, menuOpen = isNewActivityOpen
+            )
+        }
+    ) { paddingValues ->
         Column(
             modifier = Modifier
                 .padding(paddingValues)

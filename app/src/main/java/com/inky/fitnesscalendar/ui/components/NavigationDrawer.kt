@@ -30,7 +30,13 @@ import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.ui.views.View
 
 
-val selectableViews = listOf(View.Home, View.ActivityLog, View.ImportExport, View.Settings)
+val selectableViews = listOf(
+    View.Home,
+    View.ActivityLog,
+    View.Statistics,
+    View.ImportExport,
+    View.Settings
+)
 
 @Composable
 fun NavigationDrawer(

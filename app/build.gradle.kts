@@ -94,6 +94,9 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.animation)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.vico.compose)
+    implementation(libs.vico.compose.m3)
+    implementation(libs.vico.core)
 
     annotationProcessor(libs.androidx.room.compiler)
     ksp(libs.hilt.android.compiler)

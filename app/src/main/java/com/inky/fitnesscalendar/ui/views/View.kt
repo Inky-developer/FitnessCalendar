@@ -17,7 +17,8 @@ enum class View(
     NewActivity(R.string.new_activity, "new_activity", listOf(Argument.ACTIVITY_ID)),
     RecordActivity(R.string.record_activity, "record_activity"),
     ImportExport(R.string.import_export, "import_export"),
-    Settings(R.string.settings, "settings");
+    Settings(R.string.settings, "settings"),
+    Statistics(R.string.statistics, "statistics");
 
     fun getPath(): String = if (arguments.isEmpty()) {
         pathTemplate()

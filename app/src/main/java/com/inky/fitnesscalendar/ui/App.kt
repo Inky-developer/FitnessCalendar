@@ -29,6 +29,7 @@ import com.inky.fitnesscalendar.ui.views.ImportExport
 import com.inky.fitnesscalendar.ui.views.NewActivity
 import com.inky.fitnesscalendar.ui.views.RecordActivity
 import com.inky.fitnesscalendar.ui.views.Settings
+import com.inky.fitnesscalendar.ui.views.StatisticsView
 import com.inky.fitnesscalendar.ui.views.View
 import com.inky.fitnesscalendar.view_model.AppViewModel
 import kotlinx.coroutines.launch
@@ -172,6 +173,14 @@ fun App(viewModel: AppViewModel = hiltViewModel()) {
                     currentView = View.ImportExport
                     ProvideSharedContent(sharedContentScope = this@SharedTransitionLayout) {
                         ImportExport(
+                            onOpenDrawer = openDrawer
+                        )
+                    }
+                }
+                composable(View.Statistics.pathTemplate()) {
+                    currentView = View.Statistics
+                    ProvideSharedContent(sharedContentScope = this@SharedTransitionLayout) {
+                        StatisticsView(
                             onOpenDrawer = openDrawer
                         )
                     }
