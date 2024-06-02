@@ -374,12 +374,18 @@ fun ActivitiesToday(
                 }
 
                 false -> {
-                    for (activity in activities) {
-                        CompactActivityCard(
-                            activity = activity,
-                            localizationRepository = localizationRepository,
-                            modifier = Modifier.sharedElement(SharedContentKey.ActivityCard(activity.uid))
-                        )
+                    Column {
+                        for (activity in activities) {
+                            CompactActivityCard(
+                                activity = activity,
+                                localizationRepository = localizationRepository,
+                                modifier = Modifier.sharedElement(
+                                    SharedContentKey.ActivityCard(
+                                        activity.uid
+                                    )
+                                )
+                            )
+                        }
                     }
                 }
             }
