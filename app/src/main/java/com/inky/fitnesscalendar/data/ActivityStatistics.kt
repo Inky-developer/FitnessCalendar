@@ -8,6 +8,9 @@ import java.util.Date
 data class ActivityStatistics(
     val activities: List<Activity>,
 ) {
+    val size
+        get() = activities.size
+
     val activitiesByCategory: Map<ActivityCategory, List<Activity>>
         get() = activities.groupBy { it.type.activityCategory }.toList()
             .sortedBy { (_, v) -> -v.size }

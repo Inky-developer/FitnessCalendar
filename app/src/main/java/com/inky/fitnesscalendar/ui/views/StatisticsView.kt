@@ -1,7 +1,6 @@
 package com.inky.fitnesscalendar.ui.views
 
 import android.graphics.Typeface
-import android.icu.text.DateFormatSymbols
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -35,7 +34,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityStatistics
-import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.view_model.StatisticsViewModel
@@ -45,7 +43,7 @@ import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStartAxis
 import com.patrykandpatrick.vico.compose.cartesian.fullWidth
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberColumnCartesianLayer
 import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
-import com.patrykandpatrick.vico.compose.cartesian.rememberVicoZoomState
+import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
 import com.patrykandpatrick.vico.compose.common.component.rememberLineComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberShapeComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
@@ -60,21 +58,23 @@ import com.patrykandpatrick.vico.core.common.Dimensions
 import com.patrykandpatrick.vico.core.common.data.ExtraStore
 import com.patrykandpatrick.vico.core.common.shape.Shape
 import java.text.DecimalFormat
-import java.time.Instant
-import java.util.Calendar
-import java.util.Date
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
+import java.time.format.FormatStyle
+import java.time.format.TextStyle
+import java.time.temporal.WeekFields
+import java.util.Locale
 
 @Composable
 fun StatisticsView(viewModel: StatisticsViewModel = hiltViewModel(), onOpenDrawer: () -> Unit) {
     val stats by viewModel.activityStatistics.collectAsState(initial = ActivityStatistics(emptyList()))
-    StatisticsView(stats, viewModel.appRepository.localizationRepository, onOpenDrawer)
+    StatisticsView(stats, onOpenDrawer)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StatisticsView(
     statistics: ActivityStatistics,
-    localizationRepository: LocalizationRepository,
     onOpenDrawer: () -> Unit
 ) {
     val modelProducer = remember { CartesianChartModelProducer.build() }
@@ -82,7 +82,7 @@ fun StatisticsView(
 
     // TODO: Move this to the view model
     LaunchedEffect(key1 = selectedPeriod, key2 = statistics) {
-        val points = selectedPeriod.filter(statistics, localizationRepository).reversed()
+        val points = selectedPeriod.filter(statistics)
         if (points.isNotEmpty()) {
             modelProducer.runTransaction {
                 columnSeries { series(points.map { it.first }) }
@@ -198,7 +198,7 @@ fun Graph(modelProducer: CartesianChartModelProducer, label: String) {
             modelProducer = modelProducer,
             runInitialAnimation = true,
             horizontalLayout = HorizontalLayout.fullWidth(),
-            zoomState = rememberVicoZoomState(zoomEnabled = false)
+            scrollState = rememberVicoScrollState(scrollEnabled = false),
         )
     }
 }
@@ -209,25 +209,60 @@ enum class Period(val nameId: Int, val xLabelId: Int) {
     Year(R.string.year, R.string.month),
     All(R.string.all_time, R.string.year);
 
-    fun filter(
-        statistics: ActivityStatistics,
-        localizationRepository: LocalizationRepository,
-    ): List<Pair<Int, String>> {
-        val calendar = Calendar.getInstance().apply { time = Date.from(Instant.now()) }
-        val dayOfYear = calendar.get(Calendar.DAY_OF_YEAR)
-        val weekOfYear = calendar.get(Calendar.WEEK_OF_YEAR)
-        return when (this) {
-            Week -> statistics.activitiesByDay
-                .filter { dayOfYear - it.key < 7 }
-                .map { it.value.activities.size to localizationRepository.shortDateFormatter.format(it.value.activities[0].startTime) }
+    fun filter(statistics: ActivityStatistics): List<Pair<Int, String>> {
+        val dateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)
+        val woyField = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear()
 
-            Month -> statistics.activitiesByWeek
-                .filter { weekOfYear - it.key < 4 }
-                .map { it.value.activities.size to it.key.toString() }
+        val result: MutableList<Pair<Int, String>> = mutableListOf()
 
-            Year -> statistics.activitiesByMonth.map { it.value.activities.size to DateFormatSymbols.getInstance().shortMonths[it.key] }
-            All -> statistics.activitiesByYear.map { it.value.activities.size to it.key.toString() }
+        val today = LocalDate.now()
+        // TODO: Filter out older statistics already in the db query
+        when (this) {
+            Week -> {
+                var day = today.minusWeeks(1)
+                val activityMap = statistics.activitiesByDay
+                while (!day.isAfter(today)) {
+                    result.add((activityMap[day.dayOfYear]?.size ?: 0) to day.format(dateFormatter))
+                    day = day.plusDays(1)
+                }
+            }
+
+            Month -> {
+                var day = today.minusMonths(1)
+                val activityMap = statistics.activitiesByWeek
+                while (!day.isAfter(today)) {
+                    result.add(
+                        (activityMap[day.get(woyField)]?.size ?: 0) to day.format(dateFormatter)
+                    )
+                    day = day.plusWeeks(1)
+                }
+            }
+
+            Year -> {
+                var day = today.minusYears(1)
+                val activityMap = statistics.activitiesByMonth
+                while (!day.isAfter(today)) {
+                    result.add(
+                        (activityMap[day.monthValue]?.size ?: 0) to day.month.getDisplayName(
+                            TextStyle.SHORT,
+                            Locale.getDefault()
+                        )
+                    )
+                    day = day.plusMonths(1)
+                }
+            }
+
+            All -> {
+                val activityMap = statistics.activitiesByYear
+                val firstYear = activityMap.keys.min()
+                val currentYear = today.year
+                for (year in firstYear..currentYear) {
+                    result.add((activityMap[year]?.size ?: 0) to year.toString())
+                }
+            }
         }
+
+        return result
     }
 }
 
