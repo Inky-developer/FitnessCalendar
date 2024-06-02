@@ -16,6 +16,7 @@ import javax.inject.Singleton
 class LocalizationRepository @Inject constructor(@ApplicationContext context: Context) {
     val timeFormatter: java.text.DateFormat = DateFormat.getTimeFormat(context)
     val dateFormatter: java.text.DateFormat = DateFormat.getMediumDateFormat(context)
+    val shortDateFormatter: java.text.DateFormat = DateFormat.getDateFormat(context)
 
     fun formatDuration(date: Date, now: Date = Date.from(Instant.now())): String {
         val duration = date until now

@@ -191,7 +191,8 @@ fun Graph(modelProducer: CartesianChartModelProducer, label: String) {
                     title = label,
                     valueFormatter = { x, chartValues, _ ->
                         chartValues.model.extraStore[labelListKey][x.toInt()]
-                    }
+                    },
+                    itemPlacer = AxisItemPlacer.Horizontal.default(addExtremeLabelPadding = true)
                 ),
             ),
             modelProducer = modelProducer,
@@ -218,7 +219,7 @@ enum class Period(val nameId: Int, val xLabelId: Int) {
         return when (this) {
             Week -> statistics.activitiesByDay
                 .filter { dayOfYear - it.key < 7 }
-                .map { it.value.activities.size to localizationRepository.dateFormatter.format(it.value.activities[0].startTime) }
+                .map { it.value.activities.size to localizationRepository.shortDateFormatter.format(it.value.activities[0].startTime) }
 
             Month -> statistics.activitiesByWeek
                 .filter { weekOfYear - it.key < 4 }
