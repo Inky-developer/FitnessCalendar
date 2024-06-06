@@ -212,10 +212,11 @@ enum class Period(val nameId: Int, val xLabelId: Int) {
     fun filter(statistics: ActivityStatistics): List<Pair<Int, String>> {
         val dateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)
         val woyField = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear()
+        val dayOfWeekField = WeekFields.of(Locale.getDefault()).dayOfWeek()
 
         val result: MutableList<Pair<Int, String>> = mutableListOf()
 
-        val today = LocalDate.now()
+        val today = LocalDate.now().atStartOfDay()
         // TODO: Filter out older statistics already in the db query
         when (this) {
             Week -> {
@@ -228,7 +229,7 @@ enum class Period(val nameId: Int, val xLabelId: Int) {
             }
 
             Month -> {
-                var day = today.minusMonths(1)
+                var day = today.minusMonths(1).with(dayOfWeekField, 1)
                 val activityMap = statistics.activitiesByWeek
                 while (!day.isAfter(today)) {
                     result.add(
@@ -239,7 +240,7 @@ enum class Period(val nameId: Int, val xLabelId: Int) {
             }
 
             Year -> {
-                var day = today.minusYears(1)
+                var day = today.minusYears(1).withDayOfMonth(1).plusMonths(1)
                 val activityMap = statistics.activitiesByMonth
                 while (!day.isAfter(today)) {
                     result.add(

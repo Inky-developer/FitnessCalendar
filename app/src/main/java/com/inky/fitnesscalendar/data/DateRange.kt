@@ -1,5 +1,6 @@
 package com.inky.fitnesscalendar.data
 
+import com.inky.fitnesscalendar.util.toDate
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -22,10 +23,8 @@ data class DateRange(val start: Date, val end: Date?) {
             val endOfToday = day.with(LocalTime.MAX).plusHours(DAY_START_OFFSET_HOURS)
 
             return DateRange(
-                start = Date.from(startOfToday.atZone(ZoneId.systemDefault()).toInstant()),
-                end = if (offsetDays == 0L) null else Date.from(
-                    endOfToday.atZone(ZoneId.systemDefault()).toInstant()
-                )
+                start = startOfToday.toDate(),
+                end = if (offsetDays == 0L) null else endOfToday.toDate()
             )
         }
 

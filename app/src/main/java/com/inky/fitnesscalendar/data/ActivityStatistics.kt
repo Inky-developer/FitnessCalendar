@@ -1,9 +1,11 @@
 package com.inky.fitnesscalendar.data
 
-import java.time.Instant
-import java.time.temporal.ChronoUnit
+import com.inky.fitnesscalendar.util.toDate
+import java.time.LocalDate
+import java.time.temporal.WeekFields
 import java.util.Calendar
 import java.util.Date
+import java.util.Locale
 
 data class ActivityStatistics(
     val activities: List<Activity>,
@@ -20,10 +22,22 @@ data class ActivityStatistics(
         get() = keepNewerThanOneYear().groupByCalendarConstant(Calendar.DAY_OF_YEAR)
 
     val activitiesByWeek: Map<Int, ActivityStatistics>
-        get() = keepNewerThanOneYear().groupByCalendarConstant(Calendar.WEEK_OF_YEAR)
+        get() {
+            val dayOfWeekField = WeekFields.of(Locale.getDefault()).dayOfWeek()
+            val firstDateToInclude =
+                LocalDate.now().minusYears(1).plusWeeks(1).with(dayOfWeekField, 1).atStartOfDay()
+            return keepNewer(firstDateToInclude.toDate()).groupByCalendarConstant(Calendar.WEEK_OF_YEAR)
+        }
 
     val activitiesByMonth: Map<Int, ActivityStatistics>
-        get() = keepNewerThanOneYear().groupByCalendarConstant(Calendar.MONTH)
+        get() {
+            val today = LocalDate.now()
+            val firstDateToInclude =
+                today.minusYears(1).withDayOfMonth(1).plusMonths(1).atStartOfDay()
+            return keepNewer(firstDateToInclude.toDate())
+                .groupByCalendarConstant(Calendar.MONTH)
+                .mapKeys { it.key + 1 }
+        }
 
     val activitiesByYear: Map<Int, ActivityStatistics>
         get() = groupByCalendarConstant(Calendar.YEAR)
@@ -40,5 +54,5 @@ data class ActivityStatistics(
     private fun keepNewer(date: Date): ActivityStatistics = filter { it.startTime.after(date) }
 
     private fun keepNewerThanOneYear() =
-        keepNewer(Date.from(Instant.now() - ChronoUnit.YEARS.duration))
+        keepNewer(LocalDate.now().minusYears(1).plusDays(1).atStartOfDay().toDate())
 }
