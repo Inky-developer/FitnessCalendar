@@ -172,8 +172,6 @@ fun Graph(modelProducer: CartesianChartModelProducer, label: String) {
                         margins = Dimensions.of(end = 4.dp),
                         typeface = Typeface.MONOSPACE
                     ),
-                    valueFormatter = remember { CartesianValueFormatter.decimal(DecimalFormat("#")) },
-                    itemPlacer = remember { AxisItemPlacer.Vertical.step({ 1f }) },
                     title = stringResource(R.string.number_of_activity)
                 ),
                 bottomAxis = rememberBottomAxis(
