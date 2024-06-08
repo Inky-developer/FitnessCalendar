@@ -30,8 +30,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityCategory
@@ -49,7 +51,12 @@ import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
 import com.patrykandpatrick.vico.compose.common.component.rememberShapeComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
 import com.patrykandpatrick.vico.compose.common.of
+import com.patrykandpatrick.vico.compose.common.rememberHorizontalLegend
+import com.patrykandpatrick.vico.compose.common.rememberLegendItem
 import com.patrykandpatrick.vico.compose.common.shape.rounded
+import com.patrykandpatrick.vico.compose.common.vicoTheme
+import com.patrykandpatrick.vico.core.cartesian.CartesianDrawContext
+import com.patrykandpatrick.vico.core.cartesian.CartesianMeasureContext
 import com.patrykandpatrick.vico.core.cartesian.HorizontalLayout
 import com.patrykandpatrick.vico.core.cartesian.axis.AxisItemPlacer
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
@@ -202,8 +209,9 @@ fun Graph(modelProducer: CartesianChartModelProducer, label: String) {
                     valueFormatter = { x, chartValues, _ ->
                         chartValues.model.extraStore[labelListKey][x.toInt()]
                     },
-                    itemPlacer = AxisItemPlacer.Horizontal.default(addExtremeLabelPadding = true)
+                    itemPlacer = AxisItemPlacer.Horizontal.default(addExtremeLabelPadding = true),
                 ),
+                legend = rememberLegend()
             ),
             modelProducer = modelProducer,
             runInitialAnimation = true,
@@ -212,6 +220,26 @@ fun Graph(modelProducer: CartesianChartModelProducer, label: String) {
         )
     }
 }
+
+@Composable
+private fun rememberLegend() =
+    rememberHorizontalLegend<CartesianMeasureContext, CartesianDrawContext>(
+        items = ActivityCategory.entries.map { category ->
+            rememberLegendItem(
+                icon = rememberShapeComponent(Shape.Pill, colorResource(category.colorId)),
+                label = rememberTextComponent(
+                    color = vicoTheme.textColor,
+                    textSize = 12.sp,
+                    typeface = Typeface.MONOSPACE,
+                ),
+                labelText = stringResource(category.nameId),
+            )
+        },
+        iconSize = 8.dp,
+        iconPadding = 4.dp,
+        spacing = 16.dp,
+    )
+
 
 enum class Period(val nameId: Int, val xLabelId: Int) {
     Week(R.string.week, R.string.day),
