@@ -1,5 +1,7 @@
 package com.inky.fitnesscalendar.data
 
+import com.inky.fitnesscalendar.util.Duration
+import com.inky.fitnesscalendar.util.Duration.Companion.until
 import com.inky.fitnesscalendar.util.toDate
 import java.time.LocalDate
 import java.time.temporal.WeekFields
@@ -12,6 +14,8 @@ data class ActivityStatistics(
 ) {
     val size
         get() = activities.size
+
+    fun totalTime() = Duration(activities.sumOf { it.startTime.until(it.endTime).elapsedMs })
 
     fun isEmpty() = activities.isEmpty()
 

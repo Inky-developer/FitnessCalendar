@@ -12,6 +12,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
@@ -27,10 +29,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -88,17 +92,21 @@ fun StatisticsView(
     onOpenDrawer: () -> Unit
 ) {
     val modelProducer = remember { CartesianChartModelProducer.build() }
-    var selectedPeriod by remember { mutableStateOf(Period.Week) }
+    var selectedPeriod by rememberSaveable { mutableStateOf(Period.Week) }
+    var projection by rememberSaveable { mutableStateOf(Projection.ByTotalActivities) }
+    var projectionSelectionMenuOpen by rememberSaveable { mutableStateOf(false) }
 
     // TODO: Move this to the view model
-    LaunchedEffect(key1 = selectedPeriod, key2 = statistics) {
+    LaunchedEffect(key1 = selectedPeriod, key2 = statistics, key3 = projection) {
         val dataPoints =
             selectedPeriod.filter(statistics).map { it.first.activitiesByCategory to it.second }
         if (dataPoints.isNotEmpty()) {
             modelProducer.runTransaction {
                 columnSeries {
                     for (category in ActivityCategory.entries) {
-                        series(dataPoints.map { it.first[category]?.size ?: 0 })
+                        series(dataPoints.map {
+                            it.first[category]?.let { stats -> projection.apply(stats) } ?: 0
+                        })
                     }
                 }
                 updateExtras { it[labelListKey] = dataPoints.map { point -> point.second } }
@@ -126,6 +134,39 @@ fun StatisticsView(
                         )
                     }
                 },
+                actions = {
+                    IconButton(onClick = { projectionSelectionMenuOpen = true }) {
+                        when (projection) {
+                            Projection.ByTime -> Icon(
+                                painterResource(R.drawable.outline_timer_24),
+                                stringResource(R.string.by_total_time)
+                            )
+
+                            Projection.ByTotalActivities -> Icon(
+                                painterResource(R.drawable.outline_numbers_24),
+                                stringResource(R.string.number_of_activities)
+                            )
+                        }
+                    }
+                    DropdownMenu(
+                        expanded = projectionSelectionMenuOpen,
+                        onDismissRequest = { projectionSelectionMenuOpen = false }) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.by_total_activities)) },
+                            onClick = {
+                                projection = Projection.ByTotalActivities
+                                projectionSelectionMenuOpen = false
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.by_total_time)) },
+                            onClick = {
+                                projection = Projection.ByTime
+                                projectionSelectionMenuOpen = false
+                            }
+                        )
+                    }
+                },
                 modifier = Modifier.sharedBounds(SharedContentKey.AppBar)
             )
         }
@@ -140,13 +181,13 @@ fun StatisticsView(
                     )
                 }
             }
-            Graph(modelProducer, stringResource(selectedPeriod.xLabelId))
+            Graph(modelProducer, projection, stringResource(selectedPeriod.xLabelId))
         }
     }
 }
 
 @Composable
-fun DateFilterChip(selected: Boolean, onSelect: () -> Unit, label: @Composable () -> Unit) {
+private fun DateFilterChip(selected: Boolean, onSelect: () -> Unit, label: @Composable () -> Unit) {
     FilterChip(
         selected = selected,
         onClick = onSelect,
@@ -161,7 +202,11 @@ fun DateFilterChip(selected: Boolean, onSelect: () -> Unit, label: @Composable (
 }
 
 @Composable
-fun Graph(modelProducer: CartesianChartModelProducer, label: String) {
+private fun Graph(
+    modelProducer: CartesianChartModelProducer,
+    projection: Projection,
+    label: String
+) {
     val context = LocalContext.current
     val columns = remember {
         ActivityCategory.entries.map { entry ->
@@ -195,8 +240,8 @@ fun Graph(modelProducer: CartesianChartModelProducer, label: String) {
                         margins = Dimensions.of(end = 4.dp),
                         typeface = Typeface.MONOSPACE
                     ),
-                    title = stringResource(R.string.number_of_activity),
-                    itemPlacer = AxisItemPlacer.Vertical.step({ 2f })
+                    title = stringResource(projection.legendTextId),
+//                    itemPlacer = AxisItemPlacer.Vertical.step({ 2f })
                 ),
                 bottomAxis = rememberBottomAxis(
                     guideline = null,
@@ -255,7 +300,7 @@ private fun rememberMarker() =
     )
 
 
-enum class Period(val nameId: Int, val xLabelId: Int) {
+private enum class Period(val nameId: Int, val xLabelId: Int) {
     Week(R.string.week, R.string.day),
     Month(R.string.month, R.string.week),
     Year(R.string.year, R.string.month),
@@ -324,4 +369,14 @@ enum class Period(val nameId: Int, val xLabelId: Int) {
     }
 }
 
-internal val labelListKey = ExtraStore.Key<List<String>>()
+private enum class Projection(val legendTextId: Int) {
+    ByTime(R.string.total_hours),
+    ByTotalActivities(R.string.number_of_activities);
+
+    fun apply(statistics: ActivityStatistics): Double = when (this) {
+        ByTime -> statistics.totalTime().elapsedHours
+        ByTotalActivities -> statistics.size.toDouble()
+    }
+}
+
+private val labelListKey = ExtraStore.Key<List<String>>()
