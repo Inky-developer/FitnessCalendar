@@ -46,6 +46,7 @@ import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottomAxis
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStartAxis
 import com.patrykandpatrick.vico.compose.cartesian.fullWidth
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberColumnCartesianLayer
+import com.patrykandpatrick.vico.compose.cartesian.marker.rememberDefaultCartesianMarker
 import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
 import com.patrykandpatrick.vico.compose.common.component.rememberShapeComponent
@@ -62,6 +63,7 @@ import com.patrykandpatrick.vico.core.cartesian.axis.AxisItemPlacer
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.data.columnSeries
 import com.patrykandpatrick.vico.core.cartesian.layer.ColumnCartesianLayer
+import com.patrykandpatrick.vico.core.cartesian.marker.DefaultCartesianMarker
 import com.patrykandpatrick.vico.core.common.Dimensions
 import com.patrykandpatrick.vico.core.common.component.LineComponent
 import com.patrykandpatrick.vico.core.common.data.ExtraStore
@@ -211,12 +213,13 @@ fun Graph(modelProducer: CartesianChartModelProducer, label: String) {
                     },
                     itemPlacer = AxisItemPlacer.Horizontal.default(addExtremeLabelPadding = true),
                 ),
-                legend = rememberLegend()
+                legend = rememberLegend(),
             ),
             modelProducer = modelProducer,
             runInitialAnimation = true,
             horizontalLayout = HorizontalLayout.fullWidth(),
             scrollState = rememberVicoScrollState(scrollEnabled = false),
+            marker = rememberMarker()
         )
     }
 }
@@ -238,6 +241,14 @@ private fun rememberLegend() =
         iconSize = 8.dp,
         iconPadding = 4.dp,
         spacing = 16.dp,
+    )
+
+
+@Composable
+private fun rememberMarker() =
+    rememberDefaultCartesianMarker(
+        label = rememberTextComponent(),
+        labelPosition = DefaultCartesianMarker.LabelPosition.Top,
     )
 
 
