@@ -241,7 +241,7 @@ private fun Graph(
                         typeface = Typeface.MONOSPACE
                     ),
                     title = stringResource(projection.legendTextId),
-//                    itemPlacer = AxisItemPlacer.Vertical.step({ 2f })
+                    itemPlacer = AxisItemPlacer.Vertical.step({ projection.verticalStepSize() })
                 ),
                 bottomAxis = rememberBottomAxis(
                     guideline = null,
@@ -376,6 +376,11 @@ private enum class Projection(val legendTextId: Int) {
     fun apply(statistics: ActivityStatistics): Double = when (this) {
         ByTime -> statistics.totalTime().elapsedHours
         ByTotalActivities -> statistics.size.toDouble()
+    }
+
+    fun verticalStepSize() = when (this) {
+        ByTime -> null
+        ByTotalActivities -> 2f
     }
 }
 
