@@ -174,7 +174,7 @@ fun Graph(modelProducer: CartesianChartModelProducer, label: String) {
     }
 
     Surface(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize().padding(bottom = 16.dp)
     ) {
         CartesianChartHost(
             chart = rememberCartesianChart(
