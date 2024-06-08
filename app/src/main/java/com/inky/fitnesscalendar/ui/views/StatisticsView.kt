@@ -174,7 +174,9 @@ fun Graph(modelProducer: CartesianChartModelProducer, label: String) {
     }
 
     Surface(
-        modifier = Modifier.fillMaxSize().padding(bottom = 16.dp)
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(bottom = 16.dp)
     ) {
         CartesianChartHost(
             chart = rememberCartesianChart(
@@ -193,7 +195,8 @@ fun Graph(modelProducer: CartesianChartModelProducer, label: String) {
                         margins = Dimensions.of(end = 4.dp),
                         typeface = Typeface.MONOSPACE
                     ),
-                    title = stringResource(R.string.number_of_activity)
+                    title = stringResource(R.string.number_of_activity),
+                    itemPlacer = AxisItemPlacer.Vertical.step({ 2f })
                 ),
                 bottomAxis = rememberBottomAxis(
                     guideline = null,
@@ -273,7 +276,10 @@ enum class Period(val nameId: Int, val xLabelId: Int) {
                 val activityMap = statistics.activitiesByDay
                 while (!day.isAfter(today)) {
                     result.add(
-                        (activityMap[day.dayOfYear]) to day.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault())
+                        (activityMap[day.dayOfYear]) to day.dayOfWeek.getDisplayName(
+                            TextStyle.SHORT,
+                            Locale.getDefault()
+                        )
                     )
                     day = day.plusDays(1)
                 }
