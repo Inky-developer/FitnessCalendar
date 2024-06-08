@@ -276,13 +276,13 @@ fun Statistics(name: String, stats: ActivityStatistics) {
             modifier = Modifier.padding(horizontal = 8.dp)
         )
         if (stats.activities.isNotEmpty()) {
-            for ((activityCategory, activities) in stats.activitiesByCategory) {
-                if (activities.isEmpty()) {
+            for ((activityCategory, categoryStats) in stats.activitiesByCategory) {
+                if (categoryStats.isEmpty()) {
                     continue
                 }
 
-                val durationString = remember(activities) {
-                    Duration(activities.map { it.startTime until it.endTime }
+                val durationString = remember(categoryStats) {
+                    Duration(categoryStats.activities.map { it.startTime until it.endTime }
                         .sumOf { it.elapsedMs }).format()
 
                 }
@@ -298,7 +298,7 @@ fun Statistics(name: String, stats: ActivityStatistics) {
                     )
                     Text(
                         pluralStringResource(
-                            R.plurals.num_activities, activities.size, activities.size
+                            R.plurals.num_activities, categoryStats.size, categoryStats.size
                         ), modifier = Modifier.weight(1f)
                     )
                     Row(modifier = Modifier.weight(1f)) {

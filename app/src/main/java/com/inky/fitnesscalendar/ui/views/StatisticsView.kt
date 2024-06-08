@@ -29,10 +29,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
+import com.inky.fitnesscalendar.data.ActivityCategory
 import com.inky.fitnesscalendar.data.ActivityStatistics
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.sharedBounds
@@ -44,20 +46,19 @@ import com.patrykandpatrick.vico.compose.cartesian.fullWidth
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberColumnCartesianLayer
 import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
-import com.patrykandpatrick.vico.compose.common.component.rememberLineComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberShapeComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
 import com.patrykandpatrick.vico.compose.common.of
+import com.patrykandpatrick.vico.compose.common.shape.rounded
 import com.patrykandpatrick.vico.core.cartesian.HorizontalLayout
 import com.patrykandpatrick.vico.core.cartesian.axis.AxisItemPlacer
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
-import com.patrykandpatrick.vico.core.cartesian.data.CartesianValueFormatter
 import com.patrykandpatrick.vico.core.cartesian.data.columnSeries
 import com.patrykandpatrick.vico.core.cartesian.layer.ColumnCartesianLayer
 import com.patrykandpatrick.vico.core.common.Dimensions
+import com.patrykandpatrick.vico.core.common.component.LineComponent
 import com.patrykandpatrick.vico.core.common.data.ExtraStore
 import com.patrykandpatrick.vico.core.common.shape.Shape
-import java.text.DecimalFormat
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -82,11 +83,16 @@ fun StatisticsView(
 
     // TODO: Move this to the view model
     LaunchedEffect(key1 = selectedPeriod, key2 = statistics) {
-        val points = selectedPeriod.filter(statistics)
-        if (points.isNotEmpty()) {
+        val dataPoints =
+            selectedPeriod.filter(statistics).map { it.first.activitiesByCategory to it.second }
+        if (dataPoints.isNotEmpty()) {
             modelProducer.runTransaction {
-                columnSeries { series(points.map { it.first }) }
-                updateExtras { it[labelListKey] = points.map { point -> point.second } }
+                columnSeries {
+                    for (category in ActivityCategory.entries) {
+                        series(dataPoints.map { it.first[category]?.size ?: 0 })
+                    }
+                }
+                updateExtras { it[labelListKey] = dataPoints.map { point -> point.second } }
             }.await()
         }
     }
@@ -147,19 +153,25 @@ fun DateFilterChip(selected: Boolean, onSelect: () -> Unit, label: @Composable (
 
 @Composable
 fun Graph(modelProducer: CartesianChartModelProducer, label: String) {
+    val context = LocalContext.current
+    val columns = remember {
+        ActivityCategory.entries.map { entry ->
+            LineComponent(
+                color = context.getColor(entry.colorId),
+                thicknessDp = 64f,
+                shape = Shape.rounded(all = 8.dp)
+            )
+        }
+    }
+
     Surface(
         modifier = Modifier.fillMaxSize()
     ) {
         CartesianChartHost(
             chart = rememberCartesianChart(
                 rememberColumnCartesianLayer(
-                    ColumnCartesianLayer.ColumnProvider.series(
-                        rememberLineComponent(
-                            color = MaterialTheme.colorScheme.primary,
-                            thickness = 16.dp,
-                            shape = remember { Shape.rounded(allPercent = 40) }
-                        )
-                    )
+                    ColumnCartesianLayer.ColumnProvider.series(columns),
+                    mergeMode = { ColumnCartesianLayer.MergeMode.Stacked }
                 ),
                 startAxis = rememberStartAxis(
                     titleComponent = rememberTextComponent(
@@ -207,12 +219,12 @@ enum class Period(val nameId: Int, val xLabelId: Int) {
     Year(R.string.year, R.string.month),
     All(R.string.all_time, R.string.year);
 
-    fun filter(statistics: ActivityStatistics): List<Pair<Int, String>> {
+    fun filter(statistics: ActivityStatistics): List<Pair<ActivityStatistics, String>> {
         val dateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)
         val woyField = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear()
         val dayOfWeekField = WeekFields.of(Locale.getDefault()).dayOfWeek()
 
-        val result: MutableList<Pair<Int, String>> = mutableListOf()
+        val result: MutableList<Pair<ActivityStatistics?, String>> = mutableListOf()
 
         val today = LocalDate.now().atStartOfDay()
         // TODO: Filter out older statistics already in the db query
@@ -221,7 +233,9 @@ enum class Period(val nameId: Int, val xLabelId: Int) {
                 var day = today.minusWeeks(1)
                 val activityMap = statistics.activitiesByDay
                 while (!day.isAfter(today)) {
-                    result.add((activityMap[day.dayOfYear]?.size ?: 0) to day.format(dateFormatter))
+                    result.add(
+                        (activityMap[day.dayOfYear]) to day.format(dateFormatter)
+                    )
                     day = day.plusDays(1)
                 }
             }
@@ -231,7 +245,7 @@ enum class Period(val nameId: Int, val xLabelId: Int) {
                 val activityMap = statistics.activitiesByWeek
                 while (!day.isAfter(today)) {
                     result.add(
-                        (activityMap[day.get(woyField)]?.size ?: 0) to day.format(dateFormatter)
+                        (activityMap[day.get(woyField)]) to day.format(dateFormatter)
                     )
                     day = day.plusWeeks(1)
                 }
@@ -242,7 +256,7 @@ enum class Period(val nameId: Int, val xLabelId: Int) {
                 val activityMap = statistics.activitiesByMonth
                 while (!day.isAfter(today)) {
                     result.add(
-                        (activityMap[day.monthValue]?.size ?: 0) to day.month.getDisplayName(
+                        (activityMap[day.monthValue]) to day.month.getDisplayName(
                             TextStyle.SHORT,
                             Locale.getDefault()
                         )
@@ -256,12 +270,12 @@ enum class Period(val nameId: Int, val xLabelId: Int) {
                 val firstYear = activityMap.keys.min()
                 val currentYear = today.year
                 for (year in firstYear..currentYear) {
-                    result.add((activityMap[year]?.size ?: 0) to year.toString())
+                    result.add((activityMap[year]) to year.toString())
                 }
             }
         }
 
-        return result
+        return result.map { (it.first ?: ActivityStatistics(emptyList())) to it.second }
     }
 }
 

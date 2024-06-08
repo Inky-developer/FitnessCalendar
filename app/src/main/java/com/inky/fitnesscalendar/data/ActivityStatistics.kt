@@ -13,10 +13,15 @@ data class ActivityStatistics(
     val size
         get() = activities.size
 
-    val activitiesByCategory: Map<ActivityCategory, List<Activity>>
+    fun isEmpty() = activities.isEmpty()
+
+    fun isNotEmpty() = activities.isNotEmpty()
+
+    val activitiesByCategory: Map<ActivityCategory, ActivityStatistics>
         get() = activities.groupBy { it.type.activityCategory }.toList()
             .sortedBy { (_, v) -> -v.size }
             .toMap()
+            .mapValues { ActivityStatistics(it.value) }
 
     val activitiesByDay: Map<Int, ActivityStatistics>
         get() = keepNewerThanOneYear().groupByCalendarConstant(Calendar.DAY_OF_YEAR)
