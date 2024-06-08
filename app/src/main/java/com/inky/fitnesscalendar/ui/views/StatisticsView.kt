@@ -269,11 +269,11 @@ enum class Period(val nameId: Int, val xLabelId: Int) {
         // TODO: Filter out older statistics already in the db query
         when (this) {
             Week -> {
-                var day = today.minusWeeks(1)
+                var day = today.minusWeeks(1).plusDays(1)
                 val activityMap = statistics.activitiesByDay
                 while (!day.isAfter(today)) {
                     result.add(
-                        (activityMap[day.dayOfYear]) to day.format(dateFormatter)
+                        (activityMap[day.dayOfYear]) to day.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault())
                     )
                     day = day.plusDays(1)
                 }
