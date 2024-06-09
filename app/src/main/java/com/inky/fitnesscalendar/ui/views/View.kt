@@ -9,7 +9,7 @@ import com.inky.fitnesscalendar.R
 enum class View(
     val nameId: Int,
     private val navId: String,
-    private val arguments: List<Argument<*>> = emptyList()
+    private val arguments: List<Argument<*, *>> = emptyList()
 ) {
     Home(R.string.today, "home"),
     ActivityLog(R.string.activity_log, "activity_log"),
@@ -43,22 +43,30 @@ enum class View(
         }
     }
 
-    abstract class Argument<T>(
+    abstract class Argument<Ser, De>(
         val id: String,
-        val type: NavType<T>,
+        val type: NavType<Ser>,
         val nullable: Boolean = false,
-        val default: T? = null
     ) {
-        abstract fun extract(bundle: Bundle): T?
+        abstract fun extract(bundle: Bundle): De
 
         companion object {
             val ACTIVITY_ID =
-                object : Argument<Int>("activity_id", NavType.IntType, default = -1) {
+                object : Argument<Int, Int?>("activity_id", NavType.IntType) {
                     override fun extract(bundle: Bundle) =
                         when (val value = bundle.getInt(id, -1)) {
                             -1 -> null
                             else -> value
                         }
+                }
+
+            val initialPeriod =
+                object : Argument<String?, Period?>(
+                    "initial_period",
+                    NavType.StringType,
+                ) {
+                    override fun extract(bundle: Bundle) =
+                        bundle.getString(id)?.let { Period.valueOf(it) }
                 }
         }
     }

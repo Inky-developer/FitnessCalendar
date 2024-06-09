@@ -177,11 +177,16 @@ fun App(viewModel: AppViewModel = hiltViewModel()) {
                         )
                     }
                 }
-                composable(View.Statistics.pathTemplate()) {
+                composable(View.Statistics.pathTemplate()) { backStackEntry ->
                     currentView = View.Statistics
+
+                    val initialPeriod =
+                        backStackEntry.arguments?.let { View.Argument.initialPeriod.extract(it) }
+
                     ProvideSharedContent(sharedContentScope = this@SharedTransitionLayout) {
                         StatisticsView(
-                            onOpenDrawer = openDrawer
+                            onOpenDrawer = openDrawer,
+                            initialPeriod = initialPeriod
                         )
                     }
                 }

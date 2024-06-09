@@ -79,19 +79,24 @@ import java.time.temporal.WeekFields
 import java.util.Locale
 
 @Composable
-fun StatisticsView(viewModel: StatisticsViewModel = hiltViewModel(), onOpenDrawer: () -> Unit) {
+fun StatisticsView(
+    viewModel: StatisticsViewModel = hiltViewModel(),
+    initialPeriod: Period? = null,
+    onOpenDrawer: () -> Unit
+) {
     val stats by viewModel.activityStatistics.collectAsState(initial = ActivityStatistics(emptyList()))
-    StatisticsView(stats, onOpenDrawer)
+    StatisticsView(stats, initialPeriod ?: Period.Month, onOpenDrawer)
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun StatisticsView(
     statistics: ActivityStatistics,
+    initialPeriod: Period,
     onOpenDrawer: () -> Unit
 ) {
     val modelProducer = remember { CartesianChartModelProducer.build() }
-    var selectedPeriod by rememberSaveable { mutableStateOf(Period.Week) }
+    var selectedPeriod by rememberSaveable(initialPeriod) { mutableStateOf(initialPeriod) }
     var projection by rememberSaveable { mutableStateOf(Projection.ByTotalActivities) }
     var projectionSelectionMenuOpen by rememberSaveable { mutableStateOf(false) }
 
@@ -301,7 +306,7 @@ private fun rememberMarker() =
     )
 
 
-private enum class Period(val nameId: Int, val xLabelId: Int) {
+enum class Period(val nameId: Int, val xLabelId: Int) {
     Week(R.string.week, R.string.day),
     Month(R.string.month, R.string.week),
     Year(R.string.year, R.string.month),
