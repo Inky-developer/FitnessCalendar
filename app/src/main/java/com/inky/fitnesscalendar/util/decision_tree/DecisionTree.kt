@@ -2,6 +2,7 @@ package com.inky.fitnesscalendar.util.decision_tree
 
 import com.inky.fitnesscalendar.data.Activity
 import com.inky.fitnesscalendar.data.ActivityType
+import com.inky.fitnesscalendar.util.removedAt
 import java.time.Instant
 import java.util.Calendar
 import java.util.Date
@@ -20,7 +21,7 @@ sealed class DecisionTree<Classification> {
             is Leaf -> value
             is Node -> {
                 val child = children[data[attributeIndex]] ?: return default
-                child.classify(data.slice(0..<attributeIndex) + data.slice((attributeIndex + 1)..<data.size))
+                child.classify(data.removedAt(attributeIndex))
             }
         }
     }
