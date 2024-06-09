@@ -60,6 +60,7 @@ fun App(viewModel: AppViewModel = hiltViewModel()) {
         drawerState = navigationDrawerState,
         currentView = currentView,
         onNavigate = {
+            println(it.getPath())
             navController.navigate(it.getPath()) {
                 popUpTo(it.getPath()) {
                     inclusive = true
@@ -92,6 +93,9 @@ fun App(viewModel: AppViewModel = hiltViewModel()) {
                             onRecordActivity = { navController.navigate(View.RecordActivity.getPath()) },
                             onNavigateActivity = {
                                 navController.navigate(View.ActivityLog.getPath())
+                            },
+                            onNavigateStats = {
+                                navController.navigate(View.Statistics.getPath(it.toString()))
                             },
                             onOpenDrawer = openDrawer
                         )

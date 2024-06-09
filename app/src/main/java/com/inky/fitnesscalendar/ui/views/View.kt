@@ -18,12 +18,12 @@ enum class View(
     RecordActivity(R.string.record_activity, "record_activity"),
     ImportExport(R.string.import_export, "import_export"),
     Settings(R.string.settings, "settings"),
-    Statistics(R.string.statistics, "statistics");
+    Statistics(R.string.statistics, "statistics", listOf(Argument.initialPeriod));
 
     fun getPath(): String = if (arguments.isEmpty()) {
         pathTemplate()
     } else {
-        throw Error("Must be called with arguments")
+        getPath(arguments.map { it.default.toString() })
     }
 
     protected fun getPath(args: List<String>): String = navId + args.joinToString("/", prefix = "/")
@@ -46,13 +46,14 @@ enum class View(
     abstract class Argument<Ser, De>(
         val id: String,
         val type: NavType<Ser>,
+        val default: Ser,
         val nullable: Boolean = false,
     ) {
         abstract fun extract(bundle: Bundle): De
 
         companion object {
             val ACTIVITY_ID =
-                object : Argument<Int, Int?>("activity_id", NavType.IntType) {
+                object : Argument<Int, Int?>("activity_id", NavType.IntType, default = -1) {
                     override fun extract(bundle: Bundle) =
                         when (val value = bundle.getInt(id, -1)) {
                             -1 -> null
@@ -64,9 +65,12 @@ enum class View(
                 object : Argument<String?, Period?>(
                     "initial_period",
                     NavType.StringType,
+                    default = null,
+                    nullable = true
                 ) {
                     override fun extract(bundle: Bundle) =
-                        bundle.getString(id)?.let { Period.valueOf(it) }
+                        bundle.getString(id)
+                            ?.let { if (it != null.toString()) Period.valueOf(it) else null }
                 }
         }
     }

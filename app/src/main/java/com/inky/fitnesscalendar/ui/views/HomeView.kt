@@ -73,6 +73,7 @@ fun Home(
     onEditActivity: (Activity) -> Unit,
     onRecordActivity: () -> Unit,
     onNavigateActivity: () -> Unit,
+    onNavigateStats: (Period) -> Unit,
     onOpenDrawer: () -> Unit
 ) {
     val weeklyStats by viewModel.weekStats.collectAsState(initial = null)
@@ -164,8 +165,15 @@ fun Home(
                 onEdit = onEditActivity,
             )
 
-            StatisticsIfNotNull(stringResource(R.string.last_seven_days), weeklyStats)
-            StatisticsIfNotNull(stringResource(R.string.this_month), monthlyStats)
+            StatisticsIfNotNull(
+                stringResource(R.string.last_seven_days),
+                weeklyStats,
+                onClick = { onNavigateStats(Period.Week) })
+            StatisticsIfNotNull(
+                stringResource(R.string.this_month),
+                monthlyStats,
+                onClick = { onNavigateStats(Period.Month) }
+            )
 
             ActivitiesToday(
                 activities = activitiesToday ?: emptyList(),
@@ -254,16 +262,16 @@ fun RecordingStatus(
 }
 
 @Composable
-fun StatisticsIfNotNull(name: String, stats: ActivityStatistics?) {
+fun StatisticsIfNotNull(name: String, stats: ActivityStatistics?, onClick: () -> Unit) {
     if (stats != null) {
-        Statistics(name = name, stats = stats)
+        Statistics(name = name, stats = stats, onClick)
     }
 }
 
 @Composable
-fun Statistics(name: String, stats: ActivityStatistics) {
+fun Statistics(name: String, stats: ActivityStatistics, onClick: () -> Unit) {
     Card(
-        onClick = { /*TODO*/ },
+        onClick = onClick,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
         modifier = Modifier
             .padding(all = 8.dp)
