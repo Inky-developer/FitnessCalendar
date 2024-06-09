@@ -17,6 +17,8 @@ data class ActivityStatistics(
 
     fun totalTime() = Duration(activities.sumOf { it.startTime.until(it.endTime).elapsedMs })
 
+    fun averageTime() = Duration(totalTime().elapsedMs / size)
+
     fun isEmpty() = activities.isEmpty()
 
     fun isNotEmpty() = activities.isNotEmpty()

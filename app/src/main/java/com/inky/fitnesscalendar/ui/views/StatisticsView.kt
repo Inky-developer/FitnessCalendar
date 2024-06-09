@@ -142,8 +142,13 @@ fun StatisticsView(
                     IconButton(onClick = { projectionSelectionMenuOpen = true }) {
                         when (projection) {
                             Projection.ByTotalTime -> Icon(
-                                painterResource(R.drawable.outline_timer_24),
+                                painterResource(R.drawable.outline_total_time_24),
                                 stringResource(R.string.by_total_time)
+                            )
+
+                            Projection.ByAverageTime -> Icon(
+                                painterResource(R.drawable.outline_timer_24),
+                                stringResource(R.string.by_average_time)
                             )
 
                             Projection.ByTotalActivities -> Icon(
@@ -166,6 +171,13 @@ fun StatisticsView(
                             text = { Text(stringResource(R.string.by_total_time)) },
                             onClick = {
                                 projection = Projection.ByTotalTime
+                                projectionSelectionMenuOpen = false
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.by_average_time)) },
+                            onClick = {
+                                projection = Projection.ByAverageTime
                                 projectionSelectionMenuOpen = false
                             }
                         )
@@ -377,15 +389,17 @@ enum class Period(val nameId: Int, val xLabelId: Int) {
 
 private enum class Projection(val legendTextId: Int) {
     ByTotalTime(R.string.total_hours),
+    ByAverageTime(R.string.average_hours),
     ByTotalActivities(R.string.number_of_activities);
 
     fun apply(statistics: ActivityStatistics): Double = when (this) {
         ByTotalTime -> statistics.totalTime().elapsedHours
+        ByAverageTime -> statistics.averageTime().elapsedHours
         ByTotalActivities -> statistics.size.toDouble()
     }
 
     fun verticalStepSize() = when (this) {
-        ByTotalTime -> null
+        ByTotalTime, ByAverageTime -> null
         ByTotalActivities -> 2f
     }
 }
