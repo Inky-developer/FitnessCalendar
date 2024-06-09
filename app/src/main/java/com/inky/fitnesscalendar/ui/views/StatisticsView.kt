@@ -59,7 +59,6 @@ import com.patrykandpatrick.vico.compose.common.of
 import com.patrykandpatrick.vico.compose.common.rememberHorizontalLegend
 import com.patrykandpatrick.vico.compose.common.rememberLegendItem
 import com.patrykandpatrick.vico.compose.common.shape.rounded
-import com.patrykandpatrick.vico.compose.common.vicoTheme
 import com.patrykandpatrick.vico.core.cartesian.CartesianDrawContext
 import com.patrykandpatrick.vico.core.cartesian.CartesianMeasureContext
 import com.patrykandpatrick.vico.core.cartesian.HorizontalLayout
@@ -279,7 +278,7 @@ private fun rememberLegend() =
             rememberLegendItem(
                 icon = rememberShapeComponent(Shape.Pill, colorResource(category.colorId)),
                 label = rememberTextComponent(
-                    color = vicoTheme.textColor,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                     textSize = 12.sp,
                     typeface = Typeface.MONOSPACE,
                 ),
@@ -295,7 +294,9 @@ private fun rememberLegend() =
 @Composable
 private fun rememberMarker() =
     rememberDefaultCartesianMarker(
-        label = rememberTextComponent(),
+        label = rememberTextComponent(
+            color = MaterialTheme.colorScheme.onPrimaryContainer
+        ),
         labelPosition = DefaultCartesianMarker.LabelPosition.Top,
     )
 
