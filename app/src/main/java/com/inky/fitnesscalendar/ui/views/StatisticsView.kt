@@ -141,7 +141,7 @@ fun StatisticsView(
                 actions = {
                     IconButton(onClick = { projectionSelectionMenuOpen = true }) {
                         when (projection) {
-                            Projection.ByTime -> Icon(
+                            Projection.ByTotalTime -> Icon(
                                 painterResource(R.drawable.outline_timer_24),
                                 stringResource(R.string.by_total_time)
                             )
@@ -165,7 +165,7 @@ fun StatisticsView(
                         DropdownMenuItem(
                             text = { Text(stringResource(R.string.by_total_time)) },
                             onClick = {
-                                projection = Projection.ByTime
+                                projection = Projection.ByTotalTime
                                 projectionSelectionMenuOpen = false
                             }
                         )
@@ -376,16 +376,16 @@ enum class Period(val nameId: Int, val xLabelId: Int) {
 }
 
 private enum class Projection(val legendTextId: Int) {
-    ByTime(R.string.total_hours),
+    ByTotalTime(R.string.total_hours),
     ByTotalActivities(R.string.number_of_activities);
 
     fun apply(statistics: ActivityStatistics): Double = when (this) {
-        ByTime -> statistics.totalTime().elapsedHours
+        ByTotalTime -> statistics.totalTime().elapsedHours
         ByTotalActivities -> statistics.size.toDouble()
     }
 
     fun verticalStepSize() = when (this) {
-        ByTime -> null
+        ByTotalTime -> null
         ByTotalActivities -> 2f
     }
 }
