@@ -1,7 +1,6 @@
 package com.inky.fitnesscalendar.ui.views
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.gestures.scrollable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
