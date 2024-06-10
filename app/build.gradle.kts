@@ -16,6 +16,10 @@ android {
     namespace = "com.inky.fitnesscalendar"
     compileSdk = 34
 
+    androidResources {
+        @Suppress("UnstableApiUsage")
+        generateLocaleConfig = true
+    }
     defaultConfig {
         applicationId = "com.inky.fitnesscalendar"
         minSdk = 27
