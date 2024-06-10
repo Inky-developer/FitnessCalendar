@@ -88,6 +88,7 @@
     <string name="jump_to">Springe zu</string>
     <string name="yesterday">Gestern</string>
     <string name="entertainment">Unterhaltung</string>
+    <string name="film">Film</string>
     <plurals name="num_activities">
         <item quantity="one">%1d Aktivität</item>
         <item quantity="other">%1d Aktivitäten</item>
