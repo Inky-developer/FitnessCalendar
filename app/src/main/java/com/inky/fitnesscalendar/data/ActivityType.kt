@@ -35,6 +35,12 @@ enum class ActivityType(
     Gaming(ActivityCategory.Entertainment, nameId = R.string.gaming, emoji = "🎮"),
     Film(ActivityCategory.Entertainment, nameId = R.string.film, emoji = "🎬"),
     Note(ActivityCategory.Other, nameId = R.string.activity_note, emoji = "📓", hasDuration = false),
+    HealthNote(
+        ActivityCategory.Other,
+        nameId = R.string.health_note,
+        emoji = "⚕",
+        hasDuration = false
+    ),
     Other(ActivityCategory.Other, nameId = R.string.other, emoji = "🏷️");
 
     fun hasFeel() = hasDuration

@@ -89,6 +89,8 @@
     <string name="yesterday">Gestern</string>
     <string name="entertainment">Unterhaltung</string>
     <string name="film">Film</string>
+    <string name="health_note">Gesundheitsnotiz</string>
+
     <plurals name="num_activities">
         <item quantity="one">%1d Aktivität</item>
         <item quantity="other">%1d Aktivitäten</item>

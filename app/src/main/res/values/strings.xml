@@ -88,6 +88,7 @@
     <string name="jump_to">Jump To</string>
     <string name="entertainment">Entertainment</string>
     <string name="film">Film</string>
+    <string name="health_note">Health Note</string>
     <plurals name="num_activities">
         <item quantity="one">%1d activity</item>
         <item quantity="other">%1d activities</item>
