@@ -85,6 +85,7 @@
     <string name="total_hours">Total Hours</string>
     <string name="average_hours">Average Hours</string>
     <string name="by_average_time">Average Time</string>
+    <string name="jump_to">Jump To</string>
     <plurals name="num_activities">
         <item quantity="one">%1d activity</item>
         <item quantity="other">%1d activities</item>

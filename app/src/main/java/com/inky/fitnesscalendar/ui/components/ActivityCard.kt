@@ -1,5 +1,6 @@
 package com.inky.fitnesscalendar.ui.components
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Delete
+import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -48,6 +50,8 @@ fun ActivityCard(
     onEdit: (Activity) -> Unit,
     localizationRepository: LocalizationRepository,
     modifier: Modifier = Modifier,
+    onJumpTo: () -> Unit = {},
+    showJumpToOption: Boolean = false,
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainerLow,
     contentColor: Color = MaterialTheme.colorScheme.primary
 ) {
@@ -140,15 +144,25 @@ fun ActivityCard(
 
     if (showContextMenu) {
         ActivityCardContextMenu(
+            isFilterActive = showJumpToOption,
             onDismiss = { showContextMenu = false },
-            onDelete = onDelete
+            onDelete = onDelete,
+            onJumpTo = {
+                showContextMenu = false
+                onJumpTo()
+            }
         )
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ActivityCardContextMenu(onDismiss: () -> Unit, onDelete: () -> Unit) {
+fun ActivityCardContextMenu(
+    isFilterActive: Boolean,
+    onDismiss: () -> Unit,
+    onDelete: () -> Unit,
+    onJumpTo: () -> Unit
+) {
     ModalBottomSheet(onDismissRequest = onDismiss) {
         Text(
             "Options",
@@ -161,6 +175,19 @@ fun ActivityCardContextMenu(onDismiss: () -> Unit, onDelete: () -> Unit) {
             leadingContent = { Icon(Icons.Outlined.Delete, stringResource(R.string.delete)) },
             modifier = Modifier.clickable { onDelete() }
         )
+
+        AnimatedVisibility(visible = isFilterActive) {
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.jump_to)) },
+                leadingContent = {
+                    Icon(
+                        Icons.Outlined.PlayArrow,
+                        stringResource(R.string.jump_to)
+                    )
+                },
+                modifier = Modifier.clickable { onJumpTo() }
+            )
+        }
 
         Spacer(Modifier.height(32.dp))
     }

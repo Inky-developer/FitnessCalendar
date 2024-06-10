@@ -430,6 +430,6 @@ fun RecentActivity(
         onDelete = onDelete,
         onEdit = onEdit,
         containerColor = MaterialTheme.colorScheme.primaryContainer,
-        contentColor = contentColorFor(MaterialTheme.colorScheme.primaryContainer)
+        contentColor = contentColorFor(MaterialTheme.colorScheme.primaryContainer),
     )
 }

@@ -74,15 +74,21 @@ fun ActivityLog(
     val activities by remember(filter) { viewModel.repository.getActivities(filter) }
         .collectAsState(initial = emptyList())
 
-    // Detect when a new activity was inserted and scroll to it
+    // Scroll to requested activity or to the newest activity
+    var scrollToId by remember { mutableStateOf<Int?>(null) }
     var latestActivity by remember { mutableStateOf(activities.firstOrNull()) }
     LaunchedEffect(activities) {
-        if (activities.firstOrNull()?.uid != latestActivity?.uid) {
+        if (scrollToId != null) {
+            val index = activities.withIndex().find { it.value.uid == scrollToId }?.index
+            if (index != null) {
+                activityListState.animateScrollToItem(index)
+            }
+            scrollToId = null
+        } else if (activities.firstOrNull()?.uid != latestActivity?.uid) {
             activityListState.animateScrollToItem(0)
         }
         latestActivity = activities.firstOrNull()
     }
-
 
     Scaffold(topBar = {
         CenterAlignedTopAppBar(
@@ -161,8 +167,13 @@ fun ActivityLog(
                     items(activities, key = { it.uid ?: -1 }) { activity ->
                         ActivityCard(
                             activity,
+                            showJumpToOption = !filter.isEmpty(),
                             onDelete = {
                                 scope.launch { viewModel.repository.deleteActivity(activity) }
+                            },
+                            onJumpTo = {
+                                onEditFilter(ActivityFilter())
+                                scrollToId = activity.uid
                             },
                             onEdit = onEditActivity,
                             localizationRepository = viewModel.repository.localizationRepository,
