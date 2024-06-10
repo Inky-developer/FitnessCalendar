@@ -307,9 +307,10 @@ fun Statistics(name: String, stats: ActivityStatistics, onClick: () -> Unit) {
                     Text(
                         pluralStringResource(
                             R.plurals.num_activities, categoryStats.size, categoryStats.size
-                        ), modifier = Modifier.weight(1f)
+                        ),
+                        modifier = Modifier.weight(0.75f)
                     )
-                    Row(modifier = Modifier.weight(1f)) {
+                    Row(modifier = Modifier.weight(0.75f)) {
                         Icon(
                             painterResource(R.drawable.outline_timer_24),
                             stringResource(R.string.time)

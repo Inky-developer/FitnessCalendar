@@ -10,6 +10,6 @@
     <color name="stats_sport">#B54D4D</color>
     <color name="stats_travel">#5576A4</color>
     <color name="stats_work">#D8C365</color>
-    <color name="stats_gaming">#90B762</color>
+    <color name="stats_entertainment">#90B762</color>
     <color name="stats_other">#818084</color>
 </resources>

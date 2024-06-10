@@ -32,8 +32,8 @@ enum class ActivityType(
         hasVehicle = true
     ),
     Work(ActivityCategory.Work, nameId = R.string.work, emoji = "💼"),
+    Gaming(ActivityCategory.Entertainment, nameId = R.string.gaming, emoji = "🎮"),
     Note(ActivityCategory.Other, nameId = R.string.activity_note, emoji = "📓", hasDuration = false),
-    Gaming(ActivityCategory.Gaming, nameId = R.string.gaming, emoji = "🎮"),
     Other(ActivityCategory.Other, nameId = R.string.other, emoji = "🏷️");
 
     fun hasFeel() = hasDuration
@@ -44,7 +44,7 @@ enum class ActivityType(
             when (it.activityCategory) {
                 ActivityCategory.Sports -> 0
                 ActivityCategory.Travel -> 1
-                ActivityCategory.Gaming, ActivityCategory.Work, ActivityCategory.Other -> 2
+                ActivityCategory.Entertainment, ActivityCategory.Work, ActivityCategory.Other -> 2
             }
         }.map { (_, types) -> types }.toList()
 
