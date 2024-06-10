@@ -88,4 +88,12 @@
     <string name="jump_to">Springe zu</string>
     <string name="yesterday">Gestern</string>
     <string name="entertainment">Unterhaltung</string>
+    <plurals name="num_activities">
+        <item quantity="one">%1d Aktivität</item>
+        <item quantity="other">%1d Aktivitäten</item>
+    </plurals>
+    <plurals name="imported_activities">
+        <item quantity="one">%1d Aktivität importiert</item>
+        <item quantity="other">%1d Aktivitäten importiert</item>
+    </plurals>
 </resources>
