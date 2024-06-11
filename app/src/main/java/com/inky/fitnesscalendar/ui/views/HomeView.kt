@@ -309,7 +309,6 @@ fun Statistics(name: String, stats: ActivityStatistics, onClick: () -> Unit) {
                         pluralStringResource(
                             R.plurals.num_activities, categoryStats.size, categoryStats.size
                         ),
-                        textAlign = TextAlign.End,
                         modifier = Modifier.weight(0.75f).padding(end=8.dp)
                     )
                     Row(modifier = Modifier.weight(0.75f)) {
