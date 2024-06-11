@@ -94,7 +94,7 @@ fun RecordActivity(
                     )
                     onStart(recording)
                 }) {
-                    Text(stringResource(R.string.record))
+                    Text(stringResource(R.string.action_record))
                 }
             }
         }

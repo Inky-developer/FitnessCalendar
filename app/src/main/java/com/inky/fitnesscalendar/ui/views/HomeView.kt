@@ -129,7 +129,7 @@ fun Home(
                             contentColor = contentColorFor(MaterialTheme.colorScheme.primary)
                         )
                     ) {
-                        Icon(Icons.Filled.PlayArrow, stringResource(R.string.record))
+                        Icon(Icons.Filled.PlayArrow, stringResource(R.string.action_record))
                     }
                 },
                 modifier = Modifier.sharedBounds(SharedContentKey.AppBar)

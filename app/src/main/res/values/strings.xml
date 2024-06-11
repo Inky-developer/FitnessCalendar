@@ -48,7 +48,7 @@
     <string name="this_month">This Month</string>
     <string name="work">Work</string>
     <string name="gaming">Gaming</string>
-    <string name="record">Record</string>
+    <string name="action_record">Record</string>
     <string name="record_activity">Record Activity</string>
     <string name="record_activity_type">Record %1s</string>
     <string name="recording_activity_type">Recording %1s</string>

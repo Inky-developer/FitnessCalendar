@@ -49,7 +49,7 @@
     <string name="this_month">Dieser Monat</string>
     <string name="work">Arbeit</string>
     <string name="gaming">Gaming</string>
-    <string name="record">Aufzeichung</string>
+    <string name="action_record">Aufzeichnen</string>
     <string name="record_activity">Aktivität Aufzeichnen</string>
     <string name="record_activity_type">%1$s Aufzeichnen</string>
     <string name="recording_activity_type">%1$s wird aufgezeichnet</string>
