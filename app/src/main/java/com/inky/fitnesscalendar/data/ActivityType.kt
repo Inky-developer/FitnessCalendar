@@ -38,7 +38,7 @@ enum class ActivityType(
     HealthNote(
         ActivityCategory.Other,
         nameId = R.string.health_note,
-        emoji = "⚕",
+        emoji = "🩹",
         hasDuration = false
     ),
     Other(ActivityCategory.Other, nameId = R.string.other, emoji = "🏷️");
