@@ -42,6 +42,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
@@ -140,7 +141,6 @@ fun Home(
             )
         }
     ) { paddingValues ->
-        
         Column(
             modifier = Modifier
                 .padding(paddingValues)
@@ -309,7 +309,8 @@ fun Statistics(name: String, stats: ActivityStatistics, onClick: () -> Unit) {
                         pluralStringResource(
                             R.plurals.num_activities, categoryStats.size, categoryStats.size
                         ),
-                        modifier = Modifier.weight(0.75f)
+                        textAlign = TextAlign.End,
+                        modifier = Modifier.weight(0.75f).padding(end=8.dp)
                     )
                     Row(modifier = Modifier.weight(0.75f)) {
                         Icon(
