@@ -170,11 +170,6 @@ fun ActivityCardContextMenu(
             modifier = Modifier.padding(horizontal = 8.dp)
         )
         HorizontalDivider(modifier = Modifier.padding(all = 8.dp))
-        ListItem(
-            headlineContent = { Text(stringResource(R.string.delete_activity)) },
-            leadingContent = { Icon(Icons.Outlined.Delete, stringResource(R.string.delete)) },
-            modifier = Modifier.clickable { onDelete() }
-        )
 
         AnimatedVisibility(visible = isFilterActive) {
             ListItem(
@@ -188,6 +183,11 @@ fun ActivityCardContextMenu(
                 modifier = Modifier.clickable { onJumpTo() }
             )
         }
+        ListItem(
+            headlineContent = { Text(stringResource(R.string.delete_activity)) },
+            leadingContent = { Icon(Icons.Outlined.Delete, stringResource(R.string.delete)) },
+            modifier = Modifier.clickable { onDelete() }
+        )
 
         Spacer(Modifier.height(32.dp))
     }
