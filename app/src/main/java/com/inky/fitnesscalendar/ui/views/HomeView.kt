@@ -38,6 +38,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
@@ -101,6 +102,7 @@ fun Home(
         }
     }
 
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -110,8 +112,8 @@ fun Home(
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                    scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                 ),
                 navigationIcon = {
                     IconButton(onClick = onOpenDrawer) {
@@ -132,6 +134,7 @@ fun Home(
                         Icon(Icons.Filled.PlayArrow, stringResource(R.string.action_record))
                     }
                 },
+                scrollBehavior = scrollBehavior,
                 modifier = Modifier.sharedBounds(SharedContentKey.AppBar)
             )
         },
@@ -139,7 +142,8 @@ fun Home(
             NewActivityFAB(
                 onClick = onNewActivity, menuOpen = isNewActivityOpen
             )
-        }
+        },
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { paddingValues ->
         Column(
             modifier = Modifier

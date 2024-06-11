@@ -31,6 +31,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -63,12 +64,13 @@ fun ImportExport(
         }
     }
 
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text(stringResource(R.string.import_export)) },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 ),
                 navigationIcon = {
@@ -76,13 +78,19 @@ fun ImportExport(
                         Icon(Icons.Outlined.Menu, stringResource(R.string.Menu))
                     }
                 },
+                scrollBehavior = scrollBehavior,
                 modifier = Modifier.sharedBounds(SharedContentKey.AppBar)
             )
         },
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) }
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { paddingValues ->
         val context = LocalContext.current
-        Column(modifier = Modifier.verticalScroll(state = scrollState).padding(paddingValues)) {
+        Column(
+            modifier = Modifier
+                .verticalScroll(state = scrollState)
+                .padding(paddingValues)
+        ) {
             Button(
                 enabled = !exporting,
                 onClick = {

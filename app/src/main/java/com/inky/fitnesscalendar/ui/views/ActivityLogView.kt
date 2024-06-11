@@ -43,6 +43,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -90,36 +91,42 @@ fun ActivityLog(
         latestActivity = activities.firstOrNull()
     }
 
-    Scaffold(topBar = {
-        CenterAlignedTopAppBar(
-            title = { Text(stringResource(R.string.activity_log)) },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-            ),
-            navigationIcon = {
-                IconButton(onClick = onOpenDrawer) {
-                    Icon(
-                        imageVector = Icons.Outlined.Menu,
-                        contentDescription = stringResource(R.string.Menu),
-                    )
-                }
-            },
-            actions = {
-                IconButton(onClick = { onFilter() }) {
-                    Icon(Icons.Outlined.Search, stringResource(R.string.filter))
-                }
-            },
-            modifier = Modifier.sharedBounds(SharedContentKey.AppBar)
-        )
-    }, floatingActionButton = {
-        NewActivityFAB(
-            onClick = {
-                onNewActivity()
-            },
-            menuOpen = isNewActivityOpen,
-        )
-    }) { innerPadding ->
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text(stringResource(R.string.activity_log)) },
+                colors = TopAppBarDefaults.topAppBarColors(
+                    scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                ),
+                navigationIcon = {
+                    IconButton(onClick = onOpenDrawer) {
+                        Icon(
+                            imageVector = Icons.Outlined.Menu,
+                            contentDescription = stringResource(R.string.Menu),
+                        )
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { onFilter() }) {
+                        Icon(Icons.Outlined.Search, stringResource(R.string.filter))
+                    }
+                },
+                scrollBehavior = scrollBehavior,
+                modifier = Modifier.sharedBounds(SharedContentKey.AppBar)
+            )
+        },
+        floatingActionButton = {
+            NewActivityFAB(
+                onClick = {
+                    onNewActivity()
+                },
+                menuOpen = isNewActivityOpen,
+            )
+        },
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+    ) { innerPadding ->
         Column(
             modifier = Modifier.padding(innerPadding)
         ) {
