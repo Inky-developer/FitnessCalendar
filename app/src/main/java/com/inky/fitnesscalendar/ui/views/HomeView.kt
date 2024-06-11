@@ -140,6 +140,7 @@ fun Home(
             )
         }
     ) { paddingValues ->
+        
         Column(
             modifier = Modifier
                 .padding(paddingValues)
@@ -229,28 +230,28 @@ fun RecordingStatus(
             localizationRepository.formatDuration(recording.startTime)
         }
     }
-    Row(
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .padding(all = 8.dp)
-            .fillMaxWidth()
-    ) {
-        Row(modifier = Modifier.padding(end = 8.dp)) {
-            Icon(
-                painterResource(R.drawable.record_24),
-                stringResource(R.string.recording),
-                tint = Color.Red,
-                modifier = Modifier.align(Alignment.CenterVertically)
-            )
-            Text(
-                stringResource(recording.type.nameId),
-                modifier = Modifier.align(Alignment.CenterVertically)
-            )
+    Column(modifier = Modifier.padding(all = 8.dp)) {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Row(modifier = Modifier.padding(end = 8.dp)) {
+                Icon(
+                    painterResource(R.drawable.record_24),
+                    stringResource(R.string.recording),
+                    tint = Color.Red,
+                    modifier = Modifier.align(Alignment.CenterVertically)
+                )
+                Text(
+                    stringResource(recording.type.nameId),
+                    modifier = Modifier.align(Alignment.CenterVertically)
+                )
+            }
+            Text(timeString)
+            Text(durationString, modifier = Modifier)
         }
-        Text(timeString, modifier = Modifier.weight(0.5f))
-        Text(durationString, modifier = Modifier.weight(0.5f))
-        Row {
+        Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
             TextButton(onClick = onAbort) {
                 Text(stringResource(R.string.abort))
             }
