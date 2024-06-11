@@ -167,14 +167,15 @@ fun ActivityLog(
                     items(activities, key = { it.uid ?: -1 }) { activity ->
                         ActivityCard(
                             activity,
-                            showJumpToOption = !filter.isEmpty(),
                             onDelete = {
                                 scope.launch { viewModel.repository.deleteActivity(activity) }
                             },
-                            onJumpTo = {
-                                onEditFilter(ActivityFilter())
-                                scrollToId = activity.uid
-                            },
+                            onJumpTo = if (!filter.isEmpty()) {
+                                {
+                                    onEditFilter(ActivityFilter())
+                                    scrollToId = activity.uid
+                                }
+                            } else null,
                             onEdit = onEditActivity,
                             localizationRepository = viewModel.repository.localizationRepository,
                             modifier = Modifier

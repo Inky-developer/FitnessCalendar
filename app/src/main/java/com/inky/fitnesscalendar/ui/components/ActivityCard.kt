@@ -50,8 +50,7 @@ fun ActivityCard(
     onEdit: (Activity) -> Unit,
     localizationRepository: LocalizationRepository,
     modifier: Modifier = Modifier,
-    onJumpTo: () -> Unit = {},
-    showJumpToOption: Boolean = false,
+    onJumpTo: (() -> Unit)? = null,
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainerLow,
     contentColor: Color = MaterialTheme.colorScheme.primary
 ) {
@@ -144,12 +143,13 @@ fun ActivityCard(
 
     if (showContextMenu) {
         ActivityCardContextMenu(
-            isFilterActive = showJumpToOption,
             onDismiss = { showContextMenu = false },
             onDelete = onDelete,
-            onJumpTo = {
-                showContextMenu = false
-                onJumpTo()
+            onJumpTo = onJumpTo?.let {
+                {
+                    showContextMenu = false
+                    it()
+                }
             }
         )
     }
@@ -158,10 +158,9 @@ fun ActivityCard(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActivityCardContextMenu(
-    isFilterActive: Boolean,
     onDismiss: () -> Unit,
     onDelete: () -> Unit,
-    onJumpTo: () -> Unit
+    onJumpTo: (() -> Unit)?
 ) {
     ModalBottomSheet(onDismissRequest = onDismiss) {
         Text(
@@ -171,7 +170,7 @@ fun ActivityCardContextMenu(
         )
         HorizontalDivider(modifier = Modifier.padding(all = 8.dp))
 
-        AnimatedVisibility(visible = isFilterActive) {
+        AnimatedVisibility(visible = onJumpTo != null) {
             ListItem(
                 headlineContent = { Text(stringResource(R.string.jump_to)) },
                 leadingContent = {
@@ -180,7 +179,7 @@ fun ActivityCardContextMenu(
                         stringResource(R.string.jump_to)
                     )
                 },
-                modifier = Modifier.clickable { onJumpTo() }
+                modifier = Modifier.clickable { onJumpTo?.let { it() } }
             )
         }
         ListItem(
