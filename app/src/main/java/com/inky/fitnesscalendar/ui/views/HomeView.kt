@@ -42,7 +42,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
@@ -303,20 +303,26 @@ fun Statistics(name: String, stats: ActivityStatistics, onClick: () -> Unit) {
                 ) {
                     Text(
                         activityCategory.emoji + stringResource(activityCategory.nameId),
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f)
                     )
                     Text(
                         pluralStringResource(
                             R.plurals.num_activities, categoryStats.size, categoryStats.size
                         ),
-                        modifier = Modifier.weight(0.75f).padding(end=8.dp)
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier
+                            .weight(1f)
+                            .padding(end = 8.dp)
                     )
                     Row(modifier = Modifier.weight(0.75f)) {
                         Icon(
                             painterResource(R.drawable.outline_timer_24),
                             stringResource(R.string.time)
                         )
-                        Text(durationString)
+                        Text(durationString, maxLines = 1, overflow = TextOverflow.Ellipsis)
                     }
                 }
             }
