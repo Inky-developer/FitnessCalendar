@@ -100,10 +100,16 @@ fun App(viewModel: AppViewModel = hiltViewModel()) {
                         )
                     }
                 }
-                composable(View.ActivityLog.pathTemplate()) {
+                composable(
+                    View.ActivityLog.pathTemplate(),
+                    arguments = View.ActivityLog.navArgs()
+                ) { backStackEntry ->
                     currentView = View.ActivityLog
+                    val activityId =
+                        backStackEntry.arguments?.let { View.Argument.ACTIVITY_ID.extract(it) }
                     ProvideSharedContent(sharedContentScope = this@SharedTransitionLayout) {
                         ActivityLog(
+                            initialSelectedActivityId = activityId,
                             filter = filterState,
                             onOpenDrawer = openDrawer,
                             onNewActivity = {
@@ -180,7 +186,10 @@ fun App(viewModel: AppViewModel = hiltViewModel()) {
                         )
                     }
                 }
-                composable(View.Statistics.pathTemplate()) { backStackEntry ->
+                composable(
+                    View.Statistics.pathTemplate(),
+                    arguments = View.Statistics.navArgs()
+                ) { backStackEntry ->
                     currentView = View.Statistics
 
                     val initialPeriod =
@@ -188,8 +197,11 @@ fun App(viewModel: AppViewModel = hiltViewModel()) {
 
                     ProvideSharedContent(sharedContentScope = this@SharedTransitionLayout) {
                         StatisticsView(
+                            initialPeriod = initialPeriod,
                             onOpenDrawer = openDrawer,
-                            initialPeriod = initialPeriod
+                            onViewActivity = {
+                                navController.navigate(View.ActivityLog.getPath(it.uid ?: -1))
+                            }
                         )
                     }
                 }

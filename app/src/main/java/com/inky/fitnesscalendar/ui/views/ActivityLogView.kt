@@ -74,6 +74,7 @@ fun ActivityLog(
     onNewActivity: () -> Unit,
     onEditActivity: (Activity) -> Unit,
     onFilter: () -> Unit,
+    initialSelectedActivityId: Int? = null,
 ) {
     val scope = rememberCoroutineScope()
     val activityListState = rememberLazyListState()
@@ -81,15 +82,15 @@ fun ActivityLog(
         .collectAsState(initial = emptyList())
 
     // Scroll to requested activity or to the newest activity
-    var scrollToId by remember { mutableStateOf<Int?>(null) }
+    var scrollToId by remember(initialSelectedActivityId) { mutableStateOf(initialSelectedActivityId) }
     var latestActivity by remember { mutableStateOf(activities.firstOrNull()) }
     LaunchedEffect(activities) {
         if (scrollToId != null) {
             val index = activities.withIndex().find { it.value.uid == scrollToId }?.index
             if (index != null) {
                 activityListState.animateScrollToItem(index)
+                scrollToId = null
             }
-            scrollToId = null
         } else if (activities.firstOrNull()?.uid != latestActivity?.uid) {
             activityListState.animateScrollToItem(0)
         }

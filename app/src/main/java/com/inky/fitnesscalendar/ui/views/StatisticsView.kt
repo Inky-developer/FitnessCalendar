@@ -2,12 +2,15 @@ package com.inky.fitnesscalendar.ui.views
 
 import android.graphics.Typeface
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Menu
@@ -41,8 +44,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
+import com.inky.fitnesscalendar.data.Activity
 import com.inky.fitnesscalendar.data.ActivityCategory
 import com.inky.fitnesscalendar.data.ActivityStatistics
+import com.inky.fitnesscalendar.localization.LocalizationRepository
+import com.inky.fitnesscalendar.ui.components.CompactActivityCard
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.view_model.StatisticsViewModel
@@ -83,28 +89,38 @@ import java.util.Locale
 fun StatisticsView(
     viewModel: StatisticsViewModel = hiltViewModel(),
     initialPeriod: Period? = null,
-    onOpenDrawer: () -> Unit
+    onOpenDrawer: () -> Unit,
+    onViewActivity: (Activity) -> Unit
 ) {
     val stats by viewModel.activityStatistics.collectAsState(initial = ActivityStatistics(emptyList()))
-    StatisticsView(stats, initialPeriod ?: Period.Month, onOpenDrawer)
+    StatisticsView(
+        stats,
+        initialPeriod ?: Period.Month,
+        viewModel.appRepository.localizationRepository,
+        onOpenDrawer,
+        onViewActivity
+    )
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun StatisticsView(
     statistics: ActivityStatistics,
     initialPeriod: Period,
-    onOpenDrawer: () -> Unit
+    localizationRepository: LocalizationRepository,
+    onOpenDrawer: () -> Unit,
+    onViewActivity: (Activity) -> Unit,
 ) {
     val modelProducer = remember { CartesianChartModelProducer.build() }
     var selectedPeriod by rememberSaveable(initialPeriod) { mutableStateOf(initialPeriod) }
     var projection by rememberSaveable { mutableStateOf(Projection.ByTotalActivities) }
     var projectionSelectionMenuOpen by rememberSaveable { mutableStateOf(false) }
+    val selectedActivities =
+        remember(selectedPeriod, statistics) { selectedPeriod.filter(statistics) }
 
     // TODO: Move this to the view model
-    LaunchedEffect(key1 = selectedPeriod, key2 = statistics, key3 = projection) {
-        val dataPoints =
-            selectedPeriod.filter(statistics).map { it.first.activitiesByCategory to it.second }
+    LaunchedEffect(key1 = selectedActivities, key2 = projection) {
+        val dataPoints = selectedActivities.map { it.first.activitiesByCategory to it.second }
         if (dataPoints.isNotEmpty()) {
             modelProducer.runTransaction {
                 columnSeries {
@@ -191,17 +207,53 @@ fun StatisticsView(
         },
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { contentPadding ->
-        Column(modifier = Modifier.padding(contentPadding)) {
-            Row(horizontalArrangement = Arrangement.Center, modifier = Modifier.fillMaxWidth()) {
-                for (period in Period.entries) {
-                    DateFilterChip(
-                        selected = selectedPeriod == period,
-                        onSelect = { selectedPeriod = period },
-                        label = { Text(stringResource(period.nameId)) }
+        LazyColumn(modifier = Modifier.padding(contentPadding)) {
+            stickyHeader {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(MaterialTheme.colorScheme.surface)
+                ) {
+                    for (period in Period.entries) {
+                        DateFilterChip(
+                            selected = selectedPeriod == period,
+                            onSelect = { selectedPeriod = period },
+                            label = { Text(stringResource(period.nameId)) }
+                        )
+                    }
+                }
+            }
+
+            item {
+                Graph(
+                    modelProducer,
+                    projection,
+                    stringResource(selectedPeriod.xLabelId),
+                    modifier = Modifier.fillParentMaxHeight(0.9f)
+                )
+            }
+
+            for ((activities, header) in selectedActivities) {
+                stickyHeader {
+                    Text(
+                        header,
+                        style = MaterialTheme.typography.labelLarge,
+                        modifier = Modifier
+                            .background(MaterialTheme.colorScheme.primaryContainer)
+                            .padding(all = 8.dp)
+                            .fillMaxWidth()
+                    )
+                }
+
+                items(activities.activities) { activity ->
+                    CompactActivityCard(
+                        activity = activity,
+                        localizationRepository = localizationRepository,
+                        modifier = Modifier.clickable { onViewActivity(activity) }
                     )
                 }
             }
-            Graph(modelProducer, projection, stringResource(selectedPeriod.xLabelId))
         }
     }
 }
@@ -225,7 +277,8 @@ private fun DateFilterChip(selected: Boolean, onSelect: () -> Unit, label: @Comp
 private fun Graph(
     modelProducer: CartesianChartModelProducer,
     projection: Projection,
-    label: String
+    label: String,
+    modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
     val columns = remember {
@@ -239,8 +292,7 @@ private fun Graph(
     }
 
     Surface(
-        modifier = Modifier
-            .fillMaxSize()
+        modifier = modifier
             .padding(bottom = 16.dp)
     ) {
         CartesianChartHost(
