@@ -234,7 +234,7 @@ fun StatisticsView(
                 )
             }
 
-            for ((activities, header) in selectedActivities) {
+            for ((activities, header) in selectedActivities.asReversed()) {
                 stickyHeader {
                     Text(
                         header,
