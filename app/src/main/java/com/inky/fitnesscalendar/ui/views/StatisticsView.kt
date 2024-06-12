@@ -208,7 +208,7 @@ fun StatisticsView(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { contentPadding ->
         LazyColumn(modifier = Modifier.padding(contentPadding)) {
-            stickyHeader {
+            stickyHeader(contentType = ContentType.Tabs) {
                 Row(
                     horizontalArrangement = Arrangement.Center,
                     modifier = Modifier
@@ -225,7 +225,7 @@ fun StatisticsView(
                 }
             }
 
-            item {
+            item(contentType = ContentType.Graph) {
                 Graph(
                     modelProducer,
                     projection,
@@ -235,7 +235,7 @@ fun StatisticsView(
             }
 
             for ((activities, header) in selectedActivities.asReversed()) {
-                stickyHeader {
+                stickyHeader(contentType = ContentType.Date) {
                     Text(
                         header,
                         style = MaterialTheme.typography.labelLarge,
@@ -246,7 +246,7 @@ fun StatisticsView(
                     )
                 }
 
-                items(activities.activities) { activity ->
+                items(activities.activities, contentType = { ContentType.Activity }) { activity ->
                     CompactActivityCard(
                         activity = activity,
                         localizationRepository = localizationRepository,
@@ -256,6 +256,13 @@ fun StatisticsView(
             }
         }
     }
+}
+
+private enum class ContentType {
+    Tabs,
+    Graph,
+    Date,
+    Activity
 }
 
 @Composable
