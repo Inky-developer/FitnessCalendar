@@ -104,4 +104,6 @@
     <string name="weeks">Wochen</string>
     <string name="months">Monate</string>
     <string name="years">Jahre</string>
+    <string name="filter_activity_category">Aktivitätskategorie filtern</string>
+    <string name="filter_all">Alle</string>
 </resources>

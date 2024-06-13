@@ -12,4 +12,9 @@
     <color name="stats_work">#D8C365</color>
     <color name="stats_entertainment">#90B762</color>
     <color name="stats_other">#818084</color>
+    <color name="stats_1">#EF5350</color>
+    <color name="stats_2">#66BB6A</color>
+    <color name="stats_3">#5C6BC0</color>
+    <color name="stats_4">#26C6DA</color>
+    <color name="stats_5">#D4E157</color>
 </resources>

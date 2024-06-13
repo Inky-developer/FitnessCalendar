@@ -1,5 +1,6 @@
 package com.inky.fitnesscalendar.ui.views
 
+import android.content.Context
 import android.graphics.Typeface
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -35,9 +36,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -46,7 +47,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.Activity
 import com.inky.fitnesscalendar.data.ActivityCategory
+import com.inky.fitnesscalendar.data.ActivityFilter
 import com.inky.fitnesscalendar.data.ActivityStatistics
+import com.inky.fitnesscalendar.data.ActivityType
+import com.inky.fitnesscalendar.data.Displayable
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.CompactActivityCard
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
@@ -101,9 +105,11 @@ fun StatisticsView(
     StatisticsView(
         stats,
         initialPeriod ?: Period.Week,
+        Grouping(viewModel.filter.categories.firstOrNull()),
         viewModel.appRepository.localizationRepository,
         onOpenDrawer,
-        onViewActivity
+        onViewActivity,
+        onGrouping = { viewModel.filter = ActivityFilter(categories = listOfNotNull(it.category)) }
     )
 }
 
@@ -112,26 +118,27 @@ fun StatisticsView(
 fun StatisticsView(
     statistics: ActivityStatistics,
     initialPeriod: Period,
+    grouping: Grouping,
     localizationRepository: LocalizationRepository,
     onOpenDrawer: () -> Unit,
     onViewActivity: (Activity) -> Unit,
+    onGrouping: (Grouping) -> Unit,
 ) {
     val modelProducer = remember { CartesianChartModelProducer.build() }
     var selectedPeriod by rememberSaveable(initialPeriod) { mutableStateOf(initialPeriod) }
     var projection by rememberSaveable { mutableStateOf(Projection.ByTotalActivities) }
-    var projectionSelectionMenuOpen by rememberSaveable { mutableStateOf(false) }
     val selectedActivities =
         remember(selectedPeriod, statistics) { selectedPeriod.filter(statistics) }
 
     // TODO: Move this to the view model
-    LaunchedEffect(key1 = selectedActivities, key2 = projection) {
-        val dataPoints = selectedActivities.map { it.first.activitiesByCategory to it.second }
+    LaunchedEffect(key1 = selectedActivities, key2 = projection, key3 = grouping) {
+        val dataPoints = selectedActivities.map { grouping.apply(it.first) to it.second }
         if (dataPoints.isNotEmpty()) {
             modelProducer.runTransaction {
                 columnSeries {
-                    for (category in ActivityCategory.entries) {
+                    for (group in grouping.options()) {
                         series(dataPoints.map {
-                            it.first[category]?.let { stats -> projection.apply(stats) } ?: 0
+                            it.first[group]?.let { stats -> projection.apply(stats) } ?: 0
                         })
                     }
                 }
@@ -162,49 +169,11 @@ fun StatisticsView(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { projectionSelectionMenuOpen = true }) {
-                        when (projection) {
-                            Projection.ByTotalTime -> Icon(
-                                painterResource(R.drawable.outline_total_time_24),
-                                stringResource(R.string.by_total_time)
-                            )
-
-                            Projection.ByAverageTime -> Icon(
-                                painterResource(R.drawable.outline_timer_24),
-                                stringResource(R.string.by_average_time)
-                            )
-
-                            Projection.ByTotalActivities -> Icon(
-                                painterResource(R.drawable.outline_numbers_24),
-                                stringResource(R.string.number_of_activities)
-                            )
-                        }
-                    }
-                    DropdownMenu(
-                        expanded = projectionSelectionMenuOpen,
-                        onDismissRequest = { projectionSelectionMenuOpen = false }) {
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.by_total_activities)) },
-                            onClick = {
-                                projection = Projection.ByTotalActivities
-                                projectionSelectionMenuOpen = false
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.by_total_time)) },
-                            onClick = {
-                                projection = Projection.ByTotalTime
-                                projectionSelectionMenuOpen = false
-                            }
-                        )
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.by_average_time)) },
-                            onClick = {
-                                projection = Projection.ByAverageTime
-                                projectionSelectionMenuOpen = false
-                            }
-                        )
-                    }
+                    ActivityFilterButton(
+                        selectedCategory = grouping.category,
+                        onCategory = { onGrouping(Grouping(it)) }
+                    )
+                    ProjectionSelectButton(projection) { projection = it }
                 },
                 scrollBehavior = scrollBehavior,
                 modifier = Modifier.sharedBounds(SharedContentKey.AppBar)
@@ -235,6 +204,7 @@ fun StatisticsView(
                     modelProducer,
                     projection,
                     selectedPeriod,
+                    grouping,
                     modifier = Modifier
                         .fillParentMaxHeight(0.9f)
                         .fillMaxWidth()
@@ -261,6 +231,88 @@ fun StatisticsView(
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun ProjectionSelectButton(projection: Projection, onProjection: (Projection) -> Unit) {
+    var menuOpen by rememberSaveable { mutableStateOf(false) }
+    IconButton(onClick = { menuOpen = true }) {
+        when (projection) {
+            Projection.ByTotalTime -> Icon(
+                painterResource(R.drawable.outline_total_time_24),
+                stringResource(R.string.by_total_time)
+            )
+
+            Projection.ByAverageTime -> Icon(
+                painterResource(R.drawable.outline_timer_24),
+                stringResource(R.string.by_average_time)
+            )
+
+            Projection.ByTotalActivities -> Icon(
+                painterResource(R.drawable.outline_numbers_24),
+                stringResource(R.string.number_of_activities)
+            )
+        }
+    }
+    DropdownMenu(
+        expanded = menuOpen,
+        onDismissRequest = { menuOpen = false }) {
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.by_total_activities)) },
+            onClick = {
+                onProjection(Projection.ByTotalActivities)
+                menuOpen = false
+            }
+        )
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.by_total_time)) },
+            onClick = {
+                onProjection(Projection.ByTotalTime)
+                menuOpen = false
+            }
+        )
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.by_average_time)) },
+            onClick = {
+                onProjection(Projection.ByAverageTime)
+                menuOpen = false
+            }
+        )
+    }
+}
+
+@Composable
+private fun ActivityFilterButton(
+    selectedCategory: ActivityCategory?,
+    onCategory: (ActivityCategory?) -> Unit
+) {
+    var menuOpen by rememberSaveable { mutableStateOf(false) }
+
+    val filterId =
+        if (selectedCategory == null) R.drawable.outline_filter_off_24 else R.drawable.outline_filter_24
+    IconButton(onClick = { menuOpen = true }) {
+        Icon(
+            painterResource(filterId),
+            stringResource(R.string.filter_activity_category)
+        )
+    }
+
+    DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
+        DropdownMenuItem(text = { Text(stringResource(R.string.filter_all)) }, onClick = {
+            menuOpen = false
+            onCategory(null)
+        })
+
+        for (category in ActivityCategory.entries) {
+            DropdownMenuItem(
+                text = { Text(category.emoji + " " + stringResource(category.nameId)) },
+                onClick = {
+                    menuOpen = false
+                    onCategory(category)
+                }
+            )
         }
     }
 }
@@ -292,13 +344,14 @@ private fun Graph(
     modelProducer: CartesianChartModelProducer,
     projection: Projection,
     period: Period,
+    grouping: Grouping,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    val columns = remember {
-        ActivityCategory.entries.map { entry ->
+    val columns = remember(grouping) {
+        grouping.options().map { group ->
             LineComponent(
-                color = context.getColor(entry.colorId),
+                color = group.getColor(context),
                 thicknessDp = 64f,
                 shape = Shape.rounded(all = 8.dp)
             )
@@ -353,7 +406,7 @@ private fun Graph(
                     },
                     itemPlacer = AxisItemPlacer.Horizontal.default(addExtremeLabelPadding = true),
                 ),
-                legend = rememberLegend(),
+                legend = rememberLegend(grouping),
             ),
             modelProducer = modelProducer,
             runInitialAnimation = true,
@@ -367,17 +420,17 @@ private fun Graph(
 }
 
 @Composable
-private fun rememberLegend() =
+private fun rememberLegend(grouping: Grouping, context: Context = LocalContext.current) =
     rememberHorizontalLegend<CartesianMeasureContext, CartesianDrawContext>(
-        items = ActivityCategory.entries.map { category ->
+        items = grouping.options().map { group ->
             rememberLegendItem(
-                icon = rememberShapeComponent(Shape.Pill, colorResource(category.colorId)),
+                icon = rememberShapeComponent(Shape.Pill, Color(group.getColor(context))),
                 label = rememberTextComponent(
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     textSize = 12.sp,
                     typeface = Typeface.MONOSPACE,
                 ),
-                labelText = stringResource(category.nameId),
+                labelText = group.getText(context),
             )
         },
         iconSize = 8.dp,
@@ -488,6 +541,18 @@ private enum class Projection(val legendTextId: Int) {
     fun verticalStepSize() = when (this) {
         ByTotalTime, ByAverageTime -> null
         ByTotalActivities -> 2f
+    }
+}
+
+data class Grouping(val category: ActivityCategory?) {
+    fun apply(statistics: ActivityStatistics): Map<out Any, ActivityStatistics> = when (category) {
+        null -> statistics.activitiesByCategory
+        else -> statistics.activitiesByType
+    }
+
+    fun options(): List<Displayable> = when (category) {
+        null -> ActivityCategory.entries
+        else -> ActivityType.entries.filter { it.activityCategory == category }
     }
 }
 

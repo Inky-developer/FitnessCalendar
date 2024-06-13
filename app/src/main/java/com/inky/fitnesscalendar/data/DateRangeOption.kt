@@ -1,9 +1,10 @@
 package com.inky.fitnesscalendar.data
 
+import androidx.annotation.StringRes
 import com.inky.fitnesscalendar.R
 
 
-enum class DateRangeOption(val nameId: Int) {
+enum class DateRangeOption(@StringRes val nameId: Int) {
     Today(R.string.today),
     Yesterday(R.string.yesterday),
     SevenDays(R.string.week),

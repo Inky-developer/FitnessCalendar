@@ -24,10 +24,21 @@ data class ActivityStatistics(
     fun isNotEmpty() = activities.isNotEmpty()
 
     val activitiesByCategory: Map<ActivityCategory, ActivityStatistics>
-        get() = activities.groupBy { it.type.activityCategory }.toList()
+        get() = activities
+            .groupBy { it.type.activityCategory }
+            .toList()
             .sortedBy { (_, v) -> -v.size }
             .toMap()
             .mapValues { ActivityStatistics(it.value) }
+
+    val activitiesByType: Map<ActivityType, ActivityStatistics>
+        get() = activities
+            .groupBy { it.type }
+            .toList()
+            .sortedBy { (_, v) -> -v.size }
+            .toMap()
+            .mapValues { ActivityStatistics(it.value) }
+
 
     val activitiesByDay: Map<Int, ActivityStatistics>
         get() = keepNewerThanOneYear().groupByCalendarConstant(Calendar.DAY_OF_YEAR)
@@ -55,10 +66,11 @@ data class ActivityStatistics(
 
     private fun groupByCalendarConstant(calendarConstant: Int): Map<Int, ActivityStatistics> {
         val calendar = Calendar.getInstance()
-        return activities
-            .groupBy { calendar.apply { time = it.startTime }.get(calendarConstant) }
-            .mapValues { ActivityStatistics(it.value) }
+        return groupBy { calendar.apply { time = it.startTime }.get(calendarConstant) }
     }
+
+    private fun <T> groupBy(func: (Activity) -> T): Map<T, ActivityStatistics> =
+        activities.groupBy(func).mapValues { ActivityStatistics(it.value) }
 
     fun filter(func: (Activity) -> Boolean) = ActivityStatistics(activities.filter(func))
 
