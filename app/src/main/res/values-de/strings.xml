@@ -99,4 +99,9 @@
         <item quantity="one">%1d Aktivität importiert</item>
         <item quantity="other">%1d Aktivitäten importiert</item>
     </plurals>
+
+    <string name="days">Tage</string>
+    <string name="weeks">Wochen</string>
+    <string name="months">Monate</string>
+    <string name="years">Jahre</string>
 </resources>

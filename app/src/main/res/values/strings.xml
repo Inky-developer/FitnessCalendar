@@ -89,6 +89,10 @@
     <string name="entertainment">Entertainment</string>
     <string name="film">Film</string>
     <string name="health_note">Health</string>
+    <string name="days">Days</string>
+    <string name="weeks">Weeks</string>
+    <string name="months">Months</string>
+    <string name="years">Years</string>
     <plurals name="num_activities">
         <item quantity="one">%1d activity</item>
         <item quantity="other">%1d activities</item>

@@ -60,15 +60,19 @@ import com.patrykandpatrick.vico.compose.cartesian.layer.rememberColumnCartesian
 import com.patrykandpatrick.vico.compose.cartesian.marker.rememberDefaultCartesianMarker
 import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
+import com.patrykandpatrick.vico.compose.cartesian.rememberVicoZoomState
 import com.patrykandpatrick.vico.compose.common.component.rememberShapeComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
 import com.patrykandpatrick.vico.compose.common.of
 import com.patrykandpatrick.vico.compose.common.rememberHorizontalLegend
 import com.patrykandpatrick.vico.compose.common.rememberLegendItem
 import com.patrykandpatrick.vico.compose.common.shape.rounded
+import com.patrykandpatrick.vico.core.cartesian.AutoScrollCondition
 import com.patrykandpatrick.vico.core.cartesian.CartesianDrawContext
 import com.patrykandpatrick.vico.core.cartesian.CartesianMeasureContext
 import com.patrykandpatrick.vico.core.cartesian.HorizontalLayout
+import com.patrykandpatrick.vico.core.cartesian.Scroll
+import com.patrykandpatrick.vico.core.cartesian.Zoom
 import com.patrykandpatrick.vico.core.cartesian.axis.AxisItemPlacer
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.data.columnSeries
@@ -79,6 +83,7 @@ import com.patrykandpatrick.vico.core.common.component.LineComponent
 import com.patrykandpatrick.vico.core.common.data.ExtraStore
 import com.patrykandpatrick.vico.core.common.shape.Shape
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.time.format.TextStyle
@@ -95,7 +100,7 @@ fun StatisticsView(
     val stats by viewModel.activityStatistics.collectAsState(initial = ActivityStatistics(emptyList()))
     StatisticsView(
         stats,
-        initialPeriod ?: Period.Month,
+        initialPeriod ?: Period.Week,
         viewModel.appRepository.localizationRepository,
         onOpenDrawer,
         onViewActivity
@@ -229,8 +234,10 @@ fun StatisticsView(
                 Graph(
                     modelProducer,
                     projection,
-                    stringResource(selectedPeriod.xLabelId),
-                    modifier = Modifier.fillParentMaxHeight(0.9f)
+                    selectedPeriod,
+                    modifier = Modifier
+                        .fillParentMaxHeight(0.9f)
+                        .fillMaxWidth()
                 )
             }
 
@@ -284,7 +291,7 @@ private fun DateFilterChip(selected: Boolean, onSelect: () -> Unit, label: @Comp
 private fun Graph(
     modelProducer: CartesianChartModelProducer,
     projection: Projection,
-    label: String,
+    period: Period,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -297,6 +304,12 @@ private fun Graph(
             )
         }
     }
+
+    val scrollState = rememberVicoScrollState(
+        initialScroll = Scroll.Absolute.End,
+        autoScroll = Scroll.Absolute.End,
+        autoScrollCondition = AutoScrollCondition.OnModelSizeIncreased
+    )
 
     Surface(
         modifier = modifier
@@ -334,7 +347,7 @@ private fun Graph(
                         margins = Dimensions.of(top = 4.dp),
                         typeface = Typeface.MONOSPACE
                     ),
-                    title = label,
+                    title = stringResource(period.xLabelId),
                     valueFormatter = { x, chartValues, _ ->
                         chartValues.model.extraStore[labelListKey][x.toInt()]
                     },
@@ -345,7 +358,9 @@ private fun Graph(
             modelProducer = modelProducer,
             runInitialAnimation = true,
             horizontalLayout = HorizontalLayout.fullWidth(),
-            scrollState = rememberVicoScrollState(scrollEnabled = false),
+            scrollState = scrollState,
+            // TODO: use rememberSaveable
+            zoomState = rememberVicoZoomState(initialZoom = remember(period) { Zoom.x(period.numVisibleEntries + 0.5f) }),
             marker = rememberMarker()
         )
     }
@@ -381,11 +396,11 @@ private fun rememberMarker() =
     )
 
 
-enum class Period(val nameId: Int, val xLabelId: Int) {
-    Week(R.string.week, R.string.day),
-    Month(R.string.month, R.string.week),
-    Year(R.string.year, R.string.month),
-    All(R.string.all_time, R.string.year);
+enum class Period(val nameId: Int, val xLabelId: Int, val numVisibleEntries: Float) {
+    Day(R.string.days, R.string.day, 7f),
+    Week(R.string.weeks, R.string.week, 5f),
+    Month(R.string.months, R.string.month, 12f),
+    Year(R.string.years, R.string.year, 4f);
 
     fun filter(statistics: ActivityStatistics): List<Pair<ActivityStatistics, String>> {
         val dateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)
@@ -395,24 +410,33 @@ enum class Period(val nameId: Int, val xLabelId: Int) {
         val result: MutableList<Pair<ActivityStatistics?, String>> = mutableListOf()
 
         val today = LocalDate.now().atStartOfDay()
+
+        val relativeDayFormat: (LocalDateTime) -> String = { day ->
+            if (!day.isBefore(today.minusWeeks(1))) {
+                day.dayOfWeek.getDisplayName(
+                    TextStyle.SHORT,
+                    Locale.getDefault()
+                )
+            } else {
+                day.format(dateFormatter)
+            }
+        }
+
         // TODO: Filter out older statistics already in the db query
         when (this) {
-            Week -> {
-                var day = today.minusWeeks(1).plusDays(1)
+            Day -> {
+                var day = today.minusYears(1).with(dayOfWeekField, 1).plusWeeks(1)
                 val activityMap = statistics.activitiesByDay
                 while (!day.isAfter(today)) {
                     result.add(
-                        (activityMap[day.dayOfYear]) to day.dayOfWeek.getDisplayName(
-                            TextStyle.SHORT,
-                            Locale.getDefault()
-                        )
+                        (activityMap[day.dayOfYear]) to relativeDayFormat(day)
                     )
                     day = day.plusDays(1)
                 }
             }
 
-            Month -> {
-                var day = today.minusMonths(1).with(dayOfWeekField, 1)
+            Week -> {
+                var day = today.minusYears(1).with(dayOfWeekField, 1).plusWeeks(1)
                 val activityMap = statistics.activitiesByWeek
                 while (!day.isAfter(today)) {
                     result.add(
@@ -422,7 +446,7 @@ enum class Period(val nameId: Int, val xLabelId: Int) {
                 }
             }
 
-            Year -> {
+            Month -> {
                 var day = today.minusYears(1).withDayOfMonth(1).plusMonths(1)
                 val activityMap = statistics.activitiesByMonth
                 while (!day.isAfter(today)) {
@@ -436,7 +460,7 @@ enum class Period(val nameId: Int, val xLabelId: Int) {
                 }
             }
 
-            All -> {
+            Year -> {
                 val activityMap = statistics.activitiesByYear
                 val firstYear = activityMap.keys.min()
                 val currentYear = today.year
