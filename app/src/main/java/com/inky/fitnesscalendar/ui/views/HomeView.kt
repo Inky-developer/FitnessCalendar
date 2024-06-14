@@ -62,6 +62,7 @@ import com.inky.fitnesscalendar.util.Duration
 import com.inky.fitnesscalendar.util.Duration.Companion.until
 import com.inky.fitnesscalendar.util.showRecordingNotification
 import com.inky.fitnesscalendar.view_model.HomeViewModel
+import com.inky.fitnesscalendar.view_model.statistics.Period
 import kotlinx.coroutines.launch
 
 const val TAG = "HOME"

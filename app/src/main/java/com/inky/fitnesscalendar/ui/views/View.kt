@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.inky.fitnesscalendar.R
+import com.inky.fitnesscalendar.view_model.statistics.Period
 
 
 enum class View(

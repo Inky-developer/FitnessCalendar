@@ -28,7 +28,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -47,15 +46,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.Activity
 import com.inky.fitnesscalendar.data.ActivityCategory
-import com.inky.fitnesscalendar.data.ActivityFilter
-import com.inky.fitnesscalendar.data.ActivityStatistics
-import com.inky.fitnesscalendar.data.ActivityType
-import com.inky.fitnesscalendar.data.Displayable
-import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.CompactActivityCard
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.view_model.StatisticsViewModel
+import com.inky.fitnesscalendar.view_model.statistics.Grouping
+import com.inky.fitnesscalendar.view_model.statistics.Period
+import com.inky.fitnesscalendar.view_model.statistics.Projection
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottomAxis
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStartAxis
@@ -79,20 +76,11 @@ import com.patrykandpatrick.vico.core.cartesian.Scroll
 import com.patrykandpatrick.vico.core.cartesian.Zoom
 import com.patrykandpatrick.vico.core.cartesian.axis.AxisItemPlacer
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
-import com.patrykandpatrick.vico.core.cartesian.data.columnSeries
 import com.patrykandpatrick.vico.core.cartesian.layer.ColumnCartesianLayer
 import com.patrykandpatrick.vico.core.cartesian.marker.DefaultCartesianMarker
 import com.patrykandpatrick.vico.core.common.Dimensions
 import com.patrykandpatrick.vico.core.common.component.LineComponent
-import com.patrykandpatrick.vico.core.common.data.ExtraStore
 import com.patrykandpatrick.vico.core.common.shape.Shape
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
-import java.time.format.TextStyle
-import java.time.temporal.WeekFields
-import java.util.Locale
 
 @Composable
 fun StatisticsView(
@@ -101,51 +89,24 @@ fun StatisticsView(
     onOpenDrawer: () -> Unit,
     onViewActivity: (Activity) -> Unit
 ) {
-    val stats by viewModel.activityStatistics.collectAsState(initial = ActivityStatistics(emptyList()))
+    if (initialPeriod != null) {
+        viewModel.period = initialPeriod
+    }
+
     StatisticsView(
-        stats,
-        initialPeriod ?: Period.Week,
-        Grouping(viewModel.filter.categories.firstOrNull()),
-        viewModel.appRepository.localizationRepository,
-        onOpenDrawer,
-        onViewActivity,
-        onGrouping = { viewModel.filter = ActivityFilter(categories = listOfNotNull(it.category)) }
+        onOpenDrawer = onOpenDrawer,
+        onViewActivity = onViewActivity,
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun StatisticsView(
-    statistics: ActivityStatistics,
-    initialPeriod: Period,
-    grouping: Grouping,
-    localizationRepository: LocalizationRepository,
+    viewModel: StatisticsViewModel = hiltViewModel(),
     onOpenDrawer: () -> Unit,
     onViewActivity: (Activity) -> Unit,
-    onGrouping: (Grouping) -> Unit,
 ) {
-    val modelProducer = remember { CartesianChartModelProducer.build() }
-    var selectedPeriod by rememberSaveable(initialPeriod) { mutableStateOf(initialPeriod) }
-    var projection by rememberSaveable { mutableStateOf(Projection.ByTotalActivities) }
-    val selectedActivities =
-        remember(selectedPeriod, statistics) { selectedPeriod.filter(statistics) }
-
-    // TODO: Move this to the view model
-    LaunchedEffect(key1 = selectedActivities, key2 = projection, key3 = grouping) {
-        val dataPoints = selectedActivities.map { grouping.apply(it.first) to it.second }
-        if (dataPoints.isNotEmpty()) {
-            modelProducer.runTransaction {
-                columnSeries {
-                    for (group in grouping.options()) {
-                        series(dataPoints.map {
-                            it.first[group]?.let { stats -> projection.apply(stats) } ?: 0
-                        })
-                    }
-                }
-                updateExtras { it[labelListKey] = dataPoints.map { point -> point.second } }
-            }.await()
-        }
-    }
+    val selectedActivities by viewModel.activityStatistics.collectAsState(initial = emptyList())
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
@@ -170,10 +131,10 @@ fun StatisticsView(
                 },
                 actions = {
                     ActivityFilterButton(
-                        selectedCategory = grouping.category,
-                        onCategory = { onGrouping(Grouping(it)) }
+                        selectedCategory = viewModel.grouping.category,
+                        onCategory = { viewModel.grouping = Grouping(it) }
                     )
-                    ProjectionSelectButton(projection) { projection = it }
+                    ProjectionSelectButton(viewModel.projection) { viewModel.projection = it }
                 },
                 scrollBehavior = scrollBehavior,
                 modifier = Modifier.sharedBounds(SharedContentKey.AppBar)
@@ -191,8 +152,8 @@ fun StatisticsView(
                 ) {
                     for (period in Period.entries) {
                         DateFilterChip(
-                            selected = selectedPeriod == period,
-                            onSelect = { selectedPeriod = period },
+                            selected = viewModel.period == period,
+                            onSelect = { viewModel.period = period },
                             label = { Text(stringResource(period.nameId)) }
                         )
                     }
@@ -201,10 +162,10 @@ fun StatisticsView(
 
             item(contentType = ContentType.Graph) {
                 Graph(
-                    modelProducer,
-                    projection,
-                    selectedPeriod,
-                    grouping,
+                    viewModel.modelProducer,
+                    viewModel.projection,
+                    viewModel.period,
+                    viewModel.grouping,
                     modifier = Modifier
                         .fillParentMaxHeight(0.9f)
                         .fillMaxWidth()
@@ -226,7 +187,7 @@ fun StatisticsView(
                 items(activities.activities, contentType = { ContentType.Activity }) { activity ->
                     CompactActivityCard(
                         activity = activity,
-                        localizationRepository = localizationRepository,
+                        localizationRepository = viewModel.appRepository.localizationRepository,
                         modifier = Modifier.clickable { onViewActivity(activity) }
                     )
                 }
@@ -402,7 +363,7 @@ private fun Graph(
                     ),
                     title = stringResource(period.xLabelId),
                     valueFormatter = { x, chartValues, _ ->
-                        chartValues.model.extraStore[labelListKey][x.toInt()]
+                        chartValues.model.extraStore[StatisticsViewModel.labelListKey][x.toInt()]
                     },
                     itemPlacer = AxisItemPlacer.Horizontal.default(addExtremeLabelPadding = true),
                 ),
@@ -447,113 +408,3 @@ private fun rememberMarker() =
         ),
         labelPosition = DefaultCartesianMarker.LabelPosition.Top,
     )
-
-
-enum class Period(val nameId: Int, val xLabelId: Int, val numVisibleEntries: Float) {
-    Day(R.string.days, R.string.day, 7f),
-    Week(R.string.weeks, R.string.week, 5f),
-    Month(R.string.months, R.string.month, 12f),
-    Year(R.string.years, R.string.year, 4f);
-
-    fun filter(statistics: ActivityStatistics): List<Pair<ActivityStatistics, String>> {
-        val dateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)
-        val woyField = WeekFields.of(Locale.getDefault()).weekOfWeekBasedYear()
-        val dayOfWeekField = WeekFields.of(Locale.getDefault()).dayOfWeek()
-
-        val result: MutableList<Pair<ActivityStatistics?, String>> = mutableListOf()
-
-        val today = LocalDate.now().atStartOfDay()
-
-        val relativeDayFormat: (LocalDateTime) -> String = { day ->
-            if (!day.isBefore(today.minusWeeks(1))) {
-                day.dayOfWeek.getDisplayName(
-                    TextStyle.SHORT,
-                    Locale.getDefault()
-                )
-            } else {
-                day.format(dateFormatter)
-            }
-        }
-
-        // TODO: Filter out older statistics already in the db query
-        when (this) {
-            Day -> {
-                var day = today.minusYears(1).with(dayOfWeekField, 1).plusWeeks(1)
-                val activityMap = statistics.activitiesByDay
-                while (!day.isAfter(today)) {
-                    result.add(
-                        (activityMap[day.dayOfYear]) to relativeDayFormat(day)
-                    )
-                    day = day.plusDays(1)
-                }
-            }
-
-            Week -> {
-                var day = today.minusYears(1).with(dayOfWeekField, 1).plusWeeks(1)
-                val activityMap = statistics.activitiesByWeek
-                while (!day.isAfter(today)) {
-                    result.add(
-                        (activityMap[day.get(woyField)]) to day.format(dateFormatter)
-                    )
-                    day = day.plusWeeks(1)
-                }
-            }
-
-            Month -> {
-                var day = today.minusYears(1).withDayOfMonth(1).plusMonths(1)
-                val activityMap = statistics.activitiesByMonth
-                while (!day.isAfter(today)) {
-                    result.add(
-                        (activityMap[day.monthValue]) to day.month.getDisplayName(
-                            TextStyle.SHORT,
-                            Locale.getDefault()
-                        )
-                    )
-                    day = day.plusMonths(1)
-                }
-            }
-
-            Year -> {
-                val activityMap = statistics.activitiesByYear
-                val firstYear = activityMap.keys.min()
-                val currentYear = today.year
-                for (year in firstYear..currentYear) {
-                    result.add((activityMap[year]) to year.toString())
-                }
-            }
-        }
-
-        return result.map { (it.first ?: ActivityStatistics(emptyList())) to it.second }
-    }
-}
-
-private enum class Projection(val legendTextId: Int) {
-    ByTotalTime(R.string.total_hours),
-    ByAverageTime(R.string.average_hours),
-    ByTotalActivities(R.string.number_of_activities);
-
-    fun apply(statistics: ActivityStatistics): Double = when (this) {
-        ByTotalTime -> statistics.totalTime().elapsedHours
-        ByAverageTime -> statistics.averageTime().elapsedHours
-        ByTotalActivities -> statistics.size.toDouble()
-    }
-
-    fun verticalStepSize() = when (this) {
-        ByTotalTime, ByAverageTime -> null
-        ByTotalActivities -> 2f
-    }
-}
-
-data class Grouping(val category: ActivityCategory?) {
-    fun apply(statistics: ActivityStatistics): Map<out Any, ActivityStatistics> = when (category) {
-        null -> statistics.activitiesByCategory
-        else -> statistics.activitiesByType
-    }
-
-    fun options(): List<Displayable> = when (category) {
-        null -> ActivityCategory.entries
-        else -> ActivityType.entries.filter { it.activityCategory == category }
-    }
-}
-
-private val labelListKey = ExtraStore.Key<List<String>>()
