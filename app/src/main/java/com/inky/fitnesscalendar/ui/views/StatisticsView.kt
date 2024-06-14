@@ -24,7 +24,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -68,7 +67,6 @@ import com.patrykandpatrick.vico.compose.common.of
 import com.patrykandpatrick.vico.compose.common.rememberHorizontalLegend
 import com.patrykandpatrick.vico.compose.common.rememberLegendItem
 import com.patrykandpatrick.vico.compose.common.shape.rounded
-import com.patrykandpatrick.vico.core.cartesian.AutoScrollCondition
 import com.patrykandpatrick.vico.core.cartesian.CartesianDrawContext
 import com.patrykandpatrick.vico.core.cartesian.CartesianMeasureContext
 import com.patrykandpatrick.vico.core.cartesian.HorizontalLayout
@@ -167,6 +165,7 @@ fun StatisticsView(
                     viewModel.period,
                     viewModel.grouping,
                     modifier = Modifier
+                        .padding(all = 8.dp)
                         .fillParentMaxHeight(0.9f)
                         .fillMaxWidth()
                 )
@@ -322,62 +321,57 @@ private fun Graph(
     val scrollState = rememberVicoScrollState(
         initialScroll = Scroll.Absolute.End,
         autoScroll = Scroll.Absolute.End,
-        autoScrollCondition = AutoScrollCondition.OnModelSizeIncreased
+        autoScrollCondition = { _, _ -> true }
     )
 
-    Surface(
-        modifier = modifier
-            .padding(bottom = 16.dp)
-    ) {
-        CartesianChartHost(
-            chart = rememberCartesianChart(
-                rememberColumnCartesianLayer(
-                    ColumnCartesianLayer.ColumnProvider.series(columns),
-                    mergeMode = { ColumnCartesianLayer.MergeMode.Stacked }
-                ),
-                startAxis = rememberStartAxis(
-                    titleComponent = rememberTextComponent(
-                        color = MaterialTheme.colorScheme.onSecondaryContainer,
-                        background = rememberShapeComponent(
-                            Shape.Pill,
-                            MaterialTheme.colorScheme.secondaryContainer
-                        ),
-                        padding = Dimensions.of(horizontal = 8.dp, vertical = 2.dp),
-                        margins = Dimensions.of(end = 4.dp),
-                        typeface = Typeface.MONOSPACE
-                    ),
-                    title = stringResource(projection.legendTextId),
-                    itemPlacer = AxisItemPlacer.Vertical.step({ projection.verticalStepSize() })
-                ),
-                bottomAxis = rememberBottomAxis(
-                    guideline = null,
-                    titleComponent = rememberTextComponent(
-                        background = rememberShapeComponent(
-                            Shape.Pill,
-                            MaterialTheme.colorScheme.secondaryContainer
-                        ),
-                        color = MaterialTheme.colorScheme.onSecondaryContainer,
-                        padding = Dimensions.of(horizontal = 8.dp, vertical = 2.dp),
-                        margins = Dimensions.of(top = 4.dp),
-                        typeface = Typeface.MONOSPACE
-                    ),
-                    title = stringResource(period.xLabelId),
-                    valueFormatter = { x, chartValues, _ ->
-                        chartValues.model.extraStore[StatisticsViewModel.labelListKey][x.toInt()]
-                    },
-                    itemPlacer = AxisItemPlacer.Horizontal.default(addExtremeLabelPadding = true),
-                ),
-                legend = rememberLegend(grouping),
+    CartesianChartHost(
+        modifier = modifier,
+        chart = rememberCartesianChart(
+            rememberColumnCartesianLayer(
+                ColumnCartesianLayer.ColumnProvider.series(columns),
+                mergeMode = { ColumnCartesianLayer.MergeMode.Stacked }
             ),
-            modelProducer = modelProducer,
-            runInitialAnimation = true,
-            horizontalLayout = HorizontalLayout.fullWidth(),
-            scrollState = scrollState,
-            // TODO: use rememberSaveable
-            zoomState = rememberVicoZoomState(initialZoom = remember(period) { Zoom.x(period.numVisibleEntries + 0.5f) }),
-            marker = rememberMarker()
-        )
-    }
+            startAxis = rememberStartAxis(
+                titleComponent = rememberTextComponent(
+                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                    background = rememberShapeComponent(
+                        Shape.Pill,
+                        MaterialTheme.colorScheme.secondaryContainer
+                    ),
+                    padding = Dimensions.of(horizontal = 8.dp, vertical = 2.dp),
+                    margins = Dimensions.of(end = 4.dp),
+                    typeface = Typeface.MONOSPACE
+                ),
+                title = stringResource(projection.legendTextId),
+                itemPlacer = AxisItemPlacer.Vertical.step({ projection.verticalStepSize() })
+            ),
+            bottomAxis = rememberBottomAxis(
+                guideline = null,
+                titleComponent = rememberTextComponent(
+                    background = rememberShapeComponent(
+                        Shape.Pill,
+                        MaterialTheme.colorScheme.secondaryContainer
+                    ),
+                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                    padding = Dimensions.of(horizontal = 8.dp, vertical = 2.dp),
+                    margins = Dimensions.of(top = 4.dp),
+                    typeface = Typeface.MONOSPACE
+                ),
+                title = stringResource(period.xLabelId),
+                valueFormatter = { x, chartValues, _ ->
+                    chartValues.model.extraStore[StatisticsViewModel.labelListKey][x.toInt()]
+                },
+                itemPlacer = AxisItemPlacer.Horizontal.default(addExtremeLabelPadding = true),
+            ),
+            legend = rememberLegend(grouping),
+        ),
+        modelProducer = modelProducer,
+        runInitialAnimation = true,
+        horizontalLayout = HorizontalLayout.fullWidth(),
+        scrollState = scrollState,
+        zoomState = rememberVicoZoomState(initialZoom = remember(period) { Zoom.x(period.numVisibleEntries + 0.5f) }),
+        marker = rememberMarker()
+    )
 }
 
 @Composable
