@@ -7,6 +7,7 @@ import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -73,6 +74,7 @@ import com.patrykandpatrick.vico.core.cartesian.HorizontalLayout
 import com.patrykandpatrick.vico.core.cartesian.Scroll
 import com.patrykandpatrick.vico.core.cartesian.Zoom
 import com.patrykandpatrick.vico.core.cartesian.axis.AxisItemPlacer
+import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.layer.ColumnCartesianLayer
 import com.patrykandpatrick.vico.core.cartesian.marker.DefaultCartesianMarker
@@ -159,16 +161,21 @@ fun StatisticsView(
             }
 
             item(contentType = ContentType.Graph) {
-                Graph(
-                    viewModel.modelProducer,
-                    viewModel.projection,
-                    viewModel.period,
-                    viewModel.grouping,
-                    modifier = Modifier
-                        .padding(all = 8.dp)
-                        .fillParentMaxHeight(0.9f)
-                        .fillMaxWidth()
-                )
+                Column(modifier = Modifier.padding(all = 8.dp)) {
+                    Text(
+                        stringResource(viewModel.projection.legendTextId),
+                        style = MaterialTheme.typography.labelLarge,
+                    )
+                    Graph(
+                        viewModel.modelProducer,
+                        viewModel.projection,
+                        viewModel.period,
+                        viewModel.grouping,
+                        modifier = Modifier
+                            .fillParentMaxHeight(0.9f)
+                            .fillMaxWidth()
+                    )
+                }
             }
 
             for ((activities, header) in selectedActivities.asReversed()) {
@@ -332,18 +339,8 @@ private fun Graph(
                 mergeMode = { ColumnCartesianLayer.MergeMode.Stacked }
             ),
             startAxis = rememberStartAxis(
-                titleComponent = rememberTextComponent(
-                    color = MaterialTheme.colorScheme.onSecondaryContainer,
-                    background = rememberShapeComponent(
-                        Shape.Pill,
-                        MaterialTheme.colorScheme.secondaryContainer
-                    ),
-                    padding = Dimensions.of(horizontal = 8.dp, vertical = 2.dp),
-                    margins = Dimensions.of(end = 4.dp),
-                    typeface = Typeface.MONOSPACE
-                ),
-                title = stringResource(projection.legendTextId),
-                itemPlacer = AxisItemPlacer.Vertical.step({ projection.verticalStepSize() })
+                itemPlacer = AxisItemPlacer.Vertical.step({ projection.verticalStepSize() }),
+                horizontalLabelPosition = VerticalAxis.HorizontalLabelPosition.Inside,
             ),
             bottomAxis = rememberBottomAxis(
                 guideline = null,
