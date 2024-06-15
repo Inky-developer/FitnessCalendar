@@ -12,6 +12,7 @@ import com.inky.fitnesscalendar.data.ActivityStatistics
 import com.inky.fitnesscalendar.view_model.statistics.Grouping
 import com.inky.fitnesscalendar.view_model.statistics.Period
 import com.inky.fitnesscalendar.view_model.statistics.Projection
+import com.patrykandpatrick.vico.core.cartesian.AutoScrollCondition
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.data.columnSeries
 import com.patrykandpatrick.vico.core.common.data.ExtraStore
@@ -77,11 +78,31 @@ class StatisticsViewModel @Inject constructor(val appRepository: AppRepository) 
                     })
                 }
             }
-            updateExtras { it[labelListKey] = dataPoints.map { (_, label) -> label } }
+            updateExtras {
+                it[labelListKey] = dataPoints.map { (_, label) -> label }
+                it[periodKey] = period.ordinal
+            }
         }.await()
     }
 
     companion object {
         val labelListKey = ExtraStore.Key<List<String>>()
+        val periodKey = ExtraStore.Key<Int>()
+
+        val autoScrollCondition = AutoScrollCondition { newModel, oldModel ->
+            if (oldModel == null) {
+                return@AutoScrollCondition true
+            }
+
+            if (newModel.models.size != oldModel.models.size) {
+                return@AutoScrollCondition true
+            }
+
+            if (newModel.extraStore.getOrNull(periodKey) != oldModel.extraStore.getOrNull(periodKey)) {
+                return@AutoScrollCondition true
+            }
+
+            false
+        }
     }
 }

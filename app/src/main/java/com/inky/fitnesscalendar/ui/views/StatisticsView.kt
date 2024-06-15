@@ -321,7 +321,7 @@ private fun Graph(
     val scrollState = rememberVicoScrollState(
         initialScroll = Scroll.Absolute.End,
         autoScroll = Scroll.Absolute.End,
-        autoScrollCondition = { _, _ -> true }
+        autoScrollCondition = StatisticsViewModel.autoScrollCondition
     )
 
     CartesianChartHost(
