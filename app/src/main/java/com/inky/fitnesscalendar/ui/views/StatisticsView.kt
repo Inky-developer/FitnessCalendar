@@ -366,7 +366,7 @@ private fun Graph(
         runInitialAnimation = true,
         horizontalLayout = HorizontalLayout.fullWidth(),
         scrollState = scrollState,
-        zoomState = rememberVicoZoomState(initialZoom = remember(period) { Zoom.x(period.numVisibleEntries + 0.5f) }),
+        zoomState = rememberVicoZoomState(initialZoom = remember(period) { Zoom.x(period.numVisibleEntries) }),
         marker = rememberMarker()
     )
 }
