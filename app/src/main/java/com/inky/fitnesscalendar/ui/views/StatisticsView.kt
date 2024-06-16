@@ -32,6 +32,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -46,6 +47,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.Activity
 import com.inky.fitnesscalendar.data.ActivityCategory
+import com.inky.fitnesscalendar.preferences.Preference
 import com.inky.fitnesscalendar.ui.components.CompactActivityCard
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.sharedBounds
@@ -81,6 +83,7 @@ import com.patrykandpatrick.vico.core.cartesian.marker.DefaultCartesianMarker
 import com.patrykandpatrick.vico.core.common.Dimensions
 import com.patrykandpatrick.vico.core.common.component.LineComponent
 import com.patrykandpatrick.vico.core.common.shape.Shape
+import kotlinx.coroutines.launch
 
 @Composable
 fun StatisticsView(
@@ -134,7 +137,7 @@ fun StatisticsView(
                         selectedCategory = viewModel.grouping.category,
                         onCategory = { viewModel.grouping = Grouping(it) }
                     )
-                    ProjectionSelectButton(viewModel.projection) { viewModel.projection = it }
+                    ProjectionSelectButton(viewModel.projection)
                 },
                 scrollBehavior = scrollBehavior,
                 modifier = Modifier.sharedBounds(SharedContentKey.AppBar)
@@ -203,50 +206,31 @@ fun StatisticsView(
 }
 
 @Composable
-private fun ProjectionSelectButton(projection: Projection, onProjection: (Projection) -> Unit) {
+private fun ProjectionSelectButton(projection: Projection) {
     var menuOpen by rememberSaveable { mutableStateOf(false) }
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+
     IconButton(onClick = { menuOpen = true }) {
-        when (projection) {
-            Projection.ByTotalTime -> Icon(
-                painterResource(R.drawable.outline_total_time_24),
-                stringResource(R.string.by_total_time)
-            )
-
-            Projection.ByAverageTime -> Icon(
-                painterResource(R.drawable.outline_timer_24),
-                stringResource(R.string.by_average_time)
-            )
-
-            Projection.ByTotalActivities -> Icon(
-                painterResource(R.drawable.outline_numbers_24),
-                stringResource(R.string.number_of_activities)
-            )
-        }
+        Icon(
+            painterResource(projection.iconId),
+            stringResource(projection.labelTextId)
+        )
     }
     DropdownMenu(
         expanded = menuOpen,
         onDismissRequest = { menuOpen = false }) {
-        DropdownMenuItem(
-            text = { Text(stringResource(R.string.by_total_activities)) },
-            onClick = {
-                onProjection(Projection.ByTotalActivities)
-                menuOpen = false
-            }
-        )
-        DropdownMenuItem(
-            text = { Text(stringResource(R.string.by_total_time)) },
-            onClick = {
-                onProjection(Projection.ByTotalTime)
-                menuOpen = false
-            }
-        )
-        DropdownMenuItem(
-            text = { Text(stringResource(R.string.by_average_time)) },
-            onClick = {
-                onProjection(Projection.ByAverageTime)
-                menuOpen = false
-            }
-        )
+        for (projectionEntry in Projection.entries) {
+            DropdownMenuItem(
+                text = { Text(stringResource(projectionEntry.labelTextId)) },
+                onClick = {
+                    scope.launch {
+                        Preference.PREF_STATS_PROJECTION.set(context, projectionEntry)
+                    }
+                    menuOpen = false
+                }
+            )
+        }
     }
 }
 

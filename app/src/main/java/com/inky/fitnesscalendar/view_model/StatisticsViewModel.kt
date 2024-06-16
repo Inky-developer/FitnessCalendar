@@ -1,5 +1,6 @@
 package com.inky.fitnesscalendar.view_model
 
+import android.content.Context
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -9,6 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.inky.fitnesscalendar.AppRepository
 import com.inky.fitnesscalendar.data.ActivityFilter
 import com.inky.fitnesscalendar.data.ActivityStatistics
+import com.inky.fitnesscalendar.preferences.Preference
 import com.inky.fitnesscalendar.view_model.statistics.Grouping
 import com.inky.fitnesscalendar.view_model.statistics.Period
 import com.inky.fitnesscalendar.view_model.statistics.Projection
@@ -17,6 +19,7 @@ import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.data.columnSeries
 import com.patrykandpatrick.vico.core.common.data.ExtraStore
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -29,7 +32,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class StatisticsViewModel @Inject constructor(val appRepository: AppRepository) : ViewModel() {
+class StatisticsViewModel @Inject constructor(
+    @ApplicationContext val context: Context,
+    val appRepository: AppRepository
+) : ViewModel() {
     var grouping by mutableStateOf(Grouping(null))
     var period by mutableStateOf(Period.Week)
     var projection by mutableStateOf(Projection.ByTotalActivities)
@@ -51,6 +57,10 @@ class StatisticsViewModel @Inject constructor(val appRepository: AppRepository) 
         activityStatistics.onEach {
             refreshModel()
         }.launchIn(viewModelScope)
+
+        Preference.PREF_STATS_PROJECTION.flow(context)
+            .onEach { projection = it }
+            .launchIn(viewModelScope)
     }
 
     private suspend fun refreshActivities() {
