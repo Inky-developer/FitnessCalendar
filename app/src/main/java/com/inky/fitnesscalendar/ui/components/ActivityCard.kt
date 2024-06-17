@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.PlayArrow
@@ -43,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.Activity
+import com.inky.fitnesscalendar.data.ActivityFilter
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.util.skipToLookaheadSize
 import com.inky.fitnesscalendar.util.Duration.Companion.until
@@ -56,6 +56,7 @@ fun ActivityCard(
     localizationRepository: LocalizationRepository,
     modifier: Modifier = Modifier,
     onJumpTo: (() -> Unit)? = null,
+    onFilter: ((ActivityFilter) -> Unit)? = null,
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainerLow,
     contentColor: Color = MaterialTheme.colorScheme.primary
 ) {
@@ -169,6 +170,12 @@ fun ActivityCard(
                     showContextMenu = false
                     it()
                 }
+            },
+            onFilterByType = onFilter?.let {
+                {
+                    showContextMenu = false
+                    it(ActivityFilter(types = listOf(activity.type)))
+                }
             }
         )
     }
@@ -179,7 +186,8 @@ fun ActivityCard(
 fun ActivityCardContextMenu(
     onDismiss: () -> Unit,
     onDelete: () -> Unit,
-    onJumpTo: (() -> Unit)?
+    onJumpTo: (() -> Unit)?,
+    onFilterByType: (() -> Unit)?,
 ) {
     ModalBottomSheet(onDismissRequest = onDismiss) {
         Text(
@@ -199,6 +207,18 @@ fun ActivityCardContextMenu(
                     )
                 },
                 modifier = Modifier.clickable { onJumpTo?.let { it() } }
+            )
+        }
+        AnimatedVisibility(visible = onFilterByType != null) {
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.only_show_this_activity_type)) },
+                leadingContent = {
+                    Icon(
+                        painterResource(R.drawable.outline_filter_24),
+                        stringResource(R.string.filter)
+                    )
+                },
+                modifier = Modifier.clickable { onFilterByType?.let { it() } }
             )
         }
         ListItem(

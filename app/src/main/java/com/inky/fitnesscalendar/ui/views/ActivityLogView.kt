@@ -202,6 +202,9 @@ fun ActivityLog(
                                     scrollToId = activity.uid
                                 }
                             } else null,
+                            onFilter = if (filter.isEmpty()) {
+                                onEditFilter
+                            } else null,
                             onEdit = onEditActivity,
                             localizationRepository = viewModel.repository.localizationRepository,
                             modifier = Modifier

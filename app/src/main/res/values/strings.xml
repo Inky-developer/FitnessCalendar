@@ -98,6 +98,7 @@
     <string name="add_image">Add image</string>
     <string name="open_context_menu">Open context menu</string>
     <string name="user_uploaded_image">Image uploaded by the user</string>
+    <string name="only_show_this_activity_type">Only show this activity type</string>
     <plurals name="num_activities">
         <item quantity="one">%1d activity</item>
         <item quantity="other">%1d activities</item>
