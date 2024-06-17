@@ -144,7 +144,7 @@ fun FilterView(
                 modifier = Modifier.padding(all = 8.dp)
             ) {
                 LazyRow {
-                    items(DateRangeOption.entries) { range ->
+                    items(dateRangeOptions) { range ->
                         FilterChip(
                             selected = filter.range == range,
                             onClick = {
@@ -168,4 +168,15 @@ fun FilterView(
             }
         }
     }
+}
+
+val dateRangeOptions by lazy {
+    listOf(
+        DateRangeOption.SevenDays,
+        DateRangeOption.LastWeek,
+        DateRangeOption.ThirtyDays,
+        DateRangeOption.LastMonth,
+        DateRangeOption.Year,
+        DateRangeOption.LastYear
+    )
 }
