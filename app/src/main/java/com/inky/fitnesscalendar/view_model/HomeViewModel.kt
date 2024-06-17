@@ -3,9 +3,9 @@ package com.inky.fitnesscalendar.view_model
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.inky.fitnesscalendar.AppRepository
-import com.inky.fitnesscalendar.data.ActivityFilter
+import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.data.ActivityStatistics
-import com.inky.fitnesscalendar.data.DateRangeOption
+import com.inky.fitnesscalendar.data.activity_filter.DateRangeOption
 import com.inky.fitnesscalendar.data.Recording
 import com.inky.fitnesscalendar.util.Duration.Companion.until
 import dagger.hilt.android.lifecycle.HiltViewModel

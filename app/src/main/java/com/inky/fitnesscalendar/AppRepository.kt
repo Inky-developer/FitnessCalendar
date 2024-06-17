@@ -4,10 +4,10 @@ import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.Stable
 import com.inky.fitnesscalendar.data.Activity
-import com.inky.fitnesscalendar.data.ActivityFilter
 import com.inky.fitnesscalendar.data.ActivityType
 import com.inky.fitnesscalendar.data.Recording
 import com.inky.fitnesscalendar.data.Vehicle
+import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.db.dao.ActivityDao
 import com.inky.fitnesscalendar.db.dao.RecordingDao
 import com.inky.fitnesscalendar.localization.LocalizationRepository
@@ -51,16 +51,23 @@ class AppRepository @Inject constructor(
 
         val rangeDate = filter.range?.getDateRange()
 
+        val hasDescription = filter.attributes.description.toBooleanOrNull()
+        val hasFeel = filter.attributes.feel.toBooleanOrNull()
+        val hasImage = filter.attributes.image.toBooleanOrNull()
+
         return activityDao.getFiltered(
-            filter.types,
-            filter.types.isEmpty(),
-            categoryTypes,
-            categoryTypes.isEmpty(),
-            filter.text?.let { "%$it%" },
-            searchTypes,
-            searchVehicles,
-            rangeDate?.start,
-            rangeDate?.end
+            types = filter.types,
+            isTypesEmpty = filter.types.isEmpty(),
+            categoryTypes = categoryTypes,
+            isCategoryTypesEmpty = categoryTypes.isEmpty(),
+            search = filter.text?.let { "%$it%" },
+            searchTypes = searchTypes,
+            searchVehicles = searchVehicles,
+            start = rangeDate?.start,
+            end = rangeDate?.end,
+            hasDescription = hasDescription,
+            hasFeel = hasFeel,
+            hasImage = hasImage
         )
     }
 

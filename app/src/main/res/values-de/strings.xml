@@ -113,4 +113,12 @@
     <string name="filter_by_activities">Nach Aktivitäten filtern…</string>
     <string name="filter_by_categories">Nach Kategorien filtern…</string>
     <string name="filter_by_date">Nach Datum filtern…</string>
+    <string name="filter_by_attributes">Nach Attributen filtern…</string>
+    <string name="vehicle">Fahrzeug</string>
+    <string name="description">Beschreibung</string>
+    <string name="feel">Stimmung</string>
+    <string name="image">Bild</string>
+    <string name="with_attribute">Mit: %1s</string>
+    <string name="without_attribute">Ohne: %1s</string>
+    <string name="attribute">Attribut</string>
 </resources>

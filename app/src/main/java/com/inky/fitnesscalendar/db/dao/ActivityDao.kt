@@ -33,7 +33,10 @@ abstract class ActivityDao {
                 "(type in (:categoryTypes) or :isCategoryTypesEmpty) AND" +
                 "(description LIKE :search OR type IN (:searchTypes) OR vehicle IN (:searchVehicles) OR :search IS NULL) AND" +
                 "(end_time >= :start OR :start IS NULL) AND" +
-                "(start_time <= :end OR :end IS NULL) " +
+                "(start_time <= :end OR :end IS NULL) AND" +
+                "((description != '') == :hasDescription OR :hasDescription IS NULL) AND" +
+                "((feel IS NOT NULL) == :hasFeel OR :hasFeel IS NULL) AND" +
+                "((image_uri IS NOT NULL) == :hasImage OR :hasImage IS NULL) " +
                 "ORDER BY start_time DESC"
     )
     abstract fun getFiltered(
@@ -45,7 +48,10 @@ abstract class ActivityDao {
         searchTypes: List<ActivityType>,
         searchVehicles: List<Vehicle>,
         start: Date?,
-        end: Date?
+        end: Date?,
+        hasDescription: Boolean?,
+        hasFeel: Boolean?,
+        hasImage: Boolean?,
     ): Flow<List<Activity>>
 
     @Query("SELECT * FROM ACTIVITY WHERE uid=(:id)")

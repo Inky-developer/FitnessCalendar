@@ -21,6 +21,7 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -28,8 +29,9 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityCategory
-import com.inky.fitnesscalendar.data.ActivityFilter
-import com.inky.fitnesscalendar.data.DateRangeOption
+import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
+import com.inky.fitnesscalendar.data.activity_filter.AttributeFilter
+import com.inky.fitnesscalendar.data.activity_filter.DateRangeOption
 import com.inky.fitnesscalendar.ui.components.ActivityTypeSelector
 import com.inky.fitnesscalendar.ui.components.OptionGroup
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
@@ -83,14 +85,24 @@ fun FilterView(
     ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
             val context = LocalContext.current
-            val selectionLabel =
+            val selectionLabel = remember(filter) {
                 if (filter.types.isEmpty()) null else filter.types.joinToString(", ") {
                     context.getString(it.nameId)
                 }
-            val categorySelectionLabel =
+            }
+            val categorySelectionLabel = remember(filter) {
                 if (filter.categories.isEmpty()) null else filter.categories.joinToString(", ") {
                     context.getString(it.nameId)
                 }
+            }
+            val attributeSelectionLabel = remember(filter) {
+                val entries = filter.attributes.entries()
+                    .filter { (_, state) -> state != AttributeFilter.TriState.Undefined }
+                if (entries.isEmpty()) null else entries.joinToString(", ") { (attribute, state) ->
+                    attribute.getString(context, state.toBooleanOrNull() == true)
+                }
+            }
+
             OptionGroup(
                 label = stringResource(R.string.filter_by_activities),
                 selectionLabel = selectionLabel,
@@ -158,6 +170,42 @@ fun FilterView(
                             label = {
                                 Text(
                                     stringResource(range.nameId),
+                                    style = MaterialTheme.typography.headlineSmall
+                                )
+                            },
+                            modifier = Modifier.padding(all = 4.dp)
+                        )
+                    }
+                }
+            }
+
+            OptionGroup(
+                label = stringResource(R.string.filter_by_attributes),
+                selectionLabel = attributeSelectionLabel,
+                modifier = Modifier.padding(all = 8.dp)
+            ) {
+                LazyRow {
+                    items(AttributeFilter.Attribute.entries) { attribute ->
+                        FilterChip(
+                            selected = filter.attributes.get(attribute).toBooleanOrNull() != null,
+                            onClick = {
+                                val newState = when (filter.attributes.get(attribute)) {
+                                    AttributeFilter.TriState.Undefined -> AttributeFilter.TriState.Yes
+                                    AttributeFilter.TriState.Yes -> AttributeFilter.TriState.No
+                                    AttributeFilter.TriState.No -> AttributeFilter.TriState.Undefined
+                                }
+                                onFilterChange(
+                                    filter.copy(
+                                        attributes = filter.attributes.with(
+                                            attribute,
+                                            newState
+                                        )
+                                    )
+                                )
+                            },
+                            label = {
+                                Text(
+                                    stringResource(attribute.nameId),
                                     style = MaterialTheme.typography.headlineSmall
                                 )
                             },

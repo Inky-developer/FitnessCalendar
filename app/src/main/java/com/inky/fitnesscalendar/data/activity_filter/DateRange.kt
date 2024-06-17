@@ -1,4 +1,4 @@
-package com.inky.fitnesscalendar.data
+package com.inky.fitnesscalendar.data.activity_filter
 
 import com.inky.fitnesscalendar.util.toDate
 import java.time.Instant

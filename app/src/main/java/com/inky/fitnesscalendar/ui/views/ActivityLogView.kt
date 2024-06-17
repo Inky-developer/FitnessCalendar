@@ -49,12 +49,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.Activity
-import com.inky.fitnesscalendar.data.ActivityFilter
+import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
+import com.inky.fitnesscalendar.data.activity_filter.AttributeFilter
 import com.inky.fitnesscalendar.ui.components.ActivityCard
 import com.inky.fitnesscalendar.ui.components.NewActivityFAB
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
@@ -221,6 +224,11 @@ fun ActivityLog(
 @Composable
 private fun FilterInformation(filter: ActivityFilter, onChange: (ActivityFilter) -> Unit) {
     val listState = rememberLazyListState()
+    val attributes = remember(filter) {
+        filter.attributes.entries()
+            .filter { (_, value) -> value != AttributeFilter.TriState.Undefined }
+    }
+
     LazyRow(state = listState) {
         if (filter.text != null) {
             item {
@@ -267,6 +275,29 @@ private fun FilterInformation(filter: ActivityFilter, onChange: (ActivityFilter)
                         style = MaterialTheme.typography.labelLarge
                     )
                 },
+            )
+        }
+        items(attributes) { (attribute, value) ->
+            FilterChip(
+                onClick = {
+                    val newAttributes =
+                        filter.attributes.with(attribute, AttributeFilter.TriState.Undefined)
+                    onChange(filter.copy(attributes = newAttributes))
+                },
+                leadingIcon = {
+                    Icon(
+                        painterResource(R.drawable.outline_label_24),
+                        stringResource(R.string.attribute)
+                    )
+                },
+                label = {
+                    Text(
+                        attribute.getString(
+                            LocalContext.current,
+                            value.toBooleanOrNull() == true
+                        )
+                    )
+                }
             )
         }
     }

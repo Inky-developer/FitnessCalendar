@@ -1,4 +1,4 @@
-package com.inky.fitnesscalendar.data
+package com.inky.fitnesscalendar.data.activity_filter
 
 import androidx.annotation.StringRes
 import com.inky.fitnesscalendar.R

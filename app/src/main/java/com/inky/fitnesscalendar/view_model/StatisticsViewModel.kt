@@ -8,7 +8,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.inky.fitnesscalendar.AppRepository
-import com.inky.fitnesscalendar.data.ActivityFilter
+import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.data.ActivityStatistics
 import com.inky.fitnesscalendar.preferences.Preference
 import com.inky.fitnesscalendar.view_model.statistics.Grouping

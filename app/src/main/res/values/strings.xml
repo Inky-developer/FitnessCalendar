@@ -102,6 +102,14 @@
     <string name="filter_by_activities">Filter by activities…</string>
     <string name="filter_by_categories">Filter by categories…</string>
     <string name="filter_by_date">Filter by date…</string>
+    <string name="filter_by_attributes">Filter by attributes…</string>
+    <string name="vehicle">Vehicle</string>
+    <string name="description">Description</string>
+    <string name="feel">Feel</string>
+    <string name="image">Image</string>
+    <string name="with_attribute">With: %1s</string>
+    <string name="without_attribute">Without: %1s</string>
+    <string name="attribute">Attribute</string>
     <plurals name="num_activities">
         <item quantity="one">%1d activity</item>
         <item quantity="other">%1d activities</item>

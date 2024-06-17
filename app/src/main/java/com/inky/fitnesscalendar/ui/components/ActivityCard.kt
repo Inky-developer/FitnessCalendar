@@ -42,7 +42,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.Activity
-import com.inky.fitnesscalendar.data.ActivityFilter
+import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.util.skipToLookaheadSize
 import com.inky.fitnesscalendar.util.Duration.Companion.until
