@@ -99,6 +99,9 @@
     <string name="open_context_menu">Open context menu</string>
     <string name="user_uploaded_image">Image uploaded by the user</string>
     <string name="only_show_this_activity_type">Only show this activity type</string>
+    <string name="filter_by_activities">Filter by activities…</string>
+    <string name="filter_by_categories">Filter by categories…</string>
+    <string name="filter_by_date">Filter by date…</string>
     <plurals name="num_activities">
         <item quantity="one">%1d activity</item>
         <item quantity="other">%1d activities</item>

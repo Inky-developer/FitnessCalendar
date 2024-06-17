@@ -110,4 +110,7 @@
     <string name="open_context_menu">Kontextmenü öffnen</string>
     <string name="user_uploaded_image">Vom Nutzer hochgeladenes Bild</string>
     <string name="only_show_this_activity_type">Nur Aktivitäten dieser Art anzeigen</string>
+    <string name="filter_by_activities">Nach Aktivitäten filtern…</string>
+    <string name="filter_by_categories">Nach Kategorien filtern…</string>
+    <string name="filter_by_date">Nach Datum filtern…</string>
 </resources>

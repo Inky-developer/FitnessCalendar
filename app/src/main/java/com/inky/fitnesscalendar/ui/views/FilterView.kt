@@ -92,7 +92,7 @@ fun FilterView(
                     context.getString(it.nameId)
                 }
             OptionGroup(
-                label = stringResource(R.string.select_activity),
+                label = stringResource(R.string.filter_by_activities),
                 selectionLabel = selectionLabel,
                 modifier = Modifier.padding(all = 8.dp)
             ) {
@@ -109,7 +109,7 @@ fun FilterView(
             }
 
             OptionGroup(
-                label = stringResource(R.string.select_category),
+                label = stringResource(R.string.filter_by_categories),
                 selectionLabel = categorySelectionLabel,
                 modifier = Modifier.padding(all = 8.dp)
             ) {
@@ -139,7 +139,7 @@ fun FilterView(
             }
 
             OptionGroup(
-                label = stringResource(R.string.select_date),
+                label = stringResource(R.string.filter_by_date),
                 selectionLabel = filter.range?.nameId?.let { stringResource(it) },
                 modifier = Modifier.padding(all = 8.dp)
             ) {
