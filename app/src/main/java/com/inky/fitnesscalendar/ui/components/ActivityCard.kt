@@ -155,7 +155,7 @@ fun ActivityCard(
                     .padding(all = 8.dp)
                     .fillMaxWidth()
                     .heightIn(max = 256.dp)
-                    .clip(RoundedCornerShape(32.dp))
+                    .clip(MaterialTheme.shapes.large)
             )
         }
     }

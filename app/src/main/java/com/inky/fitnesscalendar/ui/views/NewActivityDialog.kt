@@ -49,6 +49,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
@@ -183,6 +184,7 @@ fun NewActivity(
         ) {
             Column(modifier = Modifier.background(MaterialTheme.colorScheme.primaryContainer)) {
                 Row(
+                    verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
                         .padding(horizontal = 8.dp)
@@ -191,9 +193,9 @@ fun NewActivity(
                         title,
                         style = MaterialTheme.typography.displaySmall,
                         color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f)
                     )
-
-                    Spacer(modifier = Modifier.weight(1f))
 
                     Column {
                         IconButton(onClick = { contextMenuOpen = true }) {
@@ -242,7 +244,7 @@ fun NewActivity(
                             contentScale = ContentScale.FillHeight,
                             modifier = Modifier
                                 .padding(bottom = 16.dp)
-                                .clip(RoundedCornerShape(16.dp))
+                                .clip(MaterialTheme.shapes.large)
                                 .clickable {
                                     // TODO: Make this more explicit
                                     imageUri = null
