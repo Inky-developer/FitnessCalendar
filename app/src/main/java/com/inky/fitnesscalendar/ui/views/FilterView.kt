@@ -170,7 +170,7 @@ fun FilterView(
                             label = {
                                 Text(
                                     stringResource(range.nameId),
-                                    style = MaterialTheme.typography.headlineSmall
+                                    style = MaterialTheme.typography.titleMedium
                                 )
                             },
                             modifier = Modifier.padding(all = 4.dp)
@@ -206,7 +206,7 @@ fun FilterView(
                             label = {
                                 Text(
                                     stringResource(attribute.nameId),
-                                    style = MaterialTheme.typography.headlineSmall
+                                    style = MaterialTheme.typography.titleMedium
                                 )
                             },
                             modifier = Modifier.padding(all = 4.dp)
