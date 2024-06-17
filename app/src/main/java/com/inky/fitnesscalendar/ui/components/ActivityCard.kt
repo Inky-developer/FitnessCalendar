@@ -27,6 +27,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -60,7 +61,8 @@ fun ActivityCard(
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainerLow,
     contentColor: Color = MaterialTheme.colorScheme.primary
 ) {
-    var showContextMenu by remember { mutableStateOf(false) }
+    var showContextMenu by rememberSaveable { mutableStateOf(false) }
+    var showImageView by rememberSaveable { mutableStateOf(false) }
 
     val activityName = stringResource(activity.type.nameId)
 
@@ -157,6 +159,9 @@ fun ActivityCard(
                     .fillMaxWidth()
                     .heightIn(max = 256.dp)
                     .clip(MaterialTheme.shapes.large)
+                    .clickable {
+                        showImageView = true
+                    }
             )
         }
     }
@@ -178,6 +183,10 @@ fun ActivityCard(
                 }
             }
         )
+    }
+
+    if (showImageView && activity.imageUri != null) {
+        ImageViewer(imageUri = activity.imageUri, onDismiss = { showImageView = false })
     }
 }
 

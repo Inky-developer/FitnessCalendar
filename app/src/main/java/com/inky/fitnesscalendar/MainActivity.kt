@@ -17,6 +17,7 @@ import androidx.lifecycle.lifecycleScope
 import com.inky.fitnesscalendar.ui.App
 import com.inky.fitnesscalendar.ui.theme.FitnessCalendarTheme
 import com.inky.fitnesscalendar.util.cleanActivityImageStorage
+import com.inky.fitnesscalendar.util.getOrCreateSharedMediaCache
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -70,6 +71,10 @@ class MainActivity : ComponentActivity() {
         lifecycleScope.launch(Dispatchers.IO) {
             val usedActivityImages = repository.getActivityImages()
             cleanActivityImageStorage(usedActivityImages.toSet())
+
+            getOrCreateSharedMediaCache().listFiles()?.forEach {
+                it.delete()
+            }
         }
     }
 }

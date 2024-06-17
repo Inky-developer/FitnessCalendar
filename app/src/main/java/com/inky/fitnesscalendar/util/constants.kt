@@ -15,3 +15,4 @@ const val ACTION_SAVE = "$APP_URL.action.save"
 const val EXTRA_RECORDING_ID = "recording_id"
 
 const val ACTIVITY_IMAGES_DIR = "activity_images"
+const val SHARED_MEDIA_DIR = "shared_media_cache"

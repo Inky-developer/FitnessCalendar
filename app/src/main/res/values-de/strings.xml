@@ -121,4 +121,6 @@
     <string name="with_attribute">Mit: %1s</string>
     <string name="without_attribute">Ohne: %1s</string>
     <string name="attribute">Attribut</string>
+    <string name="share">Teilen</string>
+    <string name="close">schließen</string>
 </resources>

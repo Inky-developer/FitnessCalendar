@@ -4,17 +4,14 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Menu
@@ -66,6 +63,7 @@ import com.inky.fitnesscalendar.ui.components.ActivitySelectorState
 import com.inky.fitnesscalendar.ui.components.DateTimePicker
 import com.inky.fitnesscalendar.ui.components.DateTimePickerState
 import com.inky.fitnesscalendar.ui.components.FeelSelector
+import com.inky.fitnesscalendar.ui.components.ImageViewer
 import com.inky.fitnesscalendar.ui.components.OptionGroup
 import com.inky.fitnesscalendar.util.copyFileToStorage
 import com.inky.fitnesscalendar.util.getOrCreateActivityImagesDir
@@ -107,7 +105,6 @@ fun NewActivity(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun NewActivity(
     activity: Activity?,
@@ -157,6 +154,7 @@ fun NewActivity(
     val scrollState = rememberScrollState()
 
     var contextMenuOpen by rememberSaveable { mutableStateOf(false) }
+    var showImageViewer by rememberSaveable { mutableStateOf(false) }
 
     val imagePickerLauncher =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.PickVisualMedia()) { uri ->
@@ -246,8 +244,7 @@ fun NewActivity(
                                 .padding(bottom = 16.dp)
                                 .clip(MaterialTheme.shapes.large)
                                 .clickable {
-                                    // TODO: Make this more explicit
-                                    imageUri = null
+                                    showImageViewer = true
                                 }
                         )
                     }
@@ -329,6 +326,17 @@ fun NewActivity(
                 }
             }
         }
+    }
+
+    if (showImageViewer && imageUri != null) {
+        ImageViewer(
+            imageUri!!,
+            onDismiss = { showImageViewer = false },
+            onDelete = {
+                imageUri = null
+                showImageViewer = false
+            }
+        )
     }
 }
 

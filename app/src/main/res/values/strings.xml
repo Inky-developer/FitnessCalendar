@@ -110,6 +110,8 @@
     <string name="with_attribute">With: %1s</string>
     <string name="without_attribute">Without: %1s</string>
     <string name="attribute">Attribute</string>
+    <string name="share">Share</string>
+    <string name="close">close</string>
     <plurals name="num_activities">
         <item quantity="one">%1d activity</item>
         <item quantity="other">%1d activities</item>
