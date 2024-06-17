@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 import javax.inject.Singleton
 
-const val TAG = "AppRepository"
+private const val TAG = "AppRepository"
 
 @Singleton
 @Stable
@@ -77,6 +77,8 @@ class AppRepository @Inject constructor(
     suspend fun loadMostRecentActivities(n: Int) = activityDao.loadMostRecentActivities(n)
 
     fun getActivity(id: Int) = activityDao.get(id)
+
+    suspend fun getActivityImages() = activityDao.getImages()
 
     suspend fun startRecording(recording: Recording) {
         recordingDao.insert(recording)

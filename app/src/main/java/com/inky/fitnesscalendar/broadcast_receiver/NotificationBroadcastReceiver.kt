@@ -14,7 +14,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-const val TAG = "NotificationPodcastReceiver"
+private const val TAG = "NotificationPodcastReceiver"
 
 @AndroidEntryPoint
 class NotificationBroadcastReceiver : BroadcastReceiver() {

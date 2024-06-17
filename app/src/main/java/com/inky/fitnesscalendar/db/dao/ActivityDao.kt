@@ -1,5 +1,6 @@
 package com.inky.fitnesscalendar.db.dao
 
+import android.net.Uri
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Query
@@ -49,6 +50,9 @@ abstract class ActivityDao {
 
     @Query("SELECT * FROM ACTIVITY WHERE uid=(:id)")
     abstract fun get(id: Int): Flow<Activity>
+
+    @Query("SELECT image_uri FROM ACTIVITY WHERE image_uri IS NOT NULL")
+    abstract suspend fun getImages(): List<Uri>
 
     @Upsert
     abstract suspend fun save(activity: Activity)

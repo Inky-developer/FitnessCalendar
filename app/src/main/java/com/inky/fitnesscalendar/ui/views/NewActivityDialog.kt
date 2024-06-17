@@ -1,19 +1,32 @@
 package com.inky.fitnesscalendar.ui.views
 
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -31,16 +44,20 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImage
+import coil.compose.AsyncImagePainter
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.Activity
 import com.inky.fitnesscalendar.data.ActivityType
-import com.inky.fitnesscalendar.data.Feel
 import com.inky.fitnesscalendar.di.ActivityTypeDecisionTree
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivitySelector
@@ -49,6 +66,8 @@ import com.inky.fitnesscalendar.ui.components.DateTimePicker
 import com.inky.fitnesscalendar.ui.components.DateTimePickerState
 import com.inky.fitnesscalendar.ui.components.FeelSelector
 import com.inky.fitnesscalendar.ui.components.OptionGroup
+import com.inky.fitnesscalendar.util.copyFileToStorage
+import com.inky.fitnesscalendar.util.getOrCreateActivityImagesDir
 import com.inky.fitnesscalendar.view_model.NewActivityViewModel
 import kotlinx.coroutines.flow.flowOf
 import java.time.Instant
@@ -87,6 +106,7 @@ fun NewActivity(
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun NewActivity(
     activity: Activity?,
@@ -94,6 +114,8 @@ fun NewActivity(
     onSave: (Activity) -> Unit,
     onNavigateBack: () -> Unit
 ) {
+    val context = LocalContext.current
+
     val title = activity?.type?.let {
         stringResource(
             R.string.edit_activity,
@@ -124,12 +146,26 @@ fun NewActivity(
     }
     var description by rememberSaveable { mutableStateOf(activity?.description ?: "") }
 
-    var feel by rememberSaveable { mutableStateOf<Feel?>(activity?.feel) }
+    var feel by rememberSaveable { mutableStateOf(activity?.feel) }
 
-    val scrollState = rememberScrollState()
+    var imageUri by rememberSaveable { mutableStateOf(activity?.imageUri) }
 
     val formValid =
         selectedActivityType != null && (!selectedActivityType!!.hasVehicle || selectedVehicle != null)
+
+    val scrollState = rememberScrollState()
+
+    var contextMenuOpen by rememberSaveable { mutableStateOf(false) }
+
+    val imagePickerLauncher =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.PickVisualMedia()) { uri ->
+            val actualUri = uri?.let {
+                context.copyFileToStorage(it, context.getOrCreateActivityImagesDir())
+            }
+            if (actualUri != null) {
+                imageUri = actualUri
+            }
+        }
 
     // When the start date time changes, move the end date time along as well
     LaunchedEffect(startDateTimePickerState.selectedDateTime) {
@@ -146,13 +182,44 @@ fun NewActivity(
             ),
         ) {
             Column(modifier = Modifier.background(MaterialTheme.colorScheme.primaryContainer)) {
-                Text(
-                    title,
-                    style = MaterialTheme.typography.displaySmall,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
+                Row(
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
-                )
+                        .padding(horizontal = 8.dp)
+                ) {
+                    Text(
+                        title,
+                        style = MaterialTheme.typography.displaySmall,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                    )
+
+                    Spacer(modifier = Modifier.weight(1f))
+
+                    Column {
+                        IconButton(onClick = { contextMenuOpen = true }) {
+                            Icon(Icons.Outlined.Menu, stringResource(R.string.open_context_menu))
+                        }
+                        DropdownMenu(
+                            expanded = contextMenuOpen,
+                            onDismissRequest = { contextMenuOpen = false }) {
+                            DropdownMenuItem(
+                                text = { Text(stringResource(R.string.add_image)) },
+                                leadingIcon = {
+                                    Icon(
+                                        painterResource(R.drawable.outline_add_image_24),
+                                        stringResource(R.string.add_image)
+                                    )
+                                },
+                                onClick = {
+                                    contextMenuOpen = false
+                                    imagePickerLauncher.launch(
+                                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                    )
+                                }
+                            )
+                        }
+                    }
+                }
                 HorizontalDivider()
             }
 
@@ -162,6 +229,28 @@ fun NewActivity(
                     .weight(1f, fill = false)
                     .verticalScroll(scrollState)
             ) {
+                if (imageUri != null) {
+                    Column {
+                        AsyncImage(
+                            model = imageUri!!,
+                            contentDescription = stringResource(R.string.user_uploaded_image),
+                            onState = { state ->
+                                if (state is AsyncImagePainter.State.Error) {
+                                    imageUri = activity?.imageUri
+                                }
+                            },
+                            contentScale = ContentScale.FillHeight,
+                            modifier = Modifier
+                                .padding(bottom = 16.dp)
+                                .clip(RoundedCornerShape(16.dp))
+                                .clickable {
+                                    // TODO: Make this more explicit
+                                    imageUri = null
+                                }
+                        )
+                    }
+                }
+
                 ActivitySelector(
                     ActivitySelectorState(selectedActivityType, selectedVehicle),
                     onActivityType = { selectedActivityType = it },
@@ -203,7 +292,6 @@ fun NewActivity(
                         localizationRepository = localizationRepository,
                         labelId = R.string.datetime_end
                     )
-
                 }
             }
 
@@ -213,25 +301,24 @@ fun NewActivity(
                 }
                 TextButton(
                     onClick = {
-                        val newActivity = when (activity) {
+                        val oldActivity = when (activity) {
                             null -> Activity(
                                 type = selectedActivityType!!,
-                                vehicle = selectedVehicle,
-                                description = description,
-                                startTime = startDateTimePickerState.selectedDate(),
-                                endTime = endDateTimePickerState.selectedDate(),
-                                feel = feel,
+                                startTime = startDateTimePickerState.selectedDate()
                             )
 
-                            else -> activity.copy(
-                                type = selectedActivityType!!,
-                                vehicle = selectedVehicle,
-                                description = description,
-                                startTime = startDateTimePickerState.selectedDate(),
-                                endTime = endDateTimePickerState.selectedDate(),
-                                feel = feel
-                            )
+                            else -> activity
                         }
+                        val newActivity = oldActivity.copy(
+                            type = selectedActivityType!!,
+                            vehicle = selectedVehicle,
+                            description = description,
+                            startTime = startDateTimePickerState.selectedDate(),
+                            endTime = endDateTimePickerState.selectedDate(),
+                            feel = feel,
+                            imageUri = imageUri
+                        )
+
                         onSave(newActivity)
                     },
                     enabled = formValid
@@ -288,7 +375,8 @@ fun ColumnScope.DateTimeInput(
 @Composable
 fun NewActivityPreview() {
     val context = LocalContext.current
-    val activity = Activity(type = ActivityType.Bouldering, startTime = Date.from(Instant.now()))
+    val activity =
+        Activity(type = ActivityType.Bouldering, startTime = Date.from(Instant.now()))
     NewActivity(
         activity = activity,
         localizationRepository = LocalizationRepository(context),

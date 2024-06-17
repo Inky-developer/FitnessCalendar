@@ -1,5 +1,6 @@
 package com.inky.fitnesscalendar.data
 
+import android.net.Uri
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -14,6 +15,7 @@ data class Activity(
     @ColumnInfo(name = "start_time") val startTime: Date,
     @ColumnInfo(name = "end_time") val endTime: Date = startTime,
     @ColumnInfo(name = "feel") val feel: Feel? = null,
+    @ColumnInfo(name = "image_uri") val imageUri: Uri? = null
 ) {
     fun clean() = copy(
         vehicle = if (type.hasVehicle) vehicle else null,

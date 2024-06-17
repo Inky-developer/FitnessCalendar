@@ -13,10 +13,11 @@ import com.inky.fitnesscalendar.db.dao.RecordingDao
 import com.inky.fitnesscalendar.util.DATABASE_NAME
 
 @Database(
-    version = 3,
+    version = 4,
     entities = [Activity::class, Recording::class],
     autoMigrations = [
-        AutoMigration(from = 2, to = 3)
+        AutoMigration(from = 2, to = 3),
+        AutoMigration(from = 3, to = 4)
     ]
 )
 @TypeConverters(Converters::class)

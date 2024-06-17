@@ -9,7 +9,7 @@ import com.inky.fitnesscalendar.data.Vehicle
 import java.time.Instant
 import java.util.Date
 
-const val TAG = "import_export"
+private const val TAG = "import_export"
 
 fun Context.exportCsv(activities: List<Activity>) {
     val csvData = CSVWriter(listOf("uid", "type", "vehicle", "description", "start", "end")) {

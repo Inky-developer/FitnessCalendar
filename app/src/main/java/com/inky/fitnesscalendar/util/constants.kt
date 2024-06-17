@@ -13,3 +13,5 @@ const val ACTION_CANCEL = "$APP_URL.action.cancel"
 const val ACTION_SAVE = "$APP_URL.action.save"
 
 const val EXTRA_RECORDING_ID = "recording_id"
+
+const val ACTIVITY_IMAGES_DIR = "activity_images"

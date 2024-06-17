@@ -106,4 +106,7 @@
     <string name="years">Jahre</string>
     <string name="filter_activity_category">Aktivitätskategorie filtern</string>
     <string name="filter_all">Alle</string>
+    <string name="add_image">Bild hinzufügen</string>
+    <string name="open_context_menu">Kontextmenü öffnen</string>
+    <string name="user_uploaded_image">Vom Nutzer hochgeladenes Bild</string>
 </resources>

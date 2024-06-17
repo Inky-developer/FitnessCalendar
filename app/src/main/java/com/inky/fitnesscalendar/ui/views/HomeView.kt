@@ -65,7 +65,7 @@ import com.inky.fitnesscalendar.view_model.HomeViewModel
 import com.inky.fitnesscalendar.view_model.statistics.Period
 import kotlinx.coroutines.launch
 
-const val TAG = "HOME"
+private const val TAG = "HOME"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
