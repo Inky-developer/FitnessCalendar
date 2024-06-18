@@ -9,7 +9,7 @@ import java.util.Date
 @Entity
 data class Activity(
     @PrimaryKey val uid: Int? = null,
-    @ColumnInfo(name = "type") val type: ActivityType,
+    @ColumnInfo(name = "type_id") val type: ActivityType,
     @ColumnInfo(name = "vehicle") val vehicle: Vehicle? = null,
     @ColumnInfo(name = "description") val description: String = "",
     @ColumnInfo(name = "start_time") val startTime: Date,
