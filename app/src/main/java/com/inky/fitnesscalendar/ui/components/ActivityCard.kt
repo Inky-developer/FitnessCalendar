@@ -200,7 +200,7 @@ fun ActivityCardContextMenu(
 ) {
     ModalBottomSheet(onDismissRequest = onDismiss) {
         Text(
-            "Options",
+            stringResource(R.string.options),
             style = MaterialTheme.typography.displaySmall,
             modifier = Modifier.padding(horizontal = 8.dp)
         )
