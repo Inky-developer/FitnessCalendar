@@ -124,4 +124,6 @@
     <string name="share">Teilen</string>
     <string name="close">schließen</string>
     <string name="options">Optionen</string>
+    <string name="confirm">Bestätigen</string>
+    <string name="ask_delete_activity">Aktivität löschen?</string>
 </resources>

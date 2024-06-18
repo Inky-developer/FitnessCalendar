@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.PlayArrow
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -23,6 +24,7 @@ import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -198,6 +200,8 @@ fun ActivityCardContextMenu(
     onJumpTo: (() -> Unit)?,
     onFilterByType: (() -> Unit)?,
 ) {
+    var showDialog by rememberSaveable { mutableStateOf(false) }
+
     ModalBottomSheet(onDismissRequest = onDismiss) {
         Text(
             stringResource(R.string.options),
@@ -233,9 +237,33 @@ fun ActivityCardContextMenu(
         ListItem(
             headlineContent = { Text(stringResource(R.string.delete_activity)) },
             leadingContent = { Icon(Icons.Outlined.Delete, stringResource(R.string.delete)) },
-            modifier = Modifier.clickable { onDelete() }
+            modifier = Modifier.clickable { showDialog = true }
         )
 
         Spacer(Modifier.height(32.dp))
+    }
+
+    if (showDialog) {
+        AlertDialog(
+            icon = {
+                Icon(
+                    Icons.Outlined.Delete,
+                    stringResource(R.string.delete),
+                    tint = MaterialTheme.colorScheme.error
+                )
+            },
+            title = { Text(stringResource(R.string.ask_delete_activity)) },
+            onDismissRequest = { showDialog = false },
+            confirmButton = {
+                TextButton(onClick = onDelete) {
+                    Text(stringResource(R.string.confirm))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = onDismiss) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
     }
 }
