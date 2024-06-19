@@ -84,7 +84,7 @@ enum class Period(val nameId: Int, val xLabelId: Int, val numVisibleEntries: Flo
 
             Year -> {
                 val activityMap = statistics.activitiesByYear
-                val firstYear = activityMap.keys.min()
+                val firstYear = activityMap.keys.minOrNull() ?: today.year
                 val currentYear = today.year
                 for (year in firstYear..currentYear) {
                     result.add((activityMap[year]) to year.toString())
