@@ -86,18 +86,18 @@ fun ActivityLog(
 
     // Scroll to requested activity or to the newest activity
     var scrollToId by remember(initialSelectedActivityId) { mutableStateOf(initialSelectedActivityId) }
-    var latestActivity by remember { mutableStateOf(activities.firstOrNull()) }
+    var latestActivity by remember { mutableStateOf(activities.firstOrNull()?.activity) }
     LaunchedEffect(activities) {
         if (scrollToId != null) {
-            val index = activities.withIndex().find { it.value.uid == scrollToId }?.index
+            val index = activities.withIndex().find { it.value.activity.uid == scrollToId }?.index
             if (index != null) {
                 activityListState.animateScrollToItem(index)
                 scrollToId = null
             }
-        } else if (activities.firstOrNull()?.uid != latestActivity?.uid) {
+        } else if (activities.firstOrNull()?.activity?.uid != latestActivity?.uid) {
             activityListState.animateScrollToItem(0)
         }
-        latestActivity = activities.firstOrNull()
+        latestActivity = activities.firstOrNull()?.activity
     }
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -193,16 +193,16 @@ fun ActivityLog(
                     state = activityListState,
                     contentPadding = PaddingValues(bottom = 128.dp),
                 ) {
-                    items(activities, key = { it.uid ?: -1 }) { activity ->
+                    items(activities, key = { it.activity.uid ?: -1 }) { typeActivity ->
                         ActivityCard(
-                            activity,
+                            typeActivity,
                             onDelete = {
-                                scope.launch { viewModel.repository.deleteActivity(activity) }
+                                scope.launch { viewModel.repository.deleteActivity(typeActivity.activity) }
                             },
                             onJumpTo = if (!filter.isEmpty()) {
                                 {
                                     onEditFilter(ActivityFilter())
-                                    scrollToId = activity.uid
+                                    scrollToId = typeActivity.activity.uid
                                 }
                             } else null,
                             onFilter = if (filter.isEmpty()) {
@@ -212,7 +212,7 @@ fun ActivityLog(
                             localizationRepository = viewModel.repository.localizationRepository,
                             modifier = Modifier
                                 .animateItem(fadeInSpec = null, fadeOutSpec = null)
-                                .sharedElement(SharedContentKey.ActivityCard(activity.uid))
+                                .sharedElement(SharedContentKey.ActivityCard(typeActivity.activity.uid))
                         )
                     }
                 }
@@ -271,7 +271,7 @@ private fun FilterInformation(filter: ActivityFilter, onChange: (ActivityFilter)
                 leadingIcon = { Text(type.emoji, style = MaterialTheme.typography.titleLarge) },
                 label = {
                     Text(
-                        stringResource(type.nameId),
+                        type.name,
                         style = MaterialTheme.typography.labelLarge
                     )
                 },

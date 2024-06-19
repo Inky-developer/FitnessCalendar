@@ -86,9 +86,7 @@ fun FilterView(
         Column(modifier = Modifier.padding(paddingValues)) {
             val context = LocalContext.current
             val selectionLabel = remember(filter) {
-                if (filter.types.isEmpty()) null else filter.types.joinToString(", ") {
-                    context.getString(it.nameId)
-                }
+                if (filter.types.isEmpty()) null else filter.types.joinToString(", ") { it.name }
             }
             val categorySelectionLabel = remember(filter) {
                 if (filter.categories.isEmpty()) null else filter.categories.joinToString(", ") {

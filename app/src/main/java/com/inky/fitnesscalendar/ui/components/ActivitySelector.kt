@@ -33,7 +33,7 @@ fun ActivitySelector(
     Column(modifier = modifier) {
         OptionGroup(
             label = stringResource(R.string.select_activity),
-            selectionLabel = state.activityType?.nameId?.let { stringResource(it) },
+            selectionLabel = state.activityType?.name,
         ) {
             ActivityTypeSelector(
                 activityRows = activityRows,

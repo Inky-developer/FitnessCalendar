@@ -20,8 +20,8 @@ data class Grouping(val category: ActivityCategory?) {
         else -> statistics.activitiesByType
     }
 
-    fun options(): List<Displayable> = when (category) {
+    fun options(activityTypes: List<ActivityType>): List<Displayable> = when (category) {
         null -> ActivityCategory.entries
-        else -> ActivityType.entries.filter { it.activityCategory == category }
+        else -> activityTypes.filter { it.activityCategory == category }
     }
 }

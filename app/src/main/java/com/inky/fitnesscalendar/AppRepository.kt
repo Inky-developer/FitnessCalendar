@@ -4,11 +4,12 @@ import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.Stable
 import com.inky.fitnesscalendar.data.Activity
-import com.inky.fitnesscalendar.data.ActivityType
 import com.inky.fitnesscalendar.data.Recording
+import com.inky.fitnesscalendar.data.TypeActivity
 import com.inky.fitnesscalendar.data.Vehicle
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.db.dao.ActivityDao
+import com.inky.fitnesscalendar.db.dao.ActivityTypeDao
 import com.inky.fitnesscalendar.db.dao.RecordingDao
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.util.hideRecordingNotification
@@ -25,21 +26,16 @@ class AppRepository @Inject constructor(
     @ApplicationContext val context: Context,
     private val activityDao: ActivityDao,
     private val recordingDao: RecordingDao,
+    private val activityTypeDao: ActivityTypeDao,
     val localizationRepository: LocalizationRepository
 ) {
     suspend fun loadAllActivities() = activityDao.loadActivities()
 
-    fun getActivities(filter: ActivityFilter): Flow<List<Activity>> {
+    fun getActivities(filter: ActivityFilter): Flow<List<TypeActivity>> {
         // Use simpler query if no filters are needed
         if (filter.isEmpty()) {
             return activityDao.getActivities()
         }
-
-        val searchTypes = filter.text?.let { filterText ->
-            ActivityType.entries.filter { type ->
-                context.getString(type.nameId).contains(filterText, ignoreCase = true)
-            }
-        } ?: emptyList()
 
         val searchVehicles = filter.text?.let { filterText ->
             Vehicle.entries.filter { vehicle ->
@@ -47,7 +43,7 @@ class AppRepository @Inject constructor(
             }
         } ?: emptyList()
 
-        val categoryTypes = ActivityType.entries.filter { it.activityCategory in filter.categories }
+        val categories = filter.categories.map { it.toString() }
 
         val rangeDate = filter.range?.getDateRange()
 
@@ -56,12 +52,11 @@ class AppRepository @Inject constructor(
         val hasImage = filter.attributes.image.toBooleanOrNull()
 
         return activityDao.getFiltered(
-            types = filter.types,
+            typeIds = filter.types.mapNotNull { it.uid },
             isTypesEmpty = filter.types.isEmpty(),
-            categoryTypes = categoryTypes,
-            isCategoryTypesEmpty = categoryTypes.isEmpty(),
+            categories = categories,
+            isCategoriesEmpty = categories.isEmpty(),
             search = filter.text?.let { "%$it%" },
-            searchTypes = searchTypes,
             searchVehicles = searchVehicles,
             start = rangeDate?.start,
             end = rangeDate?.end,
@@ -73,8 +68,8 @@ class AppRepository @Inject constructor(
 
     fun getMostRecentActivity() = activityDao.getMostRecentActivity()
 
-    suspend fun saveActivity(activity: Activity) {
-        activityDao.save(activity.clean())
+    suspend fun saveActivity(activity: TypeActivity) {
+        activityDao.save(activity.clean().activity)
     }
 
     suspend fun deleteActivity(activity: Activity) {
@@ -107,4 +102,10 @@ class AppRepository @Inject constructor(
         val activity = recording.toActivity()
         activityDao.stopRecording(recording, activity)
     }
+
+    suspend fun loadActivityTypes() = activityTypeDao.loadTypes()
+
+    fun getActivityTypes() = activityTypeDao.getTypes()
+
+    fun getActivityTypes(filter: List<Int>) = activityTypeDao.getTypes(filter)
 }

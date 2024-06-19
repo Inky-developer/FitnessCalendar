@@ -47,6 +47,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.Activity
 import com.inky.fitnesscalendar.data.ActivityCategory
+import com.inky.fitnesscalendar.data.Displayable
 import com.inky.fitnesscalendar.preferences.Preference
 import com.inky.fitnesscalendar.ui.components.CompactActivityCard
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
@@ -97,6 +98,7 @@ fun StatisticsView(
     }
 
     StatisticsView(
+        viewModel = viewModel,
         onOpenDrawer = onOpenDrawer,
         onViewActivity = onViewActivity,
     )
@@ -105,7 +107,7 @@ fun StatisticsView(
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun StatisticsView(
-    viewModel: StatisticsViewModel = hiltViewModel(),
+    viewModel: StatisticsViewModel,
     onOpenDrawer: () -> Unit,
     onViewActivity: (Activity) -> Unit,
 ) {
@@ -173,7 +175,7 @@ fun StatisticsView(
                         viewModel.modelProducer,
                         viewModel.projection,
                         viewModel.period,
-                        viewModel.grouping,
+                        viewModel.groupingOptions.value,
                         modifier = Modifier
                             .fillParentMaxHeight(0.9f)
                             .fillMaxWidth()
@@ -193,11 +195,13 @@ fun StatisticsView(
                     )
                 }
 
-                items(activities.activities, contentType = { ContentType.Activity }) { activity ->
+                items(
+                    activities.activities,
+                    contentType = { ContentType.Activity }) { typeActivity ->
                     CompactActivityCard(
-                        activity = activity,
+                        typeActivity = typeActivity,
                         localizationRepository = viewModel.appRepository.localizationRepository,
-                        modifier = Modifier.clickable { onViewActivity(activity) }
+                        modifier = Modifier.clickable { onViewActivity(typeActivity.activity) }
                     )
                 }
             }
@@ -295,12 +299,12 @@ private fun Graph(
     modelProducer: CartesianChartModelProducer,
     projection: Projection,
     period: Period,
-    grouping: Grouping,
+    groupingOptions: List<Displayable>,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    val columns = remember(grouping) {
-        grouping.options().map { group ->
+    val columns = remember(groupingOptions) {
+        groupingOptions.map { group ->
             LineComponent(
                 color = group.getColor(context),
                 thicknessDp = 64f,
@@ -344,7 +348,7 @@ private fun Graph(
                 },
                 itemPlacer = AxisItemPlacer.Horizontal.default(addExtremeLabelPadding = true),
             ),
-            legend = rememberLegend(grouping),
+            legend = rememberLegend(groupingOptions),
         ),
         modelProducer = modelProducer,
         runInitialAnimation = true,
@@ -356,9 +360,12 @@ private fun Graph(
 }
 
 @Composable
-private fun rememberLegend(grouping: Grouping, context: Context = LocalContext.current) =
+private fun rememberLegend(
+    groupingOptions: List<Displayable>,
+    context: Context = LocalContext.current
+) =
     rememberHorizontalLegend<CartesianMeasureContext, CartesianDrawContext>(
-        items = grouping.options().map { group ->
+        items = groupingOptions.map { group ->
             rememberLegendItem(
                 icon = rememberShapeComponent(Shape.Pill, Color(group.getColor(context))),
                 label = rememberTextComponent(

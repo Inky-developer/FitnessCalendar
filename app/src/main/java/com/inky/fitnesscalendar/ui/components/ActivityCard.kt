@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.Activity
+import com.inky.fitnesscalendar.data.TypeActivity
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.util.skipToLookaheadSize
@@ -53,7 +54,7 @@ import com.inky.fitnesscalendar.util.Duration.Companion.until
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ActivityCard(
-    activity: Activity,
+    typeActivity: TypeActivity,
     onDelete: () -> Unit,
     onEdit: (Activity) -> Unit,
     localizationRepository: LocalizationRepository,
@@ -63,12 +64,12 @@ fun ActivityCard(
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainerLow,
     contentColor: Color = MaterialTheme.colorScheme.primary
 ) {
+    val (activity, activityType) = typeActivity
+
     var showContextMenu by rememberSaveable { mutableStateOf(false) }
     var showImageView by rememberSaveable { mutableStateOf(false) }
 
-    val activityName = stringResource(activity.type.nameId)
-
-    val title = remember(activity) { "${activity.type.emoji} $activityName" }
+    val title = remember(activityType) { "${activityType.emoji} ${activityType.name}" }
     val time = remember(activity) {
         localizationRepository.formatRelativeDate(activity.startTime)
     }
@@ -181,7 +182,7 @@ fun ActivityCard(
             onFilterByType = onFilter?.let {
                 {
                     showContextMenu = false
-                    it(ActivityFilter(types = listOf(activity.type)))
+                    it(ActivityFilter(types = listOf(activityType)))
                 }
             }
         )

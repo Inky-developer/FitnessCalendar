@@ -20,9 +20,11 @@ class MainApp : Application() {
 
         MainScope().launch {
             Log.i("MainApp", "Initializing app data")
-            val activities = appRepository.loadMostRecentActivities(200)
 
-            ActivityTypeOrder.init(activities)
+            val activities = appRepository.loadMostRecentActivities(200)
+            val types = appRepository.loadActivityTypes()
+
+            ActivityTypeOrder.init(activities, types)
             ActivityTypeDecisionTree.decisionTree = DecisionTree.learnFromActivities(activities)
             Log.i("MainApp", "App data successfully initialized")
         }

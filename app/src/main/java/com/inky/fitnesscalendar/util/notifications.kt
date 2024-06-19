@@ -32,7 +32,7 @@ fun Context.showRecordingNotification(
     )
     notificationManager.createNotificationChannel(channel)
 
-    val title = getString(recordingType.nameId)
+    val title = recordingType.name
 
     val launchIntent = Intent(this, MainActivity::class.java)
     val pendingIntent =

@@ -31,13 +31,13 @@ import com.inky.fitnesscalendar.ui.views.RecordActivity
 import com.inky.fitnesscalendar.ui.views.Settings
 import com.inky.fitnesscalendar.ui.views.StatisticsView
 import com.inky.fitnesscalendar.ui.views.View
-import com.inky.fitnesscalendar.view_model.AppViewModel
+import com.inky.fitnesscalendar.view_model.GenericViewModel
 import kotlinx.coroutines.launch
 
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
-fun App(viewModel: AppViewModel = hiltViewModel()) {
+fun App(viewModel: GenericViewModel = hiltViewModel()) {
     val navController = rememberNavController()
     val scope = rememberCoroutineScope()
 
@@ -136,7 +136,7 @@ fun App(viewModel: AppViewModel = hiltViewModel()) {
                     currentView = View.FilterActivity
                     ProvideSharedContent(sharedContentScope = this@SharedTransitionLayout) {
                         FilterView(
-                            filterState,
+                            filter = filterState,
                             onFilterChange = { filterState = it },
                             onBack = { navController.popBackStack() }
                         )

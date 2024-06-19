@@ -44,7 +44,7 @@ fun RecordActivity(
     val title = remember(activityType) {
         when (val type = activityType) {
             null -> context.getString(R.string.record_activity)
-            else -> context.getString(R.string.record_activity_type, context.getString(type.nameId))
+            else -> context.getString(R.string.record_activity_type, type.name)
         }
     }
 
@@ -88,7 +88,7 @@ fun RecordActivity(
 
                 TextButton(enabled = enabled, onClick = {
                     val recording = Recording(
-                        type = activityType!!,
+                        typeId = activityType?.uid!!,
                         vehicle = vehicle,
                         startTime = Date.from(Instant.now())
                     )

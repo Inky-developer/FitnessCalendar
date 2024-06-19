@@ -50,6 +50,8 @@ import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.Activity
 import com.inky.fitnesscalendar.data.ActivityStatistics
 import com.inky.fitnesscalendar.data.Recording
+import com.inky.fitnesscalendar.data.TypeActivity
+import com.inky.fitnesscalendar.data.TypeRecording
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivityCard
 import com.inky.fitnesscalendar.ui.components.CompactActivityCard
@@ -83,22 +85,22 @@ fun Home(
     val monthlyStats by viewModel.monthStats.collectAsState(initial = null)
     val activitiesToday by viewModel.activitiesToday.collectAsState(initial = null)
     val recentActivity by viewModel.mostRecentActivity.collectAsState(initial = null)
-    val recordings by viewModel.recordings.collectAsState(initial = null)
+    val typeRecordings by viewModel.recordings.collectAsState(initial = null)
     val scrollState = rememberScrollState()
 
     val scope = rememberCoroutineScope()
 
     val context = LocalContext.current
-    LaunchedEffect(recordings) {
-        for (recording in recordings ?: emptyList()) {
-            if (recording.uid == null) {
+    LaunchedEffect(typeRecordings) {
+        for (typeRecording in typeRecordings ?: emptyList()) {
+            if (typeRecording.recording.uid == null) {
                 continue
             }
-            Log.d(TAG, "Notification for $recording")
+            Log.d(TAG, "Notification for $typeRecording")
             context.showRecordingNotification(
-                recording.uid,
-                recording.type,
-                recording.startTime.time
+                typeRecording.recording.uid,
+                typeRecording.type,
+                typeRecording.recording.startTime.time
             )
         }
     }
@@ -152,16 +154,14 @@ fun Home(
                 .verticalScroll(scrollState)
         ) {
 
-            if (recordings != null) {
-                AnimatedVisibility(visible = recordings?.isNotEmpty() ?: false) {
-                    Recordings(
-                        recordings = recordings ?: emptyList(),
-                        localizationRepository = viewModel.repository.localizationRepository,
-                        onAbort = { viewModel.abortRecording(it) },
-                        onSave = { viewModel.saveRecording(it) }
+            AnimatedVisibility(visible = typeRecordings?.isNotEmpty() ?: false) {
+                Recordings(
+                    typeRecordings = typeRecordings ?: emptyList(),
+                    localizationRepository = viewModel.repository.localizationRepository,
+                    onAbort = { viewModel.abortRecording(it) },
+                    onSave = { viewModel.saveRecording(it) }
 
-                    )
-                }
+                )
             }
 
             RecentActivityOrNull(
@@ -182,7 +182,7 @@ fun Home(
             )
 
             ActivitiesToday(
-                activities = activitiesToday ?: emptyList(),
+                typeActivities = activitiesToday ?: emptyList(),
                 localizationRepository = viewModel.repository.localizationRepository,
                 onNavigateActivity = onNavigateActivity
             )
@@ -192,7 +192,7 @@ fun Home(
 
 @Composable
 fun Recordings(
-    recordings: List<Recording>,
+    typeRecordings: List<TypeRecording>,
     localizationRepository: LocalizationRepository,
     onAbort: (Recording) -> Unit,
     onSave: (Recording) -> Unit
@@ -203,14 +203,14 @@ fun Recordings(
             .padding(all = 8.dp)
             .fillMaxWidth()
     ) {
-        for (recording in recordings) {
+        for (typeRecording in typeRecordings) {
             Timer { time ->
                 RecordingStatus(
-                    recording,
+                    typeRecording,
                     localizationRepository,
                     time,
-                    onAbort = { onAbort(recording) },
-                    onSave = { onSave(recording) }
+                    onAbort = { onAbort(typeRecording.recording) },
+                    onSave = { onSave(typeRecording.recording) }
                 )
             }
         }
@@ -219,7 +219,7 @@ fun Recordings(
 
 @Composable
 fun RecordingStatus(
-    recording: Recording,
+    typeRecording: TypeRecording,
     localizationRepository: LocalizationRepository,
     currentTimeMs: Long,
     onAbort: () -> Unit,
@@ -227,12 +227,12 @@ fun RecordingStatus(
 ) {
     val timeString by remember {
         derivedStateOf {
-            localizationRepository.formatRelativeDate(recording.startTime)
+            localizationRepository.formatRelativeDate(typeRecording.recording.startTime)
         }
     }
     val durationString by remember(currentTimeMs) {
         derivedStateOf {
-            localizationRepository.formatDuration(recording.startTime)
+            localizationRepository.formatDuration(typeRecording.recording.startTime)
         }
     }
     Column(modifier = Modifier.padding(all = 8.dp)) {
@@ -249,7 +249,7 @@ fun RecordingStatus(
                     modifier = Modifier.align(Alignment.CenterVertically)
                 )
                 Text(
-                    stringResource(recording.type.nameId),
+                    typeRecording.type.name,
                     modifier = Modifier.align(Alignment.CenterVertically)
                 )
             }
@@ -296,7 +296,7 @@ fun Statistics(name: String, stats: ActivityStatistics, onClick: () -> Unit) {
                 }
 
                 val durationString = remember(categoryStats) {
-                    Duration(categoryStats.activities.map { it.startTime until it.endTime }
+                    Duration(categoryStats.activities.map { it.activity.startTime until it.activity.endTime }
                         .sumOf { it.elapsedMs }).format()
 
                 }
@@ -342,7 +342,7 @@ fun Statistics(name: String, stats: ActivityStatistics, onClick: () -> Unit) {
 
 @Composable
 fun ActivitiesToday(
-    activities: List<Activity>,
+    typeActivities: List<TypeActivity>,
     localizationRepository: LocalizationRepository,
     onNavigateActivity: () -> Unit
 ) {
@@ -369,7 +369,7 @@ fun ActivitiesToday(
         )
 
         AnimatedContent(
-            targetState = activities.isEmpty(),
+            targetState = typeActivities.isEmpty(),
             label = "ActivitiesToday"
         ) { noActivities ->
             when (noActivities) {
@@ -396,13 +396,13 @@ fun ActivitiesToday(
 
                 false -> {
                     Column {
-                        for (activity in activities) {
+                        for (typeActivity in typeActivities) {
                             CompactActivityCard(
-                                activity = activity,
+                                typeActivity = typeActivity,
                                 localizationRepository = localizationRepository,
                                 modifier = Modifier.sharedElement(
                                     SharedContentKey.ActivityCard(
-                                        activity.uid
+                                        typeActivity.activity.uid
                                     )
                                 )
                             )
@@ -416,29 +416,29 @@ fun ActivitiesToday(
 
 @Composable
 fun RecentActivityOrNull(
-    activity: Activity?,
+    typeActivity: TypeActivity?,
     localizationRepository: LocalizationRepository,
     onDelete: (Activity) -> Unit,
     onEdit: (Activity) -> Unit
 ) {
-    if (activity != null) {
+    if (typeActivity != null) {
         RecentActivity(
-            activity,
+            typeActivity,
             localizationRepository,
-            { onDelete(activity) },
-            { onEdit(activity) })
+            { onDelete(typeActivity.activity) },
+            { onEdit(typeActivity.activity) })
     }
 }
 
 @Composable
 fun RecentActivity(
-    activity: Activity,
+    typeActivity: TypeActivity,
     localizationRepository: LocalizationRepository,
     onDelete: () -> Unit,
     onEdit: (Activity) -> Unit,
 ) {
     ActivityCard(
-        activity = activity,
+        typeActivity = typeActivity,
         localizationRepository = localizationRepository,
         onDelete = onDelete,
         onEdit = onEdit,

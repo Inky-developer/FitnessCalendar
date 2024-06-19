@@ -47,7 +47,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -55,7 +54,7 @@ import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.Activity
-import com.inky.fitnesscalendar.data.ActivityType
+import com.inky.fitnesscalendar.data.TypeActivity
 import com.inky.fitnesscalendar.di.ActivityTypeDecisionTree
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivitySelector
@@ -77,7 +76,7 @@ import java.util.Date
 fun NewActivity(
     activityId: Int?,
     viewModel: NewActivityViewModel = hiltViewModel(),
-    onSave: (Activity) -> Unit,
+    onSave: (TypeActivity) -> Unit,
     onNavigateBack: () -> Unit
 ) {
     val activity =
@@ -88,14 +87,14 @@ fun NewActivity(
 
     if (activityId == null) {
         NewActivity(
-            activity = null,
+            typeActivity = null,
             localizationRepository = viewModel.localizationRepository,
             onSave = onSave,
             onNavigateBack = onNavigateBack
         )
     } else if (activity.value != null) {
         NewActivity(
-            activity = activity.value,
+            typeActivity = activity.value,
             localizationRepository = viewModel.localizationRepository,
             onSave = onSave,
             onNavigateBack = onNavigateBack
@@ -107,46 +106,45 @@ fun NewActivity(
 
 @Composable
 fun NewActivity(
-    activity: Activity?,
+    typeActivity: TypeActivity?,
     localizationRepository: LocalizationRepository,
-    onSave: (Activity) -> Unit,
+    onSave: (TypeActivity) -> Unit,
     onNavigateBack: () -> Unit
 ) {
     val context = LocalContext.current
 
-    val title = activity?.type?.let {
-        stringResource(
-            R.string.edit_activity,
-            stringResource(it.nameId)
-        )
-    } ?: stringResource(R.string.new_activity)
+    val title = typeActivity?.type?.let { stringResource(R.string.edit_activity, it.name) }
+        ?: stringResource(R.string.new_activity)
 
     var selectedActivityType by rememberSaveable {
         mutableStateOf(
-            activity?.type ?: ActivityTypeDecisionTree.decisionTree?.classifyNow()
+            typeActivity?.type ?: ActivityTypeDecisionTree.decisionTree?.classifyNow()
         )
     }
-    var selectedVehicle by rememberSaveable { mutableStateOf(activity?.vehicle) }
+    var selectedVehicle by rememberSaveable { mutableStateOf(typeActivity?.activity?.vehicle) }
     val startDateTimePickerState by rememberSaveable(stateSaver = DateTimePickerState.SAVER) {
         mutableStateOf(
             DateTimePickerState(
-                initialDateTime = activity?.startTime?.time ?: Instant.now().toEpochMilli()
+                initialDateTime = typeActivity?.activity?.startTime?.time ?: Instant.now()
+                    .toEpochMilli()
             )
         )
     }
     val endDateTimePickerState by rememberSaveable(stateSaver = DateTimePickerState.SAVER) {
         mutableStateOf(
             DateTimePickerState(
-                initialDateTime = activity?.endTime?.time
+                initialDateTime = typeActivity?.activity?.endTime?.time
                     ?: startDateTimePickerState.selectedDateTime
             )
         )
     }
-    var description by rememberSaveable { mutableStateOf(activity?.description ?: "") }
+    var description by rememberSaveable {
+        mutableStateOf(typeActivity?.activity?.description ?: "")
+    }
 
-    var feel by rememberSaveable { mutableStateOf(activity?.feel) }
+    var feel by rememberSaveable { mutableStateOf(typeActivity?.activity?.feel) }
 
-    var imageUri by rememberSaveable { mutableStateOf(activity?.imageUri) }
+    var imageUri by rememberSaveable { mutableStateOf(typeActivity?.activity?.imageUri) }
 
     val formValid =
         selectedActivityType != null && (!selectedActivityType!!.hasVehicle || selectedVehicle != null)
@@ -236,7 +234,7 @@ fun NewActivity(
                             contentDescription = stringResource(R.string.user_uploaded_image),
                             onState = { state ->
                                 if (state is AsyncImagePainter.State.Error) {
-                                    imageUri = activity?.imageUri
+                                    imageUri = typeActivity?.activity?.imageUri
                                 }
                             },
                             contentScale = ContentScale.FillHeight,
@@ -300,16 +298,16 @@ fun NewActivity(
                 }
                 TextButton(
                     onClick = {
-                        val oldActivity = when (activity) {
+                        val oldActivity = when (typeActivity) {
                             null -> Activity(
-                                type = selectedActivityType!!,
+                                typeId = 0,
                                 startTime = startDateTimePickerState.selectedDate()
                             )
 
-                            else -> activity
+                            else -> typeActivity.activity
                         }
                         val newActivity = oldActivity.copy(
-                            type = selectedActivityType!!,
+                            typeId = selectedActivityType?.uid!!,
                             vehicle = selectedVehicle,
                             description = description,
                             startTime = startDateTimePickerState.selectedDate(),
@@ -318,7 +316,7 @@ fun NewActivity(
                             imageUri = imageUri
                         )
 
-                        onSave(newActivity)
+                        onSave(TypeActivity(activity = newActivity, type = selectedActivityType!!))
                     },
                     enabled = formValid
                 ) {
@@ -379,17 +377,4 @@ fun ColumnScope.DateTimeInput(
             )
         }
     }
-}
-
-@Preview
-@Composable
-fun NewActivityPreview() {
-    val context = LocalContext.current
-    val activity =
-        Activity(type = ActivityType.Bouldering, startTime = Date.from(Instant.now()))
-    NewActivity(
-        activity = activity,
-        localizationRepository = LocalizationRepository(context),
-        onSave = {},
-        onNavigateBack = {})
 }

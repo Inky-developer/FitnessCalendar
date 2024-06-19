@@ -21,4 +21,7 @@ class DatabaseModule {
 
     @Provides
     fun provideRecordingDao(database: AppDatabase) = database.recordingDao()
+
+    @Provides
+    fun provideActivityTypeDao(database: AppDatabase) = database.activityTypeDao()
 }

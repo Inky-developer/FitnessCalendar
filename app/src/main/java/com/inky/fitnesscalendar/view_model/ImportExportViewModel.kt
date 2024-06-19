@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.inky.fitnesscalendar.AppRepository
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.Activity
+import com.inky.fitnesscalendar.data.TypeActivity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -27,9 +28,12 @@ class ImportExportViewModel @Inject constructor(
 
     fun import(activities: List<Activity>) {
         viewModelScope.launch(Dispatchers.IO) {
+            val types = repository.loadActivityTypes().associateBy { it.uid!! }
+
             _importing.emit(true)
             for (activity in activities) {
-                repository.saveActivity(activity)
+                val typeActivity = TypeActivity(activity, types[activity.typeId]!!)
+                repository.saveActivity(typeActivity)
             }
             _toastMessage.emit(
                 context.resources.getQuantityString(

@@ -1,6 +1,7 @@
 package com.inky.fitnesscalendar.view_model
 
 import android.content.Context
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -8,8 +9,9 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.inky.fitnesscalendar.AppRepository
-import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.data.ActivityStatistics
+import com.inky.fitnesscalendar.data.ActivityType
+import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.preferences.Preference
 import com.inky.fitnesscalendar.view_model.statistics.Grouping
 import com.inky.fitnesscalendar.view_model.statistics.Period
@@ -37,6 +39,8 @@ class StatisticsViewModel @Inject constructor(
     val appRepository: AppRepository
 ) : ViewModel() {
     var grouping by mutableStateOf(Grouping(null))
+    val groupingOptions =
+        derivedStateOf { activityTypes?.let { grouping.options(it) } ?: emptyList() }
     var period by mutableStateOf(Period.Week)
     var projection by mutableStateOf(Projection.ByTotalActivities)
 
@@ -44,14 +48,22 @@ class StatisticsViewModel @Inject constructor(
         MutableStateFlow<List<Pair<ActivityStatistics, String>>?>(null)
     val activityStatistics get() = _activityStatistics.filterNotNull()
 
+    private var activityTypes: List<ActivityType>? by mutableStateOf(null)
+
     val modelProducer = CartesianChartModelProducer.build()
 
     init {
+        viewModelScope.launch {
+            appRepository.getActivityTypes().collect {
+                activityTypes = it
+            }
+        }
+
         viewModelScope.launch(Dispatchers.IO) {
             snapshotFlow { period to grouping }.collect { refreshActivities() }
         }
         viewModelScope.launch {
-            snapshotFlow { projection }.collect { refreshModel() }
+            snapshotFlow { projection to activityTypes }.collect { refreshModel() }
         }
 
         activityStatistics.onEach {
@@ -76,13 +88,15 @@ class StatisticsViewModel @Inject constructor(
     }
 
     private suspend fun refreshModel() {
+        val types = activityTypes ?: return
+
         val dataPoints =
             _activityStatistics.value?.map { grouping.apply(it.first) to it.second } ?: return
         if (dataPoints.isEmpty()) return
 
         modelProducer.runTransaction {
             columnSeries {
-                for (group in grouping.options()) {
+                for (group in grouping.options(types)) {
                     series(dataPoints.map { (stats, _) ->
                         stats[group]?.let { projection.apply(it) } ?: 0
                     })

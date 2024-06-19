@@ -3,10 +3,10 @@ package com.inky.fitnesscalendar.view_model
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.inky.fitnesscalendar.AppRepository
-import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.data.ActivityStatistics
-import com.inky.fitnesscalendar.data.activity_filter.DateRangeOption
 import com.inky.fitnesscalendar.data.Recording
+import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
+import com.inky.fitnesscalendar.data.activity_filter.DateRangeOption
 import com.inky.fitnesscalendar.util.Duration.Companion.until
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
@@ -22,9 +22,9 @@ class HomeViewModel @Inject constructor(val repository: AppRepository) : ViewMod
     val weekStats = loadWeekStats()
     val monthStats = loadMonthStats()
     val activitiesToday = repository.getActivities(ActivityFilter(range = DateRangeOption.Today))
-    val mostRecentActivity = repository.getMostRecentActivity().map { activity ->
-        if (activity?.let { it.endTime.until(Date.from(Instant.now())).elapsedHours < 2.0 } == true) {
-            activity
+    val mostRecentActivity = repository.getMostRecentActivity().map { typeActivity ->
+        if (typeActivity?.activity?.let { it.endTime.until(Date.from(Instant.now())).elapsedHours < 2.0 } == true) {
+            typeActivity
         } else {
             null
         }

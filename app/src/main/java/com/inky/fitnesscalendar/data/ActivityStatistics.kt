@@ -10,12 +10,13 @@ import java.util.Date
 import java.util.Locale
 
 data class ActivityStatistics(
-    val activities: List<Activity>,
+    val activities: List<TypeActivity>,
 ) {
     val size
         get() = activities.size
 
-    fun totalTime() = Duration(activities.sumOf { it.startTime.until(it.endTime).elapsedMs })
+    fun totalTime() =
+        Duration(activities.sumOf { it.activity.startTime.until(it.activity.endTime).elapsedMs })
 
     fun averageTime() = Duration(totalTime().elapsedMs / size)
 
@@ -66,15 +67,16 @@ data class ActivityStatistics(
 
     private fun groupByCalendarConstant(calendarConstant: Int): Map<Int, ActivityStatistics> {
         val calendar = Calendar.getInstance()
-        return groupBy { calendar.apply { time = it.startTime }.get(calendarConstant) }
+        return groupBy { calendar.apply { time = it.activity.startTime }.get(calendarConstant) }
     }
 
-    private fun <T> groupBy(func: (Activity) -> T): Map<T, ActivityStatistics> =
+    private fun <T> groupBy(func: (TypeActivity) -> T): Map<T, ActivityStatistics> =
         activities.groupBy(func).mapValues { ActivityStatistics(it.value) }
 
-    fun filter(func: (Activity) -> Boolean) = ActivityStatistics(activities.filter(func))
+    fun filter(func: (TypeActivity) -> Boolean) = ActivityStatistics(activities.filter(func))
 
-    private fun keepNewer(date: Date): ActivityStatistics = filter { it.startTime.after(date) }
+    private fun keepNewer(date: Date): ActivityStatistics =
+        filter { it.activity.startTime.after(date) }
 
     private fun keepNewerThanOneYear() =
         keepNewer(LocalDate.now().minusYears(1).plusDays(1).atStartOfDay().toDate())

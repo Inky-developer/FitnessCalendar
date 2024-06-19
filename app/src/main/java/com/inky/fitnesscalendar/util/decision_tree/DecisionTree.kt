@@ -1,7 +1,7 @@
 package com.inky.fitnesscalendar.util.decision_tree
 
-import com.inky.fitnesscalendar.data.Activity
 import com.inky.fitnesscalendar.data.ActivityType
+import com.inky.fitnesscalendar.data.TypeActivity
 import com.inky.fitnesscalendar.util.removedAt
 import java.time.Instant
 import java.util.Calendar
@@ -48,9 +48,9 @@ sealed class DecisionTree<Classification> {
             return listOf(timeOfDay, weekDay)
         }
 
-        fun learnFromActivities(activities: List<Activity>): DecisionTree<ActivityType> {
+        fun learnFromActivities(activities: List<TypeActivity>): DecisionTree<ActivityType> {
             val examples = Examples(activities.map {
-                val attributes = attributes(it.startTime)
+                val attributes = attributes(it.activity.startTime)
                 Example(it.type, attributes)
             })
 

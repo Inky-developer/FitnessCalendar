@@ -9,12 +9,13 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.inky.fitnesscalendar.data.ActivityType
 import com.inky.fitnesscalendar.util.decision_tree.DecisionTree
 import com.inky.fitnesscalendar.util.removedAt
 
 @Composable
 fun DecisionTreeVisualization(
-    tree: DecisionTree<*>,
+    tree: DecisionTree<ActivityType>,
     attributes: List<Pair<String, Map<Any, String>>>
 ) {
     val scrollState = rememberScrollState()
@@ -27,12 +28,15 @@ fun DecisionTreeVisualization(
 }
 
 @Composable
-private fun Leaf(leaf: DecisionTree.Leaf<*>) {
-    Text(leaf.value.toString())
+private fun Leaf(leaf: DecisionTree.Leaf<ActivityType>) {
+    Text(leaf.value?.name ?: "null")
 }
 
 @Composable
-private fun Node(node: DecisionTree.Node<*>, attributes: List<Pair<String, Map<Any, String>>>) {
+private fun Node(
+    node: DecisionTree.Node<ActivityType>,
+    attributes: List<Pair<String, Map<Any, String>>>
+) {
     val (attributeName, attributeValueNames) = attributes[node.attributeIndex]
     Column {
         for ((attr, child) in node.children.toList().sortedBy { it.first.toString() }) {
@@ -47,6 +51,6 @@ private fun Node(node: DecisionTree.Node<*>, attributes: List<Pair<String, Map<A
                 }
             }
         }
-        Text("else ${node.default}")
+        Text("else ${node.default?.name ?: "null"}")
     }
 }
