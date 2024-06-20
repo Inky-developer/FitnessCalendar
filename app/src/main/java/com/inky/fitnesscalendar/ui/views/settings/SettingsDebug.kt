@@ -1,4 +1,4 @@
-package com.inky.fitnesscalendar.ui.views
+package com.inky.fitnesscalendar.ui.views.settings
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.Text
@@ -16,8 +16,9 @@ import java.time.format.TextStyle
 import java.util.Locale
 
 @Composable
-fun Settings() {
+fun SettingsDebug() {
     var classification by remember { mutableStateOf<ActivityType?>(null) }
+
 
     Column {
         TextButton(onClick = {

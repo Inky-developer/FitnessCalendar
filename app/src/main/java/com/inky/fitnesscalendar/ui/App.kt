@@ -28,9 +28,9 @@ import com.inky.fitnesscalendar.ui.views.Home
 import com.inky.fitnesscalendar.ui.views.ImportExport
 import com.inky.fitnesscalendar.ui.views.NewActivity
 import com.inky.fitnesscalendar.ui.views.RecordActivity
-import com.inky.fitnesscalendar.ui.views.Settings
 import com.inky.fitnesscalendar.ui.views.StatisticsView
-import com.inky.fitnesscalendar.ui.views.View
+import com.inky.fitnesscalendar.ui.views.Views
+import com.inky.fitnesscalendar.ui.views.settingsDestination
 import com.inky.fitnesscalendar.view_model.GenericViewModel
 import kotlinx.coroutines.launch
 
@@ -53,7 +53,7 @@ fun App(viewModel: GenericViewModel = hiltViewModel()) {
         }
         Unit
     }
-    var currentView by rememberSaveable { mutableStateOf<View?>(null) }
+    var currentView by rememberSaveable { mutableStateOf<Views?>(null) }
     var isNewActivityOpen by rememberSaveable { mutableStateOf(false) }
 
     NavigationDrawer(
@@ -73,53 +73,52 @@ fun App(viewModel: GenericViewModel = hiltViewModel()) {
         SharedTransitionLayout {
             NavHost(
                 navController = navController,
-                startDestination = View.Home.getPath(),
+                startDestination = Views.Home.getPath(),
             ) {
-
                 composable(
-                    View.Home.pathTemplate(),
+                    Views.Home.pathTemplate(),
                     enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.End) },
                     exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Start) }
                 ) {
-                    currentView = View.Home
+                    currentView = Views.Home
                     ProvideSharedContent(sharedContentScope = this@SharedTransitionLayout) {
                         Home(
                             isNewActivityOpen = isNewActivityOpen,
-                            onNewActivity = { navController.navigate(View.NewActivity.getPath(-1)) },
+                            onNewActivity = { navController.navigate(Views.NewActivity.getPath(-1)) },
                             onEditActivity = {
-                                navController.navigate(View.NewActivity.getPath(it.uid ?: -1))
+                                navController.navigate(Views.NewActivity.getPath(it.uid ?: -1))
                             },
-                            onRecordActivity = { navController.navigate(View.RecordActivity.getPath()) },
+                            onRecordActivity = { navController.navigate(Views.RecordActivity.getPath()) },
                             onNavigateActivity = {
-                                navController.navigate(View.ActivityLog.getPath())
+                                navController.navigate(Views.ActivityLog.getPath())
                             },
                             onNavigateStats = {
-                                navController.navigate(View.Statistics.getPath(it.toString()))
+                                navController.navigate(Views.Statistics.getPath(it.toString()))
                             },
                             onOpenDrawer = openDrawer
                         )
                     }
                 }
                 composable(
-                    View.ActivityLog.pathTemplate(),
-                    arguments = View.ActivityLog.navArgs()
+                    Views.ActivityLog.pathTemplate(),
+                    arguments = Views.ActivityLog.navArgs()
                 ) { backStackEntry ->
-                    currentView = View.ActivityLog
+                    currentView = Views.ActivityLog
                     val activityId =
-                        backStackEntry.arguments?.let { View.Argument.ACTIVITY_ID.extract(it) }
+                        backStackEntry.arguments?.let { Views.Argument.ACTIVITY_ID.extract(it) }
                     ProvideSharedContent(sharedContentScope = this@SharedTransitionLayout) {
                         ActivityLog(
                             initialSelectedActivityId = activityId,
                             filter = filterState,
                             onOpenDrawer = openDrawer,
                             onNewActivity = {
-                                navController.navigate(View.NewActivity.getPath(-1))
+                                navController.navigate(Views.NewActivity.getPath(-1))
                             },
                             onEditActivity = {
-                                navController.navigate(View.NewActivity.getPath(it.uid ?: -1))
+                                navController.navigate(Views.NewActivity.getPath(it.uid ?: -1))
                             },
                             onFilter = {
-                                navController.navigate(View.FilterActivity.getPath())
+                                navController.navigate(Views.FilterActivity.getPath())
                             },
                             onEditFilter = {
                                 filterState = it
@@ -128,12 +127,12 @@ fun App(viewModel: GenericViewModel = hiltViewModel()) {
                         )
                     }
                 }
-                composable(View.FilterActivity.pathTemplate(), enterTransition = {
+                composable(Views.FilterActivity.pathTemplate(), enterTransition = {
                     slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Up)
                 }, exitTransition = {
                     slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Down)
                 }) {
-                    currentView = View.FilterActivity
+                    currentView = Views.FilterActivity
                     ProvideSharedContent(sharedContentScope = this@SharedTransitionLayout) {
                         FilterView(
                             filter = filterState,
@@ -143,12 +142,12 @@ fun App(viewModel: GenericViewModel = hiltViewModel()) {
                     }
                 }
                 dialog(
-                    View.NewActivity.pathTemplate(), arguments = View.NewActivity.navArgs()
+                    Views.NewActivity.pathTemplate(), arguments = Views.NewActivity.navArgs()
                 ) { backStackEntry ->
-                    currentView = View.NewActivity
+                    currentView = Views.NewActivity
                     isNewActivityOpen = true
                     val activityId =
-                        backStackEntry.arguments?.let { View.Argument.ACTIVITY_ID.extract(it) }
+                        backStackEntry.arguments?.let { Views.Argument.ACTIVITY_ID.extract(it) }
                     NewActivity(
                         activityId,
                         onSave = {
@@ -165,9 +164,9 @@ fun App(viewModel: GenericViewModel = hiltViewModel()) {
                     )
                 }
                 dialog(
-                    View.RecordActivity.pathTemplate(), arguments = View.RecordActivity.navArgs()
+                    Views.RecordActivity.pathTemplate(), arguments = Views.RecordActivity.navArgs()
                 ) {
-                    currentView = View.RecordActivity
+                    currentView = Views.RecordActivity
                     RecordActivity(
                         onStart = {
                             scope.launch {
@@ -178,8 +177,8 @@ fun App(viewModel: GenericViewModel = hiltViewModel()) {
                         onNavigateBack = { navController.popBackStack() }
                     )
                 }
-                composable(View.ImportExport.pathTemplate()) {
-                    currentView = View.ImportExport
+                composable(Views.ImportExport.pathTemplate()) {
+                    currentView = Views.ImportExport
                     ProvideSharedContent(sharedContentScope = this@SharedTransitionLayout) {
                         ImportExport(
                             onOpenDrawer = openDrawer
@@ -187,30 +186,29 @@ fun App(viewModel: GenericViewModel = hiltViewModel()) {
                     }
                 }
                 composable(
-                    View.Statistics.pathTemplate(),
-                    arguments = View.Statistics.navArgs()
+                    Views.Statistics.pathTemplate(),
+                    arguments = Views.Statistics.navArgs()
                 ) { backStackEntry ->
-                    currentView = View.Statistics
+                    currentView = Views.Statistics
 
                     val initialPeriod =
-                        backStackEntry.arguments?.let { View.Argument.initialPeriod.extract(it) }
+                        backStackEntry.arguments?.let { Views.Argument.initialPeriod.extract(it) }
 
                     ProvideSharedContent(sharedContentScope = this@SharedTransitionLayout) {
                         StatisticsView(
                             initialPeriod = initialPeriod,
                             onOpenDrawer = openDrawer,
                             onViewActivity = {
-                                navController.navigate(View.ActivityLog.getPath(it.uid ?: -1))
+                                navController.navigate(Views.ActivityLog.getPath(it.uid ?: -1))
                             }
                         )
                     }
                 }
-                composable(View.Settings.pathTemplate()) {
-                    currentView = View.Settings
-                    ProvideSharedContent(sharedContentScope = this@SharedTransitionLayout) {
-                        Settings()
-                    }
-                }
+                settingsDestination(
+                    sharedContentScope = this@SharedTransitionLayout,
+                    onNavigate = { navController.navigate(it) },
+                    onOpenDrawer = openDrawer,
+                )
             }
         }
     }

@@ -126,4 +126,6 @@
     <string name="options">Optionen</string>
     <string name="confirm">Bestätigen</string>
     <string name="ask_delete_activity">Aktivität löschen?</string>
+    <string name="configure_activity_types">Aktivitätsarten</string>
+    <string name="debug">Debug</string>
 </resources>

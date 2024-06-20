@@ -7,7 +7,7 @@ import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.view_model.statistics.Period
 
 
-enum class View(
+enum class Views(
     val nameId: Int,
     private val navId: String,
     private val arguments: List<Argument<*, *>> = emptyList()

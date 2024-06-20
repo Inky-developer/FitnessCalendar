@@ -115,6 +115,8 @@
     <string name="options">Options</string>
     <string name="confirm">Confirm</string>
     <string name="ask_delete_activity">Delete activity?</string>
+    <string name="configure_activity_types">Activity types</string>
+    <string name="debug">Debug</string>
     <plurals name="num_activities">
         <item quantity="one">%1d activity</item>
         <item quantity="other">%1d activities</item>

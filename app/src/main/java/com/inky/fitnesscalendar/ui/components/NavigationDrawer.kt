@@ -27,22 +27,22 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.inky.fitnesscalendar.R
-import com.inky.fitnesscalendar.ui.views.View
+import com.inky.fitnesscalendar.ui.views.Views
 
 
 val selectableViews = listOf(
-    View.Home,
-    View.ActivityLog,
-    View.Statistics,
-    View.ImportExport,
-    View.Settings
+    Views.Home,
+    Views.ActivityLog,
+    Views.Statistics,
+    Views.ImportExport,
+    Views.Settings
 )
 
 @Composable
 fun NavigationDrawer(
     drawerState: DrawerState,
-    currentView: View?,
-    onNavigate: (View) -> Unit,
+    currentView: Views?,
+    onNavigate: (Views) -> Unit,
     content: @Composable () -> Unit
 ) {
 
