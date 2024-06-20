@@ -22,7 +22,7 @@ data class Activity(
     @ColumnInfo(name = "type_id") val typeId: Int,
     @ColumnInfo(name = "vehicle") val vehicle: Vehicle? = null,
     @ColumnInfo(name = "description") val description: String = "",
-    @ColumnInfo(name = "start_time") val startTime: Date,
+    @ColumnInfo(name = "start_time", index = true) val startTime: Date,
     @ColumnInfo(name = "end_time") val endTime: Date = startTime,
     @ColumnInfo(name = "feel") val feel: Feel? = null,
     @ColumnInfo(name = "image_uri") val imageUri: Uri? = null
