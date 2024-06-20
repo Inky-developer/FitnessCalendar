@@ -33,7 +33,7 @@ val MIGRATION_5_6 = object : Migration(5, 6) {
                 arrayOf(
                     index + 1,
                     type.activityCategory,
-                    type.name,
+                    type.title,
                     type.emoji,
                     type.colorId,
                     type.hasVehicle,
