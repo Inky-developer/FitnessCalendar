@@ -52,11 +52,11 @@ val MIGRATION_5_6 = object : Migration(5, 6) {
         }
 
         db.execSQL("DROP TABLE Activity")
-        db.execSQL("CREATE TABLE Activity (uid INTEGER PRIMARY KEY, type_id INTEGER NOT NULL, vehicle TEXT, description TEXT NOT NULL, start_time INTEGER NOT NULL, end_time int NOT NULL, feel TEXT, image_uri TEXT)")
+        db.execSQL("CREATE TABLE Activity (uid INTEGER PRIMARY KEY, type_id INTEGER NOT NULL, vehicle TEXT, description TEXT NOT NULL, start_time INTEGER NOT NULL, end_time int NOT NULL, feel TEXT, image_uri TEXT, FOREIGN KEY (type_id) REFERENCES ActivityType (uid) ON DELETE RESTRICT)")
         db.execSQL("INSERT INTO Activity SELECT uid, type_id, vehicle, description, start_time, end_time, feel, image_uri FROM TempActivity")
         db.execSQL("DROP TABLE TempActivity")
         db.execSQL("DROP TABLE RECORDING")
-        db.execSQL("CREATE TABLE Recording (uid INTEGER PRIMARY KEY, type_id INTEGER NOT NULL, vehicle TEXT, start_time INTEGER NOT NULL)")
+        db.execSQL("CREATE TABLE Recording (uid INTEGER PRIMARY KEY, type_id INTEGER NOT NULL, vehicle TEXT, start_time INTEGER NOT NULL, FOREIGN KEY (type_id) REFERENCES ActivityType (uid) ON DELETE RESTRICT)")
         db.execSQL("INSERT INTO Recording SELECT uid, type_id, vehicle, start_time FROM TempRecording")
         db.execSQL("DROP TABLE TempRecording")
     }

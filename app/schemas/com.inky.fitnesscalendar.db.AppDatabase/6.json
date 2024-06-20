@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 6,
-    "identityHash": "96e3440e5c7634e415aea7f09c7929e6",
+    "identityHash": "41943c99fc5f9ca93a0d3b9fbd49ab4c",
     "entities": [
       {
         "tableName": "Activity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uid` INTEGER, `type_id` INTEGER NOT NULL, `vehicle` TEXT, `description` TEXT NOT NULL, `start_time` INTEGER NOT NULL, `end_time` INTEGER NOT NULL, `feel` TEXT, `image_uri` TEXT, PRIMARY KEY(`uid`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uid` INTEGER, `type_id` INTEGER NOT NULL, `vehicle` TEXT, `description` TEXT NOT NULL, `start_time` INTEGER NOT NULL, `end_time` INTEGER NOT NULL, `feel` TEXT, `image_uri` TEXT, PRIMARY KEY(`uid`), FOREIGN KEY(`type_id`) REFERENCES `ActivityType`(`uid`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
         "fields": [
           {
             "fieldPath": "uid",
@@ -58,11 +58,24 @@
           "columnNames": [
             "uid"
           ]
-        }
+        },
+        "foreignKeys": [
+          {
+            "table": "ActivityType",
+            "onDelete": "RESTRICT",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "type_id"
+            ],
+            "referencedColumns": [
+              "uid"
+            ]
+          }
+        ]
       },
       {
         "tableName": "Recording",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uid` INTEGER, `type_id` INTEGER NOT NULL, `vehicle` TEXT, `start_time` INTEGER NOT NULL, PRIMARY KEY(`uid`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`uid` INTEGER, `type_id` INTEGER NOT NULL, `vehicle` TEXT, `start_time` INTEGER NOT NULL, PRIMARY KEY(`uid`), FOREIGN KEY(`type_id`) REFERENCES `ActivityType`(`uid`) ON UPDATE NO ACTION ON DELETE RESTRICT )",
         "fields": [
           {
             "fieldPath": "uid",
@@ -92,7 +105,20 @@
           "columnNames": [
             "uid"
           ]
-        }
+        },
+        "foreignKeys": [
+          {
+            "table": "ActivityType",
+            "onDelete": "RESTRICT",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "type_id"
+            ],
+            "referencedColumns": [
+              "uid"
+            ]
+          }
+        ]
       },
       {
         "tableName": "ActivityType",
@@ -150,7 +176,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '96e3440e5c7634e415aea7f09c7929e6')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '41943c99fc5f9ca93a0d3b9fbd49ab4c')"
     ]
   }
 }
