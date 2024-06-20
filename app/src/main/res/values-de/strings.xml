@@ -114,6 +114,7 @@
     <string name="filter_by_categories">Nach Kategorien filtern…</string>
     <string name="filter_by_date">Nach Datum filtern…</string>
     <string name="filter_by_attributes">Nach Attributen filtern…</string>
+    <string name="w">Fahrzeug</string>
     <string name="vehicle">Fahrzeug</string>
     <string name="description">Beschreibung</string>
     <string name="feel">Stimmung</string>
@@ -128,4 +129,11 @@
     <string name="ask_delete_activity">Aktivität löschen?</string>
     <string name="configure_activity_types">Aktivitätsarten</string>
     <string name="debug">Debug</string>
+    <string name="actity_types">Aktivitätsarten</string>
+    <string name="edit_type">%1s bearbeiten</string>
+    <string name="type_name">Name</string>
+    <string name="name_of_type">Name der Aktivitätsart</string>
+    <string name="has_vehicle">Hat Fahrzeug?</string>
+    <string name="has_duration">Hat Dauer?</string>
+    <string name="select_color">Farbe auswählen…</string>
 </resources>

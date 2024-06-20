@@ -11,17 +11,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.data.ActivityType
-import com.inky.fitnesscalendar.di.ActivityTypeOrder
 
 @Composable
 fun ActivityTypeSelector(
     modifier: Modifier = Modifier,
-    activityRows: List<List<ActivityType>> = ActivityTypeOrder.getRows(),
+    typeRows: List<List<ActivityType>>,
     isSelected: (ActivityType) -> Boolean,
     onSelect: (ActivityType) -> Unit,
 ) {
     Column(modifier = modifier) {
-        for (activities in activityRows) {
+        for (activities in typeRows) {
             LazyRow {
                 items(activities) { activityType ->
                     FilterChip(

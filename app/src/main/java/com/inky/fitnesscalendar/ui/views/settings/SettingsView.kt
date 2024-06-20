@@ -25,7 +25,11 @@ import com.inky.fitnesscalendar.ui.util.sharedBounds
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsView(onOpenDrawer: () -> Unit, onNavigateDebug: () -> Unit) {
+fun SettingsView(
+    onOpenDrawer: () -> Unit,
+    onNavigateDebug: () -> Unit,
+    onNavigateTypes: () -> Unit,
+) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     Scaffold(
@@ -55,7 +59,7 @@ fun SettingsView(onOpenDrawer: () -> Unit, onNavigateDebug: () -> Unit) {
             item {
                 Setting(
                     title = stringResource(R.string.configure_activity_types),
-                    onClick = { /*TODO*/ }
+                    onClick = onNavigateTypes
                 )
                 Setting(
                     title = stringResource(R.string.debug),

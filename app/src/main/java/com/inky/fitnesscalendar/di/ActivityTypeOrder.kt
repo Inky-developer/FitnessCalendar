@@ -1,20 +1,23 @@
 package com.inky.fitnesscalendar.di
 
+import com.inky.fitnesscalendar.data.ActivityCategory
 import com.inky.fitnesscalendar.data.ActivityType
 import com.inky.fitnesscalendar.data.TypeActivity
 
-class ActivityTypeOrder(val typesByRow: List<List<ActivityType>>) {
-    companion object {
-        fun init(activities: List<TypeActivity>, types: List<ActivityType>) = synchronized(this) {
-            val frequencies = activities.groupBy { it.type }.mapValues { it.value.size }
-            val typesByCategory = types.groupBy { it.activityCategory }
-            val rows = typesByCategory.values.map { types ->
-                types.sortedByDescending { frequencies[it] ?: 0 }
-            }
-            instance = ActivityTypeOrder(rows)
+class ActivityTypeOrder(private val frequencies: Map<ActivityType, Int>) {
+    fun getRows(typesByCategory: Map<ActivityCategory, List<ActivityType>>) =
+        typesByCategory.values.map { types ->
+            types.sortedByDescending { frequencies[it] ?: 0 }
         }
 
-        fun getRows() = instance?.typesByRow ?: emptyList()
+    companion object {
+        fun init(activities: List<TypeActivity>) = synchronized(this) {
+            val frequencies = activities.groupBy { it.type }.mapValues { it.value.size }
+            instance = ActivityTypeOrder(frequencies)
+        }
+
+        fun getRowsOrDefault(typesByCategory: Map<ActivityCategory, List<ActivityType>>) =
+            instance?.getRows(typesByCategory) ?: emptyList()
 
         var instance: ActivityTypeOrder? = null
     }

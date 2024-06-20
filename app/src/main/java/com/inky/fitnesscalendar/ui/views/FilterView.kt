@@ -21,30 +21,40 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
-import com.inky.fitnesscalendar.data.ActivityCategory
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.data.activity_filter.AttributeFilter
 import com.inky.fitnesscalendar.data.activity_filter.DateRangeOption
+import com.inky.fitnesscalendar.ui.components.ActivityCategorySelector
 import com.inky.fitnesscalendar.ui.components.ActivityTypeSelector
 import com.inky.fitnesscalendar.ui.components.OptionGroup
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.sharedBounds
+import com.inky.fitnesscalendar.view_model.GenericViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilterView(
+    viewModel: GenericViewModel = hiltViewModel(),
     filter: ActivityFilter,
     onFilterChange: (ActivityFilter) -> Unit,
     onBack: () -> Unit
 ) {
+    val typeRows by viewModel
+        .repository
+        .getActivityTypeRows()
+        .collectAsState(initial = emptyList())
+
     val appBar = @Composable {
         TopAppBar(colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -106,7 +116,8 @@ fun FilterView(
                 selectionLabel = selectionLabel,
                 modifier = Modifier.padding(all = 8.dp)
             ) {
-                ActivityTypeSelector(isSelected = { filter.types.contains(it) },
+                ActivityTypeSelector(
+                    isSelected = { filter.types.contains(it) },
                     onSelect = { activityType ->
                         val oldSelection = filter.types
                         val newSelection =
@@ -115,7 +126,9 @@ fun FilterView(
                             newSelection.add(activityType)
                         }
                         onFilterChange(filter.copy(types = newSelection))
-                    })
+                    },
+                    typeRows = typeRows,
+                )
             }
 
             OptionGroup(
@@ -123,29 +136,18 @@ fun FilterView(
                 selectionLabel = categorySelectionLabel,
                 modifier = Modifier.padding(all = 8.dp)
             ) {
-                LazyRow {
-                    items(ActivityCategory.entries) { category ->
-                        FilterChip(
-                            selected = filter.categories.contains(category),
-                            onClick = {
-                                val oldSelection = filter.categories
-                                val newSelection =
-                                    oldSelection.filter { it != category }.toMutableList()
-                                if (newSelection.size == oldSelection.size) {
-                                    newSelection.add(category)
-                                }
-                                onFilterChange(filter.copy(categories = newSelection))
-                            },
-                            label = {
-                                Text(
-                                    category.emoji,
-                                    style = MaterialTheme.typography.headlineMedium
-                                )
-                            },
-                            modifier = Modifier.padding(all = 4.dp)
-                        )
+                ActivityCategorySelector(
+                    isSelected = { filter.categories.contains(it) },
+                    onSelect = { category ->
+                        val oldSelection = filter.categories
+                        val newSelection =
+                            oldSelection.filter { it != category }.toMutableList()
+                        if (newSelection.size == oldSelection.size) {
+                            newSelection.add(category)
+                        }
+                        onFilterChange(filter.copy(categories = newSelection))
                     }
-                }
+                )
             }
 
             OptionGroup(

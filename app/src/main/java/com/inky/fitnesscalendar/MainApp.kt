@@ -22,9 +22,8 @@ class MainApp : Application() {
             Log.i("MainApp", "Initializing app data")
 
             val activities = appRepository.loadMostRecentActivities(200)
-            val types = appRepository.loadActivityTypes()
 
-            ActivityTypeOrder.init(activities, types)
+            ActivityTypeOrder.init(activities)
             ActivityTypeDecisionTree.decisionTree = DecisionTree.learnFromActivities(activities)
             Log.i("MainApp", "App data successfully initialized")
         }

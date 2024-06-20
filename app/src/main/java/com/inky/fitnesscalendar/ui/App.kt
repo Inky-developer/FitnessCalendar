@@ -9,6 +9,7 @@ import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -55,6 +56,8 @@ fun App(viewModel: GenericViewModel = hiltViewModel()) {
     }
     var currentView by rememberSaveable { mutableStateOf<Views?>(null) }
     var isNewActivityOpen by rememberSaveable { mutableStateOf(false) }
+
+    val typeRows by viewModel.repository.getActivityTypeRows().collectAsState(initial = emptyList())
 
     NavigationDrawer(
         drawerState = navigationDrawerState,
@@ -174,7 +177,8 @@ fun App(viewModel: GenericViewModel = hiltViewModel()) {
                             }
                             navController.popBackStack()
                         },
-                        onNavigateBack = { navController.popBackStack() }
+                        onNavigateBack = { navController.popBackStack() },
+                        typeRows = typeRows
                     )
                 }
                 composable(Views.ImportExport.pathTemplate()) {
@@ -206,8 +210,10 @@ fun App(viewModel: GenericViewModel = hiltViewModel()) {
                 }
                 settingsDestination(
                     sharedContentScope = this@SharedTransitionLayout,
-                    onNavigate = { navController.navigate(it) },
                     onOpenDrawer = openDrawer,
+                    onNavigate = { navController.navigate(it) },
+                    onBack = { navController.popBackStack() },
+                    onOpen = { currentView = Views.Settings }
                 )
             }
         }

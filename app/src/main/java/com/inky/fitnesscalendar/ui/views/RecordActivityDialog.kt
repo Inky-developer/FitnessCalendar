@@ -23,10 +23,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.inky.fitnesscalendar.R
+import com.inky.fitnesscalendar.data.ActivityType
 import com.inky.fitnesscalendar.data.Recording
 import com.inky.fitnesscalendar.data.Vehicle
 import com.inky.fitnesscalendar.di.ActivityTypeDecisionTree
-import com.inky.fitnesscalendar.di.ActivityTypeOrder
 import com.inky.fitnesscalendar.ui.components.ActivitySelector
 import com.inky.fitnesscalendar.ui.components.ActivitySelectorState
 import java.time.Instant
@@ -34,11 +34,15 @@ import java.util.Date
 
 @Composable
 fun RecordActivity(
+    typeRows: List<List<ActivityType>>,
     onStart: (Recording) -> Unit,
     onNavigateBack: () -> Unit
 ) {
     var activityType by remember { mutableStateOf(ActivityTypeDecisionTree.decisionTree?.classifyNow()) }
     var vehicle by remember { mutableStateOf<Vehicle?>(null) }
+
+    val relevantTypeRows =
+        remember(typeRows) { typeRows.map { row -> row.filter { it.hasDuration } } }
 
     val context = LocalContext.current
     val title = remember(activityType) {
@@ -74,8 +78,7 @@ fun RecordActivity(
 
             ActivitySelector(
                 ActivitySelectorState(activityType, vehicle),
-                activityRows = ActivityTypeOrder.getRows()
-                    .map { it.filter { type -> type.hasDuration } },
+                typeRows = relevantTypeRows,
                 onActivityType = { activityType = it },
                 onVehicle = { vehicle = it },
                 modifier = Modifier.padding(all = 8.dp)

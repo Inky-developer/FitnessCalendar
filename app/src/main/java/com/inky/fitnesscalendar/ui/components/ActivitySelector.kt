@@ -16,7 +16,6 @@ import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityType
 import com.inky.fitnesscalendar.data.Vehicle
-import com.inky.fitnesscalendar.di.ActivityTypeOrder
 
 data class ActivitySelectorState(val activityType: ActivityType?, val vehicle: Vehicle?)
 
@@ -24,7 +23,7 @@ data class ActivitySelectorState(val activityType: ActivityType?, val vehicle: V
 fun ActivitySelector(
     state: ActivitySelectorState,
     modifier: Modifier = Modifier,
-    activityRows: List<List<ActivityType>> = ActivityTypeOrder.getRows(),
+    typeRows: List<List<ActivityType>>,
     onActivityType: (ActivityType) -> Unit,
     onVehicle: (Vehicle) -> Unit,
 ) {
@@ -36,7 +35,7 @@ fun ActivitySelector(
             selectionLabel = state.activityType?.name,
         ) {
             ActivityTypeSelector(
-                activityRows = activityRows,
+                typeRows = typeRows,
                 isSelected = { it == state.activityType },
                 onSelect = onActivityType
             )

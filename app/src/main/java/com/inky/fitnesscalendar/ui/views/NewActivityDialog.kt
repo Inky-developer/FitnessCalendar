@@ -4,11 +4,9 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -16,12 +14,9 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -46,19 +41,19 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.Activity
+import com.inky.fitnesscalendar.data.ActivityType
 import com.inky.fitnesscalendar.data.TypeActivity
 import com.inky.fitnesscalendar.di.ActivityTypeDecisionTree
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivitySelector
 import com.inky.fitnesscalendar.ui.components.ActivitySelectorState
+import com.inky.fitnesscalendar.ui.components.BaseEditDialog
 import com.inky.fitnesscalendar.ui.components.DateTimePicker
 import com.inky.fitnesscalendar.ui.components.DateTimePickerState
 import com.inky.fitnesscalendar.ui.components.FeelSelector
@@ -83,21 +78,16 @@ fun NewActivity(
         (activityId?.let { viewModel.repository.getActivity(it) } ?: flowOf(null)).collectAsState(
             initial = null
         )
+    val typeRows by viewModel.typeRows.collectAsState(initial = emptyList())
 
 
-    if (activityId == null) {
-        NewActivity(
-            typeActivity = null,
-            localizationRepository = viewModel.localizationRepository,
-            onSave = onSave,
-            onNavigateBack = onNavigateBack
-        )
-    } else if (activity.value != null) {
+    if (activityId == null || activity.value != null) {
         NewActivity(
             typeActivity = activity.value,
             localizationRepository = viewModel.localizationRepository,
             onSave = onSave,
-            onNavigateBack = onNavigateBack
+            onNavigateBack = onNavigateBack,
+            typeRows = typeRows
         )
     } else {
         CircularProgressIndicator()
@@ -108,6 +98,7 @@ fun NewActivity(
 fun NewActivity(
     typeActivity: TypeActivity?,
     localizationRepository: LocalizationRepository,
+    typeRows: List<List<ActivityType>>,
     onSave: (TypeActivity) -> Unit,
     onNavigateBack: () -> Unit
 ) {
@@ -172,156 +163,125 @@ fun NewActivity(
         }
     }
 
-    Dialog(onDismissRequest = onNavigateBack) {
-        Card(
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainer
-            ),
-        ) {
-            Column(modifier = Modifier.background(MaterialTheme.colorScheme.primaryContainer)) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .padding(horizontal = 8.dp)
-                ) {
-                    Text(
-                        title,
-                        style = MaterialTheme.typography.displaySmall,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
-                        overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f)
-                    )
+    BaseEditDialog(
+        saveEnabled = formValid,
+        onNavigateBack = onNavigateBack,
+        onSave = {
+            val oldActivity = when (typeActivity) {
+                null -> Activity(
+                    typeId = 0,
+                    startTime = startDateTimePickerState.selectedDate()
+                )
 
-                    Column {
-                        IconButton(onClick = { contextMenuOpen = true }) {
-                            Icon(Icons.Outlined.Menu, stringResource(R.string.open_context_menu))
-                        }
-                        DropdownMenu(
-                            expanded = contextMenuOpen,
-                            onDismissRequest = { contextMenuOpen = false }) {
-                            DropdownMenuItem(
-                                text = { Text(stringResource(R.string.add_image)) },
-                                leadingIcon = {
-                                    Icon(
-                                        painterResource(R.drawable.outline_add_image_24),
-                                        stringResource(R.string.add_image)
-                                    )
-                                },
-                                onClick = {
-                                    contextMenuOpen = false
-                                    imagePickerLauncher.launch(
-                                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                                    )
-                                }
-                            )
-                        }
-                    }
-                }
-                HorizontalDivider()
+                else -> typeActivity.activity
             }
+            val newActivity = oldActivity.copy(
+                typeId = selectedActivityType?.uid!!,
+                vehicle = selectedVehicle,
+                description = description,
+                startTime = startDateTimePickerState.selectedDate(),
+                endTime = endDateTimePickerState.selectedDate(),
+                feel = feel,
+                imageUri = imageUri
+            )
 
-            Column(
-                modifier = Modifier
-                    .padding(all = 8.dp)
-                    .weight(1f, fill = false)
-                    .verticalScroll(scrollState)
-            ) {
-                if (imageUri != null) {
-                    Column {
-                        AsyncImage(
-                            model = imageUri!!,
-                            contentDescription = stringResource(R.string.user_uploaded_image),
-                            onState = { state ->
-                                if (state is AsyncImagePainter.State.Error) {
-                                    imageUri = typeActivity?.activity?.imageUri
-                                }
-                            },
-                            contentScale = ContentScale.FillHeight,
-                            modifier = Modifier
-                                .padding(bottom = 16.dp)
-                                .clip(MaterialTheme.shapes.large)
-                                .clickable {
-                                    showImageViewer = true
-                                }
-                        )
-                    }
-                }
-
-                ActivitySelector(
-                    ActivitySelectorState(selectedActivityType, selectedVehicle),
-                    onActivityType = { selectedActivityType = it },
-                    onVehicle = { selectedVehicle = it }
-                )
-
-                AnimatedVisibility(visible = selectedActivityType?.hasFeel() == true) {
-                    OptionGroup(
-                        label = stringResource(R.string.select_feel),
-                        selectionLabel = feel?.let { stringResource(it.nameId) }) {
-                        FeelSelector(
-                            feel = feel,
-                            onChange = { feel = it },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .align(Alignment.CenterHorizontally)
-                        )
-                    }
-                }
-                TextField(
-                    value = description,
-                    onValueChange = { description = it },
-                    placeholder = { Text(stringResource(R.string.placeholder_description)) },
-                    modifier = Modifier.fillMaxWidth(),
-                    maxLines = 3,
-                    colors = TextFieldDefaults.colors(unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
-                    shape = MaterialTheme.shapes.small
-                )
-
-                DateTimeInput(
-                    state = startDateTimePickerState,
-                    localizationRepository = localizationRepository,
-                    labelId = R.string.datetime_start
-                )
-
-                AnimatedVisibility(visible = selectedActivityType?.hasDuration == true) {
-                    DateTimeInput(
-                        state = endDateTimePickerState,
-                        localizationRepository = localizationRepository,
-                        labelId = R.string.datetime_end
-                    )
-                }
+            onSave(TypeActivity(activity = newActivity, type = selectedActivityType!!))
+        },
+        title = title,
+        actions = {
+            IconButton(onClick = { contextMenuOpen = true }) {
+                Icon(Icons.Outlined.Menu, stringResource(R.string.open_context_menu))
             }
-
-            Row(modifier = Modifier.align(Alignment.End)) {
-                TextButton(onClick = onNavigateBack) {
-                    Text(stringResource(R.string.cancel))
-                }
-                TextButton(
-                    onClick = {
-                        val oldActivity = when (typeActivity) {
-                            null -> Activity(
-                                typeId = 0,
-                                startTime = startDateTimePickerState.selectedDate()
-                            )
-
-                            else -> typeActivity.activity
-                        }
-                        val newActivity = oldActivity.copy(
-                            typeId = selectedActivityType?.uid!!,
-                            vehicle = selectedVehicle,
-                            description = description,
-                            startTime = startDateTimePickerState.selectedDate(),
-                            endTime = endDateTimePickerState.selectedDate(),
-                            feel = feel,
-                            imageUri = imageUri
+            DropdownMenu(
+                expanded = contextMenuOpen,
+                onDismissRequest = { contextMenuOpen = false }) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.add_image)) },
+                    leadingIcon = {
+                        Icon(
+                            painterResource(R.drawable.outline_add_image_24),
+                            stringResource(R.string.add_image)
                         )
-
-                        onSave(TypeActivity(activity = newActivity, type = selectedActivityType!!))
                     },
-                    enabled = formValid
-                ) {
-                    Text(stringResource(R.string.save))
+                    onClick = {
+                        contextMenuOpen = false
+                        imagePickerLauncher.launch(
+                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                        )
+                    }
+                )
+            }
+        }
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(all = 8.dp)
+                .weight(1f, fill = false)
+                .verticalScroll(scrollState)
+        ) {
+            if (imageUri != null) {
+                Column {
+                    AsyncImage(
+                        model = imageUri!!,
+                        contentDescription = stringResource(R.string.user_uploaded_image),
+                        onState = { state ->
+                            if (state is AsyncImagePainter.State.Error) {
+                                imageUri = typeActivity?.activity?.imageUri
+                            }
+                        },
+                        contentScale = ContentScale.FillHeight,
+                        modifier = Modifier
+                            .padding(bottom = 16.dp)
+                            .clip(MaterialTheme.shapes.large)
+                            .clickable {
+                                showImageViewer = true
+                            }
+                    )
                 }
+            }
+
+            ActivitySelector(
+                ActivitySelectorState(selectedActivityType, selectedVehicle),
+                onActivityType = { selectedActivityType = it },
+                onVehicle = { selectedVehicle = it },
+                typeRows = typeRows
+            )
+
+            AnimatedVisibility(visible = selectedActivityType?.hasFeel() == true) {
+                OptionGroup(
+                    label = stringResource(R.string.select_feel),
+                    selectionLabel = feel?.let { stringResource(it.nameId) }) {
+                    FeelSelector(
+                        feel = feel,
+                        onChange = { feel = it },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .align(Alignment.CenterHorizontally)
+                    )
+                }
+            }
+            TextField(
+                value = description,
+                onValueChange = { description = it },
+                placeholder = { Text(stringResource(R.string.placeholder_description)) },
+                modifier = Modifier.fillMaxWidth(),
+                maxLines = 3,
+                colors = TextFieldDefaults.colors(unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+                shape = MaterialTheme.shapes.small
+            )
+
+            DateTimeInput(
+                state = startDateTimePickerState,
+                localizationRepository = localizationRepository,
+                labelId = R.string.datetime_start
+            )
+
+            AnimatedVisibility(visible = selectedActivityType?.hasDuration == true) {
+                DateTimeInput(
+                    state = endDateTimePickerState,
+                    localizationRepository = localizationRepository,
+                    labelId = R.string.datetime_end
+                )
             }
         }
     }

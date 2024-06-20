@@ -8,4 +8,6 @@ import javax.inject.Inject
 @HiltViewModel
 class NewActivityViewModel @Inject constructor(val repository: AppRepository) : ViewModel() {
     val localizationRepository = repository.localizationRepository
+
+    val typeRows = repository.getActivityTypeRows()
 }

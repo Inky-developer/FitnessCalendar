@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.Stable
 import com.inky.fitnesscalendar.data.Activity
+import com.inky.fitnesscalendar.data.ActivityType
 import com.inky.fitnesscalendar.data.Recording
 import com.inky.fitnesscalendar.data.TypeActivity
 import com.inky.fitnesscalendar.data.Vehicle
@@ -11,10 +12,12 @@ import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.db.dao.ActivityDao
 import com.inky.fitnesscalendar.db.dao.ActivityTypeDao
 import com.inky.fitnesscalendar.db.dao.RecordingDao
+import com.inky.fitnesscalendar.di.ActivityTypeOrder
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.util.hideRecordingNotification
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -103,9 +106,16 @@ class AppRepository @Inject constructor(
         activityDao.stopRecording(recording, activity)
     }
 
+    suspend fun saveActivityType(activityType: ActivityType) = activityTypeDao.save(activityType)
+
     suspend fun loadActivityTypes() = activityTypeDao.loadTypes()
 
     fun getActivityTypes() = activityTypeDao.getTypes()
 
     fun getActivityTypes(filter: List<Int>) = activityTypeDao.getTypes(filter)
+
+    fun getActivityTypeRows() =
+        getActivityTypesByCategory().map { ActivityTypeOrder.getRowsOrDefault(it) }
+
+    private fun getActivityTypesByCategory() = activityTypeDao.getActivityTypesByCategory()
 }
