@@ -126,6 +126,8 @@
     <string name="select_color">Select color…</string>
     <string name="delete_activity_type">Delete activity type</string>
     <string name="cannot_delete_type_because_there_are_still_activities">Cannot delete type. Make sure to delete all activities of this type before.</string>
+    <string name="add_activity_type">Add activity type</string>
+    <string name="new_type">New Type</string>
     <plurals name="num_activities">
         <item quantity="one">%1d activity</item>
         <item quantity="other">%1d activities</item>

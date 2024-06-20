@@ -138,4 +138,6 @@
     <string name="select_color">Farbe auswählen…</string>
     <string name="delete_activity_type">Aktivitätsart löschen</string>
     <string name="cannot_delete_type_because_there_are_still_activities">Löschen fehlgeschlagen. Es müssen zuerst alle Aktivitäten dieser Art gelöscht werden.</string>
+    <string name="add_activity_type">Aktivitätsart hinzufügen</string>
+    <string name="new_type">Neue Aktivitätsart</string>
 </resources>

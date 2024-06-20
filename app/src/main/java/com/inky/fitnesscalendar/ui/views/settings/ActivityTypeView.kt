@@ -11,6 +11,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Menu
@@ -30,7 +31,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,6 +38,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -49,13 +50,15 @@ import com.inky.fitnesscalendar.ui.components.ActivityTypeSelector
 import com.inky.fitnesscalendar.ui.components.BaseEditDialog
 import com.inky.fitnesscalendar.ui.components.OptionGroup
 import com.inky.fitnesscalendar.util.ACTIVITY_TYPE_COLOR_IDS
+import com.inky.fitnesscalendar.view_model.settings.ActivityTypeEditState
 import com.inky.fitnesscalendar.view_model.settings.ActivityTypeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActivityTypeView(viewModel: ActivityTypeViewModel = hiltViewModel(), onBack: () -> Unit) {
     val typeRows by viewModel.typeRows.collectAsState(initial = emptyList())
-    var selectedType by remember { mutableStateOf<ActivityType?>(null) }
+    var initialEditState by remember { mutableStateOf(ActivityTypeEditState()) }
+
     var showEditDialog by remember { mutableStateOf(false) }
 
     Scaffold(
@@ -66,12 +69,22 @@ fun ActivityTypeView(viewModel: ActivityTypeViewModel = hiltViewModel(), onBack:
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.back))
                     }
+                },
+                actions = {
+                    IconButton(
+                        onClick = {
+                            initialEditState = ActivityTypeEditState()
+                            showEditDialog = true
+                        }
+                    ) {
+                        Icon(Icons.Outlined.Add, stringResource(R.string.add_activity_type))
+                    }
                 }
             )
         },
         snackbarHost = {
             SnackbarHost(hostState = viewModel.snackbarHostState)
-        }
+        },
     ) { paddingValues ->
         Row(
             modifier = Modifier
@@ -82,7 +95,7 @@ fun ActivityTypeView(viewModel: ActivityTypeViewModel = hiltViewModel(), onBack:
             ActivityTypeSelector(
                 isSelected = { false },
                 onSelect = {
-                    selectedType = it
+                    initialEditState = ActivityTypeEditState(it)
                     showEditDialog = true
                 },
                 typeRows = typeRows
@@ -91,53 +104,54 @@ fun ActivityTypeView(viewModel: ActivityTypeViewModel = hiltViewModel(), onBack:
     }
 
     if (showEditDialog) {
-        when (val type = selectedType) {
-            null -> {}
-            else -> EditTypeDialog(
-                initialType = type,
-                onDismiss = { showEditDialog = false },
-                onSave = {
-                    showEditDialog = false
-                    viewModel.save(it)
-                },
-                onDelete = {
-                    showEditDialog = false
-                    viewModel.delete(it)
-                }
-            )
-        }
+        EditTypeDialog(
+            initialState = initialEditState,
+            onDismiss = { showEditDialog = false },
+            onSave = {
+                showEditDialog = false
+                viewModel.save(it)
+            },
+            onDelete = {
+                showEditDialog = false
+                viewModel.delete(it)
+            }
+        )
     }
 }
 
 
 @Composable
 fun EditTypeDialog(
-    initialType: ActivityType,
+    initialState: ActivityTypeEditState,
     onDismiss: () -> Unit,
     onSave: (ActivityType) -> Unit,
     onDelete: (ActivityType) -> Unit,
 ) {
-    var type by remember(initialType) { mutableStateOf(initialType) }
+    val context = LocalContext.current
 
-    val formValid by remember {
-        derivedStateOf {
-            type.name.isNotBlank() && type.name.lines().size == 1 && type.emoji.isNotBlank() && type.emoji.lines().size == 1
+    var state by remember(initialState) { mutableStateOf(initialState) }
+    val type = remember(state) { state.toActivityType() }
+    val title = remember(state) {
+        if (state.isNewType) {
+            context.getString(R.string.new_type)
+        } else {
+            context.getString(R.string.edit_type, state.name)
         }
     }
 
     BaseEditDialog(
-        saveEnabled = formValid,
-        onSave = { onSave(type) },
+        saveEnabled = type != null,
+        onSave = { type?.let(onSave) },
         onNavigateBack = onDismiss,
-        title = stringResource(R.string.edit_type, type.name),
+        title = title,
         actions = {
-            EditTypeDialogMenu(onDeleteType = { onDelete(type) })
+            EditTypeDialogMenu(onDeleteType = { type?.let(onDelete) })
         }
     ) {
         Column(modifier = Modifier.padding(all = 8.dp)) {
             TextField(
-                value = type.name,
-                onValueChange = { type = type.copy(name = it) },
+                value = state.name,
+                onValueChange = { state = state.copy(name = it) },
                 leadingIcon = { Icon(Icons.Outlined.Edit, stringResource(R.string.type_name)) },
                 placeholder = { Text(stringResource(R.string.name_of_type)) },
                 singleLine = true,
@@ -148,8 +162,8 @@ fun EditTypeDialog(
 
             // TODO: Use proper emoji picker
             TextField(
-                value = type.emoji,
-                onValueChange = { type = type.copy(emoji = it) },
+                value = state.emoji,
+                onValueChange = { state = state.copy(emoji = it) },
                 singleLine = true,
                 modifier = Modifier
                     .fillMaxWidth()
@@ -158,12 +172,12 @@ fun EditTypeDialog(
 
             OptionGroup(
                 label = stringResource(R.string.select_category),
-                selectionLabel = stringResource(type.activityCategory.nameId),
+                selectionLabel = if (state.category != null) stringResource(state.category!!.nameId) else null,
                 modifier = Modifier.padding(vertical = 4.dp)
             ) {
                 ActivityCategorySelector(
-                    isSelected = { type.activityCategory == it },
-                    onSelect = { type = type.copy(activityCategory = it) }
+                    isSelected = { state.category == it },
+                    onSelect = { state = state.copy(category = it) }
                 )
             }
 
@@ -173,20 +187,20 @@ fun EditTypeDialog(
                 modifier = Modifier.padding(vertical = 4.dp)
             ) {
                 ColorSelector(
-                    isSelected = { type.colorId == it },
-                    onSelect = { type = type.copy(colorId = it) }
+                    isSelected = { state.colorId == it },
+                    onSelect = { state = state.copy(colorId = it) }
                 )
             }
 
             Toggle(
                 name = stringResource(R.string.has_duration),
-                value = type.hasDuration,
-                onValue = { type = type.copy(hasDuration = it) }
+                value = state.hasDuration,
+                onValue = { state = state.copy(hasDuration = it) }
             )
             Toggle(
                 name = stringResource(R.string.has_vehicle),
-                value = type.hasVehicle,
-                onValue = { type = type.copy(hasVehicle = it) }
+                value = state.hasVehicle,
+                onValue = { state = state.copy(hasVehicle = it) }
             )
 
         }
