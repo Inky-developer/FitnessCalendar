@@ -108,6 +108,8 @@ class AppRepository @Inject constructor(
 
     suspend fun saveActivityType(activityType: ActivityType) = activityTypeDao.save(activityType)
 
+    suspend fun deleteActivityType(activityType: ActivityType) = activityTypeDao.delete(activityType)
+
     suspend fun loadActivityTypes() = activityTypeDao.loadTypes()
 
     fun getActivityTypes() = activityTypeDao.getTypes()

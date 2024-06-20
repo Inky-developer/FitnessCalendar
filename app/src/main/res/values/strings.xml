@@ -124,6 +124,8 @@
     <string name="has_vehicle">Has vehicle?</string>
     <string name="has_duration">Has duration?</string>
     <string name="select_color">Select color…</string>
+    <string name="delete_activity_type">Delete activity type</string>
+    <string name="cannot_delete_type_because_there_are_still_activities">Cannot delete type. Make sure to delete all activities of this type before.</string>
     <plurals name="num_activities">
         <item quantity="one">%1d activity</item>
         <item quantity="other">%1d activities</item>

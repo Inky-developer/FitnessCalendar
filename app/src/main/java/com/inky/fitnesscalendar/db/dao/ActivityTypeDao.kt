@@ -1,6 +1,7 @@
 package com.inky.fitnesscalendar.db.dao
 
 import androidx.room.Dao
+import androidx.room.Delete
 import androidx.room.MapColumn
 import androidx.room.Query
 import androidx.room.Upsert
@@ -24,4 +25,7 @@ abstract class ActivityTypeDao {
 
     @Upsert
     abstract suspend fun save(type: ActivityType)
+
+    @Delete
+    abstract suspend fun delete(type: ActivityType)
 }

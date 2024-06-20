@@ -11,14 +11,19 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -63,6 +68,9 @@ fun ActivityTypeView(viewModel: ActivityTypeViewModel = hiltViewModel(), onBack:
                     }
                 }
             )
+        },
+        snackbarHost = {
+            SnackbarHost(hostState = viewModel.snackbarHostState)
         }
     ) { paddingValues ->
         Row(
@@ -91,7 +99,12 @@ fun ActivityTypeView(viewModel: ActivityTypeViewModel = hiltViewModel(), onBack:
                 onSave = {
                     showEditDialog = false
                     viewModel.save(it)
-                })
+                },
+                onDelete = {
+                    showEditDialog = false
+                    viewModel.delete(it)
+                }
+            )
         }
     }
 }
@@ -101,7 +114,8 @@ fun ActivityTypeView(viewModel: ActivityTypeViewModel = hiltViewModel(), onBack:
 fun EditTypeDialog(
     initialType: ActivityType,
     onDismiss: () -> Unit,
-    onSave: (ActivityType) -> Unit
+    onSave: (ActivityType) -> Unit,
+    onDelete: (ActivityType) -> Unit,
 ) {
     var type by remember(initialType) { mutableStateOf(initialType) }
 
@@ -116,7 +130,9 @@ fun EditTypeDialog(
         onSave = { onSave(type) },
         onNavigateBack = onDismiss,
         title = stringResource(R.string.edit_type, type.name),
-        actions = {}
+        actions = {
+            EditTypeDialogMenu(onDeleteType = { onDelete(type) })
+        }
     ) {
         Column(modifier = Modifier.padding(all = 8.dp)) {
             TextField(
@@ -174,6 +190,23 @@ fun EditTypeDialog(
             )
 
         }
+    }
+}
+
+@Composable
+fun EditTypeDialogMenu(onDeleteType: () -> Unit) {
+    var showMenu by remember { mutableStateOf(false) }
+
+    IconButton(onClick = { showMenu = true }) {
+        Icon(Icons.Outlined.Menu, stringResource(R.string.Menu))
+    }
+
+    DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.delete_activity_type)) },
+            leadingIcon = { Icon(Icons.Outlined.Delete, stringResource(R.string.delete)) },
+            onClick = onDeleteType
+        )
     }
 }
 
