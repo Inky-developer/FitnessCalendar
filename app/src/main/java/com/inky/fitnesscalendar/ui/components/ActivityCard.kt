@@ -172,7 +172,10 @@ fun ActivityCard(
     if (showContextMenu) {
         ActivityCardContextMenu(
             onDismiss = { showContextMenu = false },
-            onDelete = onDelete,
+            onDelete = {
+                showContextMenu = false
+                onDelete()
+            },
             onJumpTo = onJumpTo?.let {
                 {
                     showContextMenu = false

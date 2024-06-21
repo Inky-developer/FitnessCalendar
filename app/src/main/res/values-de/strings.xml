@@ -139,4 +139,6 @@
     <string name="cannot_delete_type_because_there_are_still_activities">Löschen fehlgeschlagen. Es müssen zuerst alle Aktivitäten dieser Art gelöscht werden.</string>
     <string name="add_activity_type">Aktivitätsart hinzufügen</string>
     <string name="new_type">Neue Aktivitätsart</string>
+    <string name="deleting_activity">Aktivität wird gelöscht</string>
+    <string name="deleting_activity_type">Aktivitätsart wird gelöscht</string>
 </resources>

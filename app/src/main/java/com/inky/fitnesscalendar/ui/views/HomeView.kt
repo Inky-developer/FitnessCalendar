@@ -24,6 +24,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
@@ -34,7 +35,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -65,7 +65,6 @@ import com.inky.fitnesscalendar.util.Duration.Companion.until
 import com.inky.fitnesscalendar.util.showRecordingNotification
 import com.inky.fitnesscalendar.view_model.HomeViewModel
 import com.inky.fitnesscalendar.view_model.statistics.Period
-import kotlinx.coroutines.launch
 
 private const val TAG = "HOME"
 
@@ -87,8 +86,6 @@ fun Home(
     val recentActivity by viewModel.mostRecentActivity.collectAsState(initial = null)
     val typeRecordings by viewModel.recordings.collectAsState(initial = null)
     val scrollState = rememberScrollState()
-
-    val scope = rememberCoroutineScope()
 
     val context = LocalContext.current
     LaunchedEffect(typeRecordings) {
@@ -146,6 +143,7 @@ fun Home(
                 onClick = onNewActivity, menuOpen = isNewActivityOpen
             )
         },
+        snackbarHost = { SnackbarHost(viewModel.snackbarHostState) },
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { paddingValues ->
         Column(
@@ -167,7 +165,7 @@ fun Home(
             RecentActivityOrNull(
                 recentActivity,
                 viewModel.repository.localizationRepository,
-                onDelete = { scope.launch { viewModel.repository.deleteActivity(it) } },
+                onDelete = { viewModel.deleteActivity(it) },
                 onEdit = onEditActivity,
             )
 

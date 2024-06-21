@@ -35,6 +35,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -43,7 +44,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -64,7 +64,6 @@ import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.ui.util.sharedElement
 import com.inky.fitnesscalendar.view_model.ActivityLogViewModel
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -79,7 +78,6 @@ fun ActivityLog(
     onFilter: () -> Unit,
     initialSelectedActivityId: Int? = null,
 ) {
-    val scope = rememberCoroutineScope()
     val activityListState = rememberLazyListState()
     val activities by remember(filter) { viewModel.repository.getActivities(filter) }
         .collectAsState(initial = emptyList())
@@ -147,6 +145,7 @@ fun ActivityLog(
                 menuOpen = isNewActivityOpen,
             )
         },
+        snackbarHost = { SnackbarHost(hostState = viewModel.snackbarHostState) },
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { innerPadding ->
         Column(
@@ -197,7 +196,7 @@ fun ActivityLog(
                         ActivityCard(
                             typeActivity,
                             onDelete = {
-                                scope.launch { viewModel.repository.deleteActivity(typeActivity.activity) }
+                                viewModel.deleteActivity(typeActivity.activity)
                             },
                             onJumpTo = if (!filter.isEmpty()) {
                                 {
