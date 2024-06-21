@@ -4,7 +4,7 @@ import com.inky.fitnesscalendar.data.ActivityCategory
 import com.inky.fitnesscalendar.data.ActivityType
 
 data class ActivityTypeEditState(
-    val isNewType: Boolean = true,
+    val uid: Int? = null,
     val category: ActivityCategory? = null,
     val name: String = "",
     val emoji: String = "",
@@ -13,7 +13,7 @@ data class ActivityTypeEditState(
     val hasDuration: Boolean = false,
 ) {
     constructor(activityType: ActivityType) : this(
-        isNewType = false,
+        uid = activityType.uid,
         category = activityType.activityCategory,
         name = activityType.name,
         emoji = activityType.emoji,
@@ -21,6 +21,8 @@ data class ActivityTypeEditState(
         hasVehicle = activityType.hasVehicle,
         hasDuration = activityType.hasDuration
     )
+
+    val isNewType get() = uid == null
 
 
     fun toActivityType(): ActivityType? {
@@ -31,6 +33,7 @@ data class ActivityTypeEditState(
         if (colorId == null) return null
 
         return ActivityType(
+            uid = uid,
             activityCategory = category,
             name = name,
             emoji = emoji,

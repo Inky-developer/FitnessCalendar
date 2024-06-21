@@ -57,7 +57,11 @@ import com.inky.fitnesscalendar.view_model.settings.ActivityTypeViewModel
 @Composable
 fun ActivityTypeView(viewModel: ActivityTypeViewModel = hiltViewModel(), onBack: () -> Unit) {
     val typeRows by viewModel.typeRows.collectAsState(initial = emptyList())
-    var initialEditState by remember { mutableStateOf(ActivityTypeEditState()) }
+    var selectedType by remember { mutableStateOf<ActivityType?>(null) }
+    val initialEditState =
+        remember(selectedType) {
+            selectedType?.let { ActivityTypeEditState(it) } ?: ActivityTypeEditState()
+        }
 
     var showEditDialog by remember { mutableStateOf(false) }
 
@@ -73,7 +77,7 @@ fun ActivityTypeView(viewModel: ActivityTypeViewModel = hiltViewModel(), onBack:
                 actions = {
                     IconButton(
                         onClick = {
-                            initialEditState = ActivityTypeEditState()
+                            selectedType = null
                             showEditDialog = true
                         }
                     ) {
@@ -95,7 +99,7 @@ fun ActivityTypeView(viewModel: ActivityTypeViewModel = hiltViewModel(), onBack:
             ActivityTypeSelector(
                 isSelected = { false },
                 onSelect = {
-                    initialEditState = ActivityTypeEditState(it)
+                    selectedType = it
                     showEditDialog = true
                 },
                 typeRows = typeRows
@@ -113,7 +117,7 @@ fun ActivityTypeView(viewModel: ActivityTypeViewModel = hiltViewModel(), onBack:
             },
             onDelete = {
                 showEditDialog = false
-                viewModel.delete(it)
+                selectedType?.let { viewModel.delete(it) }
             }
         )
     }
@@ -125,7 +129,7 @@ fun EditTypeDialog(
     initialState: ActivityTypeEditState,
     onDismiss: () -> Unit,
     onSave: (ActivityType) -> Unit,
-    onDelete: (ActivityType) -> Unit,
+    onDelete: () -> Unit,
 ) {
     val context = LocalContext.current
 
@@ -145,7 +149,7 @@ fun EditTypeDialog(
         onNavigateBack = onDismiss,
         title = title,
         actions = {
-            EditTypeDialogMenu(onDeleteType = { type?.let(onDelete) })
+            EditTypeDialogMenu(onDeleteType = onDelete)
         }
     ) {
         Column(modifier = Modifier.padding(all = 8.dp)) {
