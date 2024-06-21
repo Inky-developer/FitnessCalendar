@@ -14,19 +14,18 @@ data class Duration(val elapsedMs: Long) {
         val seconds = TimeUnit.MILLISECONDS.toSeconds(
             elapsedMs - TimeUnit.HOURS.toMillis(hours) - TimeUnit.MINUTES.toMillis(minutes)
         )
-        val builder = StringBuilder()
+        val entries = mutableListOf<String>()
         if (hours > 0) {
-            builder.append("${hours}h ")
+            entries.add("${hours}h")
         }
         if (minutes > 0) {
-            builder.append("${minutes}m ")
+            entries.add("${minutes}m")
         }
         if (hours == 0L && minutes <= 10L) {
-            builder.append("${seconds}s ")
+            entries.add("${seconds}s")
         }
 
-
-        return builder.toString()
+        return entries.joinToString(" ")
     }
 
     companion object {
@@ -34,4 +33,8 @@ data class Duration(val elapsedMs: Long) {
             return Duration(end.time - this.time)
         }
     }
+}
+
+fun kotlin.time.Duration.format(): String {
+    return Duration(inWholeMilliseconds).format()
 }

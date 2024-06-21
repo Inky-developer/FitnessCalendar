@@ -54,6 +54,7 @@ import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.view_model.StatisticsViewModel
 import com.inky.fitnesscalendar.view_model.statistics.Grouping
+import com.inky.fitnesscalendar.view_model.statistics.IconMarker
 import com.inky.fitnesscalendar.view_model.statistics.Period
 import com.inky.fitnesscalendar.view_model.statistics.Projection
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
@@ -80,8 +81,6 @@ import com.patrykandpatrick.vico.core.cartesian.axis.AxisItemPlacer
 import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.layer.ColumnCartesianLayer
-import com.patrykandpatrick.vico.core.cartesian.marker.CartesianMarker
-import com.patrykandpatrick.vico.core.cartesian.marker.ColumnCartesianLayerMarkerTarget
 import com.patrykandpatrick.vico.core.cartesian.marker.DefaultCartesianMarker
 import com.patrykandpatrick.vico.core.common.Dimensions
 import com.patrykandpatrick.vico.core.common.component.LineComponent
@@ -339,7 +338,7 @@ private fun Graph(
                 mergeMode = { ColumnCartesianLayer.MergeMode.Stacked }
             ),
             startAxis = rememberStartAxis(
-                itemPlacer = AxisItemPlacer.Vertical.step({ projection.verticalStepSize() }),
+                itemPlacer = AxisItemPlacer.Vertical.step({ projection.verticalStepSize }),
                 horizontalLabelPosition = VerticalAxis.HorizontalLabelPosition.Inside,
             ),
             bottomAxis = rememberBottomAxis(
@@ -368,7 +367,7 @@ private fun Graph(
         horizontalLayout = HorizontalLayout.fullWidth(),
         scrollState = scrollState,
         zoomState = rememberVicoZoomState(initialZoom = remember(period) { Zoom.x(period.numVisibleEntries) }),
-        marker = rememberMarker(),
+        marker = rememberMarker(projection),
     )
 }
 
@@ -396,12 +395,13 @@ private fun rememberLegend(
 
 
 @Composable
-private fun rememberMarker() =
+private fun rememberMarker(projection: Projection) =
     rememberDefaultCartesianMarker(
         label = rememberTextComponent(
             color = MaterialTheme.colorScheme.onPrimaryContainer
         ),
         labelPosition = DefaultCartesianMarker.LabelPosition.Top,
+        valueFormatter = remember(projection) { projection.markerFormatter() }
     )
 
 
@@ -422,40 +422,3 @@ private fun rememberIconMarker(indicator: TextComponent, emojis: List<String>) =
     IconMarker(indicator, emojis)
 }
 
-class IconMarker(private val indicator: TextComponent, private val emojis: List<String>) :
-    CartesianMarker {
-    override fun draw(context: CartesianDrawContext, targets: List<CartesianMarker.Target>) {
-        // Don't draw markers if it gets too crowded
-        if (context.zoom < 0.5f) {
-            return
-        }
-        with(context) {
-            val bounds = context.chartBounds
-            var bottomEdge = bounds.bottom
-            targets.forEach { target ->
-                when (target) {
-                    is ColumnCartesianLayerMarkerTarget -> {
-                        target.columns.zip(emojis).forEach { (column, emoji) ->
-                            if (column.entry.y != 0f) {
-                                val posY = (column.canvasY + bottomEdge) / 2f
-                                drawIndicator(target.canvasX, posY, emoji)
-                                bottomEdge = column.canvasY
-                            }
-                        }
-                    }
-
-                    else -> throw NotImplementedError("IconMarker only supports columns")
-                }
-            }
-        }
-    }
-
-    private fun CartesianDrawContext.drawIndicator(x: Float, y: Float, emoji: String) {
-        indicator.drawText(
-            this,
-            emoji,
-            x,
-            y
-        )
-    }
-}
