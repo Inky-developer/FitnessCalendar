@@ -15,7 +15,7 @@ interface RecordingDao {
     @Query("SELECT * FROM recording ORDER BY start_time")
     fun getRecordings(): Flow<List<TypeRecording>>
 
-    @Query("SELECT * FROM recording WHERE type_id=:uid")
+    @Query("SELECT * FROM recording WHERE uid=:uid")
     suspend fun getById(uid: Int): Recording?
 
     @Insert
