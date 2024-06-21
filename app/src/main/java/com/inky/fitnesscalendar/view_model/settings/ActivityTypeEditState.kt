@@ -1,8 +1,11 @@
 package com.inky.fitnesscalendar.view_model.settings
 
+import android.os.Parcelable
 import com.inky.fitnesscalendar.data.ActivityCategory
 import com.inky.fitnesscalendar.data.ActivityType
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 data class ActivityTypeEditState(
     val uid: Int? = null,
     val category: ActivityCategory? = null,
@@ -11,7 +14,7 @@ data class ActivityTypeEditState(
     val colorId: Int? = null,
     val hasVehicle: Boolean = false,
     val hasDuration: Boolean = false,
-) {
+) : Parcelable {
     constructor(activityType: ActivityType) : this(
         uid = activityType.uid,
         category = activityType.activityCategory,

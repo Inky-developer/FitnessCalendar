@@ -35,6 +35,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -58,13 +59,12 @@ import com.inky.fitnesscalendar.view_model.settings.ActivityTypeViewModel
 @Composable
 fun ActivityTypeView(viewModel: ActivityTypeViewModel = hiltViewModel(), onBack: () -> Unit) {
     val typeRows by viewModel.typeRows.collectAsState(initial = emptyList())
-    var selectedType by remember { mutableStateOf<ActivityType?>(null) }
-    val initialEditState =
-        remember(selectedType) {
-            selectedType?.let { ActivityTypeEditState(it) } ?: ActivityTypeEditState()
-        }
+    var selectedType by rememberSaveable { mutableStateOf<ActivityType?>(null) }
+    val initialEditState = remember(selectedType) {
+        selectedType?.let { ActivityTypeEditState(it) } ?: ActivityTypeEditState()
+    }
 
-    var showEditDialog by remember { mutableStateOf(false) }
+    var showEditDialog by rememberSaveable { mutableStateOf(false) }
 
     Scaffold(
         topBar = {
@@ -134,7 +134,7 @@ fun EditTypeDialog(
 ) {
     val context = LocalContext.current
 
-    var state by remember(initialState) { mutableStateOf(initialState) }
+    var state by rememberSaveable { mutableStateOf(initialState) }
     val type = remember(state) { state.toActivityType() }
     val title = remember(state) {
         if (state.isNewType) {
