@@ -13,14 +13,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.lifecycleScope
 import com.inky.fitnesscalendar.ui.App
 import com.inky.fitnesscalendar.ui.theme.FitnessCalendarTheme
-import com.inky.fitnesscalendar.util.cleanActivityImageStorage
-import com.inky.fitnesscalendar.util.getOrCreateSharedMediaCache
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -34,8 +29,6 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         requestNotificationPermission()
-
-        cleanupStorage()
 
         setContent {
             FitnessCalendarTheme {
@@ -64,17 +57,6 @@ class MainActivity : ComponentActivity() {
                 }
 
             locationPermissionRequest.launch(Manifest.permission.POST_NOTIFICATIONS)
-        }
-    }
-
-    private fun cleanupStorage() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            val usedActivityImages = repository.getActivityImages()
-            cleanActivityImageStorage(usedActivityImages.toSet())
-
-            getOrCreateSharedMediaCache().listFiles()?.forEach {
-                it.delete()
-            }
         }
     }
 }
