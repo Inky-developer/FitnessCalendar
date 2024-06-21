@@ -12,9 +12,9 @@
     <color name="stats_work">#D8C365</color>
     <color name="stats_entertainment">#90B762</color>
     <color name="stats_other">#818084</color>
-    <color name="stats_1">#EF5350</color>
-    <color name="stats_2">#66BB6A</color>
-    <color name="stats_3">#5C6BC0</color>
-    <color name="stats_4">#26C6DA</color>
-    <color name="stats_5">#D4E157</color>
+    <color name="stats_1">#C0674B</color>
+    <color name="stats_2">#81A558</color>
+    <color name="stats_3">#3BA79D</color>
+    <color name="stats_4">#5A3B3B</color>
+    <color name="stats_5">#C7BD6B</color>
 </resources>

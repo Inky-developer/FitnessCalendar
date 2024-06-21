@@ -142,4 +142,10 @@
     <string name="deleting_activity">Aktivität wird gelöscht</string>
     <string name="deleting_activity_type">Aktivitätsart wird gelöscht</string>
     <string name="color">Farbe</string>
+    <string name="color_orange">Orange</string>
+    <string name="color_green">Grün</string>
+    <string name="color_turquoise">Türkis</string>
+    <string name="color_brown">Braun</string>
+    <string name="color_yellow">Gelb</string>
+    <string name="color_grey">Grau</string>
 </resources>

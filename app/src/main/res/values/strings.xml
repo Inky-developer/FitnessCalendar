@@ -131,6 +131,12 @@
     <string name="deleting_activity">Deleting activity</string>
     <string name="deleting_activity_type">Deleting activity type</string>
     <string name="color">Color</string>
+    <string name="color_orange">Orange</string>
+    <string name="color_green">Green</string>
+    <string name="color_turquoise">Turquoise</string>
+    <string name="color_brown">Brown</string>
+    <string name="color_yellow">Yellow</string>
+    <string name="color_grey">Grey</string>
     <plurals name="num_activities">
         <item quantity="one">%1d activity</item>
         <item quantity="other">%1d activities</item>
