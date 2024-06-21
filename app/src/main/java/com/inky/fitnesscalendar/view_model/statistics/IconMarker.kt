@@ -9,7 +9,7 @@ class IconMarker(private val indicator: TextComponent, private val emojis: List<
     CartesianMarker {
     override fun draw(context: CartesianDrawContext, targets: List<CartesianMarker.Target>) {
         // Don't draw markers if it gets too crowded
-        if (context.zoom < 0.5f) {
+        if (context.zoom < 0.3f) {
             return
         }
 
