@@ -267,7 +267,7 @@ fun NewActivity(
                 onValueChange = { description = it },
                 placeholder = { Text(stringResource(R.string.placeholder_description)) },
                 modifier = Modifier.fillMaxWidth(),
-                maxLines = 3,
+                maxLines = 8,
                 keyboardOptions = remember { KeyboardOptions(capitalization = KeyboardCapitalization.Sentences) },
                 colors = TextFieldDefaults.colors(unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
                 shape = MaterialTheme.shapes.small
