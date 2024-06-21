@@ -80,9 +80,12 @@ import com.patrykandpatrick.vico.core.cartesian.axis.AxisItemPlacer
 import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.layer.ColumnCartesianLayer
+import com.patrykandpatrick.vico.core.cartesian.marker.CartesianMarker
+import com.patrykandpatrick.vico.core.cartesian.marker.ColumnCartesianLayerMarkerTarget
 import com.patrykandpatrick.vico.core.cartesian.marker.DefaultCartesianMarker
 import com.patrykandpatrick.vico.core.common.Dimensions
 import com.patrykandpatrick.vico.core.common.component.LineComponent
+import com.patrykandpatrick.vico.core.common.component.TextComponent
 import com.patrykandpatrick.vico.core.common.shape.Shape
 import kotlinx.coroutines.launch
 
@@ -176,6 +179,7 @@ fun StatisticsView(
                         viewModel.projection,
                         viewModel.period,
                         viewModel.groupingOptions.value,
+                        viewModel.numDataPoints,
                         modifier = Modifier
                             .fillParentMaxHeight(0.9f)
                             .fillMaxWidth()
@@ -300,6 +304,7 @@ private fun Graph(
     projection: Projection,
     period: Period,
     groupingOptions: List<Displayable>,
+    numDataPoints: Int,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -318,6 +323,13 @@ private fun Graph(
         autoScroll = Scroll.Absolute.End,
         autoScrollCondition = StatisticsViewModel.autoScrollCondition
     )
+
+    val persistentMarker =
+        rememberPersistentCartesianMarker(groupingOptions.map { it.getShortText() })
+    val persistentMarkers =
+        remember(numDataPoints, persistentMarker) {
+            (0..<numDataPoints).map { it.toFloat() }.associateWith { persistentMarker }
+        }
 
     CartesianChartHost(
         modifier = modifier,
@@ -349,13 +361,14 @@ private fun Graph(
                 itemPlacer = AxisItemPlacer.Horizontal.default(addExtremeLabelPadding = true),
             ),
             legend = rememberLegend(groupingOptions),
+            persistentMarkers = persistentMarkers
         ),
         modelProducer = modelProducer,
         runInitialAnimation = true,
         horizontalLayout = HorizontalLayout.fullWidth(),
         scrollState = scrollState,
         zoomState = rememberVicoZoomState(initialZoom = remember(period) { Zoom.x(period.numVisibleEntries) }),
-        marker = rememberMarker()
+        marker = rememberMarker(),
     )
 }
 
@@ -390,3 +403,51 @@ private fun rememberMarker() =
         ),
         labelPosition = DefaultCartesianMarker.LabelPosition.Top,
     )
+
+
+@Composable
+private fun rememberPersistentCartesianMarker(emojis: List<String>) =
+    rememberIconMarker(
+        indicator = rememberTextComponent(
+            textSize = MaterialTheme.typography.titleLarge.fontSize
+        ),
+        emojis
+    )
+
+@Composable
+private fun rememberIconMarker(indicator: TextComponent, emojis: List<String>) = remember(
+    indicator,
+    emojis
+) {
+    IconMarker(indicator, emojis)
+}
+
+class IconMarker(private val indicator: TextComponent, private val emojis: List<String>) :
+    CartesianMarker {
+    override fun draw(context: CartesianDrawContext, targets: List<CartesianMarker.Target>) {
+        with(context) {
+            targets.forEach { target ->
+                when (target) {
+                    is ColumnCartesianLayerMarkerTarget -> {
+                        target.columns.zip(emojis).forEach { (column, emoji) ->
+                            if (column.entry.y != 0f) {
+                                drawIndicator(target.canvasX, column.canvasY, emoji)
+                            }
+                        }
+                    }
+
+                    else -> throw NotImplementedError("IconMarker only supports columns")
+                }
+            }
+        }
+    }
+
+    private fun CartesianDrawContext.drawIndicator(x: Float, y: Float, emoji: String) {
+        indicator.drawText(
+            this,
+            emoji,
+            x,
+            y
+        )
+    }
+}

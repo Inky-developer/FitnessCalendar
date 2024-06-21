@@ -3,6 +3,7 @@ package com.inky.fitnesscalendar.view_model
 import android.content.Context
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
@@ -50,6 +51,8 @@ class StatisticsViewModel @Inject constructor(
 
     private var activityTypes: List<ActivityType>? by mutableStateOf(null)
 
+    var numDataPoints by mutableIntStateOf(0)
+
     val modelProducer = CartesianChartModelProducer.build()
 
     init {
@@ -92,6 +95,7 @@ class StatisticsViewModel @Inject constructor(
 
         val dataPoints =
             _activityStatistics.value?.map { grouping.apply(it.first) to it.second } ?: return
+        numDataPoints = dataPoints.size
         if (dataPoints.isEmpty()) return
 
         modelProducer.runTransaction {

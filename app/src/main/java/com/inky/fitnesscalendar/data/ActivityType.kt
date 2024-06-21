@@ -23,4 +23,6 @@ data class ActivityType(
     override fun getColor(context: Context) = context.getColor(color.colorId)
 
     override fun getText(context: Context) = name
+
+    override fun getShortText() = emoji
 }

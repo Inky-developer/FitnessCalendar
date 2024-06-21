@@ -19,4 +19,6 @@ enum class ActivityCategory(
     override fun getColor(context: Context) = context.getColor(colorId)
 
     override fun getText(context: Context) = context.getString(nameId)
+
+    override fun getShortText() = emoji
 }
