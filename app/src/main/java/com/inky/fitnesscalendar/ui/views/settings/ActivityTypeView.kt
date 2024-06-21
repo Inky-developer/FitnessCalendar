@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Add
@@ -43,6 +44,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
@@ -162,6 +164,7 @@ fun EditTypeDialog(
                 leadingIcon = { Icon(Icons.Outlined.Edit, stringResource(R.string.type_name)) },
                 placeholder = { Text(stringResource(R.string.name_of_type)) },
                 singleLine = true,
+                keyboardOptions = remember { KeyboardOptions(capitalization = KeyboardCapitalization.Words) },
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 4.dp)
