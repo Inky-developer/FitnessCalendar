@@ -149,7 +149,9 @@ fun EditTypeDialog(
         onNavigateBack = onDismiss,
         title = title,
         actions = {
-            EditTypeDialogMenu(onDeleteType = onDelete)
+            if (!state.isNewType) {
+                EditTypeDialogMenu(onDeleteType = onDelete)
+            }
         }
     ) {
         Column(modifier = Modifier.padding(all = 8.dp)) {
