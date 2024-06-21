@@ -12,6 +12,9 @@ class IconMarker(private val indicator: TextComponent, private val emojis: List<
         if (context.zoom < 0.5f) {
             return
         }
+
+        val indicatorHeight = indicator.textSizeSp
+
         with(context) {
             val bounds = context.chartBounds
             var bottomEdge = bounds.bottom
@@ -19,7 +22,8 @@ class IconMarker(private val indicator: TextComponent, private val emojis: List<
                 when (target) {
                     is ColumnCartesianLayerMarkerTarget -> {
                         target.columns.zip(emojis).forEach { (column, emoji) ->
-                            if (column.entry.y != 0f) {
+                            val columnHeight = bottomEdge - column.canvasY
+                            if (columnHeight > indicatorHeight) {
                                 val posY = (column.canvasY + bottomEdge) / 2f
                                 drawIndicator(target.canvasX, posY, emoji)
                                 bottomEdge = column.canvasY
