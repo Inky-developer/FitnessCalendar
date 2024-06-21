@@ -7,6 +7,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityCategory
+import com.inky.fitnesscalendar.data.ActivityTypeColor
 
 val MIGRATION_1_2 = object : Migration(1, 2) {
     override fun migrate(db: SupportSQLiteDatabase) {
@@ -149,4 +150,27 @@ enum class LegacyActivityType(
         colorId = R.color.stats_3,
         emoji = "🏷️"
     );
+}
+
+val MIGRATION_6_7 = object : Migration(6, 7) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("CREATE TABLE TempActivityType (uid INTEGER PRIMARY KEY, activity_category TEXT NOT NULL, name TEXT NOT NULL, emoji TEXT NOT NULL, color TEXT, color_id INTEGER NOT NULL, has_vehicle INTEGER NOT NULL, has_duration INTEGER NOT NULL)")
+        db.execSQL("INSERT INTO TempActivityType(uid, activity_category, name, emoji, color_id, has_vehicle, has_duration) SELECT uid, activity_category, name, emoji, color_id, has_vehicle, has_duration FROM ActivityType")
+
+        for (color in ActivityTypeColor.entries) {
+            db.execSQL(
+                "UPDATE TempActivityType SET color = ? WHERE color_id = ?",
+                arrayOf(color.toString(), color.colorId)
+            )
+        }
+        db.execSQL(
+            "UPDATE TempActivityType SET color = ? WHERE color_id = NULL",
+            arrayOf(ActivityTypeColor.ColorOther)
+        )
+
+        db.execSQL("DROP TABLE ActivityType")
+        db.execSQL("CREATE TABLE ActivityType (uid INTEGER PRIMARY KEY, activity_category TEXT NOT NULL, name TEXT NOT NULL, emoji TEXT NOT NULL, color TEXT NOT NULL, has_vehicle INTEGER NOT NULL, has_duration INTEGER NOT NULL)")
+        db.execSQL("INSERT INTO ActivityType(uid, activity_category, name, emoji, color, has_vehicle, has_duration) SELECT uid, activity_category, name, emoji, color, has_vehicle, has_duration FROM TempActivityType")
+        db.execSQL("DROP TABLE TempActivityType")
+    }
 }

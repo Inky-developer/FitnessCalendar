@@ -37,7 +37,7 @@ fun ActivityTypeSelector(
                         border = FilterChipDefaults.filterChipBorder(
                             enabled = true,
                             selected = isSelected(activityType),
-                            borderColor = colorResource(activityType.colorId)
+                            borderColor = colorResource(activityType.color.colorId)
                         ),
                         modifier = Modifier.padding(horizontal = 4.dp)
                     )

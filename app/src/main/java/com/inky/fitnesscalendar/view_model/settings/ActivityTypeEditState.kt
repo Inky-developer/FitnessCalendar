@@ -3,6 +3,7 @@ package com.inky.fitnesscalendar.view_model.settings
 import android.os.Parcelable
 import com.inky.fitnesscalendar.data.ActivityCategory
 import com.inky.fitnesscalendar.data.ActivityType
+import com.inky.fitnesscalendar.data.ActivityTypeColor
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -11,7 +12,7 @@ data class ActivityTypeEditState(
     val category: ActivityCategory? = null,
     val name: String = "",
     val emoji: String = "",
-    val colorId: Int? = null,
+    val color: ActivityTypeColor? = null,
     val hasVehicle: Boolean = false,
     val hasDuration: Boolean = false,
 ) : Parcelable {
@@ -20,7 +21,7 @@ data class ActivityTypeEditState(
         category = activityType.activityCategory,
         name = activityType.name,
         emoji = activityType.emoji,
-        colorId = activityType.colorId,
+        color = activityType.color,
         hasVehicle = activityType.hasVehicle,
         hasDuration = activityType.hasDuration
     )
@@ -33,14 +34,14 @@ data class ActivityTypeEditState(
         if (name.isBlank() || name.lines().size != 1) return null
         // TODO: Make sure this actually is an emoji
         if (emoji.isBlank() || emoji.lines().size != 1) return null
-        if (colorId == null) return null
+        if (color == null) return null
 
         return ActivityType(
             uid = uid,
             activityCategory = category,
             name = name,
             emoji = emoji,
-            colorId = colorId,
+            color = color,
             hasVehicle = hasVehicle,
             hasDuration = hasDuration
         )

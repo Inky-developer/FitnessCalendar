@@ -49,11 +49,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityType
+import com.inky.fitnesscalendar.data.ActivityTypeColor
 import com.inky.fitnesscalendar.ui.components.ActivityCategorySelector
 import com.inky.fitnesscalendar.ui.components.ActivityTypeSelector
 import com.inky.fitnesscalendar.ui.components.BaseEditDialog
 import com.inky.fitnesscalendar.ui.components.OptionGroup
-import com.inky.fitnesscalendar.util.ACTIVITY_TYPE_COLOR_IDS
 import com.inky.fitnesscalendar.view_model.settings.ActivityTypeEditState
 import com.inky.fitnesscalendar.view_model.settings.ActivityTypeViewModel
 
@@ -197,8 +197,8 @@ fun EditTypeDialog(
                 modifier = Modifier.padding(vertical = 4.dp)
             ) {
                 ColorSelector(
-                    isSelected = { state.colorId == it },
-                    onSelect = { state = state.copy(colorId = it) }
+                    isSelected = { state.color == it },
+                    onSelect = { state = state.copy(color = it) }
                 )
             }
 
@@ -236,17 +236,17 @@ fun EditTypeDialogMenu(onDeleteType: () -> Unit) {
 
 @Composable
 fun ColorSelector(
-    isSelected: (Int) -> Boolean,
-    onSelect: (Int) -> Unit
+    isSelected: (ActivityTypeColor) -> Boolean,
+    onSelect: (ActivityTypeColor) -> Unit
 ) {
     LazyRow {
-        items(ACTIVITY_TYPE_COLOR_IDS) { colorId ->
+        items(ActivityTypeColor.entries) { color ->
             FilterChip(
-                selected = isSelected(colorId),
-                onClick = { onSelect(colorId) },
+                selected = isSelected(color),
+                onClick = { onSelect(color) },
                 label = {
                     Surface(
-                        color = colorResource(colorId),
+                        color = colorResource(color.colorId),
                         modifier = Modifier
                             .width(24.dp)
                             .height(24.dp)

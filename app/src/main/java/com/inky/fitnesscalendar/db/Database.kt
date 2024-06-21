@@ -16,7 +16,7 @@ import com.inky.fitnesscalendar.db.dao.RecordingDao
 import com.inky.fitnesscalendar.util.DATABASE_NAME
 
 @Database(
-    version = 6,
+    version = 7,
     entities = [Activity::class, Recording::class, ActivityType::class],
     autoMigrations = [
         AutoMigration(from = 2, to = 3),
@@ -45,7 +45,7 @@ abstract class AppDatabase : RoomDatabase() {
         private fun buildDatabase(context: Context) =
             Room
                 .databaseBuilder(context, AppDatabase::class.java, DATABASE_NAME)
-                .addMigrations(MIGRATION_1_2, MIGRATION_5_6)
+                .addMigrations(MIGRATION_1_2, MIGRATION_5_6, MIGRATION_6_7)
                 .addCallback(object : Callback() {
                     override fun onCreate(db: SupportSQLiteDatabase) {
                         loadDefaultData(db)

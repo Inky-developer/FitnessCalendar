@@ -130,6 +130,7 @@
     <string name="new_type">New Type</string>
     <string name="deleting_activity">Deleting activity</string>
     <string name="deleting_activity_type">Deleting activity type</string>
+    <string name="color">Color</string>
     <plurals name="num_activities">
         <item quantity="one">%1d activity</item>
         <item quantity="other">%1d activities</item>

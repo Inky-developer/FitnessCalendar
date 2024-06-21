@@ -141,4 +141,5 @@
     <string name="new_type">Neue Aktivitätsart</string>
     <string name="deleting_activity">Aktivität wird gelöscht</string>
     <string name="deleting_activity_type">Aktivitätsart wird gelöscht</string>
+    <string name="color">Farbe</string>
 </resources>
