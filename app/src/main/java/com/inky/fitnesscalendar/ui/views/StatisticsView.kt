@@ -425,13 +425,21 @@ private fun rememberIconMarker(indicator: TextComponent, emojis: List<String>) =
 class IconMarker(private val indicator: TextComponent, private val emojis: List<String>) :
     CartesianMarker {
     override fun draw(context: CartesianDrawContext, targets: List<CartesianMarker.Target>) {
+        // Don't draw markers if it gets too crowded
+        if (context.zoom < 0.5f) {
+            return
+        }
         with(context) {
+            val bounds = context.chartBounds
+            var bottomEdge = bounds.bottom
             targets.forEach { target ->
                 when (target) {
                     is ColumnCartesianLayerMarkerTarget -> {
                         target.columns.zip(emojis).forEach { (column, emoji) ->
                             if (column.entry.y != 0f) {
-                                drawIndicator(target.canvasX, column.canvasY, emoji)
+                                val posY = (column.canvasY + bottomEdge) / 2f
+                                drawIndicator(target.canvasX, posY, emoji)
+                                bottomEdge = column.canvasY
                             }
                         }
                     }
