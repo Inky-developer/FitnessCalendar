@@ -1,5 +1,6 @@
 package com.inky.fitnesscalendar.ui.views.settings
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -261,11 +262,19 @@ fun Toggle(
     value: Boolean,
     onValue: (Boolean) -> Unit
 ) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .padding(vertical = 4.dp)
+            .clip(MaterialTheme.shapes.small)
+            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+    ) {
         Text(
             name,
             style = MaterialTheme.typography.labelLarge,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier
+                .weight(1f)
+                .padding(horizontal = 8.dp)
         )
         Switch(checked = value, onCheckedChange = onValue)
     }
