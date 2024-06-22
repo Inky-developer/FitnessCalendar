@@ -16,6 +16,7 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Face
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenu
@@ -174,6 +175,8 @@ fun EditTypeDialog(
             TextField(
                 value = state.emoji,
                 onValueChange = { state = state.copy(emoji = it) },
+                leadingIcon = { Icon(Icons.Outlined.Face, stringResource(R.string.emoji)) },
+                placeholder = { Text(stringResource(R.string.emoji)) },
                 singleLine = true,
                 modifier = Modifier
                     .fillMaxWidth()

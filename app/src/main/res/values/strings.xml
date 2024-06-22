@@ -137,6 +137,7 @@
     <string name="color_brown">Brown</string>
     <string name="color_yellow">Yellow</string>
     <string name="color_grey">Grey</string>
+    <string name="emoji">Emoij</string>
     <plurals name="num_activities">
         <item quantity="one">%1d activity</item>
         <item quantity="other">%1d activities</item>
