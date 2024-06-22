@@ -194,9 +194,9 @@ fun EditTypeDialog(
                 )
             }
 
-            // TODO: Display selected color name
             OptionGroup(
                 label = stringResource(R.string.select_color),
+                selectionLabel = if (state.color != null) stringResource(state.color!!.nameId) else null,
                 modifier = Modifier.padding(vertical = 4.dp)
             ) {
                 ColorSelector(
