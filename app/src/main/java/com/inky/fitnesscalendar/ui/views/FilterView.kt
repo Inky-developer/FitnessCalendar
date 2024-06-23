@@ -56,12 +56,12 @@ fun FilterView(
 ) {
     var filter by rememberSaveable(initialFilter) { mutableStateOf(initialFilter) }
 
-    BackHandler {
-        onFilterChange(filter)
-    }
     val onBack = {
         onFilterChange(filter)
         onNavigateBack()
+    }
+    BackHandler {
+        onBack()
     }
 
     val typeRows by viewModel
