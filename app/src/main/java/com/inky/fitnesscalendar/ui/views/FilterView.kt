@@ -1,5 +1,6 @@
 package com.inky.fitnesscalendar.ui.views
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
@@ -23,7 +24,10 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
@@ -46,48 +50,63 @@ import com.inky.fitnesscalendar.view_model.GenericViewModel
 @Composable
 fun FilterView(
     viewModel: GenericViewModel = hiltViewModel(),
-    filter: ActivityFilter,
+    initialFilter: ActivityFilter,
     onFilterChange: (ActivityFilter) -> Unit,
-    onBack: () -> Unit
+    onNavigateBack: () -> Unit
 ) {
+    var filter by rememberSaveable(initialFilter) { mutableStateOf(initialFilter) }
+
+    BackHandler {
+        onFilterChange(filter)
+    }
+    val onBack = {
+        onFilterChange(filter)
+        onNavigateBack()
+    }
+
     val typeRows by viewModel
         .repository
         .getActivityTypeRows()
         .collectAsState(initial = emptyList())
 
     val appBar = @Composable {
-        TopAppBar(colors = TopAppBarDefaults.topAppBarColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-        ), title = {
-            TextField(
-                filter.text ?: "",
-                onValueChange = {
-                    onFilterChange(filter.copy(text = it))
-                },
-                placeholder = { Text(stringResource(R.string.search_for_activity)) },
-                colors = TextFieldDefaults.colors(
-                    unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                    focusedContainerColor = MaterialTheme.colorScheme.primaryContainer
-                ),
-                singleLine = true,
-                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                keyboardActions = KeyboardActions(onSearch = { onBack() })
-            )
-        }, navigationIcon = {
-            IconButton(onClick = { onBack() }) {
-                Icon(
-                    Icons.AutoMirrored.Outlined.ArrowBack,
-                    stringResource(R.string.back),
+        TopAppBar(
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+            ),
+            title = {
+                TextField(
+                    filter.text ?: "",
+                    onValueChange = {
+                        filter = filter.copy(text = it)
+                    },
+                    placeholder = { Text(stringResource(R.string.search_for_activity)) },
+                    colors = TextFieldDefaults.colors(
+                        unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                        focusedContainerColor = MaterialTheme.colorScheme.primaryContainer
+                    ),
+                    singleLine = true,
+                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                    keyboardActions = KeyboardActions(onSearch = { onBack() })
                 )
-            }
-        }, actions = {
-            IconButton(
-                onClick = { onFilterChange(ActivityFilter()) }, enabled = !filter.isEmpty()
-            ) {
-                Icon(Icons.Outlined.Clear, stringResource(R.string.reset_filters))
-            }
-        }, modifier = Modifier.sharedBounds(SharedContentKey.AppBar)
+            },
+            navigationIcon = {
+                IconButton(onClick = { onBack() }) {
+                    Icon(
+                        Icons.AutoMirrored.Outlined.ArrowBack,
+                        stringResource(R.string.back),
+                    )
+                }
+            },
+            actions = {
+                IconButton(
+                    onClick = { filter = ActivityFilter() }, enabled = !filter.isEmpty()
+                ) {
+                    Icon(Icons.Outlined.Clear, stringResource(R.string.reset_filters))
+                }
+            },
+            modifier = Modifier.sharedBounds(SharedContentKey.AppBar)
         )
     }
     Scaffold(
@@ -125,7 +144,7 @@ fun FilterView(
                         if (newSelection.size == oldSelection.size) {
                             newSelection.add(activityType)
                         }
-                        onFilterChange(filter.copy(types = newSelection))
+                        filter = filter.copy(types = newSelection)
                     },
                     typeRows = typeRows,
                 )
@@ -145,7 +164,7 @@ fun FilterView(
                         if (newSelection.size == oldSelection.size) {
                             newSelection.add(category)
                         }
-                        onFilterChange(filter.copy(categories = newSelection))
+                        filter = filter.copy(categories = newSelection)
                     }
                 )
             }
@@ -165,7 +184,7 @@ fun FilterView(
                                 } else {
                                     range
                                 }
-                                onFilterChange(filter.copy(range = newRange))
+                                filter = filter.copy(range = newRange)
                             },
                             label = {
                                 Text(
@@ -194,14 +213,13 @@ fun FilterView(
                                     AttributeFilter.TriState.Yes -> AttributeFilter.TriState.No
                                     AttributeFilter.TriState.No -> AttributeFilter.TriState.Undefined
                                 }
-                                onFilterChange(
-                                    filter.copy(
-                                        attributes = filter.attributes.with(
-                                            attribute,
-                                            newState
-                                        )
+                                filter = filter.copy(
+                                    attributes = filter.attributes.with(
+                                        attribute,
+                                        newState
                                     )
                                 )
+
                             },
                             label = {
                                 Text(

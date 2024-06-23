@@ -174,3 +174,10 @@ val MIGRATION_6_7 = object : Migration(6, 7) {
         db.execSQL("DROP TABLE TempActivityType")
     }
 }
+
+val MIGRATION_7_8 = object : Migration(7, 8) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("CREATE TABLE IF NOT EXISTS FilterHistoryItem (`uid` INTEGER, `type` TEXT NOT NULL, `text` TEXT, `date_range_option` TEXT, `category` TEXT, `type_id` INTEGER, `attribute` TEXT, `attribute_state` INTEGER, `last_updated` INTEGER NOT NULL, PRIMARY KEY(`uid`), FOREIGN KEY(`type_id`) REFERENCES `ActivityType`(`uid`) ON DELETE CASCADE )")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_FilterHistoryItem_last_updated` ON FilterHistoryItem (`last_updated`)")
+    }
+}

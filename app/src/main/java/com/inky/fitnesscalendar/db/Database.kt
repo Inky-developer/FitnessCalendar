@@ -10,14 +10,16 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.inky.fitnesscalendar.data.Activity
 import com.inky.fitnesscalendar.data.ActivityType
 import com.inky.fitnesscalendar.data.Recording
+import com.inky.fitnesscalendar.data.activity_filter.FilterHistoryItem
 import com.inky.fitnesscalendar.db.dao.ActivityDao
 import com.inky.fitnesscalendar.db.dao.ActivityTypeDao
+import com.inky.fitnesscalendar.db.dao.FilterHistoryDao
 import com.inky.fitnesscalendar.db.dao.RecordingDao
 import com.inky.fitnesscalendar.util.DATABASE_NAME
 
 @Database(
-    version = 7,
-    entities = [Activity::class, Recording::class, ActivityType::class],
+    version = 8,
+    entities = [Activity::class, Recording::class, ActivityType::class, FilterHistoryItem::class],
     autoMigrations = [
         AutoMigration(from = 2, to = 3),
         AutoMigration(from = 3, to = 4),
@@ -32,6 +34,8 @@ abstract class AppDatabase : RoomDatabase() {
 
     abstract fun activityTypeDao(): ActivityTypeDao
 
+    abstract fun filterHistoryDao(): FilterHistoryDao
+
     companion object {
         @Volatile
         private var instance: AppDatabase? = null
@@ -45,7 +49,7 @@ abstract class AppDatabase : RoomDatabase() {
         private fun buildDatabase(context: Context) =
             Room
                 .databaseBuilder(context, AppDatabase::class.java, DATABASE_NAME)
-                .addMigrations(MIGRATION_1_2, MIGRATION_5_6, MIGRATION_6_7)
+                .addMigrations(MIGRATION_1_2, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8)
                 .addCallback(object : Callback() {
                     override fun onCreate(db: SupportSQLiteDatabase) {
                         loadDefaultData(db)

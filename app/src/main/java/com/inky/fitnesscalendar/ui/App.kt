@@ -125,22 +125,30 @@ fun App(viewModel: GenericViewModel = hiltViewModel()) {
                             },
                             onEditFilter = {
                                 filterState = it
+                                viewModel.addToFilterHistory(filterState)
                             },
                             isNewActivityOpen = isNewActivityOpen
                         )
                     }
                 }
-                composable(Views.FilterActivity.pathTemplate(), enterTransition = {
-                    slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Up)
-                }, exitTransition = {
-                    slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Down)
-                }) {
+                composable(
+                    Views.FilterActivity.pathTemplate(),
+                    enterTransition = {
+                        slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Up)
+                    },
+                    exitTransition = {
+                        slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Down)
+                    }
+                ) {
                     currentView = Views.FilterActivity
                     ProvideSharedContent(sharedContentScope = this@SharedTransitionLayout) {
                         FilterView(
-                            filter = filterState,
-                            onFilterChange = { filterState = it },
-                            onBack = { navController.popBackStack() }
+                            initialFilter = filterState,
+                            onFilterChange = {
+                                filterState = it
+                                viewModel.addToFilterHistory(filterState)
+                            },
+                            onNavigateBack = { navController.popBackStack() }
                         )
                     }
                 }

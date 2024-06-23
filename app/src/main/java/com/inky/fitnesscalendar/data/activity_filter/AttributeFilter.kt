@@ -54,5 +54,12 @@ data class AttributeFilter(
             No -> false
             Undefined -> null
         }
+
+        companion object {
+            fun fromBoolean(value: Boolean) = when (value) {
+                true -> Yes
+                false -> No
+            }
+        }
     }
 }

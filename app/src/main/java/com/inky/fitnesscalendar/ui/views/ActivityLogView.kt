@@ -1,6 +1,5 @@
 package com.inky.fitnesscalendar.ui.views
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.Spring
@@ -33,9 +32,11 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.InputChip
+import androidx.compose.material3.InputChipDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -57,7 +58,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.Activity
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
-import com.inky.fitnesscalendar.data.activity_filter.AttributeFilter
+import com.inky.fitnesscalendar.data.activity_filter.ActivityFilterChip
 import com.inky.fitnesscalendar.ui.components.ActivityCard
 import com.inky.fitnesscalendar.ui.components.NewActivityFAB
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
@@ -81,6 +82,7 @@ fun ActivityLog(
     val activityListState = rememberLazyListState()
     val activities by remember(filter) { viewModel.repository.getActivities(filter) }
         .collectAsState(initial = emptyList())
+    val filterHistoryItems by viewModel.filterHistory.collectAsState(initial = emptyList())
 
     // Scroll to requested activity or to the newest activity
     var scrollToId by remember(initialSelectedActivityId) { mutableStateOf(initialSelectedActivityId) }
@@ -151,15 +153,17 @@ fun ActivityLog(
         Column(
             modifier = Modifier.padding(innerPadding)
         ) {
-            AnimatedVisibility(visible = !filter.isEmpty()) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(appBarContainerColor)
-                        .padding(all = 8.dp)
-                ) {
-                    FilterInformation(filter = filter, onChange = onEditFilter)
-                }
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(appBarContainerColor)
+                    .padding(all = 8.dp)
+            ) {
+                FilterInformation(
+                    filter = filter,
+                    historyItems = filterHistoryItems,
+                    onChange = onEditFilter
+                )
             }
             if (activities.isEmpty()) {
                 Row(
@@ -221,84 +225,67 @@ fun ActivityLog(
 }
 
 @Composable
-private fun FilterInformation(filter: ActivityFilter, onChange: (ActivityFilter) -> Unit) {
+private fun FilterInformation(
+    filter: ActivityFilter,
+    historyItems: List<ActivityFilterChip>,
+    onChange: (ActivityFilter) -> Unit
+) {
     val listState = rememberLazyListState()
-    val attributes = remember(filter) {
-        filter.attributes.entries()
-            .filter { (_, value) -> value != AttributeFilter.TriState.Undefined }
+    val context = LocalContext.current
+    val filterItems = remember(filter) { filter.items() }
+    val filteredHistoryItems = remember(filter, historyItems) {
+        historyItems.filter {
+            !filterItems.contains(
+                it
+            )
+        }
     }
 
     LazyRow(state = listState) {
-        if (filter.text != null) {
-            item {
-                FilterChip(
-                    onClick = { onChange(filter.copy(text = null)) },
-                    label = { Text(filter.text) },
-                    leadingIcon = { Icon(Icons.Outlined.Edit, stringResource(R.string.text)) }
-                )
-            }
-        }
-        if (filter.range != null) {
-            item {
-                FilterChip(
-                    onClick = { onChange(filter.copy(range = null)) },
-                    label = { Text(stringResource(filter.range.nameId)) },
-                    leadingIcon = {
-                        Icon(
-                            Icons.Outlined.DateRange,
-                            stringResource(R.string.date_range)
-                        )
-                    }
-                )
-            }
-        }
-        items(filter.categories) { category ->
+        items(filterItems) { chip ->
             FilterChip(
-                onClick = { onChange(filter.copy(categories = filter.categories.filter { it != category })) },
-                leadingIcon = { Text(category.emoji, style = MaterialTheme.typography.titleLarge) },
-                label = {
-                    Text(
-                        stringResource(category.nameId),
-                        style = MaterialTheme.typography.labelLarge
-                    )
-                }
+                onClick = { onChange(chip.removeFrom(filter)) },
+                label = { Text(chip.displayText(context)) },
+                leadingIcon = { FilterChipIcon(chip) }
             )
         }
-        items(filter.types) { type ->
-            FilterChip(
-                onClick = { onChange(filter.copy(types = filter.types.filter { it != type })) },
-                leadingIcon = { Text(type.emoji, style = MaterialTheme.typography.titleLarge) },
-                label = {
-                    Text(
-                        type.name,
-                        style = MaterialTheme.typography.labelLarge
-                    )
-                },
+
+        items(filteredHistoryItems) { chip ->
+            SuggestionFilterChip(
+                onClick = { onChange(chip.addTo(filter)) },
+                label = { Text(chip.displayText(context)) },
             )
         }
-        items(attributes) { (attribute, value) ->
-            FilterChip(
-                onClick = {
-                    val newAttributes =
-                        filter.attributes.with(attribute, AttributeFilter.TriState.Undefined)
-                    onChange(filter.copy(attributes = newAttributes))
-                },
-                leadingIcon = {
-                    Icon(
-                        painterResource(R.drawable.outline_label_24),
-                        stringResource(R.string.attribute)
-                    )
-                },
-                label = {
-                    Text(
-                        attribute.getString(
-                            LocalContext.current,
-                            value.toBooleanOrNull() == true
-                        )
-                    )
-                }
-            )
-        }
+    }
+}
+
+@Composable
+private fun FilterChipIcon(chip: ActivityFilterChip) {
+    when (chip) {
+        is ActivityFilterChip.AttributeFilterChip -> Icon(
+            painterResource(R.drawable.outline_label_24),
+            stringResource(R.string.attribute)
+        )
+
+        is ActivityFilterChip.CategoryFilterChip -> Text(
+            chip.category.emoji,
+            style = MaterialTheme.typography.titleLarge
+        )
+
+        is ActivityFilterChip.DateFilterChip -> Icon(
+            Icons.Outlined.DateRange,
+            stringResource(R.string.date_range)
+        )
+
+        is ActivityFilterChip.TextFilterChip -> Icon(
+            Icons.Outlined.Edit,
+            stringResource(R.string.text)
+        )
+
+        is ActivityFilterChip.TypeFilterChip -> Text(
+            chip.type.emoji,
+            style = MaterialTheme.typography.titleLarge
+        )
     }
 }
 
@@ -314,6 +301,29 @@ private fun LazyItemScope.FilterChip(
         label = label,
         leadingIcon = leadingIcon,
         trailingIcon = { Icon(Icons.Outlined.Clear, stringResource(R.string.clear)) },
+        colors = InputChipDefaults.inputChipColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer),
+        modifier = Modifier
+            .padding(horizontal = 4.dp)
+            .animateItem()
+    )
+}
+
+@Composable
+private fun LazyItemScope.SuggestionFilterChip(
+    label: @Composable () -> Unit,
+    onClick: () -> Unit
+) {
+    SuggestionChip(
+        onClick = onClick,
+        label = label,
+        icon = {
+            Icon(
+                painterResource(
+                    R.drawable.outline_history_24,
+                ),
+                stringResource(R.string.recent)
+            )
+        },
         modifier = Modifier
             .padding(horizontal = 4.dp)
             .animateItem()

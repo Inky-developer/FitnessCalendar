@@ -9,8 +9,10 @@ import androidx.lifecycle.viewModelScope
 import com.inky.fitnesscalendar.AppRepository
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.Activity
+import com.inky.fitnesscalendar.data.activity_filter.ActivityFilterChip.Companion.toActivityFilterChip
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -20,6 +22,9 @@ class ActivityLogViewModel @Inject constructor(
     val repository: AppRepository
 ) : ViewModel() {
     val snackbarHostState = SnackbarHostState()
+
+    val filterHistory = repository.getFilterHistoryItems()
+        .map { item -> item.mapNotNull { it.toActivityFilterChip() } }
 
     fun deleteActivity(activity: Activity) {
         viewModelScope.launch {

@@ -24,4 +24,7 @@ class DatabaseModule {
 
     @Provides
     fun provideActivityTypeDao(database: AppDatabase) = database.activityTypeDao()
+
+    @Provides
+    fun filterHistoryDao(database: AppDatabase) = database.filterHistoryDao()
 }
