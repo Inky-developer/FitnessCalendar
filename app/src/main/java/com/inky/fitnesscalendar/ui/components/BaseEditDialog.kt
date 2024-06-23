@@ -51,6 +51,7 @@ fun BaseEditDialog(
                         color = MaterialTheme.colorScheme.onPrimaryContainer,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier
+                            .weight(1f)
                             .wrapContentSize()
                             .animateContentSize()
                     )
