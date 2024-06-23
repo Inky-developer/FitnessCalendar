@@ -3,7 +3,7 @@ package com.inky.fitnesscalendar.util
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.inky.fitnesscalendar.data.Activity
+import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.data.Vehicle
 import java.time.Instant
 import java.util.Date

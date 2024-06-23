@@ -47,11 +47,11 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
-import com.inky.fitnesscalendar.data.Activity
+import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.data.ActivityStatistics
-import com.inky.fitnesscalendar.data.Recording
-import com.inky.fitnesscalendar.data.TypeActivity
-import com.inky.fitnesscalendar.data.TypeRecording
+import com.inky.fitnesscalendar.db.entities.Recording
+import com.inky.fitnesscalendar.db.entities.TypeActivity
+import com.inky.fitnesscalendar.db.entities.TypeRecording
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivityCard
 import com.inky.fitnesscalendar.ui.components.CompactActivityCard

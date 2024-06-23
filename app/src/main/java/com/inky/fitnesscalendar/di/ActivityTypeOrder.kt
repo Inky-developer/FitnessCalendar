@@ -1,8 +1,8 @@
 package com.inky.fitnesscalendar.di
 
 import com.inky.fitnesscalendar.data.ActivityCategory
-import com.inky.fitnesscalendar.data.ActivityType
-import com.inky.fitnesscalendar.data.TypeActivity
+import com.inky.fitnesscalendar.db.entities.ActivityType
+import com.inky.fitnesscalendar.db.entities.TypeActivity
 
 class ActivityTypeOrder(private val frequencies: Map<ActivityType, Int>) {
     fun getRows(typesByCategory: Map<ActivityCategory, List<ActivityType>>) =

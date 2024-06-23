@@ -6,9 +6,9 @@ import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Upsert
-import com.inky.fitnesscalendar.data.Activity
-import com.inky.fitnesscalendar.data.Recording
-import com.inky.fitnesscalendar.data.TypeActivity
+import com.inky.fitnesscalendar.db.entities.Activity
+import com.inky.fitnesscalendar.db.entities.Recording
+import com.inky.fitnesscalendar.db.entities.TypeActivity
 import com.inky.fitnesscalendar.data.Vehicle
 import kotlinx.coroutines.flow.Flow
 import java.util.Date

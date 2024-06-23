@@ -2,7 +2,9 @@ package com.inky.fitnesscalendar.data.activity_filter
 
 import android.content.Context
 import com.inky.fitnesscalendar.data.ActivityCategory
-import com.inky.fitnesscalendar.data.ActivityType
+import com.inky.fitnesscalendar.db.entities.ActivityType
+import com.inky.fitnesscalendar.db.entities.FilterHistoryItem
+import com.inky.fitnesscalendar.db.entities.FullFilterHistoryItem
 
 sealed class ActivityFilterChip {
     data class TextFilterChip(val text: String) : ActivityFilterChip()

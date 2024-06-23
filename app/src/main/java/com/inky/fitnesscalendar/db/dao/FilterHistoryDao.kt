@@ -4,8 +4,8 @@ import androidx.room.Dao
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Upsert
-import com.inky.fitnesscalendar.data.activity_filter.FilterHistoryItem
-import com.inky.fitnesscalendar.data.activity_filter.FullFilterHistoryItem
+import com.inky.fitnesscalendar.db.entities.FilterHistoryItem
+import com.inky.fitnesscalendar.db.entities.FullFilterHistoryItem
 import kotlinx.coroutines.flow.Flow
 
 @Dao

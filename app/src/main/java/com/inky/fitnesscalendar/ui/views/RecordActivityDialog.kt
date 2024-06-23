@@ -13,8 +13,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.R
-import com.inky.fitnesscalendar.data.ActivityType
-import com.inky.fitnesscalendar.data.Recording
+import com.inky.fitnesscalendar.db.entities.ActivityType
+import com.inky.fitnesscalendar.db.entities.Recording
 import com.inky.fitnesscalendar.data.Vehicle
 import com.inky.fitnesscalendar.di.ActivityTypeDecisionTree
 import com.inky.fitnesscalendar.ui.components.ActivitySelector

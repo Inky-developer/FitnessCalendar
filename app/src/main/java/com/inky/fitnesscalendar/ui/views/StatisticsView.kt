@@ -45,7 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
-import com.inky.fitnesscalendar.data.Activity
+import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.data.ActivityCategory
 import com.inky.fitnesscalendar.data.Displayable
 import com.inky.fitnesscalendar.preferences.Preference

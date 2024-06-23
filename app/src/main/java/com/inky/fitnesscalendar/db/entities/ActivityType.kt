@@ -1,10 +1,13 @@
-package com.inky.fitnesscalendar.data
+package com.inky.fitnesscalendar.db.entities
 
 import android.content.Context
 import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import com.inky.fitnesscalendar.data.ActivityCategory
+import com.inky.fitnesscalendar.data.ActivityTypeColor
+import com.inky.fitnesscalendar.data.Displayable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize

@@ -1,7 +1,9 @@
-package com.inky.fitnesscalendar.data
+package com.inky.fitnesscalendar.db.entities
 
 import androidx.room.Embedded
 import androidx.room.Relation
+import com.inky.fitnesscalendar.db.entities.Activity
+import com.inky.fitnesscalendar.db.entities.ActivityType
 
 data class TypeActivity(
     @Embedded val activity: Activity,

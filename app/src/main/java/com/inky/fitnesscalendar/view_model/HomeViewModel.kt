@@ -8,9 +8,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.inky.fitnesscalendar.AppRepository
 import com.inky.fitnesscalendar.R
-import com.inky.fitnesscalendar.data.Activity
+import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.data.ActivityStatistics
-import com.inky.fitnesscalendar.data.Recording
+import com.inky.fitnesscalendar.db.entities.Recording
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.data.activity_filter.DateRangeOption
 import com.inky.fitnesscalendar.util.Duration.Companion.until

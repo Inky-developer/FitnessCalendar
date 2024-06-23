@@ -2,7 +2,7 @@ package com.inky.fitnesscalendar.view_model.settings
 
 import android.os.Parcelable
 import com.inky.fitnesscalendar.data.ActivityCategory
-import com.inky.fitnesscalendar.data.ActivityType
+import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.data.ActivityTypeColor
 import kotlinx.parcelize.Parcelize
 

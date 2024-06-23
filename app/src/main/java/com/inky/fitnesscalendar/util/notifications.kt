@@ -12,7 +12,7 @@ import androidx.core.app.NotificationCompat
 import com.inky.fitnesscalendar.MainActivity
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.broadcast_receiver.NotificationBroadcastReceiver
-import com.inky.fitnesscalendar.data.ActivityType
+import com.inky.fitnesscalendar.db.entities.ActivityType
 
 fun Context.showRecordingNotification(
     recordingId: Int,

@@ -4,10 +4,10 @@ import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.Stable
 import androidx.room.withTransaction
-import com.inky.fitnesscalendar.data.Activity
-import com.inky.fitnesscalendar.data.ActivityType
-import com.inky.fitnesscalendar.data.Recording
-import com.inky.fitnesscalendar.data.TypeActivity
+import com.inky.fitnesscalendar.db.entities.Activity
+import com.inky.fitnesscalendar.db.entities.ActivityType
+import com.inky.fitnesscalendar.db.entities.Recording
+import com.inky.fitnesscalendar.db.entities.TypeActivity
 import com.inky.fitnesscalendar.data.Vehicle
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilterChip

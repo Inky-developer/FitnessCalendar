@@ -48,9 +48,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import com.inky.fitnesscalendar.R
-import com.inky.fitnesscalendar.data.Activity
-import com.inky.fitnesscalendar.data.ActivityType
-import com.inky.fitnesscalendar.data.TypeActivity
+import com.inky.fitnesscalendar.db.entities.Activity
+import com.inky.fitnesscalendar.db.entities.ActivityType
+import com.inky.fitnesscalendar.db.entities.TypeActivity
 import com.inky.fitnesscalendar.di.ActivityTypeDecisionTree
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivitySelector

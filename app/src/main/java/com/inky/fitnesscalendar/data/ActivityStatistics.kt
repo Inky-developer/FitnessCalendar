@@ -1,5 +1,7 @@
 package com.inky.fitnesscalendar.data
 
+import com.inky.fitnesscalendar.db.entities.ActivityType
+import com.inky.fitnesscalendar.db.entities.TypeActivity
 import com.inky.fitnesscalendar.util.Duration
 import com.inky.fitnesscalendar.util.Duration.Companion.until
 import com.inky.fitnesscalendar.util.toDate

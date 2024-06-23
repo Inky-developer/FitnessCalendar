@@ -1,8 +1,7 @@
-package com.inky.fitnesscalendar.data.activity_filter
+package com.inky.fitnesscalendar.db.entities
 
 import androidx.room.Embedded
 import androidx.room.Relation
-import com.inky.fitnesscalendar.data.ActivityType
 
 data class FullFilterHistoryItem(
     @Embedded val item: FilterHistoryItem,

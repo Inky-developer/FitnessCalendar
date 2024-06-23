@@ -1,7 +1,7 @@
 package com.inky.fitnesscalendar.util.decision_tree
 
-import com.inky.fitnesscalendar.data.ActivityType
-import com.inky.fitnesscalendar.data.TypeActivity
+import com.inky.fitnesscalendar.db.entities.ActivityType
+import com.inky.fitnesscalendar.db.entities.TypeActivity
 import com.inky.fitnesscalendar.util.removedAt
 import java.time.Instant
 import java.util.Calendar

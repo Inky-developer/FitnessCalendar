@@ -2,7 +2,7 @@ package com.inky.fitnesscalendar.data.activity_filter
 
 import android.os.Parcelable
 import com.inky.fitnesscalendar.data.ActivityCategory
-import com.inky.fitnesscalendar.data.ActivityType
+import com.inky.fitnesscalendar.db.entities.ActivityType
 import kotlinx.parcelize.Parcelize
 
 

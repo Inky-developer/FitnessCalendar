@@ -1,4 +1,4 @@
-package com.inky.fitnesscalendar.data.activity_filter
+package com.inky.fitnesscalendar.db.entities
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
@@ -6,7 +6,8 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.inky.fitnesscalendar.data.ActivityCategory
-import com.inky.fitnesscalendar.data.ActivityType
+import com.inky.fitnesscalendar.data.activity_filter.AttributeFilter
+import com.inky.fitnesscalendar.data.activity_filter.DateRangeOption
 import java.time.Instant
 import java.util.Date
 

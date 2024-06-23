@@ -2,7 +2,7 @@ package com.inky.fitnesscalendar.view_model.statistics
 
 import com.inky.fitnesscalendar.data.ActivityCategory
 import com.inky.fitnesscalendar.data.ActivityStatistics
-import com.inky.fitnesscalendar.data.ActivityType
+import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.data.Displayable
 
 /**

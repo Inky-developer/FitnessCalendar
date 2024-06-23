@@ -7,10 +7,10 @@ import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
-import com.inky.fitnesscalendar.data.Activity
-import com.inky.fitnesscalendar.data.ActivityType
-import com.inky.fitnesscalendar.data.Recording
-import com.inky.fitnesscalendar.data.activity_filter.FilterHistoryItem
+import com.inky.fitnesscalendar.db.entities.Activity
+import com.inky.fitnesscalendar.db.entities.ActivityType
+import com.inky.fitnesscalendar.db.entities.Recording
+import com.inky.fitnesscalendar.db.entities.FilterHistoryItem
 import com.inky.fitnesscalendar.db.dao.ActivityDao
 import com.inky.fitnesscalendar.db.dao.ActivityTypeDao
 import com.inky.fitnesscalendar.db.dao.FilterHistoryDao

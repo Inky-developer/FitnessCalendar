@@ -1,9 +1,10 @@
-package com.inky.fitnesscalendar.data
+package com.inky.fitnesscalendar.db.entities
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.PrimaryKey
+import com.inky.fitnesscalendar.data.Vehicle
 import java.time.Instant
 import java.util.Date
 

@@ -5,8 +5,8 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
-import com.inky.fitnesscalendar.data.Recording
-import com.inky.fitnesscalendar.data.TypeRecording
+import com.inky.fitnesscalendar.db.entities.Recording
+import com.inky.fitnesscalendar.db.entities.TypeRecording
 import kotlinx.coroutines.flow.Flow
 
 @Dao
