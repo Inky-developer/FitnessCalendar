@@ -52,7 +52,7 @@ abstract class AppDatabase : RoomDatabase() {
                 .addMigrations(MIGRATION_1_2, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8)
                 .addCallback(object : Callback() {
                     override fun onCreate(db: SupportSQLiteDatabase) {
-                        loadDefaultData(db)
+                        loadDefaultData(db, context)
                     }
                 })
                 .build()
