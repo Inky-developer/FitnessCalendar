@@ -18,7 +18,7 @@ import java.util.Locale
 enum class Period(val nameId: Int, val xLabelId: Int, val numVisibleEntries: Float) {
     Day(R.string.days, R.string.day, 7f),
     Week(R.string.weeks, R.string.week, 5f),
-    Month(R.string.months, R.string.month, 12f),
+    Month(R.string.months, R.string.month, 6f),
     Year(R.string.years, R.string.year, 4f);
 
     /**
