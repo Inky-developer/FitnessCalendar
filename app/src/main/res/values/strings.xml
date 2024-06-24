@@ -117,7 +117,7 @@
     <string name="ask_delete_activity">Delete activity?</string>
     <string name="configure_activity_types">Activity types</string>
     <string name="debug">Debug</string>
-    <string name="actity_types">Activity Types</string>
+    <string name="activity_types">Activity Types</string>
     <string name="edit_type">Edit %1s</string>
     <string name="type_name">Name</string>
     <string name="name_of_type">Name of type</string>
@@ -137,7 +137,7 @@
     <string name="color_brown">Brown</string>
     <string name="color_yellow">Yellow</string>
     <string name="color_grey">Grey</string>
-    <string name="emoji">Emoij</string>
+    <string name="emoji">Emoji</string>
     <string name="recent">Recent</string>
     <plurals name="num_activities">
         <item quantity="one">%1d activity</item>

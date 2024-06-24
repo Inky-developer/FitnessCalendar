@@ -3,6 +3,7 @@ package com.inky.fitnesscalendar.ui.components
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -11,7 +12,7 @@ import kotlinx.coroutines.delay
 
 @Composable
 fun Timer(content: @Composable (Long) -> Unit) {
-    var ticks by remember { mutableStateOf(0) }
+    var ticks by remember { mutableIntStateOf(0) }
     var isRunning by remember { mutableStateOf(true) }
     val time = remember(ticks) { System.currentTimeMillis() }
 

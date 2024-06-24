@@ -123,8 +123,6 @@ class AppRepository @Inject constructor(
 
     fun getActivityTypes() = activityTypeDao.getTypes()
 
-    fun getActivityTypes(filter: List<Int>) = activityTypeDao.getTypes(filter)
-
     fun getActivityTypeRows() =
         getActivityTypesByCategory().map { ActivityTypeOrder.getRowsOrDefault(it) }
 

@@ -58,8 +58,8 @@ fun Context.showRecordingNotification(
         setContentTitle(title)
         setSmallIcon(R.drawable.outline_timer_24)
         setContentIntent(pendingIntent)
-        addAction(R.drawable.ic_notification_cancel, getString(R.string.abort), cancelIntent)
-        addAction(R.drawable.ic_notification_save, getString(R.string.save), saveIntent)
+        addAction(R.drawable.notification_cancel, getString(R.string.abort), cancelIntent)
+        addAction(R.drawable.notification_okay, getString(R.string.save), saveIntent)
     }
     notificationManager.notify(recordingId, builder.build())
 }

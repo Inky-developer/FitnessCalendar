@@ -72,7 +72,7 @@ fun ActivityTypeView(viewModel: ActivityTypeViewModel = hiltViewModel(), onBack:
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = { Text(stringResource(R.string.actity_types)) },
+                title = { Text(stringResource(R.string.activity_types)) },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.back))

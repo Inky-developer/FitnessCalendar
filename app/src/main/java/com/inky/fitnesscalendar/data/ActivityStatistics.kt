@@ -24,8 +24,6 @@ data class ActivityStatistics(
 
     fun isEmpty() = activities.isEmpty()
 
-    fun isNotEmpty() = activities.isNotEmpty()
-
     val activitiesByCategory: Map<ActivityCategory, ActivityStatistics>
         get() = activities
             .groupBy { it.type.activityCategory }

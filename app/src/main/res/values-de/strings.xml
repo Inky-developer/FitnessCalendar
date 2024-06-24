@@ -128,7 +128,7 @@
     <string name="ask_delete_activity">Aktivität löschen?</string>
     <string name="configure_activity_types">Aktivitätsarten</string>
     <string name="debug">Debug</string>
-    <string name="actity_types">Aktivitätsarten</string>
+    <string name="activity_types">Aktivitätsarten</string>
     <string name="edit_type">%1s bearbeiten</string>
     <string name="type_name">Name</string>
     <string name="name_of_type">Name der Aktivitätsart</string>
