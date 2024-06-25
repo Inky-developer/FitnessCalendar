@@ -18,7 +18,7 @@ import java.util.Date
         childColumns = arrayOf("type_id"),
         onDelete = ForeignKey.CASCADE
     )],
-    indices = [Index("last_updated")]
+    indices = [Index("last_updated"), Index("type_id")]
 )
 data class FilterHistoryItem(
     @ColumnInfo(name = "uid") @PrimaryKey val uid: Int? = null,

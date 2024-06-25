@@ -181,3 +181,11 @@ val MIGRATION_7_8 = object : Migration(7, 8) {
         db.execSQL("CREATE INDEX IF NOT EXISTS `index_FilterHistoryItem_last_updated` ON FilterHistoryItem (`last_updated`)")
     }
 }
+
+val MIGRATION_8_9 = object : Migration(8, 9) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_Activity_type_id` ON Activity (`type_id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_FilterHistoryItem_type_id` ON FilterHistoryItem (`type_id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_Recording_type_id` ON Recording (`type_id`)")
+    }
+}
