@@ -2,10 +2,12 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.hilt)
-    alias(libs.plugins.ksp)
     id("kotlin-parcelize")
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.room)
+    // Make sure this option is always at the bottom
+    // Gradle is weird
+    alias(libs.plugins.ksp)
 }
 
 room {
