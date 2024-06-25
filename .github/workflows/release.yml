@@ -16,10 +16,10 @@ jobs:
         KEYSTORE_B64: ${{ secrets.KEYSTOREB64 }}
       run: |
         echo $KEYSTORE_B64 | base64 --decode > app/keystore.jks
-    - name: set up JDK 17
+    - name: set up java
       uses: actions/setup-java@v3
       with:
-        java-version: '17'
+        java-version: '21'
         distribution: 'temurin'
         cache: gradle
 
