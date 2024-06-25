@@ -5,8 +5,6 @@ plugins {
     id("kotlin-parcelize")
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.room)
-    // Make sure this option is always at the bottom
-    // Gradle is weird
     alias(libs.plugins.ksp)
 }
 
@@ -88,6 +86,9 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    hilt {
+        enableAggregatingTask = true
+    }
 }
 
 dependencies {
@@ -110,7 +111,6 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.coil.compose)
 
-    annotationProcessor(libs.androidx.room.compiler)
     ksp(libs.hilt.android.compiler)
     ksp(libs.androidx.room.compiler)
 
