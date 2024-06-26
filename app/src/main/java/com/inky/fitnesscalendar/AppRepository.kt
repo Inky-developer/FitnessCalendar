@@ -4,10 +4,6 @@ import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.Stable
 import androidx.room.withTransaction
-import com.inky.fitnesscalendar.db.entities.Activity
-import com.inky.fitnesscalendar.db.entities.ActivityType
-import com.inky.fitnesscalendar.db.entities.Recording
-import com.inky.fitnesscalendar.db.entities.TypeActivity
 import com.inky.fitnesscalendar.data.Vehicle
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilterChip
@@ -17,9 +13,15 @@ import com.inky.fitnesscalendar.db.dao.ActivityDao
 import com.inky.fitnesscalendar.db.dao.ActivityTypeDao
 import com.inky.fitnesscalendar.db.dao.FilterHistoryDao
 import com.inky.fitnesscalendar.db.dao.RecordingDao
+import com.inky.fitnesscalendar.db.entities.Activity
+import com.inky.fitnesscalendar.db.entities.ActivityType
+import com.inky.fitnesscalendar.db.entities.Recording
+import com.inky.fitnesscalendar.db.entities.TypeActivity
+import com.inky.fitnesscalendar.db.entities.TypeRecording
 import com.inky.fitnesscalendar.di.ActivityTypeOrder
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.util.hideRecordingNotification
+import com.inky.fitnesscalendar.util.showRecordingNotification
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -93,8 +95,13 @@ class AppRepository @Inject constructor(
 
     suspend fun getActivityImages() = activityDao.getImages()
 
-    suspend fun startRecording(recording: Recording) {
-        recordingDao.insert(recording)
+    suspend fun startRecording(typeRecording: TypeRecording, context: Context) {
+        val recordingId = recordingDao.insert(typeRecording.recording).toInt()
+        context.showRecordingNotification(
+            recordingId,
+            typeRecording.type,
+            typeRecording.recording.startTime.time
+        )
     }
 
     fun getRecordings() = recordingDao.getRecordings()

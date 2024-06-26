@@ -16,6 +16,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -58,6 +59,8 @@ fun App(viewModel: GenericViewModel = hiltViewModel()) {
     var isNewActivityOpen by rememberSaveable { mutableStateOf(false) }
 
     val typeRows by viewModel.repository.getActivityTypeRows().collectAsState(initial = emptyList())
+
+    val context = LocalContext.current
 
     NavigationDrawer(
         drawerState = navigationDrawerState,
@@ -181,7 +184,7 @@ fun App(viewModel: GenericViewModel = hiltViewModel()) {
                     RecordActivity(
                         onStart = {
                             scope.launch {
-                                viewModel.repository.startRecording(it)
+                                viewModel.repository.startRecording(it, context)
                             }
                             navController.popBackStack()
                         },

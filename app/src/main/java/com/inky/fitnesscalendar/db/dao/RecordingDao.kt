@@ -19,7 +19,7 @@ interface RecordingDao {
     suspend fun getById(uid: Int): Recording?
 
     @Insert
-    suspend fun insert(recording: Recording)
+    suspend fun insert(recording: Recording): Long
 
     @Delete
     suspend fun delete(recording: Recording)
