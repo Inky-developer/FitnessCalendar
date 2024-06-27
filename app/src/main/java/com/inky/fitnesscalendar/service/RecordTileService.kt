@@ -1,23 +1,38 @@
 package com.inky.fitnesscalendar.service
 
-import android.app.PendingIntent
-import android.content.Intent
-import android.os.Build
+import android.app.Dialog
+import android.content.Context
+import android.os.Bundle
 import android.service.quicksettings.TileService
+import androidx.compose.foundation.background
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.ComposeView
+import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.LifecycleRegistry
+import androidx.lifecycle.ViewModelStore
+import androidx.lifecycle.ViewModelStoreOwner
+import androidx.lifecycle.setViewTreeLifecycleOwner
+import androidx.lifecycle.setViewTreeViewModelStoreOwner
+import androidx.savedstate.SavedStateRegistry
+import androidx.savedstate.SavedStateRegistryController
+import androidx.savedstate.SavedStateRegistryOwner
+import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.inky.fitnesscalendar.AppRepository
-import com.inky.fitnesscalendar.MainActivity
 import com.inky.fitnesscalendar.R
-import com.inky.fitnesscalendar.db.entities.ActivityType
-import com.inky.fitnesscalendar.db.entities.Recording
 import com.inky.fitnesscalendar.db.entities.TypeRecording
-import com.inky.fitnesscalendar.di.ActivityTypeDecisionTree
+import com.inky.fitnesscalendar.ui.theme.FitnessCalendarTheme
+import com.inky.fitnesscalendar.ui.views.QsTileRecordActivityDialog
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import java.time.Instant
-import java.util.Date
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -28,82 +43,94 @@ class RecordTileService : TileService() {
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.IO + job)
 
-    private var currentActivityType: ActivityType? = null
-
-    private fun startMainActivity() {
-        val intent = Intent(this, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        }
-        maybeUnlock {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
-                startActivityAndCollapse(
-                    PendingIntent.getActivity(
-                        this,
-                        0,
-                        intent,
-                        PendingIntent.FLAG_IMMUTABLE
-                    )
-                )
-            } else {
-                startActivity(intent)
-            }
-        }
-    }
-
-    private fun maybeUnlock(func: () -> Unit) {
-        if (isSecure) {
-            func()
-        } else {
-            unlockAndRun(func)
-        }
-    }
-
-    private fun startRecording(type: ActivityType) = scope.launch {
-        repository.startRecording(
-            TypeRecording(
-                recording = Recording(
-                    typeId = type.uid!!,
-                    startTime = Date.from(Instant.now())
-                ),
-                type = type
-            ),
-            this@RecordTileService
-        )
-    }
-
     override fun onClick() {
         super.onClick()
-
-        // TODO: Show Dialog when not all data can be determined automatically
-        when (val type = currentActivityType) {
-            null -> startMainActivity()
-            else -> {
-                if (type.hasVehicle) {
-                    startMainActivity()
-                } else {
-                    startRecording(type)
-                }
-
-            }
-        }
-    }
-
-    override fun onStartListening() {
-        super.onStartListening()
-
-        currentActivityType = ActivityTypeDecisionTree.decisionTree?.classifyNow()
-        val title = when (val type = currentActivityType) {
-            null -> getString(R.string.record_activity)
-            else -> getString(R.string.record_activity_type, type.name)
-        }
-        qsTile?.apply {
-            label = title
-            updateTile()
-        }
+        showDialog(
+            TileServiceDialog(this, repository, onStartRecording = { startRecording(it) })
+        )
     }
 
     override fun onDestroy() {
         super.onDestroy()
         job.cancel()
+    }
+
+    private fun startRecording(typeRecording: TypeRecording) = scope.launch {
+        repository.startRecording(
+            typeRecording,
+            this@RecordTileService
+        )
+    }
+
+    class TileServiceDialog(
+        context: Context,
+        val repository: AppRepository,
+        val onStartRecording: (TypeRecording) -> Unit
+    ) : Dialog(context) {
+        private val lifecycleOwner = MyHackyLifecycleOwner()
+
+        override fun onCreate(savedInstanceState: Bundle?) {
+            super.onCreate(savedInstanceState)
+            lifecycleOwner.onStart()
+            val composeView = ComposeView(context).apply {
+                setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+
+                setViewTreeLifecycleOwner(lifecycleOwner)
+                setViewTreeViewModelStoreOwner(lifecycleOwner)
+                setViewTreeSavedStateRegistryOwner(lifecycleOwner)
+
+                setContent {
+                    FitnessCalendarTheme {
+                        Surface(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
+                            val typeRows by repository.getActivityTypeRows()
+                                .collectAsState(initial = emptyList())
+                            QsTileRecordActivityDialog(
+                                typeRows,
+                                onSave = {
+                                    onStartRecording(it)
+                                    dismiss()
+                                },
+                                onDismiss = { dismiss() }
+                            )
+                        }
+                    }
+                }
+            }
+
+            setTitle(R.string.record_activity)
+            setContentView(composeView)
+        }
+
+        override fun onStop() {
+            lifecycleOwner.onStop()
+        }
+
+        /**
+         * https://stackoverflow.com/questions/65755763/inputmethodservice-with-jetpack-compose-composeview-causes-composed-into-the
+         */
+        class MyHackyLifecycleOwner : LifecycleOwner, ViewModelStoreOwner, SavedStateRegistryOwner {
+            private val lifecycleRegistry = LifecycleRegistry(this)
+            private val savedStateRegistryController = SavedStateRegistryController.create(this)
+            private val store = ViewModelStore()
+
+            override val lifecycle: Lifecycle
+                get() = lifecycleRegistry
+
+            override val savedStateRegistry: SavedStateRegistry
+                get() = savedStateRegistryController.savedStateRegistry
+
+            override val viewModelStore: ViewModelStore
+                get() = store
+
+            fun onStart() {
+                savedStateRegistryController.performRestore(null)
+                lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_START)
+            }
+
+            fun onStop() {
+                lifecycleRegistry.handleLifecycleEvent(Lifecycle.Event.ON_STOP)
+                store.clear()
+            }
+        }
     }
 }

@@ -13,7 +13,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.R
-import com.inky.fitnesscalendar.data.Vehicle
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.Recording
 import com.inky.fitnesscalendar.db.entities.TypeRecording
@@ -30,15 +29,21 @@ fun RecordActivity(
     onStart: (TypeRecording) -> Unit,
     onNavigateBack: () -> Unit
 ) {
-    var activityType by remember { mutableStateOf(ActivityTypeDecisionTree.decisionTree?.classifyNow()) }
-    var vehicle by remember { mutableStateOf<Vehicle?>(null) }
+    var state by remember {
+        mutableStateOf(
+            ActivitySelectorState(
+                activityType = ActivityTypeDecisionTree.decisionTree?.classifyNow(),
+                vehicle = null
+            )
+        )
+    }
 
     val relevantTypeRows =
         remember(typeRows) { typeRows.map { row -> row.filter { it.hasDuration } } }
 
     val context = LocalContext.current
-    val title = remember(activityType) {
-        when (val type = activityType) {
+    val title = remember(state) {
+        when (val type = state.activityType) {
             null -> context.getString(R.string.record_activity)
             else -> context.getString(R.string.record_activity_type, type.name)
         }
@@ -46,7 +51,7 @@ fun RecordActivity(
 
     val enabled by remember {
         derivedStateOf {
-            activityType != null && (activityType?.hasVehicle != true || vehicle != null)
+            state.shouldSaveBeEnabled()
         }
     }
 
@@ -54,10 +59,10 @@ fun RecordActivity(
         title = title,
         onNavigateBack = onNavigateBack,
         onSave = {
-            val type = activityType!!
+            val type = state.activityType!!
             val recording = Recording(
                 typeId = type.uid!!,
-                vehicle = vehicle,
+                vehicle = state.vehicle,
                 startTime = Date.from(Instant.now())
             )
             onStart(TypeRecording(recording = recording, type = type))
@@ -67,10 +72,10 @@ fun RecordActivity(
         saveText = { Text(stringResource(R.string.action_record)) }
     ) {
         ActivitySelector(
-            ActivitySelectorState(activityType, vehicle),
+            state,
             typeRows = relevantTypeRows,
-            onActivityType = { activityType = it },
-            onVehicle = { vehicle = it },
+            onActivityType = { state = state.copy(activityType = it) },
+            onVehicle = { state = state.copy(vehicle = it) },
             modifier = Modifier.padding(all = 8.dp)
         )
     }

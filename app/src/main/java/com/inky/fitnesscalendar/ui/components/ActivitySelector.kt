@@ -14,10 +14,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.R
-import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.data.Vehicle
+import com.inky.fitnesscalendar.db.entities.ActivityType
 
-data class ActivitySelectorState(val activityType: ActivityType?, val vehicle: Vehicle?)
+data class ActivitySelectorState(val activityType: ActivityType?, val vehicle: Vehicle?) {
+    fun shouldSaveBeEnabled() =
+        activityType != null && (!activityType.hasVehicle || vehicle != null)
+}
 
 @Composable
 fun ActivitySelector(

@@ -65,17 +65,32 @@ fun BaseEditDialog(
 
             content()
 
-            Row(modifier = Modifier.align(Alignment.End)) {
-                TextButton(onClick = onNavigateBack) {
-                    Text(stringResource(R.string.cancel))
-                }
-                TextButton(
-                    onClick = onSave,
-                    enabled = saveEnabled
-                ) {
-                    saveText()
-                }
-            }
+            OkayCancelRow(
+                onNavigateBack = onNavigateBack,
+                onSave = onSave,
+                saveEnabled = saveEnabled,
+                saveText = saveText
+            )
+        }
+    }
+}
+
+@Composable
+fun ColumnScope.OkayCancelRow(
+    onNavigateBack: () -> Unit,
+    onSave: () -> Unit,
+    saveEnabled: Boolean,
+    saveText: @Composable () -> Unit
+) {
+    Row(modifier = Modifier.align(Alignment.End)) {
+        TextButton(onClick = onNavigateBack) {
+            Text(stringResource(R.string.cancel))
+        }
+        TextButton(
+            onClick = onSave,
+            enabled = saveEnabled
+        ) {
+            saveText()
         }
     }
 }

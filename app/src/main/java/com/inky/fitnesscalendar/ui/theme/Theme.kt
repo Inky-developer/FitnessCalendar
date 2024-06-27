@@ -55,8 +55,11 @@ fun FitnessCalendarTheme(
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
-            val window = (view.context as Activity).window
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
+            if (view.context is Activity) {
+                val window = (view.context as Activity).window
+                WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars =
+                    !darkTheme
+            }
         }
     }
 
