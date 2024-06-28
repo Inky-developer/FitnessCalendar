@@ -35,10 +35,13 @@ fun QsTileRecordActivityDialog(
 ) {
     var state by remember { mutableStateOf(ActivitySelectorState(null, null)) }
     val saveEnabled by remember { derivedStateOf { state.shouldSaveBeEnabled() } }
+    val filteredTypeRows =
+        remember(typeRows) { typeRows.map { row -> row.filter { it.hasDuration } } }
+
     Column(modifier = Modifier.padding(all = 16.dp)) {
         ActivitySelector(
             state = state,
-            typeRows = typeRows,
+            typeRows = filteredTypeRows,
             onActivityType = { state = state.copy(activityType = it) },
             onVehicle = { state = state.copy(vehicle = it) },
             background = MaterialTheme.colorScheme.background
