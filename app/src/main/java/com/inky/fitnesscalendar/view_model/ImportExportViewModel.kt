@@ -5,8 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.inky.fitnesscalendar.AppRepository
 import com.inky.fitnesscalendar.R
-import com.inky.fitnesscalendar.db.entities.Activity
-import com.inky.fitnesscalendar.db.entities.TypeActivity
+import com.inky.fitnesscalendar.util.importCsv
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -26,20 +25,21 @@ class ImportExportViewModel @Inject constructor(
     private val _importing = MutableSharedFlow<Boolean>()
     val importing = _importing.asSharedFlow()
 
-    fun import(activities: List<Activity>) {
+    fun import(importData: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            val types = repository.loadActivityTypes().associateBy { it.uid!! }
+            val types = repository.loadActivityTypes()
+
+            val typeActivities = importCsv(importData, types)
 
             _importing.emit(true)
-            for (activity in activities) {
-                val typeActivity = TypeActivity(activity, types[activity.typeId]!!)
+            for (typeActivity in typeActivities) {
                 repository.saveActivity(typeActivity)
             }
             _toastMessage.emit(
                 context.resources.getQuantityString(
                     R.plurals.imported_activities,
-                    activities.size,
-                    activities.size
+                    typeActivities.size,
+                    typeActivities.size
                 )
             )
             _importing.emit(false)

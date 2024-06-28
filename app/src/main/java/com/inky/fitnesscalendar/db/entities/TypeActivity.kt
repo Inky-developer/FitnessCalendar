@@ -9,7 +9,7 @@ data class TypeActivity(
     val type: ActivityType
 ) {
     init {
-        assert(activity.typeId == type.uid) { "Inconsistent TypeActivity" }
+        assert(activity.typeId == type.uid) { "Inconsistent TypeActivity: type is $type, but id is ${activity.typeId}" }
     }
 
     fun clean() = copy(type = type, activity = activity.clean(type))

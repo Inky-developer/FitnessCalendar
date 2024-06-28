@@ -16,6 +16,22 @@ class CSVWriter(private val headers: List<String>, elements: CSVWriterScope.() -
         return listOf(header, *rows.toTypedArray()).joinToString("\n")
     }
 
+    companion object {
+        fun escapeString(value: String): String {
+            val newValue =
+                value.replace("\\", "\\\\").replace("\n", "\\n").replace("\"", "\\\"")
+            if (newValue.contains(",")) {
+                return "\"$newValue\""
+            }
+            return newValue
+        }
+
+        fun unescapeString(value: String): String {
+            return value.removeSurrounding("\"").replace("\\\"", "\"").replace("\\n", "\n")
+                .replace("\\\\", "\\")
+        }
+    }
+
     class CSVWriterScope(val rows: MutableList<String> = mutableListOf()) {
         fun <T> rows(data: List<T>, map: (T) -> List<Any?>) {
             val rows = data.map { row ->
@@ -29,7 +45,7 @@ class CSVWriter(private val headers: List<String>, elements: CSVWriterScope.() -
             fun toCSVString(element: Any?): String {
                 return when (element) {
                     null -> ""
-                    is String -> element.replace("\n", "\\n")
+                    is String -> escapeString(element)
                     is Int -> element.toString()
                     is Long -> element.toString()
                     is Enum<*> -> element.name

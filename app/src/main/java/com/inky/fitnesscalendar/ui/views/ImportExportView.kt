@@ -40,7 +40,6 @@ import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.util.exportCsv
-import com.inky.fitnesscalendar.util.importCsv
 import com.inky.fitnesscalendar.view_model.ImportExportViewModel
 import kotlinx.coroutines.launch
 
@@ -126,8 +125,7 @@ fun ImportExport(
             Button(
                 enabled = !importing && importData.isNotBlank(),
                 onClick = {
-                    val activities = importCsv(importData)
-                    viewModel.import(activities)
+                    viewModel.import(importData)
                 },
                 modifier = Modifier
                     .padding(all = 8.dp)
