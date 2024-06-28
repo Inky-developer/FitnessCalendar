@@ -1,6 +1,8 @@
 package com.inky.fitnesscalendar.ui.views
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
@@ -8,7 +10,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.Recording
@@ -31,12 +35,13 @@ fun QsTileRecordActivityDialog(
 ) {
     var state by remember { mutableStateOf(ActivitySelectorState(null, null)) }
     val saveEnabled by remember { derivedStateOf { state.shouldSaveBeEnabled() } }
-    Column {
+    Column(modifier = Modifier.padding(all = 16.dp)) {
         ActivitySelector(
             state = state,
             typeRows = typeRows,
             onActivityType = { state = state.copy(activityType = it) },
-            onVehicle = { state = state.copy(vehicle = it) }
+            onVehicle = { state = state.copy(vehicle = it) },
+            background = MaterialTheme.colorScheme.background
         )
 
         OkayCancelRow(

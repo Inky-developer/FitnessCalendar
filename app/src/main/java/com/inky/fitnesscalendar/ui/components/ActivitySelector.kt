@@ -11,6 +11,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.R
@@ -26,6 +27,7 @@ data class ActivitySelectorState(val activityType: ActivityType?, val vehicle: V
 fun ActivitySelector(
     state: ActivitySelectorState,
     modifier: Modifier = Modifier,
+    background: Color = optionGroupDefaultBackground(),
     typeRows: List<List<ActivityType>>,
     onActivityType: (ActivityType) -> Unit,
     onVehicle: (Vehicle) -> Unit,
@@ -36,6 +38,7 @@ fun ActivitySelector(
         OptionGroup(
             label = stringResource(R.string.select_activity),
             selectionLabel = state.activityType?.name,
+            background = background
         ) {
             ActivityTypeSelector(
                 typeRows = typeRows,
@@ -47,7 +50,8 @@ fun ActivitySelector(
         AnimatedVisibility(state.activityType?.hasVehicle == true) {
             OptionGroup(
                 label = stringResource(R.string.select_vehicle),
-                selectionLabel = state.vehicle?.nameId?.let { stringResource(it) }
+                selectionLabel = state.vehicle?.nameId?.let { stringResource(it) },
+                background = background
             ) {
                 LazyRow {
                     items(vehicles) {

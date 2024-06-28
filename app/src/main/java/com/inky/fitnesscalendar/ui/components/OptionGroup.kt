@@ -8,17 +8,22 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+
+@Composable
+fun optionGroupDefaultBackground() = MaterialTheme.colorScheme.surfaceContainerHigh
 
 @Composable
 fun OptionGroup(
     modifier: Modifier = Modifier,
     label: String,
     selectionLabel: String? = null,
+    background: Color = optionGroupDefaultBackground(),
     content: @Composable () -> Unit
 ) {
     Surface(
-        color = MaterialTheme.colorScheme.surfaceContainerHigh,
+        color = background,
         shape = MaterialTheme.shapes.small,
         modifier = modifier
             .padding(vertical = 4.dp)

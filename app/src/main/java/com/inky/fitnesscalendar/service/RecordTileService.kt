@@ -66,7 +66,7 @@ class RecordTileService : TileService() {
         context: Context,
         val repository: AppRepository,
         val onStartRecording: (TypeRecording) -> Unit
-    ) : Dialog(context) {
+    ) : Dialog(context, R.style.FullHeightDialog) {
         private val lifecycleOwner = MyHackyLifecycleOwner()
 
         override fun onCreate(savedInstanceState: Bundle?) {
@@ -97,12 +97,13 @@ class RecordTileService : TileService() {
                 }
             }
 
-            setTitle(R.string.record_activity)
+//            setTitle(R.string.record_activity)
             setContentView(composeView)
         }
 
         override fun onStop() {
             lifecycleOwner.onStop()
+            super.onStop()
         }
 
         /**
