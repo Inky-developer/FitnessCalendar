@@ -139,6 +139,7 @@
     <string name="color_grey">Grey</string>
     <string name="emoji">Emoji</string>
     <string name="recent">Recent</string>
+    <string name="note_exporting_does_not_include_images">Note: Exporting does not include images!</string>
     <plurals name="num_activities">
         <item quantity="one">%1d activity</item>
         <item quantity="other">%1d activities</item>

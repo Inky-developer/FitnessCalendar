@@ -150,4 +150,5 @@
     <string name="color_grey">Grau</string>
     <string name="emoji">Emoji</string>
     <string name="recent">Letzte</string>
+    <string name="note_exporting_does_not_include_images">Info: Bilder werden nicht mit exportiert!</string>
 </resources>

@@ -99,7 +99,8 @@ fun ImportExport(
                         context.exportCsv(activities)
                         exporting = false
                     }
-                }, modifier = Modifier
+                },
+                modifier = Modifier
                     .padding(all = 8.dp)
                     .fillMaxWidth()
             ) {
@@ -110,6 +111,10 @@ fun ImportExport(
                     Text(stringResource(R.string.export_activities))
                 }
             }
+            Text(
+                stringResource(R.string.note_exporting_does_not_include_images),
+                modifier = Modifier.padding(all = 8.dp)
+            )
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 32.dp))
 
