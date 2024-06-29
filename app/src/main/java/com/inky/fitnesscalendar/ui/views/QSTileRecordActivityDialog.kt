@@ -17,6 +17,7 @@ import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.Recording
 import com.inky.fitnesscalendar.db.entities.TypeRecording
+import com.inky.fitnesscalendar.di.ActivityTypeDecisionTree
 import com.inky.fitnesscalendar.ui.components.ActivitySelector
 import com.inky.fitnesscalendar.ui.components.ActivitySelectorState
 import com.inky.fitnesscalendar.ui.components.OkayCancelRow
@@ -33,7 +34,14 @@ fun QsTileRecordActivityDialog(
     onDismiss: () -> Unit,
     onSave: (TypeRecording) -> Unit
 ) {
-    var state by remember { mutableStateOf(ActivitySelectorState(null, null)) }
+    var state by remember {
+        mutableStateOf(
+            ActivitySelectorState(
+                activityType = ActivityTypeDecisionTree.decisionTree?.classifyNow(),
+                vehicle = null
+            )
+        )
+    }
     val saveEnabled by remember { derivedStateOf { state.shouldSaveBeEnabled() } }
     val filteredTypeRows =
         remember(typeRows) { typeRows.map { row -> row.filter { it.hasDuration } } }
