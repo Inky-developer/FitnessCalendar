@@ -1,9 +1,12 @@
 package com.inky.fitnesscalendar.ui.views
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -35,8 +38,12 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
+import com.inky.fitnesscalendar.ui.components.CompactActivityCard
+import com.inky.fitnesscalendar.ui.components.OkayCancelRow
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.util.exportCsv
@@ -53,6 +60,9 @@ fun ImportExport(
     var exporting by remember { mutableStateOf(false) }
     val importing by viewModel.importing.collectAsState(initial = false)
     var importData by remember { mutableStateOf("") }
+
+    val showImportDialog by viewModel.showImportDialog.collectAsState(initial = false)
+    val activitiesToImport by viewModel.importData.collectAsState(initial = emptyList())
 
     val snackbarHostState = remember { SnackbarHostState() }
     val scrollState = rememberScrollState()
@@ -122,6 +132,7 @@ fun ImportExport(
                 value = importData,
                 onValueChange = { importData = it },
                 label = { Text(stringResource(R.string.enter_import_data)) },
+                maxLines = 8,
                 modifier = Modifier
                     .padding(all = 8.dp)
                     .fillMaxWidth()
@@ -142,6 +153,42 @@ fun ImportExport(
 
                 AnimatedVisibility(visible = !importing) {
                     Text(stringResource(R.string.import_activities))
+                }
+            }
+        }
+    }
+
+    if (showImportDialog) {
+        Dialog(
+            onDismissRequest = { viewModel.dismissImportDialog() },
+            properties = DialogProperties(usePlatformDefaultWidth = false)
+        ) {
+            Scaffold { paddingValues ->
+                Box(modifier = Modifier.padding(paddingValues)) {
+                    Column {
+                        Text(
+                            stringResource(R.string.these_activities_will_be_imported),
+                            style = MaterialTheme.typography.titleLarge,
+                            modifier = Modifier.padding(top = 16.dp)
+                        )
+
+                        LazyColumn(modifier = Modifier.weight(1f)) {
+                            items(activitiesToImport) { activity ->
+                                CompactActivityCard(
+                                    typeActivity = activity,
+                                    localizationRepository = viewModel.repository.localizationRepository
+                                )
+                            }
+                        }
+
+                        OkayCancelRow(
+                            onNavigateBack = { viewModel.dismissImportDialog() },
+                            onSave = { viewModel.confirmImport(activitiesToImport) },
+                            saveEnabled = true,
+                            saveText = { Text(stringResource(R.string.import_activities)) },
+                            modifier = Modifier.padding(bottom = 32.dp)
+                        )
+                    }
                 }
             }
         }

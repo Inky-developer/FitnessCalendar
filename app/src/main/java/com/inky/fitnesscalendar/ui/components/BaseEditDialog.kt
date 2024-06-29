@@ -80,9 +80,10 @@ fun ColumnScope.OkayCancelRow(
     onNavigateBack: () -> Unit,
     onSave: () -> Unit,
     saveEnabled: Boolean,
-    saveText: @Composable () -> Unit
+    saveText: @Composable () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    Row(modifier = Modifier.align(Alignment.End)) {
+    Row(modifier = modifier.align(Alignment.End)) {
         TextButton(onClick = onNavigateBack) {
             Text(stringResource(R.string.cancel))
         }

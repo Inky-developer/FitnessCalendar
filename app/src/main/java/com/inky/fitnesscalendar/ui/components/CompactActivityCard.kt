@@ -13,7 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.db.entities.TypeActivity
 import com.inky.fitnesscalendar.localization.LocalizationRepository
-import com.inky.fitnesscalendar.ui.util.skipToLookaheadSize
 
 @Composable
 fun CompactActivityCard(
@@ -33,7 +32,6 @@ fun CompactActivityCard(
         modifier = modifier
             .fillMaxWidth()
             .padding(all = 8.dp)
-            .skipToLookaheadSize(),
     ) {
         Text(
             time,
