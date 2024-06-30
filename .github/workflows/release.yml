@@ -1,9 +1,6 @@
 name: Android CI
 
-on:
-  push:
-    branches:
-      - master
+on: [ push ]
 
 jobs:
   build:
@@ -52,6 +49,8 @@ jobs:
         with:
           name: FitnessCalendar-Nightly
           path: release_binaries
+      - name: Delete previous release
+        run: gh release delete "Nightly" --cleanup-tag --yes
       - name: Create release
         uses: ncipollo/release-action@v1
         with:
