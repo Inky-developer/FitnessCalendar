@@ -1,9 +1,12 @@
 package com.inky.fitnesscalendar.ui.views
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,6 +28,7 @@ import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.KeyboardArrowUp
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -35,6 +39,7 @@ import androidx.compose.material3.InputChip
 import androidx.compose.material3.InputChipDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
@@ -42,9 +47,11 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -56,15 +63,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
-import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilterChip
+import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.ui.components.ActivityCard
 import com.inky.fitnesscalendar.ui.components.NewActivityFAB
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.ui.util.sharedElement
 import com.inky.fitnesscalendar.view_model.ActivityLogViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -79,7 +87,11 @@ fun ActivityLog(
     onFilter: () -> Unit,
     initialSelectedActivityId: Int? = null,
 ) {
+    val scope = rememberCoroutineScope()
+
     val activityListState = rememberLazyListState()
+    val isAtTopOfList by remember { derivedStateOf { activityListState.firstVisibleItemIndex == 0 } }
+
     val activities by remember(filter) { viewModel.repository.getActivities(filter) }
         .collectAsState(initial = emptyList())
     val filterHistoryItems by viewModel.filterHistory.collectAsState(initial = emptyList())
@@ -140,12 +152,28 @@ fun ActivityLog(
             )
         },
         floatingActionButton = {
-            NewActivityFAB(
-                onClick = {
-                    onNewActivity()
-                },
-                menuOpen = isNewActivityOpen,
-            )
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                AnimatedVisibility(
+                    visible = !isAtTopOfList,
+                    enter = slideInVertically(initialOffsetY = { it }),
+                    exit = slideOutVertically(targetOffsetY = { it })
+                ) {
+                    SmallFloatingActionButton(onClick = {
+                        scope.launch {
+                            activityListState.animateScrollToItem(0)
+                            scrollBehavior.state.contentOffset = 0f
+                        }
+                    }) {
+                        Icon(Icons.Outlined.KeyboardArrowUp, stringResource(R.string.scroll_to_top))
+                    }
+                }
+                NewActivityFAB(
+                    onClick = {
+                        onNewActivity()
+                    },
+                    menuOpen = isNewActivityOpen,
+                )
+            }
         },
         snackbarHost = { SnackbarHost(hostState = viewModel.snackbarHostState) },
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
