@@ -89,11 +89,14 @@ fun ActivityLog(
 ) {
     val scope = rememberCoroutineScope()
 
-    val activityListState = rememberLazyListState()
+    val activityListState by viewModel.activityListState
     val isAtTopOfList by remember { derivedStateOf { activityListState.firstVisibleItemIndex == 0 } }
 
-    val activities by remember(filter) { viewModel.repository.getActivities(filter) }
-        .collectAsState(initial = emptyList())
+    LaunchedEffect(filter) {
+        viewModel.setFilter(filter)
+    }
+
+    val activities by viewModel.activities.collectAsState()
     val filterHistoryItems by viewModel.filterHistory.collectAsState(initial = emptyList())
 
     // Scroll to requested activity or to the newest activity
