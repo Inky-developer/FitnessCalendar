@@ -51,7 +51,7 @@ import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.TypeActivity
-import com.inky.fitnesscalendar.di.ActivityTypeDecisionTree
+import com.inky.fitnesscalendar.di.DecisionTrees
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivitySelector
 import com.inky.fitnesscalendar.ui.components.ActivitySelectorState
@@ -111,10 +111,14 @@ fun NewActivity(
 
     var selectedActivityType by rememberSaveable {
         mutableStateOf(
-            typeActivity?.type ?: ActivityTypeDecisionTree.decisionTree?.classifyNow()
+            typeActivity?.type ?: DecisionTrees.activityType?.classifyNow()
         )
     }
-    var selectedVehicle by rememberSaveable { mutableStateOf(typeActivity?.activity?.vehicle) }
+    var selectedVehicle by rememberSaveable {
+        mutableStateOf(
+            typeActivity?.activity?.vehicle ?: DecisionTrees.vehicle?.classifyNow()
+        )
+    }
     val startDateTimePickerState by rememberSaveable(stateSaver = DateTimePickerState.SAVER) {
         mutableStateOf(
             DateTimePickerState(

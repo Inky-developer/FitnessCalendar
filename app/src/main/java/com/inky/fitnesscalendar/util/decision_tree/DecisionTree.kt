@@ -1,5 +1,6 @@
 package com.inky.fitnesscalendar.util.decision_tree
 
+import com.inky.fitnesscalendar.data.Vehicle
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.TypeActivity
 import com.inky.fitnesscalendar.util.removedAt
@@ -7,10 +8,10 @@ import java.time.Instant
 import java.util.Calendar
 import java.util.Date
 
-sealed class DecisionTree<Classification> {
-    data class Leaf<T>(val value: T?) : DecisionTree<T>()
+sealed class DecisionTree<Classification : Any> {
+    data class Leaf<T : Any>(val value: T?) : DecisionTree<T>()
 
-    data class Node<T>(
+    data class Node<T : Any>(
         val attributeIndex: Int,
         val children: Map<Any, DecisionTree<T>>,
         val default: T?
@@ -48,7 +49,7 @@ sealed class DecisionTree<Classification> {
             return listOf(timeOfDay, weekDay)
         }
 
-        fun learnFromActivities(activities: List<TypeActivity>): DecisionTree<ActivityType> {
+        fun learnActivityType(activities: List<TypeActivity>): DecisionTree<ActivityType> {
             val examples = Examples(activities.map {
                 val attributes = attributes(it.activity.startTime)
                 Example(it.type, attributes)
@@ -57,7 +58,16 @@ sealed class DecisionTree<Classification> {
             return learn(examples)
         }
 
-        private fun <T> learn(examples: Examples<T>): DecisionTree<T> {
+        fun learnVehicle(activities: List<TypeActivity>): DecisionTree<Vehicle> {
+            val examples = Examples(activities.map {
+                val attributes = attributes(it.activity.startTime)
+                Example(it.activity.vehicle, attributes)
+            })
+
+            return learn(examples)
+        }
+
+        private fun <T : Any> learn(examples: Examples<T>): DecisionTree<T> {
             if (examples.isEmpty()) {
                 return Leaf(value = null)
             }
@@ -81,7 +91,7 @@ sealed class DecisionTree<Classification> {
             )
         }
 
-        private fun <T> bestSplit(examples: Examples<T>): Int {
+        private fun <T : Any> bestSplit(examples: Examples<T>): Int {
             val rootEntropy = examples.entropy()
 
             val first = examples.first()

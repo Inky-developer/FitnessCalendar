@@ -9,7 +9,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.inky.fitnesscalendar.db.entities.ActivityType
-import com.inky.fitnesscalendar.di.ActivityTypeDecisionTree
+import com.inky.fitnesscalendar.di.DecisionTrees
 import com.inky.fitnesscalendar.ui.components.debug.DecisionTreeVisualization
 import java.time.DayOfWeek
 import java.time.format.TextStyle
@@ -22,7 +22,7 @@ fun SettingsDebug() {
 
     Column {
         TextButton(onClick = {
-            ActivityTypeDecisionTree.decisionTree?.let {
+            DecisionTrees.activityType?.let {
                 classification = it.classifyNow()
             }
         }) {
@@ -31,7 +31,7 @@ fun SettingsDebug() {
 
         Text(classification?.toString() ?: "")
 
-        val tree = ActivityTypeDecisionTree.decisionTree
+        val tree = DecisionTrees.activityType
         if (tree != null) {
             DecisionTreeVisualization(
                 tree,

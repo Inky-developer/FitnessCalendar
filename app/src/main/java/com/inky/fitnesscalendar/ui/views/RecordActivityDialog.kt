@@ -16,7 +16,7 @@ import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.Recording
 import com.inky.fitnesscalendar.db.entities.TypeRecording
-import com.inky.fitnesscalendar.di.ActivityTypeDecisionTree
+import com.inky.fitnesscalendar.di.DecisionTrees
 import com.inky.fitnesscalendar.ui.components.ActivitySelector
 import com.inky.fitnesscalendar.ui.components.ActivitySelectorState
 import com.inky.fitnesscalendar.ui.components.BaseEditDialog
@@ -32,8 +32,8 @@ fun RecordActivity(
     var state by remember {
         mutableStateOf(
             ActivitySelectorState(
-                activityType = ActivityTypeDecisionTree.decisionTree?.classifyNow(),
-                vehicle = null
+                activityType = DecisionTrees.activityType?.classifyNow(),
+                vehicle = DecisionTrees.vehicle?.classifyNow(),
             )
         )
     }

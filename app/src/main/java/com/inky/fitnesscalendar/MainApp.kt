@@ -2,10 +2,9 @@ package com.inky.fitnesscalendar
 
 import android.app.Application
 import android.util.Log
-import com.inky.fitnesscalendar.di.ActivityTypeDecisionTree
 import com.inky.fitnesscalendar.di.ActivityTypeOrder
+import com.inky.fitnesscalendar.di.DecisionTrees
 import com.inky.fitnesscalendar.util.cleanActivityImageStorage
-import com.inky.fitnesscalendar.util.decision_tree.DecisionTree
 import com.inky.fitnesscalendar.util.getOrCreateSharedMediaCache
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.Dispatchers
@@ -42,7 +41,7 @@ class MainApp : Application() {
         val activities = appRepository.loadMostRecentActivities(200)
 
         ActivityTypeOrder.init(activities)
-        ActivityTypeDecisionTree.decisionTree = DecisionTree.learnFromActivities(activities)
+        DecisionTrees.init(activities)
         Log.i("MainApp", "App data successfully initialized")
     }
 }

@@ -2,7 +2,7 @@ package com.inky.fitnesscalendar.util.decision_tree
 
 import kotlin.math.log2
 
-data class Examples<T>(val values: List<Example<T>>) {
+data class Examples<T : Any>(val values: List<Example<T>>) {
 
     fun entropy(): Double {
         val probabilities = itemProbabilities()
