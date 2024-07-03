@@ -26,10 +26,10 @@ data class Recording(
     @ColumnInfo(name = "vehicle") val vehicle: Vehicle? = null,
     @ColumnInfo(name = "start_time") val startTime: Date,
 ) {
-    fun toActivity(endTime: Date = Date.from(Instant.now())) = Activity(
+    fun toActivity(type: ActivityType, endTime: Date = Date.from(Instant.now())) = Activity(
         typeId = typeId,
         vehicle = vehicle,
         startTime = startTime,
         endTime = endTime
-    )
+    ).clean(type)
 }

@@ -117,7 +117,12 @@ class AppRepository @Inject constructor(
     suspend fun endRecording(recording: Recording) {
         Log.d(TAG, "Ending recording $recording")
         recording.uid?.let { context.hideRecordingNotification(it) }
-        val activity = recording.toActivity()
+        val type = getActivityType(recording.typeId)
+        if (type == null) {
+            Log.e(TAG, "Could not retrieve type for activity")
+            return
+        }
+        val activity = recording.toActivity(type)
         activityDao.stopRecording(recording, activity)
     }
 
@@ -129,6 +134,8 @@ class AppRepository @Inject constructor(
     suspend fun loadActivityTypes() = activityTypeDao.loadTypes()
 
     fun getActivityTypes() = activityTypeDao.getTypes()
+
+    private suspend fun getActivityType(id: Int): ActivityType? = activityTypeDao.get(id)
 
     fun getActivityTypeRows() =
         getActivityTypesByCategory().map { ActivityTypeOrder.getRowsOrDefault(it) }
