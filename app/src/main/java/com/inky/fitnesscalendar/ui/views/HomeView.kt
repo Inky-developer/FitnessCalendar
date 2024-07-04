@@ -168,21 +168,20 @@ fun Home(
                 onDelete = { viewModel.deleteActivity(it) },
                 onEdit = onEditActivity,
             )
-
-            StatisticsIfNotNull(
-                stringResource(R.string.last_seven_days),
-                weeklyStats,
-                onClick = { onNavigateStats(Period.Day) })
-            StatisticsIfNotNull(
-                stringResource(R.string.this_month),
-                monthlyStats,
-                onClick = { onNavigateStats(Period.Week) }
-            )
-
             ActivitiesToday(
                 typeActivities = activitiesToday ?: emptyList(),
                 localizationRepository = viewModel.repository.localizationRepository,
                 onNavigateActivity = onNavigateActivity
+            )
+            StatisticsIfNotNull(
+                stringResource(R.string.last_seven_days),
+                weeklyStats,
+                onClick = { onNavigateStats(Period.Day) }
+            )
+            StatisticsIfNotNull(
+                stringResource(R.string.this_month),
+                monthlyStats,
+                onClick = { onNavigateStats(Period.Week) }
             )
         }
     }
