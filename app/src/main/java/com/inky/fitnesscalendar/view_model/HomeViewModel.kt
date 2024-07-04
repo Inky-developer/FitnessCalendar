@@ -8,11 +8,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.inky.fitnesscalendar.AppRepository
 import com.inky.fitnesscalendar.R
-import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.data.ActivityStatistics
-import com.inky.fitnesscalendar.db.entities.Recording
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.data.activity_filter.DateRangeOption
+import com.inky.fitnesscalendar.db.entities.Activity
+import com.inky.fitnesscalendar.db.entities.Recording
 import com.inky.fitnesscalendar.util.Duration.Companion.until
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -77,7 +77,7 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun loadMonthStats(): Flow<ActivityStatistics> {
-        val filter = ActivityFilter(range = DateRangeOption.ThirtyDays)
+        val filter = ActivityFilter(range = DateRangeOption.FourWeeks)
         return repository.getActivities(filter).map { activities ->
             ActivityStatistics(activities)
         }

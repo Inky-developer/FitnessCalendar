@@ -47,8 +47,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
-import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.data.ActivityStatistics
+import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.Recording
 import com.inky.fitnesscalendar.db.entities.TypeActivity
 import com.inky.fitnesscalendar.db.entities.TypeRecording
@@ -179,7 +179,7 @@ fun Home(
                 onClick = { onNavigateStats(Period.Day) }
             )
             StatisticsIfNotNull(
-                stringResource(R.string.this_month),
+                stringResource(R.string.four_weeks),
                 monthlyStats,
                 onClick = { onNavigateStats(Period.Week) }
             )

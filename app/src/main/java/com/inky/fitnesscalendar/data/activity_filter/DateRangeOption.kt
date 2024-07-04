@@ -9,6 +9,7 @@ enum class DateRangeOption(@StringRes val nameId: Int) {
     Yesterday(R.string.yesterday),
     SevenDays(R.string.week),
     LastWeek(R.string.last_week),
+    FourWeeks(R.string.four_weeks),
     ThirtyDays(R.string.month),
     LastMonth(R.string.last_month),
     Year(R.string.year),
@@ -19,6 +20,7 @@ enum class DateRangeOption(@StringRes val nameId: Int) {
         Yesterday -> DateRange.atDay(-1)
         SevenDays -> DateRange.lastDays(7)
         LastWeek -> DateRange.lastDays(14, 7)
+        FourWeeks -> DateRange.lastDays(28)
         ThirtyDays -> DateRange.lastDays(30)
         LastMonth -> DateRange.lastDays(60, 30)
         Year -> DateRange.lastDays(365)
