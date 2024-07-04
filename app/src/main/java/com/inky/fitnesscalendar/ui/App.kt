@@ -81,11 +81,7 @@ fun App(viewModel: GenericViewModel = hiltViewModel()) {
                 navController = navController,
                 startDestination = Views.Home.getPath(),
             ) {
-                composable(
-                    Views.Home.pathTemplate(),
-                    enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.End) },
-                    exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Start) }
-                ) {
+                composable(Views.Home.pathTemplate()) {
                     currentView = Views.Home
                     ProvideSharedContent(sharedContentScope = this@SharedTransitionLayout) {
                         Home(
