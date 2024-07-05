@@ -150,6 +150,7 @@ fun Home(
             modifier = Modifier
                 .padding(paddingValues)
                 .verticalScroll(scrollState)
+                .padding(bottom = 64.dp) // Account for fab, maybe this should be set dynamically?
         ) {
 
             AnimatedVisibility(visible = typeRecordings?.isNotEmpty() ?: false) {
