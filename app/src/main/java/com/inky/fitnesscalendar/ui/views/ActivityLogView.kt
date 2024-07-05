@@ -7,6 +7,7 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -20,6 +21,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -66,13 +68,17 @@ import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilterChip
 import com.inky.fitnesscalendar.db.entities.Activity
+import com.inky.fitnesscalendar.db.entities.TypeActivity
+import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivityCard
 import com.inky.fitnesscalendar.ui.components.NewActivityFAB
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.ui.util.sharedElement
+import com.inky.fitnesscalendar.util.toLocalDate
 import com.inky.fitnesscalendar.view_model.ActivityLogViewModel
 import kotlinx.coroutines.launch
+import java.time.LocalDate
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -97,7 +103,10 @@ fun ActivityLog(
     }
 
     val activities by viewModel.activities.collectAsState()
-    val activitiesEmpty by remember { derivedStateOf { activities.isEmpty() } }
+    val activitiesByDay =
+        remember(activities) { activities.groupBy { it.activity.startTime.toLocalDate() } }
+    val activitiesEmpty by remember(activities) { derivedStateOf { activities.isEmpty() } }
+
     val filterHistoryItems by viewModel.filterHistory.collectAsState(initial = emptyList())
 
     // Scroll to requested activity or to the newest activity
@@ -173,7 +182,10 @@ fun ActivityLog(
                             scrollBehavior.state.heightOffset = 0f
                         }
                     }) {
-                        Icon(Icons.Outlined.KeyboardArrowUp, stringResource(R.string.scroll_to_top))
+                        Icon(
+                            Icons.Outlined.KeyboardArrowUp,
+                            stringResource(R.string.scroll_to_top)
+                        )
                     }
                 }
                 NewActivityFAB(
@@ -229,33 +241,74 @@ fun ActivityLog(
                     )
                 }
             } else {
-                LazyColumn(
-                    state = activityListState,
-                    contentPadding = PaddingValues(bottom = 128.dp),
-                ) {
-                    items(activities, key = { it.activity.uid ?: -1 }) { typeActivity ->
-                        ActivityCard(
-                            typeActivity,
-                            onDelete = {
-                                viewModel.deleteActivity(typeActivity.activity)
-                            },
-                            onJumpTo = if (!filter.isEmpty()) {
-                                {
-                                    onEditFilter(ActivityFilter())
-                                    scrollToId = typeActivity.activity.uid
-                                }
-                            } else null,
-                            onFilter = if (filter.isEmpty()) {
-                                onEditFilter
-                            } else null,
-                            onEdit = onEditActivity,
-                            localizationRepository = viewModel.repository.localizationRepository,
-                            modifier = Modifier
-                                .animateItem(fadeInSpec = null, fadeOutSpec = null)
-                                .sharedElement(SharedContentKey.ActivityCard(typeActivity.activity.uid))
-                        )
-                    }
-                }
+                ActivityList(
+                    listState = activityListState,
+                    activitiesByDay = activitiesByDay,
+                    filter = filter,
+                    localizationRepository = viewModel.repository.localizationRepository,
+                    onJumpToActivity = {
+                        onEditFilter(ActivityFilter())
+                        scrollToId = it.uid
+                    },
+                    onEditFilter = onEditFilter,
+                    onEditActivity = onEditActivity,
+                    onDeleteActivity = { viewModel.deleteActivity(it) }
+                )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun ActivityList(
+    listState: LazyListState,
+    activitiesByDay: Map<LocalDate, List<TypeActivity>>,
+    filter: ActivityFilter,
+    localizationRepository: LocalizationRepository,
+    onJumpToActivity: (Activity) -> Unit,
+    onEditFilter: (ActivityFilter) -> Unit,
+    onEditActivity: (Activity) -> Unit,
+    onDeleteActivity: (Activity) -> Unit
+) {
+    LazyColumn(
+        state = listState,
+        contentPadding = PaddingValues(bottom = 128.dp),
+    ) {
+        for ((day, dayActivities) in activitiesByDay) {
+            stickyHeader(key = day, contentType = "header") {
+                Text(
+                    LocalizationRepository.localDateFormatter.format(day),
+                    modifier = Modifier
+                        .background(MaterialTheme.colorScheme.primaryContainer)
+                        .padding(horizontal = 8.dp)
+                        .fillMaxWidth()
+                        .animateItem()
+                )
+            }
+
+            items(
+                dayActivities,
+                key = { it.activity.uid ?: -1 },
+                contentType = { "activity" }
+            ) { typeActivity ->
+                ActivityCard(
+                    typeActivity,
+                    onDelete = {
+                        onDeleteActivity(typeActivity.activity)
+                    },
+                    onFilter = if (filter.isEmpty()) {
+                        onEditFilter
+                    } else null,
+                    onJumpTo = if (filter.isEmpty()) {
+                        { onJumpToActivity(typeActivity.activity) }
+                    } else null,
+                    onEdit = onEditActivity,
+                    localizationRepository = localizationRepository,
+                    modifier = Modifier
+                        .animateItem()
+                        .sharedElement(SharedContentKey.ActivityCard(typeActivity.activity.uid))
+                )
             }
         }
     }

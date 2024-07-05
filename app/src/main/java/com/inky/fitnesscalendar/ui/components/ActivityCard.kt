@@ -44,9 +44,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import com.inky.fitnesscalendar.R
+import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.TypeActivity
-import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.util.skipToLookaheadSize
 import com.inky.fitnesscalendar.util.Duration.Companion.until
@@ -71,7 +71,7 @@ fun ActivityCard(
 
     val title = remember(activityType) { "${activityType.emoji} ${activityType.name}" }
     val time = remember(activity) {
-        localizationRepository.formatRelativeDate(activity.startTime)
+        localizationRepository.timeFormatter.format(activity.startTime)
     }
     val description = remember(activity) { activity.description }
     val timeElapsed = remember(activity) { activity.startTime until activity.endTime }
