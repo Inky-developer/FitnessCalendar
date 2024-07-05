@@ -97,6 +97,7 @@ fun ActivityLog(
     }
 
     val activities by viewModel.activities.collectAsState()
+    val activitiesEmpty by remember { derivedStateOf { activities.isEmpty() } }
     val filterHistoryItems by viewModel.filterHistory.collectAsState(initial = emptyList())
 
     // Scroll to requested activity or to the newest activity
@@ -121,8 +122,12 @@ fun ActivityLog(
         titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
     )
 
-    val colorTransitionFraction = scrollBehavior.state.overlappedFraction
-    val fraction = if (colorTransitionFraction > 0.01f) 1f else 0f
+    val fraction by remember {
+        derivedStateOf {
+            val colorTransitionFraction = scrollBehavior.state.overlappedFraction
+            if (colorTransitionFraction > 0.01f) 1f else 0f
+        }
+    }
     val appBarContainerColor by animateColorAsState(
         targetValue = lerp(
             topAppBarColors.containerColor,
@@ -197,7 +202,7 @@ fun ActivityLog(
                     onChange = onEditFilter
                 )
             }
-            if (activities.isEmpty()) {
+            if (activitiesEmpty) {
                 Row(
                     horizontalArrangement = Arrangement.Center,
                     modifier = Modifier
