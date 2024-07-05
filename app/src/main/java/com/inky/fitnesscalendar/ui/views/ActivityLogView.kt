@@ -115,7 +115,7 @@ fun ActivityLog(
         latestActivity = activities.firstOrNull()?.activity
     }
 
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val topAppBarColors = TopAppBarDefaults.topAppBarColors(
         scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,
         titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
@@ -165,6 +165,7 @@ fun ActivityLog(
                         scope.launch {
                             activityListState.animateScrollToItem(0)
                             scrollBehavior.state.contentOffset = 0f
+                            scrollBehavior.state.heightOffset = 0f
                         }
                     }) {
                         Icon(Icons.Outlined.KeyboardArrowUp, stringResource(R.string.scroll_to_top))
