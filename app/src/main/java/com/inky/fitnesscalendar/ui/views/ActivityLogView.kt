@@ -114,7 +114,23 @@ fun ActivityLog(
     var latestActivity by remember { mutableStateOf(activities.firstOrNull()?.activity) }
     LaunchedEffect(activities) {
         if (scrollToId != null) {
-            val index = activities.withIndex().find { it.value.activity.uid == scrollToId }?.index
+            // TODO Refactor this
+            val index = {
+                var index = 0
+                var found = false
+                for (dayActivities in activitiesByDay.values) {
+                    index += 1 // For the headers…
+                    val dayIndex = dayActivities.withIndex()
+                        .find { it.value.activity.uid == scrollToId }?.index
+                    if (dayIndex != null) {
+                        index += dayIndex
+                        found = true
+                        break
+                    }
+                    index += dayActivities.size
+                }
+                index.takeIf { found }
+            }()
             if (index != null) {
                 activityListState.animateScrollToItem(index)
                 scrollToId = null
@@ -300,7 +316,7 @@ private fun ActivityList(
                     onFilter = if (filter.isEmpty()) {
                         onEditFilter
                     } else null,
-                    onJumpTo = if (filter.isEmpty()) {
+                    onJumpTo = if (!filter.isEmpty()) {
                         { onJumpToActivity(typeActivity.activity) }
                     } else null,
                     onEdit = onEditActivity,
