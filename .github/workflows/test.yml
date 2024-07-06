@@ -63,5 +63,5 @@ jobs:
       - name: Upload tests reports
         uses: actions/upload-artifact@v4
         with:
-          name: Test results
+          name: Test results api-${{ matrix.api-level }}
           path: '*/build/outputs/androidTest-results'
