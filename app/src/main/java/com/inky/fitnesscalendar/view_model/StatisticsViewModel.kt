@@ -11,8 +11,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.inky.fitnesscalendar.AppRepository
 import com.inky.fitnesscalendar.data.ActivityStatistics
-import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
+import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.preferences.Preference
 import com.inky.fitnesscalendar.view_model.statistics.Grouping
 import com.inky.fitnesscalendar.view_model.statistics.Period
@@ -53,7 +53,7 @@ class StatisticsViewModel @Inject constructor(
 
     var numDataPoints by mutableIntStateOf(0)
 
-    val modelProducer = CartesianChartModelProducer.build()
+    val modelProducer = CartesianChartModelProducer()
 
     init {
         viewModelScope.launch {
@@ -106,11 +106,11 @@ class StatisticsViewModel @Inject constructor(
                     })
                 }
             }
-            updateExtras {
+            extras {
                 it[labelListKey] = dataPoints.map { (_, label) -> label }
                 it[periodKey] = period.ordinal
             }
-        }.await()
+        }
     }
 
     companion object {

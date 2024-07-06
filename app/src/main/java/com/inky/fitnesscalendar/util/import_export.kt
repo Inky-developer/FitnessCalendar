@@ -41,12 +41,16 @@ fun Context.exportCsv(activities: List<Activity>) {
 fun importCsv(rawData: String, types: List<ActivityType>): List<TypeActivity> {
     val typeMap = types.associate { it.name to it.uid!! }
     val data = readCSV(rawData)
-    Log.i(TAG, "Data to import: $data")
+
+    println("Raw data: $data")
+
     return data.mapNotNull { row -> getActivity(row, typeMap) }.map { activity ->
         TypeActivity(
             type = types.first { it.uid == activity.typeId },
             activity = activity
         ).clean()
+    }.also {
+        Log.i(TAG, "Data to import: $it")
     }
 }
 
