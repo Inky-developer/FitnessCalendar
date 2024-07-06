@@ -3,6 +3,7 @@ package com.inky.fitnesscalendar.service
 import android.app.Dialog
 import android.content.Context
 import android.os.Bundle
+import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import androidx.compose.foundation.background
 import androidx.compose.material3.MaterialTheme
@@ -48,6 +49,11 @@ class RecordTileService : TileService() {
         showDialog(
             TileServiceDialog(this, repository, onStartRecording = { startRecording(it) })
         )
+    }
+
+    override fun onStartListening() {
+        super.onStartListening()
+        qsTile.apply { state = Tile.STATE_INACTIVE }.updateTile()
     }
 
     override fun onDestroy() {
