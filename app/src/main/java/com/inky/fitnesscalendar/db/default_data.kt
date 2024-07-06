@@ -7,7 +7,6 @@ import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityCategory
 import com.inky.fitnesscalendar.data.ActivityTypeColor
 
-// TODO: Add test for this
 fun loadDefaultData(db: SupportSQLiteDatabase, context: Context) {
     db.beginTransaction()
     try {

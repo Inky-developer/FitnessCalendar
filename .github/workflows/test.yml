@@ -18,3 +18,5 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
       - name: Run tests
         run: ./gradlew test
+      - name: Run Android tests
+        run: ./gradlew pixel2api30DebugAndroidTest
