@@ -2,7 +2,7 @@ package com.inky.fitnesscalendar
 
 import android.content.Context
 import android.util.Log
-import androidx.compose.runtime.Stable
+import androidx.compose.runtime.Immutable
 import androidx.room.withTransaction
 import com.inky.fitnesscalendar.data.Vehicle
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
@@ -31,8 +31,8 @@ import javax.inject.Singleton
 
 private const val TAG = "AppRepository"
 
+@Immutable
 @Singleton
-@Stable
 class AppRepository @Inject constructor(
     @ApplicationContext val context: Context,
     private val database: AppDatabase,

@@ -2,7 +2,7 @@ package com.inky.fitnesscalendar.localization
 
 import android.content.Context
 import android.text.format.DateFormat
-import androidx.compose.runtime.Stable
+import androidx.compose.runtime.Immutable
 import com.inky.fitnesscalendar.util.Duration.Companion.until
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.time.Instant
@@ -15,7 +15,7 @@ import java.util.Locale
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Stable
+@Immutable
 @Singleton
 class LocalizationRepository @Inject constructor(@ApplicationContext context: Context) {
     val timeFormatter: java.text.DateFormat = DateFormat.getTimeFormat(context)
