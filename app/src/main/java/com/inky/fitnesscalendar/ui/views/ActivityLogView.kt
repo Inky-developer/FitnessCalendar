@@ -295,6 +295,7 @@ private fun ActivityList(
             stickyHeader(key = day, contentType = "header") {
                 Text(
                     LocalizationRepository.localDateFormatter.format(day),
+                    style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier
                         .background(MaterialTheme.colorScheme.primaryContainer)
                         .padding(horizontal = 8.dp)
