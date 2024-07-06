@@ -37,7 +37,7 @@ fun QsTileRecordActivityDialog(
     var state by remember {
         mutableStateOf(
             ActivitySelectorState(
-                activityType = DecisionTrees.activityType?.classifyNow(),
+                activityType = DecisionTrees.activityType?.classifyNow()?.takeIf { it.hasDuration },
                 vehicle = DecisionTrees.vehicle?.classifyNow()
             )
         )
