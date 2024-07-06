@@ -39,12 +39,6 @@ enum class DefaultActivityType(
     val hasVehicle: Boolean = false,
     val hasDuration: Boolean = true,
 ) {
-    Bouldering(
-        ActivityCategory.Sports,
-        titleId = R.string.activity_bouldering,
-        color = ActivityTypeColor.Color1,
-        emoji = "🧗"
-    ),
     Cycling(
         ActivityCategory.Sports,
         titleId = R.string.activity_cycling,
@@ -57,22 +51,16 @@ enum class DefaultActivityType(
         color = ActivityTypeColor.Color3,
         emoji = "🏃"
     ),
-    KungFu(
-        ActivityCategory.Sports,
-        titleId = R.string.activity_kung_fu,
-        color = ActivityTypeColor.Color4,
-        emoji = "🥋"
-    ),
-    UniversityCommute(
+    WorkCommute(
         ActivityCategory.Travel,
-        titleId = R.string.activity_commute_home_to_university,
+        titleId = R.string.activity_commute_home_to_work,
         color = ActivityTypeColor.Color1,
         emoji = "🏢",
         hasVehicle = true
     ),
     HomeCommute(
         ActivityCategory.Travel,
-        titleId = R.string.activity_commute_university_to_home,
+        titleId = R.string.activity_commute_work_to_home,
         color = ActivityTypeColor.Color2,
         emoji = "🏡",
         hasVehicle = true

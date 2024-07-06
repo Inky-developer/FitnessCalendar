@@ -20,7 +20,7 @@
     <string name="info">Info</string>
     <string name="no_activities_yet">Noch keine Aktivitäten</string>
     <string name="activity_kung_fu">Kung Fu</string>
-    <string name="activity_commute_home_to_work">Zuahuse → Arbeit</string>
+    <string name="activity_commute_home_to_work">Zuhause → Arbeit</string>
     <string name="activity_commute_work_to_home">Arbeit → Zuhause</string>
     <string name="placeholder_description">Beschreibung…</string>
     <string name="vehicle_train">Zug</string>
