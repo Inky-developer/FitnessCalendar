@@ -17,7 +17,7 @@ jobs:
       - name: Setup gradle
         uses: gradle/actions/setup-gradle@v3
       - name: Setup Android SDK
-        uses: android-actions/setup-android@v2
+        uses: android-actions/setup-android@v3
       - name: Run tests
         run: ./gradlew test
       - name: Run Android tests
