@@ -449,7 +449,8 @@ fun CompactFeelSelector(feel: Feel?, onFeel: (Feel?) -> Unit) {
         if (expanded.currentState || expanded.targetState) {
             Popup(
                 alignment = Alignment.BottomStart,
-                onDismissRequest = { expanded.targetState = false }
+                onDismissRequest = { expanded.targetState = false },
+                properties = PopupProperties(focusable = true)
             ) {
                 AnimatedVisibility(visibleState = expanded) {
                     FeelSelector(
