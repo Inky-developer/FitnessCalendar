@@ -143,6 +143,7 @@
     <string name="these_activities_will_be_imported">These activities will be imported:</string>
     <string name="scroll_to_top">Scroll to top</string>
     <string name="four_weeks">4 Weeks</string>
+    <string name="edit_day">Edit Day</string>
     <plurals name="num_activities">
         <item quantity="one">%1d activity</item>
         <item quantity="other">%1d activities</item>

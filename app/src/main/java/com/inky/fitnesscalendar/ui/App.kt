@@ -25,6 +25,7 @@ import androidx.navigation.compose.rememberNavController
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.ui.components.NavigationDrawer
 import com.inky.fitnesscalendar.ui.views.ActivityLog
+import com.inky.fitnesscalendar.ui.views.EditDayDialog
 import com.inky.fitnesscalendar.ui.views.FilterView
 import com.inky.fitnesscalendar.ui.views.Home
 import com.inky.fitnesscalendar.ui.views.ImportExport
@@ -90,6 +91,9 @@ fun App(viewModel: GenericViewModel = hiltViewModel()) {
                             onEditActivity = {
                                 navController.navigate(Views.NewActivity.getPath(it.uid ?: -1))
                             },
+                            onEditDay = {
+                                navController.navigate(Views.EditDay.getPath(it.day))
+                            },
                             onRecordActivity = { navController.navigate(Views.RecordActivity.getPath()) },
                             onNavigateActivity = {
                                 navController.navigate(Views.ActivityLog.getPath())
@@ -100,6 +104,18 @@ fun App(viewModel: GenericViewModel = hiltViewModel()) {
                             onOpenDrawer = openDrawer
                         )
                     }
+                }
+                dialog(
+                    Views.EditDay.pathTemplate(),
+                    arguments = Views.EditDay.navArgs()
+                ) { backStackEntry ->
+                    currentView = Views.EditDay
+                    val epochDay =
+                        backStackEntry.arguments!!.let { Views.Argument.EPOCH_DAY.extract(it) }
+                    EditDayDialog(
+                        epochDay = epochDay,
+                        onNavigateBack = { navController.popBackStack() }
+                    )
                 }
                 composable(
                     Views.ActivityLog.pathTemplate(),
@@ -203,7 +219,7 @@ fun App(viewModel: GenericViewModel = hiltViewModel()) {
                     currentView = Views.Statistics
 
                     val initialPeriod =
-                        backStackEntry.arguments?.let { Views.Argument.initialPeriod.extract(it) }
+                        backStackEntry.arguments?.let { Views.Argument.INITIAL_PERIOD.extract(it) }
 
                     ProvideSharedContent(sharedContentScope = this@SharedTransitionLayout) {
                         StatisticsView(

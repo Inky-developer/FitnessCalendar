@@ -2,19 +2,25 @@ package com.inky.fitnesscalendar.ui.views
 
 import android.util.Log
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Face
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Menu
@@ -51,9 +57,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
+import androidx.compose.ui.window.PopupProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityStatistics
+import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.data.Feel
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.Day
@@ -84,6 +92,7 @@ fun Home(
     isNewActivityOpen: Boolean,
     onNewActivity: () -> Unit,
     onEditActivity: (Activity) -> Unit,
+    onEditDay: (EpochDay) -> Unit,
     onRecordActivity: () -> Unit,
     onNavigateActivity: () -> Unit,
     onNavigateStats: (Period) -> Unit,
@@ -184,6 +193,7 @@ fun Home(
                 day = day,
                 localizationRepository = viewModel.repository.localizationRepository,
                 onDay = { viewModel.updateDay(it) },
+                onEditDay = onEditDay,
                 onNavigateActivity = onNavigateActivity,
             )
             StatisticsIfNotNull(
@@ -356,6 +366,7 @@ fun Today(
     day: Day,
     localizationRepository: LocalizationRepository,
     onDay: (Day) -> Unit,
+    onEditDay: (EpochDay) -> Unit,
     onNavigateActivity: () -> Unit,
 ) {
 
@@ -369,7 +380,6 @@ fun Today(
             .fillMaxWidth()
     ) {
         Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
@@ -381,7 +391,34 @@ fun Today(
                 style = MaterialTheme.typography.displayLarge,
             )
 
-            CompactFeelSelector(day.feel, onFeel = { onDay(day.copy(feel = it)) })
+            Spacer(modifier = Modifier.weight(1f))
+
+            CompactFeelSelector(
+                day.feel,
+                onFeel = { onDay(day.copy(feel = it)) },
+                modifier = Modifier.padding(horizontal = 4.dp)
+            )
+            IconButton(
+                onClick = { onEditDay(day.day) },
+                modifier = Modifier.padding(horizontal = 4.dp)
+            ) {
+                Icon(Icons.Outlined.Edit, stringResource(R.string.edit_day))
+            }
+        }
+
+        AnimatedContent(
+            targetState = day.description,
+            label = stringResource(R.string.description)
+        ) { description ->
+            if (description.isNotBlank()) {
+                Text(
+                    description,
+                    modifier = Modifier
+                        .background(MaterialTheme.colorScheme.onSecondary)
+                        .padding(horizontal = 8.dp)
+                        .fillMaxWidth()
+                )
+            }
         }
 
         AnimatedContent(
@@ -431,18 +468,34 @@ fun Today(
 }
 
 @Composable
-fun CompactFeelSelector(feel: Feel?, onFeel: (Feel?) -> Unit) {
+fun CompactFeelSelector(feel: Feel?, onFeel: (Feel?) -> Unit, modifier: Modifier = Modifier) {
     val expanded = remember { MutableTransitionState(false) }
 
-    Column {
-        OutlinedButton(
-            onClick = { expanded.targetState = true },
-            contentPadding = PaddingValues(all = 4.dp)
-        ) {
-            if (feel != null) {
-                Text(feel.emoji, style = MaterialTheme.typography.displaySmall)
-            } else {
-                Icon(Icons.Outlined.Face, stringResource(R.string.select_feel))
+    Column(modifier = modifier) {
+        AnimatedContent(
+            targetState = feel,
+            transitionSpec = {
+                val left = AnimatedContentTransitionScope.SlideDirection.Left
+                val right = AnimatedContentTransitionScope.SlideDirection.Right
+                if (targetState == null || initialState == null) {
+                    fadeIn() togetherWith fadeOut()
+                } else if (targetState!! > initialState!!) {
+                    slideIntoContainer(left) togetherWith slideOutOfContainer(left)
+                } else {
+                    slideIntoContainer(right) togetherWith slideOutOfContainer(right)
+                }
+            },
+            label = stringResource(R.string.feel)
+        ) { actualFeel ->
+            OutlinedButton(
+                onClick = { expanded.targetState = true },
+                contentPadding = PaddingValues(all = 4.dp)
+            ) {
+                if (actualFeel != null) {
+                    Text(actualFeel.emoji, style = MaterialTheme.typography.titleLarge)
+                } else {
+                    Icon(Icons.Outlined.Face, stringResource(R.string.select_feel))
+                }
             }
         }
 

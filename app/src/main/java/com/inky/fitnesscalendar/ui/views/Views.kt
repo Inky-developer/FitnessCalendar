@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 import com.inky.fitnesscalendar.R
+import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.view_model.statistics.Period
 
 
@@ -13,13 +14,14 @@ enum class Views(
     private val arguments: List<Argument<*, *>> = emptyList()
 ) {
     Home(R.string.today, "home"),
+    EditDay(R.string.edit_activity, "edit_activity", listOf(Argument.EPOCH_DAY)),
     ActivityLog(R.string.activity_log, "activity_log", listOf(Argument.ACTIVITY_ID)),
     FilterActivity(R.string.filter, "filter_activity"),
     NewActivity(R.string.new_activity, "new_activity", listOf(Argument.ACTIVITY_ID)),
     RecordActivity(R.string.record_activity, "record_activity"),
     ImportExport(R.string.import_export, "import_export"),
     Settings(R.string.settings, "settings"),
-    Statistics(R.string.statistics, "statistics", listOf(Argument.initialPeriod));
+    Statistics(R.string.statistics, "statistics", listOf(Argument.INITIAL_PERIOD));
 
     fun getPath(): String = if (arguments.isEmpty()) {
         pathTemplate()
@@ -62,7 +64,7 @@ enum class Views(
                         }
                 }
 
-            val initialPeriod =
+            val INITIAL_PERIOD =
                 object : Argument<String?, Period?>(
                     "initial_period",
                     NavType.StringType,
@@ -72,6 +74,11 @@ enum class Views(
                     override fun extract(bundle: Bundle) =
                         bundle.getString(id)
                             ?.let { if (it != null.toString()) Period.valueOf(it) else null }
+                }
+
+            val EPOCH_DAY =
+                object : Argument<Long, EpochDay>("epoch_day", NavType.LongType, default = 0) {
+                    override fun extract(bundle: Bundle) = EpochDay(bundle.getLong(id))
                 }
         }
     }
