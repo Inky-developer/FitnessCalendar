@@ -459,8 +459,9 @@ fun CompactFeelSelector(feel: Feel?, onFeel: (Feel?) -> Unit) {
                             expanded.targetState = false
                         },
                         modifier = Modifier
+                            .padding(horizontal = 16.dp)
                             .clip(MaterialTheme.shapes.medium)
-                            .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+                            .background(MaterialTheme.colorScheme.onSecondaryContainer)
                     )
                 }
             }
