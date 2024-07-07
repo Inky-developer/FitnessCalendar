@@ -278,6 +278,8 @@ private fun ActivityList(
     onEditActivity: (Activity) -> Unit,
     onDeleteActivity: (Activity) -> Unit
 ) {
+    val isFilterEmpty by remember { derivedStateOf { filter.isEmpty() } }
+
     LazyColumn(
         state = listState,
         contentPadding = PaddingValues(bottom = 128.dp),
@@ -318,10 +320,10 @@ private fun ActivityList(
                         onDelete = {
                             onDeleteActivity(item.typeActivity.activity)
                         },
-                        onFilter = if (filter.isEmpty()) {
+                        onFilter = if (isFilterEmpty) {
                             onEditFilter
                         } else null,
-                        onJumpTo = if (!filter.isEmpty()) {
+                        onJumpTo = if (!isFilterEmpty) {
                             { onJumpToActivity(item.typeActivity.activity) }
                         } else null,
                         onEdit = onEditActivity,
