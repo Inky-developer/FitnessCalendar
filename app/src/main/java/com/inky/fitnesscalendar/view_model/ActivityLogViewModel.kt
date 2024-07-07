@@ -10,9 +10,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.inky.fitnesscalendar.AppRepository
 import com.inky.fitnesscalendar.R
+import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilterChip.Companion.toActivityFilterChip
 import com.inky.fitnesscalendar.db.entities.Activity
+import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.db.entities.TypeActivity
 import com.inky.fitnesscalendar.util.toLocalDate
 import com.inky.fitnesscalendar.view_model.activity_log.ActivityListItem
@@ -40,6 +42,9 @@ class ActivityLogViewModel @Inject constructor(
     val filterHistory = repository.getFilterHistoryItems()
         .map { item -> item.mapNotNull { it.toActivityFilterChip() } }
 
+    private val _days = MutableStateFlow(emptyMap<EpochDay, Day>())
+    val days = _days.asStateFlow()
+
     private val _activities = MutableStateFlow(emptyList<TypeActivity>())
     val activities = _activities.asStateFlow()
 
@@ -65,6 +70,9 @@ class ActivityLogViewModel @Inject constructor(
         activityUpdateJob = repository.getActivities(ActivityFilter()).onEach { activityList ->
             _activities.emit(activityList)
         }.launchIn(viewModelScope)
+
+        // TODO: Only select the required days
+        repository.getDays().onEach { _days.emit(it) }.launchIn(viewModelScope)
     }
 
     fun setFilter(filter: ActivityFilter) = viewModelScope.launch {

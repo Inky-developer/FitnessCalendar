@@ -1,0 +1,21 @@
+package com.inky.fitnesscalendar.db.dao
+
+import androidx.room.Dao
+import androidx.room.MapColumn
+import androidx.room.Query
+import androidx.room.Upsert
+import com.inky.fitnesscalendar.data.EpochDay
+import com.inky.fitnesscalendar.db.entities.Day
+import kotlinx.coroutines.flow.Flow
+
+@Dao
+interface DayDao {
+    @Query("SELECT * FROM Day")
+    fun getDays(): Flow<Map<@MapColumn(columnName = "day") EpochDay, Day>>
+
+    @Query("SELECT * FROM Day WHERE day = :day")
+    fun get(day: EpochDay): Flow<Day?>
+
+    @Upsert
+    suspend fun upsert(day: Day)
+}

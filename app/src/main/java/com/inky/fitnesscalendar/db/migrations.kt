@@ -189,3 +189,9 @@ val MIGRATION_8_9 = object : Migration(8, 9) {
         db.execSQL("CREATE INDEX IF NOT EXISTS `index_Recording_type_id` ON Recording (`type_id`)")
     }
 }
+
+val MIGRATION_9_10 = object : Migration(9, 10) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("CREATE TABLE IF NOT EXISTS `Day` (`day` INTEGER NOT NULL, `description` TEXT NOT NULL, `feel` TEXT, `image_uri` TEXT, PRIMARY KEY(`day`))")
+    }
+}

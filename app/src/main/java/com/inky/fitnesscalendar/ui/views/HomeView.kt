@@ -3,9 +3,11 @@ package com.inky.fitnesscalendar.ui.views
 import android.util.Log
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.MutableTransitionState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -13,6 +15,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.outlined.Face
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.Card
@@ -23,6 +26,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
@@ -37,6 +41,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
@@ -45,16 +50,20 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Popup
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityStatistics
+import com.inky.fitnesscalendar.data.Feel
 import com.inky.fitnesscalendar.db.entities.Activity
+import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.db.entities.Recording
 import com.inky.fitnesscalendar.db.entities.TypeActivity
 import com.inky.fitnesscalendar.db.entities.TypeRecording
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivityCard
 import com.inky.fitnesscalendar.ui.components.CompactActivityCard
+import com.inky.fitnesscalendar.ui.components.FeelSelector
 import com.inky.fitnesscalendar.ui.components.NewActivityFAB
 import com.inky.fitnesscalendar.ui.components.Timer
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
@@ -83,6 +92,7 @@ fun Home(
     val weeklyStats by viewModel.weekStats.collectAsState(initial = null)
     val monthlyStats by viewModel.monthStats.collectAsState(initial = null)
     val activitiesToday by viewModel.activitiesToday.collectAsState(initial = null)
+    val day by viewModel.today.collectAsState()
     val recentActivity by viewModel.mostRecentActivity.collectAsState(initial = null)
     val typeRecordings by viewModel.recordings.collectAsState(initial = null)
     val scrollState = rememberScrollState()
@@ -169,10 +179,12 @@ fun Home(
                 onDelete = { viewModel.deleteActivity(it) },
                 onEdit = onEditActivity,
             )
-            ActivitiesToday(
+            Today(
                 typeActivities = activitiesToday ?: emptyList(),
+                day = day,
                 localizationRepository = viewModel.repository.localizationRepository,
-                onNavigateActivity = onNavigateActivity
+                onDay = { viewModel.updateDay(it) },
+                onNavigateActivity = onNavigateActivity,
             )
             StatisticsIfNotNull(
                 stringResource(R.string.last_seven_days),
@@ -339,10 +351,12 @@ fun Statistics(name: String, stats: ActivityStatistics, onClick: () -> Unit) {
 }
 
 @Composable
-fun ActivitiesToday(
+fun Today(
     typeActivities: List<TypeActivity>,
+    day: Day,
     localizationRepository: LocalizationRepository,
-    onNavigateActivity: () -> Unit
+    onDay: (Day) -> Unit,
+    onNavigateActivity: () -> Unit,
 ) {
 
     Card(
@@ -354,17 +368,21 @@ fun ActivitiesToday(
             .padding(all = 8.dp)
             .fillMaxWidth()
     ) {
-        Text(
-            stringResource(R.string.today),
-            color = MaterialTheme.colorScheme.onSecondaryContainer,
-            style = MaterialTheme.typography.displayLarge,
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 8.dp)
-                .background(
-                    MaterialTheme.colorScheme.secondaryContainer,
-                )
-        )
+        ) {
+            Text(
+                stringResource(R.string.today),
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                style = MaterialTheme.typography.displayLarge,
+            )
+
+            CompactFeelSelector(day.feel, onFeel = { onDay(day.copy(feel = it)) })
+        }
 
         AnimatedContent(
             targetState = typeActivities.isEmpty(),
@@ -406,6 +424,44 @@ fun ActivitiesToday(
                             )
                         }
                     }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun CompactFeelSelector(feel: Feel?, onFeel: (Feel?) -> Unit) {
+    val expanded = remember { MutableTransitionState(false) }
+
+    Column {
+        OutlinedButton(
+            onClick = { expanded.targetState = true },
+            contentPadding = PaddingValues(all = 4.dp)
+        ) {
+            if (feel != null) {
+                Text(feel.emoji, style = MaterialTheme.typography.displaySmall)
+            } else {
+                Icon(Icons.Outlined.Face, stringResource(R.string.select_feel))
+            }
+        }
+
+        if (expanded.currentState || expanded.targetState) {
+            Popup(
+                alignment = Alignment.BottomStart,
+                onDismissRequest = { expanded.targetState = false }
+            ) {
+                AnimatedVisibility(visibleState = expanded) {
+                    FeelSelector(
+                        feel = feel,
+                        onChange = {
+                            onFeel(it)
+                            expanded.targetState = false
+                        },
+                        modifier = Modifier
+                            .clip(MaterialTheme.shapes.medium)
+                            .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+                    )
                 }
             }
         }

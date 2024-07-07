@@ -2,6 +2,7 @@ package com.inky.fitnesscalendar.db
 
 import android.net.Uri
 import androidx.room.TypeConverter
+import com.inky.fitnesscalendar.data.EpochDay
 import java.util.Date
 
 class Converters {
@@ -23,5 +24,15 @@ class Converters {
     @TypeConverter
     fun uriFromString(value: String?): Uri? {
         return value?.let { Uri.parse(it) }
+    }
+
+    @TypeConverter
+    fun EpochDayToLong(day: EpochDay): Long {
+        return day.day
+    }
+
+    @TypeConverter
+    fun LongToEpochDay(value: Long): EpochDay {
+        return EpochDay(value)
     }
 }

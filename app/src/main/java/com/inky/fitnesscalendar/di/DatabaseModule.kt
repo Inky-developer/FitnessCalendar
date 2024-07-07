@@ -27,4 +27,7 @@ class DatabaseModule {
 
     @Provides
     fun filterHistoryDao(database: AppDatabase) = database.filterHistoryDao()
+
+    @Provides
+    fun dayDao(database: AppDatabase) = database.dayDao()
 }

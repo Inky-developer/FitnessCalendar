@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.Immutable
 import androidx.room.withTransaction
+import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.data.Vehicle
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilterChip
@@ -11,10 +12,12 @@ import com.inky.fitnesscalendar.data.activity_filter.ActivityFilterChip.Companio
 import com.inky.fitnesscalendar.db.AppDatabase
 import com.inky.fitnesscalendar.db.dao.ActivityDao
 import com.inky.fitnesscalendar.db.dao.ActivityTypeDao
+import com.inky.fitnesscalendar.db.dao.DayDao
 import com.inky.fitnesscalendar.db.dao.FilterHistoryDao
 import com.inky.fitnesscalendar.db.dao.RecordingDao
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.ActivityType
+import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.db.entities.Recording
 import com.inky.fitnesscalendar.db.entities.TypeActivity
 import com.inky.fitnesscalendar.db.entities.TypeRecording
@@ -40,6 +43,7 @@ class AppRepository @Inject constructor(
     private val recordingDao: RecordingDao,
     private val activityTypeDao: ActivityTypeDao,
     private val filterHistoryDao: FilterHistoryDao,
+    private val dayDao: DayDao,
     val localizationRepository: LocalizationRepository
 ) {
     suspend fun loadAllActivities() = activityDao.loadActivities()
@@ -156,4 +160,12 @@ class AppRepository @Inject constructor(
         }
 
     fun getFilterHistoryItems() = filterHistoryDao.getItems()
+
+    fun getDays() = dayDao.getDays()
+
+    fun getDay(day: EpochDay): Flow<Day> = dayDao.get(day).map { it ?: Day(day = day) }
+
+    suspend fun saveDay(day: Day) {
+        dayDao.upsert(day)
+    }
 }

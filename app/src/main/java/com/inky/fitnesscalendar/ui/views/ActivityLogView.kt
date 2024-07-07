@@ -65,9 +65,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
+import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilterChip
 import com.inky.fitnesscalendar.db.entities.Activity
+import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivityCard
 import com.inky.fitnesscalendar.ui.components.NewActivityFAB
@@ -103,6 +105,8 @@ fun ActivityLog(
     val activities by viewModel.activities.collectAsState()
     val activityListItems by viewModel.activityListItems.collectAsState(initial = emptyList())
     val activitiesEmpty by remember(activities) { derivedStateOf { activities.isEmpty() } }
+
+    val days by viewModel.days.collectAsState()
 
     val filterHistoryItems by viewModel.filterHistory.collectAsState(initial = emptyList())
 
@@ -245,6 +249,7 @@ fun ActivityLog(
                 ActivityList(
                     listState = activityListState,
                     activityListItems = activityListItems,
+                    days = days,
                     filter = filter,
                     localizationRepository = viewModel.repository.localizationRepository,
                     onJumpToActivity = {
@@ -265,6 +270,7 @@ fun ActivityLog(
 private fun ActivityList(
     listState: LazyListState,
     activityListItems: List<ActivityListItem>,
+    days: Map<EpochDay, Day>,
     filter: ActivityFilter,
     localizationRepository: LocalizationRepository,
     onJumpToActivity: (Activity) -> Unit,
@@ -282,15 +288,25 @@ private fun ActivityList(
                     key = item.date,
                     contentType = item.contentType
                 ) {
-                    Text(
-                        LocalizationRepository.localDateFormatter.format(item.date),
-                        style = MaterialTheme.typography.titleMedium,
+                    val feel = days[EpochDay(item.date.toEpochDay())]?.feel
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
                             .background(MaterialTheme.colorScheme.primaryContainer)
                             .padding(horizontal = 8.dp)
                             .fillMaxWidth()
                             .animateItem()
-                    )
+                    ) {
+                        Text(
+                            LocalizationRepository.localDateFormatter.format(item.date),
+                            style = MaterialTheme.typography.titleMedium,
+                        )
+
+                        if (feel != null) {
+                            Text(feel.emoji, style = MaterialTheme.typography.titleMedium)
+                        }
+                    }
                 }
 
                 is ActivityListItem.Activity -> item(
