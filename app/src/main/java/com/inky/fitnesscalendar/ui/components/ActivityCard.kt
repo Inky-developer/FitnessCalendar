@@ -112,6 +112,7 @@ fun ActivityCard(
         }
 
         Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(all = 8.dp), horizontalArrangement = Arrangement.SpaceAround
