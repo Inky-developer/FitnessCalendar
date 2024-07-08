@@ -1,5 +1,6 @@
 package com.inky.fitnesscalendar.data.activity_filter
 
+import com.inky.fitnesscalendar.util.DAY_START_OFFSET_HOURS
 import com.inky.fitnesscalendar.util.toDate
 import java.time.Instant
 import java.time.LocalDateTime
@@ -10,10 +11,6 @@ import java.util.Date
 
 data class DateRange(val start: Date, val end: Date?) {
     companion object {
-        // Specifies by how many hours offset a day starts.
-        // E.g. A value of 2 means that the day goes from 2 am to 2 am next day
-        private const val DAY_START_OFFSET_HOURS = 2L
-
         // Let days start at 2 am
         fun atDay(offsetDays: Long): DateRange {
             val day =

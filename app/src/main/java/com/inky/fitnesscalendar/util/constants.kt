@@ -16,3 +16,7 @@ const val EXTRA_RECORDING_ID = "recording_id"
 
 const val ACTIVITY_IMAGES_DIR = "activity_images"
 const val SHARED_MEDIA_DIR = "shared_media_cache"
+
+// Specifies by how many hours offset a day starts.
+// E.g. A value of 2 means that the day goes from 2 am to 2 am next day
+const val DAY_START_OFFSET_HOURS = 2L
