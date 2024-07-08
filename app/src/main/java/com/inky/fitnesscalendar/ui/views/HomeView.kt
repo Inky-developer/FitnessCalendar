@@ -9,6 +9,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -369,7 +370,6 @@ fun Today(
     onEditDay: (EpochDay) -> Unit,
     onNavigateActivity: () -> Unit,
 ) {
-
     Card(
         onClick = onNavigateActivity,
         colors = CardDefaults.cardColors(
@@ -411,10 +411,14 @@ fun Today(
             label = stringResource(R.string.description)
         ) { description ->
             if (description.isNotBlank()) {
+                // OnSecondary is too bright in light mode
+                val backgroundColor =
+                    if (isSystemInDarkTheme()) MaterialTheme.colorScheme.onSecondary else MaterialTheme.colorScheme.surfaceContainer
+
                 Text(
                     description,
                     modifier = Modifier
-                        .background(MaterialTheme.colorScheme.onSecondary)
+                        .background(backgroundColor)
                         .padding(horizontal = 8.dp)
                         .fillMaxWidth()
                 )
