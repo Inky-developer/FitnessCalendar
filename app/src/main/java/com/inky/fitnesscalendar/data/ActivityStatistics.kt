@@ -10,6 +10,7 @@ import java.time.temporal.WeekFields
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import kotlin.math.roundToLong
 
 data class ActivityStatistics(
     val activities: List<TypeActivity>,
@@ -21,6 +22,16 @@ data class ActivityStatistics(
         Duration(activities.sumOf { it.activity.startTime.until(it.activity.endTime).elapsedMs })
 
     fun averageTime() = Duration(totalTime().elapsedMs / size)
+
+    fun totalDistance() = Distance(meters = activities.sumOf { it.activity.distance?.meters ?: 0 })
+
+    fun averageDistance(): Distance {
+        val distances = activities.mapNotNull { it.activity.distance?.meters }
+        if (distances.isEmpty()) {
+            return Distance(meters = 0)
+        }
+        return Distance(meters = (distances.sum().toDouble() / distances.size).roundToLong())
+    }
 
     fun isEmpty() = activities.isEmpty()
 

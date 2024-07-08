@@ -45,9 +45,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
-import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.data.ActivityCategory
 import com.inky.fitnesscalendar.data.Displayable
+import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.preferences.Preference
 import com.inky.fitnesscalendar.ui.components.CompactActivityCard
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
@@ -230,6 +230,12 @@ private fun ProjectionSelectButton(projection: Projection) {
         for (projectionEntry in Projection.entries) {
             DropdownMenuItem(
                 text = { Text(stringResource(projectionEntry.labelTextId)) },
+                leadingIcon = {
+                    Icon(
+                        painterResource(projectionEntry.iconId),
+                        stringResource(R.string.projection)
+                    )
+                },
                 onClick = {
                     scope.launch {
                         Preference.PREF_STATS_PROJECTION.set(context, projectionEntry)

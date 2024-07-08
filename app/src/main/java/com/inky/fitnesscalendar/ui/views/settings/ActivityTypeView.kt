@@ -49,8 +49,8 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
-import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.data.ActivityTypeColor
+import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.ui.components.ActivityCategorySelector
 import com.inky.fitnesscalendar.ui.components.ActivityTypeSelector
 import com.inky.fitnesscalendar.ui.components.BaseEditDialog
@@ -211,11 +211,15 @@ fun EditTypeDialog(
                 onValue = { state = state.copy(hasDuration = it) }
             )
             Toggle(
+                name = stringResource(R.string.has_distance),
+                value = state.hasDistance,
+                onValue = { state = state.copy(hasDistance = it) }
+            )
+            Toggle(
                 name = stringResource(R.string.has_vehicle),
                 value = state.hasVehicle,
                 onValue = { state = state.copy(hasVehicle = it) }
             )
-
         }
     }
 }

@@ -83,7 +83,7 @@
     <string name="by_total_activities">Aktivitäten gesamt</string>
     <string name="by_total_time">Zeit gesamt</string>
     <string name="total_hours">Stunden gesamt</string>
-    <string name="average_hours">Durchsnittliche Stunden</string>
+    <string name="average_hours">Durchschnittliche Stunden</string>
     <string name="by_average_time">Durchschnittliche Zeit</string>
     <string name="jump_to">Springe zu</string>
     <string name="yesterday">Gestern</string>
@@ -155,4 +155,14 @@
     <string name="scroll_to_top">Nach oben scrollen</string>
     <string name="four_weeks">4 Wochen</string>
     <string name="edit_day">Tag bearbeiten</string>
+    <string name="has_distance">Hat Distanz?</string>
+    <string name="placeholder_distance">Distanz..</string>
+    <string name="km">km</string>
+    <string name="n_kilometers">%1$s km</string>
+    <string name="distance">Distanz</string>
+    <string name="total_distance">Distanz gesamt</string>
+    <string name="total_kilometers">Kilometer gesamt</string>
+    <string name="average_kilometers">Durchschnittliche Kilometer</string>
+    <string name="average_distance">Durchschnittliche Distanz</string>
+    <string name="projection">Projektion</string>
 </resources>

@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material3.AlertDialog
@@ -138,6 +139,21 @@ fun ActivityCard(
                         stringResource(R.string.time)
                     )
                     Text(timeElapsed.format(), style = MaterialTheme.typography.bodyLarge)
+                }
+            }
+
+            if (activity.distance != null) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        Icons.AutoMirrored.Outlined.ArrowForward,
+                        stringResource(R.string.distance)
+                    )
+                    Text(
+                        stringResource(
+                            R.string.n_kilometers,
+                            "%.1f".format(activity.distance.kilometers)
+                        )
+                    )
                 }
             }
         }

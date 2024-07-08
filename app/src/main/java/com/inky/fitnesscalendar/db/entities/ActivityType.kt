@@ -20,6 +20,7 @@ data class ActivityType(
     @ColumnInfo(name = "color") val color: ActivityTypeColor,
     @ColumnInfo(name = "has_vehicle") val hasVehicle: Boolean = false,
     @ColumnInfo(name = "has_duration") val hasDuration: Boolean = true,
+    @ColumnInfo(name = "has_distance", defaultValue = "false") val hasDistance: Boolean = false,
 ) : Displayable, Parcelable {
     fun hasFeel() = hasDuration
 

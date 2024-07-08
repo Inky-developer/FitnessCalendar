@@ -144,6 +144,16 @@
     <string name="scroll_to_top">Scroll to top</string>
     <string name="four_weeks">4 Weeks</string>
     <string name="edit_day">Edit Day</string>
+    <string name="has_distance">Has distance?</string>
+    <string name="placeholder_distance">Distance…</string>
+    <string name="km">km</string>
+    <string name="n_kilometers">%1$s km</string>
+    <string name="distance">Distance</string>
+    <string name="total_distance">Total Distance</string>
+    <string name="total_kilometers">Total Kilometers</string>
+    <string name="average_kilometers">Average Kilometers</string>
+    <string name="average_distance">Average Distance</string>
+    <string name="projection">Projection</string>
     <plurals name="num_activities">
         <item quantity="one">%1d activity</item>
         <item quantity="other">%1d activities</item>

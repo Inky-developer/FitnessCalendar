@@ -2,8 +2,8 @@ package com.inky.fitnesscalendar.view_model.settings
 
 import android.os.Parcelable
 import com.inky.fitnesscalendar.data.ActivityCategory
-import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.data.ActivityTypeColor
+import com.inky.fitnesscalendar.db.entities.ActivityType
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -15,6 +15,7 @@ data class ActivityTypeEditState(
     val color: ActivityTypeColor? = null,
     val hasVehicle: Boolean = false,
     val hasDuration: Boolean = false,
+    val hasDistance: Boolean = false
 ) : Parcelable {
     constructor(activityType: ActivityType) : this(
         uid = activityType.uid,
@@ -23,7 +24,8 @@ data class ActivityTypeEditState(
         emoji = activityType.emoji,
         color = activityType.color,
         hasVehicle = activityType.hasVehicle,
-        hasDuration = activityType.hasDuration
+        hasDuration = activityType.hasDuration,
+        hasDistance = activityType.hasDistance
     )
 
     val isNewType get() = uid == null
@@ -43,7 +45,8 @@ data class ActivityTypeEditState(
             emoji = emoji,
             color = color,
             hasVehicle = hasVehicle,
-            hasDuration = hasDuration
+            hasDuration = hasDuration,
+            hasDistance = hasDistance
         )
     }
 }

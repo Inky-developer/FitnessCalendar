@@ -43,11 +43,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import com.inky.fitnesscalendar.R
+import com.inky.fitnesscalendar.data.Distance
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.TypeActivity
@@ -139,12 +141,23 @@ fun NewActivity(
         mutableStateOf(typeActivity?.activity?.description ?: "")
     }
 
+    var distanceString by rememberSaveable {
+        mutableStateOf(
+            typeActivity?.activity?.distance?.kilometers?.toString() ?: ""
+        )
+    }
+    val isDistanceStringError by remember {
+        derivedStateOf {
+            distanceString.isNotBlank() && kilometerStringToDistance(distanceString) == null
+        }
+    }
+
     var feel by rememberSaveable { mutableStateOf(typeActivity?.activity?.feel) }
 
     var imageUri by rememberSaveable { mutableStateOf(typeActivity?.activity?.imageUri) }
 
     val formValid =
-        selectedActivityType != null && (!selectedActivityType!!.hasVehicle || selectedVehicle != null)
+        selectedActivityType != null && (!selectedActivityType!!.hasVehicle || selectedVehicle != null) && !isDistanceStringError
 
     val scrollState = rememberScrollState()
 
@@ -188,7 +201,8 @@ fun NewActivity(
                 startTime = startDateTimePickerState.selectedDate(),
                 endTime = endDateTimePickerState.selectedDate(),
                 feel = feel,
-                imageUri = imageUri
+                imageUri = imageUri,
+                distance = kilometerStringToDistance(distanceString)
             )
 
             onSave(TypeActivity(activity = newActivity, type = selectedActivityType!!))
@@ -266,11 +280,31 @@ fun NewActivity(
                     )
                 }
             }
+
+            AnimatedVisibility(visible = selectedActivityType?.hasDistance == true) {
+                TextField(
+                    value = distanceString,
+                    onValueChange = { distanceString = it },
+                    isError = isDistanceStringError,
+                    placeholder = { Text(stringResource(R.string.placeholder_distance)) },
+                    suffix = { Text(stringResource(R.string.km)) },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp),
+                    singleLine = true,
+                    keyboardOptions = remember { KeyboardOptions(keyboardType = KeyboardType.Number) },
+                    colors = TextFieldDefaults.colors(unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+                    shape = MaterialTheme.shapes.small
+                )
+            }
+
             TextField(
                 value = description,
                 onValueChange = { description = it },
                 placeholder = { Text(stringResource(R.string.placeholder_description)) },
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
                 maxLines = 8,
                 keyboardOptions = remember { KeyboardOptions(capitalization = KeyboardCapitalization.Sentences) },
                 colors = TextFieldDefaults.colors(unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
@@ -344,4 +378,10 @@ fun ColumnScope.DateTimeInput(
             )
         }
     }
+}
+
+fun kilometerStringToDistance(string: String) = if (string.isBlank()) {
+    null
+} else {
+    string.replace(",", ".").toDoubleOrNull()?.let { Distance(kilometers = it) }
 }
