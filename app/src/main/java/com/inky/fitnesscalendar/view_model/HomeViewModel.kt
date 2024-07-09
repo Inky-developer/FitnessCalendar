@@ -12,10 +12,10 @@ import com.inky.fitnesscalendar.data.ActivityStatistics
 import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.data.activity_filter.DateRangeOption
+import com.inky.fitnesscalendar.data.measure.Duration.Companion.until
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.db.entities.Recording
-import com.inky.fitnesscalendar.util.Duration.Companion.until
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers

@@ -2,8 +2,8 @@ package com.inky.fitnesscalendar.db
 
 import android.net.Uri
 import androidx.room.TypeConverter
-import com.inky.fitnesscalendar.data.Distance
 import com.inky.fitnesscalendar.data.EpochDay
+import com.inky.fitnesscalendar.data.measure.Distance
 import java.util.Date
 
 class Converters {

@@ -3,7 +3,7 @@ package com.inky.fitnesscalendar.view_model.statistics
 import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
-import com.inky.fitnesscalendar.util.format
+import com.inky.fitnesscalendar.data.measure.format
 import com.patrykandpatrick.vico.core.cartesian.CartesianDrawContext
 import com.patrykandpatrick.vico.core.cartesian.marker.CartesianMarker
 import com.patrykandpatrick.vico.core.cartesian.marker.CartesianMarkerValueFormatter

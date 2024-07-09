@@ -64,6 +64,8 @@ import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityStatistics
 import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.data.Feel
+import com.inky.fitnesscalendar.data.measure.Duration
+import com.inky.fitnesscalendar.data.measure.Duration.Companion.until
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.db.entities.Recording
@@ -78,8 +80,6 @@ import com.inky.fitnesscalendar.ui.components.Timer
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.ui.util.sharedElement
-import com.inky.fitnesscalendar.util.Duration
-import com.inky.fitnesscalendar.util.Duration.Companion.until
 import com.inky.fitnesscalendar.util.showRecordingNotification
 import com.inky.fitnesscalendar.view_model.HomeViewModel
 import com.inky.fitnesscalendar.view_model.statistics.Period

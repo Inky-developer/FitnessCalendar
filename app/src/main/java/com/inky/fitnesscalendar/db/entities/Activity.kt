@@ -6,11 +6,11 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.inky.fitnesscalendar.data.Distance
 import com.inky.fitnesscalendar.data.Feel
 import com.inky.fitnesscalendar.data.Vehicle
-import com.inky.fitnesscalendar.data.Velocity
-import com.inky.fitnesscalendar.util.Duration.Companion.until
+import com.inky.fitnesscalendar.data.measure.Distance
+import com.inky.fitnesscalendar.data.measure.Duration.Companion.until
+import com.inky.fitnesscalendar.data.measure.Velocity
 import java.util.Date
 
 @Entity(

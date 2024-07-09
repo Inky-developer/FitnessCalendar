@@ -3,7 +3,7 @@ package com.inky.fitnesscalendar.localization
 import android.content.Context
 import android.text.format.DateFormat
 import androidx.compose.runtime.Immutable
-import com.inky.fitnesscalendar.util.Duration.Companion.until
+import com.inky.fitnesscalendar.data.measure.Duration.Companion.until
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.time.Instant
 import java.time.format.DateTimeFormatter

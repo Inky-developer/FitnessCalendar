@@ -1,4 +1,4 @@
-package com.inky.fitnesscalendar.util
+package com.inky.fitnesscalendar.data.measure
 
 import java.time.temporal.ChronoUnit
 import java.util.Date

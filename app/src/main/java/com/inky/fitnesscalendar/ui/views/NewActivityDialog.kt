@@ -49,7 +49,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import com.inky.fitnesscalendar.R
-import com.inky.fitnesscalendar.data.Distance
+import com.inky.fitnesscalendar.data.measure.Distance
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.TypeActivity
