@@ -33,6 +33,9 @@ data class ActivityStatistics(
         return Distance(meters = (distances.sum().toDouble() / distances.size).roundToLong())
     }
 
+    fun averageVelocity() =
+        Velocity(metersPerSecond = averageDistance().meters / averageTime().elapsedSeconds)
+
     fun isEmpty() = activities.isEmpty()
 
     val activitiesByCategory: Map<ActivityCategory, ActivityStatistics>

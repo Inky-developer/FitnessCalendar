@@ -9,6 +9,8 @@ import androidx.room.PrimaryKey
 import com.inky.fitnesscalendar.data.Distance
 import com.inky.fitnesscalendar.data.Feel
 import com.inky.fitnesscalendar.data.Vehicle
+import com.inky.fitnesscalendar.data.Velocity
+import com.inky.fitnesscalendar.util.Duration.Companion.until
 import java.util.Date
 
 @Entity(
@@ -38,4 +40,15 @@ data class Activity(
         endTime = if (type.hasDuration) endTime else startTime,
         distance = if (type.hasDistance) distance else null
     )
+
+    val duration
+        get() = startTime until endTime
+
+    val velocity: Velocity?
+        get() {
+            if (duration.elapsedMs == 0L) {
+                return null
+            }
+            return distance?.let { Velocity(metersPerSecond = it.meters / duration.elapsedSeconds) }
+        }
 }

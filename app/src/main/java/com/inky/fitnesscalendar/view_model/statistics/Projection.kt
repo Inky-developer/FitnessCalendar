@@ -44,6 +44,12 @@ enum class Projection(
         R.string.average_distance,
         R.drawable.outline_avg_distance_24,
         null
+    ),
+    ByAverageVelocity(
+        R.string.average_kmh,
+        R.string.average_velocity,
+        R.drawable.outline_speed_24,
+        null
     );
 
     fun apply(statistics: ActivityStatistics): Double = when (this) {
@@ -52,10 +58,11 @@ enum class Projection(
         ByTotalActivities -> statistics.size.toDouble()
         ByTotalDistance -> statistics.totalDistance().kilometers
         ByAverageDistance -> statistics.averageDistance().kilometers
+        ByAverageVelocity -> statistics.averageVelocity().kmh
     }
 
     fun markerFormatter() = when (this) {
         ByTotalTime, ByAverageTime -> TimeMarkerFormatter()
-        ByTotalActivities, ByTotalDistance, ByAverageDistance -> DefaultCartesianMarkerValueFormatter()
+        ByTotalActivities, ByTotalDistance, ByAverageDistance, ByAverageVelocity -> DefaultCartesianMarkerValueFormatter()
     }
 }

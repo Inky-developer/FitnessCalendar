@@ -50,7 +50,6 @@ import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.TypeActivity
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.util.skipToLookaheadSize
-import com.inky.fitnesscalendar.util.Duration.Companion.until
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -75,7 +74,8 @@ fun ActivityCard(
         localizationRepository.timeFormatter.format(activity.startTime)
     }
     val description = remember(activity) { activity.description }
-    val timeElapsed = remember(activity) { activity.startTime until activity.endTime }
+    val timeElapsed = remember(activity) { activity.duration }
+    val velocity = remember(activity) { activity.velocity }
 
     val haptics = LocalHapticFeedback.current
 
@@ -153,6 +153,18 @@ fun ActivityCard(
                             R.string.n_kilometers,
                             "%.1f".format(activity.distance.kilometers)
                         )
+                    )
+                }
+            }
+
+            if (velocity != null) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        painterResource(R.drawable.outline_speed_24),
+                        stringResource(R.string.speed)
+                    )
+                    Text(
+                        stringResource(R.string.x_kmh, "%.1f".format(velocity.kmh))
                     )
                 }
             }

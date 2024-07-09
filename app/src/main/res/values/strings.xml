@@ -154,6 +154,10 @@
     <string name="average_kilometers">Average Kilometers</string>
     <string name="average_distance">Average Distance</string>
     <string name="projection">Projection</string>
+    <string name="speed">Speed</string>
+    <string name="x_kmh">%1$s km/h</string>
+    <string name="average_kmh">Average km/h</string>
+    <string name="average_velocity">Average Velocity</string>
     <plurals name="num_activities">
         <item quantity="one">%1d activity</item>
         <item quantity="other">%1d activities</item>

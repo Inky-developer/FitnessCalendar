@@ -5,6 +5,9 @@ import java.util.Date
 import java.util.concurrent.TimeUnit
 
 data class Duration(val elapsedMs: Long) {
+    val elapsedSeconds
+        get() = elapsedMs.toDouble() / ChronoUnit.SECONDS.duration.toMillis().toDouble()
+
     val elapsedHours
         get() = elapsedMs.toDouble() / ChronoUnit.HOURS.duration.toMillis().toDouble()
 

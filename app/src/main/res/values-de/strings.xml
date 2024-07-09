@@ -165,4 +165,8 @@
     <string name="average_kilometers">Durchschnittliche Kilometer</string>
     <string name="average_distance">Durchschnittliche Distanz</string>
     <string name="projection">Projektion</string>
+    <string name="speed">Geschwindigkeit</string>
+    <string name="x_kmh">%1$s km/h</string>
+    <string name="average_kmh">Durchschnittliche km/h</string>
+    <string name="average_velocity">Durchschnittsgeschwindigkeit</string>
 </resources>
