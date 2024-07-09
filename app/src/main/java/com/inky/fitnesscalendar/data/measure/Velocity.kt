@@ -1,4 +1,4 @@
-package com.inky.fitnesscalendar.data
+package com.inky.fitnesscalendar.data.measure
 
 import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
