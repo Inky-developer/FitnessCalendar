@@ -35,8 +35,13 @@ data class ActivityStatistics(
         return Distance(meters = (distances.sum().toDouble() / distances.size).roundToLong())
     }
 
-    fun averageVelocity() =
-        Velocity(metersPerSecond = averageDistance().meters / averageTime().elapsedSeconds)
+    fun averageVelocity(): Velocity {
+        val elapsedSeconds = averageTime().elapsedSeconds
+        if (elapsedSeconds == 0.0) {
+            return Velocity(metersPerSecond = 0.0)
+        }
+        return Velocity(metersPerSecond = averageDistance().meters / elapsedSeconds)
+    }
 
     fun isEmpty() = activities.isEmpty()
 
