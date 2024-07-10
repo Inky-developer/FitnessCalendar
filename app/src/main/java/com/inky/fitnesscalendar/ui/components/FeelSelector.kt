@@ -17,7 +17,7 @@ import com.inky.fitnesscalendar.data.Feel
 
 @Composable
 fun FeelSelector(feel: Feel?, onChange: (Feel?) -> Unit, modifier: Modifier = Modifier) {
-    Row(modifier = modifier) {
+    Row(modifier = modifier.padding(horizontal = 4.dp)) {
         for (feelEntry in Feel.entries) {
             InputChip(
                 selected = feel == feelEntry,
