@@ -11,19 +11,19 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 abstract class ActivityTypeDao {
-    @Query("SELECT * FROM ActivityType")
+    @Query("SELECT * FROM ActivityType ORDER BY name")
     abstract suspend fun loadTypes(): List<ActivityType>
 
     @Query("SELECT * FROM ACTIVITYTYPE WHERE uid = :id")
     abstract suspend fun get(id: Int): ActivityType?
 
-    @Query("SELECT * FROM ActivityType")
+    @Query("SELECT * FROM ActivityType ORDER BY name")
     abstract fun getTypes(): Flow<List<ActivityType>>
 
-    @Query("SELECT * FROM ActivityType WHERE uid in (:filterIds)")
+    @Query("SELECT * FROM ActivityType WHERE uid in (:filterIds) ORDER BY name")
     abstract fun getTypes(filterIds: List<Int>): Flow<List<ActivityType>>
 
-    @Query("SELECT * FROM ActivityType")
+    @Query("SELECT * FROM ActivityType ORDER BY name")
     abstract fun getActivityTypesByCategory(): Flow<Map<@MapColumn(columnName = "activity_category") ActivityCategory, List<ActivityType>>>
 
     @Upsert
