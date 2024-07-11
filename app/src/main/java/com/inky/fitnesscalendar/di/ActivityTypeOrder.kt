@@ -4,15 +4,15 @@ import com.inky.fitnesscalendar.data.ActivityCategory
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.TypeActivity
 
-class ActivityTypeOrder(private val frequencies: Map<ActivityType, Int>) {
+class ActivityTypeOrder(private val frequencies: Map<Int?, Int>) {
     fun getRows(typesByCategory: Map<ActivityCategory, List<ActivityType>>) =
         typesByCategory.values.map { types ->
-            types.sortedByDescending { frequencies[it] ?: 0 }
+            types.sortedByDescending { frequencies[it.uid] ?: 0 }
         }
 
     companion object {
         fun init(activities: List<TypeActivity>) = synchronized(this) {
-            val frequencies = activities.groupBy { it.type }.mapValues { it.value.size }
+            val frequencies = activities.groupBy { it.type.uid }.mapValues { it.value.size }
             instance = ActivityTypeOrder(frequencies)
         }
 
