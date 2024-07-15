@@ -105,7 +105,7 @@ fun ActivityCard(
         )
         Text(
             title,
-            style = MaterialTheme.typography.displayMedium,
+            style = MaterialTheme.typography.displaySmall,
             color = contentColor,
             modifier = Modifier.padding(horizontal = 4.dp)
         )

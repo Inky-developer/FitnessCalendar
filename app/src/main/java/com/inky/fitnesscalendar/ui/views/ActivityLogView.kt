@@ -46,6 +46,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -295,7 +296,7 @@ private fun ActivityList(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
-                            .background(MaterialTheme.colorScheme.primaryContainer)
+                            .background(MaterialTheme.colorScheme.primary)
                             .padding(horizontal = 8.dp)
                             .fillMaxWidth()
                             .animateItem()
@@ -303,6 +304,7 @@ private fun ActivityList(
                         Text(
                             LocalizationRepository.localDateFormatter.format(item.date),
                             style = MaterialTheme.typography.titleMedium,
+                            color = contentColorFor(backgroundColor = MaterialTheme.colorScheme.primary)
                         )
 
                         if (feel != null) {
