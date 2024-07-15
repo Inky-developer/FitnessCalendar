@@ -9,10 +9,8 @@ import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -26,8 +24,7 @@ import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.ui.components.NavigationDrawer
-import com.inky.fitnesscalendar.ui.util.DatabaseValues
-import com.inky.fitnesscalendar.ui.util.localDatabaseValues
+import com.inky.fitnesscalendar.ui.util.ProvideDatabaseValues
 import com.inky.fitnesscalendar.ui.views.ActivityLog
 import com.inky.fitnesscalendar.ui.views.EditDayDialog
 import com.inky.fitnesscalendar.ui.views.FilterView
@@ -60,22 +57,7 @@ fun App(viewModel: GenericViewModel = hiltViewModel()) {
     }
     var currentView by rememberSaveable { mutableStateOf<Views?>(null) }
 
-    val activityTypes by viewModel
-        .repository
-        .getActivityTypes()
-        .collectAsState(initial = emptyList())
-    val activityTypeRows by viewModel
-        .repository
-        .getActivityTypeRows()
-        .collectAsState(initial = emptyList())
-    val databaseValues = remember(activityTypes, activityTypeRows) {
-        DatabaseValues(
-            activityTypes = activityTypes,
-            activityTypeRows = activityTypeRows
-        )
-    }
-
-    CompositionLocalProvider(value = localDatabaseValues provides databaseValues) {
+    ProvideDatabaseValues(repository = viewModel.repository) {
         NavigationDrawer(
             drawerState = navigationDrawerState,
             currentView = currentView,

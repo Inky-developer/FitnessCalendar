@@ -26,6 +26,7 @@ import com.inky.fitnesscalendar.AppRepository
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.db.entities.TypeRecording
 import com.inky.fitnesscalendar.ui.theme.FitnessCalendarTheme
+import com.inky.fitnesscalendar.ui.util.ProvideDatabaseValues
 import com.inky.fitnesscalendar.ui.views.QsTileRecordActivityDialog
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -85,14 +86,16 @@ class RecordTileService : TileService() {
 
                 setContent {
                     FitnessCalendarTheme {
-                        Surface(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
-                            QsTileRecordActivityDialog(
-                                onSave = {
-                                    onStartRecording(it)
-                                    dismiss()
-                                },
-                                onDismiss = { dismiss() }
-                            )
+                        ProvideDatabaseValues(repository = repository) {
+                            Surface(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
+                                QsTileRecordActivityDialog(
+                                    onSave = {
+                                        onStartRecording(it)
+                                        dismiss()
+                                    },
+                                    onDismiss = { dismiss() }
+                                )
+                            }
                         }
                     }
                 }
