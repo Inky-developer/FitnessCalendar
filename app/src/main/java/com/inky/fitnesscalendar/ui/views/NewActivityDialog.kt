@@ -71,6 +71,7 @@ import kotlinx.coroutines.flow.flowOf
 import java.time.Instant
 import java.time.temporal.ChronoUnit
 import java.util.Date
+import kotlin.math.roundToInt
 
 @Composable
 fun NewActivity(
@@ -311,7 +312,7 @@ fun NewActivity(
                             intensity = if (it < 0) {
                                 null
                             } else {
-                                it.toInt().toByte()
+                                it.roundToInt().toByte()
                             }
                         },
                         steps = 10,
