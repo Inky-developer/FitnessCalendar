@@ -43,7 +43,7 @@ fun CompactActivityCard(
         )
         Text(
             title,
-            style = MaterialTheme.typography.displayMedium,
+            style = MaterialTheme.typography.displaySmall,
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(horizontal = 4.dp)
         )
