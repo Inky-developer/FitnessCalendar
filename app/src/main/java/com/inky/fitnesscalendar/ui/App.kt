@@ -12,6 +12,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -25,6 +26,8 @@ import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.ui.components.NavigationDrawer
+import com.inky.fitnesscalendar.ui.util.DatabaseValues
+import com.inky.fitnesscalendar.ui.util.localDatabaseValues
 import com.inky.fitnesscalendar.ui.views.ActivityLog
 import com.inky.fitnesscalendar.ui.views.EditDayDialog
 import com.inky.fitnesscalendar.ui.views.FilterView
@@ -40,7 +43,7 @@ import kotlinx.coroutines.launch
 
 
 @Composable
-fun App() {
+fun App(viewModel: GenericViewModel = hiltViewModel()) {
     val navController = rememberNavController()
     val scope = rememberCoroutineScope()
 
@@ -57,25 +60,42 @@ fun App() {
     }
     var currentView by rememberSaveable { mutableStateOf<Views?>(null) }
 
-    NavigationDrawer(
-        drawerState = navigationDrawerState,
-        currentView = currentView,
-        onNavigate = {
-            navController.navigate(it.getPath()) {
-                popUpTo(it.getPath()) {
-                    inclusive = true
+    val activityTypes by viewModel
+        .repository
+        .getActivityTypes()
+        .collectAsState(initial = emptyList())
+    val activityTypeRows by viewModel
+        .repository
+        .getActivityTypeRows()
+        .collectAsState(initial = emptyList())
+    val databaseValues = remember(activityTypes, activityTypeRows) {
+        DatabaseValues(
+            activityTypes = activityTypes,
+            activityTypeRows = activityTypeRows
+        )
+    }
+
+    CompositionLocalProvider(value = localDatabaseValues provides databaseValues) {
+        NavigationDrawer(
+            drawerState = navigationDrawerState,
+            currentView = currentView,
+            onNavigate = {
+                navController.navigate(it.getPath()) {
+                    popUpTo(it.getPath()) {
+                        inclusive = true
+                    }
+                }
+                scope.launch {
+                    navigationDrawerState.close()
                 }
             }
-            scope.launch {
-                navigationDrawerState.close()
-            }
+        ) {
+            AppNavigation(
+                navController = navController,
+                openDrawer = openDrawer,
+                onCurrentView = { currentView = it }
+            )
         }
-    ) {
-        AppNavigation(
-            navController = navController,
-            openDrawer = openDrawer,
-            onCurrentView = { currentView = it }
-        )
     }
 }
 
@@ -89,7 +109,6 @@ private fun AppNavigation(
 ) {
     var isNewActivityOpen by rememberSaveable { mutableStateOf(false) }
     var filterState by rememberSaveable { mutableStateOf(ActivityFilter()) }
-    val typeRows by viewModel.repository.getActivityTypeRows().collectAsState(initial = emptyList())
 
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -218,7 +237,6 @@ private fun AppNavigation(
                         navController.popBackStack()
                     },
                     onNavigateBack = { navController.popBackStack() },
-                    typeRows = typeRows
                 )
             }
             composable(Views.ImportExport.pathTemplate()) {

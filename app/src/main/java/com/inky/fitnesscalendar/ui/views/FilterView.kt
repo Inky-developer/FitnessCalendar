@@ -22,7 +22,6 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,7 +32,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.data.activity_filter.AttributeFilter
@@ -43,13 +41,11 @@ import com.inky.fitnesscalendar.ui.components.ActivityTypeSelector
 import com.inky.fitnesscalendar.ui.components.OptionGroup
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.sharedBounds
-import com.inky.fitnesscalendar.view_model.GenericViewModel
 
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilterView(
-    viewModel: GenericViewModel = hiltViewModel(),
     initialFilter: ActivityFilter,
     onFilterChange: (ActivityFilter) -> Unit,
     onNavigateBack: () -> Unit
@@ -63,11 +59,6 @@ fun FilterView(
     BackHandler {
         onBack()
     }
-
-    val typeRows by viewModel
-        .repository
-        .getActivityTypeRows()
-        .collectAsState(initial = emptyList())
 
     val appBar = @Composable {
         TopAppBar(
@@ -146,7 +137,6 @@ fun FilterView(
                         }
                         filter = filter.copy(types = newSelection)
                     },
-                    typeRows = typeRows,
                 )
             }
 

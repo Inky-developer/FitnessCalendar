@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.Vehicle
 import com.inky.fitnesscalendar.db.entities.ActivityType
+import com.inky.fitnesscalendar.ui.util.localDatabaseValues
 
 data class ActivitySelectorState(val activityType: ActivityType?, val vehicle: Vehicle?) {
     fun shouldSaveBeEnabled() =
@@ -28,7 +29,7 @@ fun ActivitySelector(
     state: ActivitySelectorState,
     modifier: Modifier = Modifier,
     background: Color = optionGroupDefaultBackground(),
-    typeRows: List<List<ActivityType>>,
+    typeRows: List<List<ActivityType>> = localDatabaseValues.current.activityTypeRows,
     onActivityType: (ActivityType) -> Unit,
     onVehicle: (Vehicle) -> Unit,
 ) {

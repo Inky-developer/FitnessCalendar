@@ -33,7 +33,6 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -61,7 +60,6 @@ import com.inky.fitnesscalendar.view_model.settings.ActivityTypeViewModel
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActivityTypeView(viewModel: ActivityTypeViewModel = hiltViewModel(), onBack: () -> Unit) {
-    val typeRows by viewModel.typeRows.collectAsState(initial = emptyList())
     var selectedType by rememberSaveable { mutableStateOf<ActivityType?>(null) }
     val initialEditState = remember(selectedType) {
         selectedType?.let { ActivityTypeEditState(it) } ?: ActivityTypeEditState()
@@ -106,7 +104,6 @@ fun ActivityTypeView(viewModel: ActivityTypeViewModel = hiltViewModel(), onBack:
                     selectedType = it
                     showEditDialog = true
                 },
-                typeRows = typeRows
             )
         }
     }

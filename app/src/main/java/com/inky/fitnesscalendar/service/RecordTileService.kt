@@ -8,8 +8,6 @@ import android.service.quicksettings.TileService
 import androidx.compose.foundation.background
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
@@ -88,10 +86,7 @@ class RecordTileService : TileService() {
                 setContent {
                     FitnessCalendarTheme {
                         Surface(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
-                            val typeRows by repository.getActivityTypeRows()
-                                .collectAsState(initial = emptyList())
                             QsTileRecordActivityDialog(
-                                typeRows,
                                 onSave = {
                                     onStartRecording(it)
                                     dismiss()

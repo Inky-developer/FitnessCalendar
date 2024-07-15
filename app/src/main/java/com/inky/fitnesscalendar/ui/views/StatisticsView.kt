@@ -49,10 +49,10 @@ import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityCategory
 import com.inky.fitnesscalendar.data.Displayable
 import com.inky.fitnesscalendar.db.entities.Activity
-import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.preferences.Preference
 import com.inky.fitnesscalendar.ui.components.CompactActivityCard
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
+import com.inky.fitnesscalendar.ui.util.localDatabaseValues
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.view_model.StatisticsViewModel
 import com.inky.fitnesscalendar.view_model.statistics.Grouping
@@ -141,7 +141,6 @@ fun StatisticsView(
                 actions = {
                     ActivityFilterButton(
                         grouping = viewModel.grouping,
-                        activityTypes = viewModel.activityTypes.value ?: emptyList(),
                         onGrouping = { viewModel.grouping = it }
                     )
                     ProjectionSelectButton(viewModel.projection)
@@ -253,7 +252,6 @@ private fun ProjectionSelectButton(projection: Projection) {
 @Composable
 private fun ActivityFilterButton(
     grouping: Grouping,
-    activityTypes: List<ActivityType>,
     onGrouping: (Grouping) -> Unit
 ) {
     var menuOpen by rememberSaveable { mutableStateOf(false) }
@@ -287,7 +285,7 @@ private fun ActivityFilterButton(
 
         HorizontalDivider()
 
-        for (type in activityTypes) {
+        for (type in localDatabaseValues.current.activityTypes) {
             DropdownMenuItem(
                 text = { Text(type.emoji + " " + type.name) },
                 onClick = {

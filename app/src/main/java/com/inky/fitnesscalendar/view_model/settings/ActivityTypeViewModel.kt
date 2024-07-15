@@ -21,7 +21,6 @@ class ActivityTypeViewModel @Inject constructor(
     private val repository: AppRepository
 ) :
     ViewModel() {
-    val typeRows = repository.getActivityTypeRows()
     val snackbarHostState = SnackbarHostState()
 
     fun save(activityType: ActivityType) = viewModelScope.launch {

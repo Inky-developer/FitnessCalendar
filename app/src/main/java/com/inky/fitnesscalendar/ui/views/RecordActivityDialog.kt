@@ -13,19 +13,18 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.R
-import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.Recording
 import com.inky.fitnesscalendar.db.entities.TypeRecording
 import com.inky.fitnesscalendar.di.DecisionTrees
 import com.inky.fitnesscalendar.ui.components.ActivitySelector
 import com.inky.fitnesscalendar.ui.components.ActivitySelectorState
 import com.inky.fitnesscalendar.ui.components.BaseEditDialog
+import com.inky.fitnesscalendar.ui.util.localDatabaseValues
 import java.time.Instant
 import java.util.Date
 
 @Composable
 fun RecordActivity(
-    typeRows: List<List<ActivityType>>,
     onStart: (TypeRecording) -> Unit,
     onNavigateBack: () -> Unit
 ) {
@@ -38,6 +37,7 @@ fun RecordActivity(
         )
     }
 
+    val typeRows = localDatabaseValues.current.activityTypeRows
     val relevantTypeRows =
         remember(typeRows) { typeRows.map { row -> row.filter { it.hasDuration } } }
 

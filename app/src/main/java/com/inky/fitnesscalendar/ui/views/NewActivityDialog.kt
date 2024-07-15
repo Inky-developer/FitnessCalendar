@@ -51,7 +51,6 @@ import coil.compose.AsyncImagePainter
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.measure.Distance
 import com.inky.fitnesscalendar.db.entities.Activity
-import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.TypeActivity
 import com.inky.fitnesscalendar.di.DecisionTrees
 import com.inky.fitnesscalendar.localization.LocalizationRepository
@@ -82,7 +81,6 @@ fun NewActivity(
         (activityId?.let { viewModel.repository.getActivity(it) } ?: flowOf(null)).collectAsState(
             initial = null
         )
-    val typeRows by viewModel.typeRows.collectAsState(initial = emptyList())
 
 
     if (activityId == null || activity.value != null) {
@@ -91,7 +89,6 @@ fun NewActivity(
             localizationRepository = viewModel.localizationRepository,
             onSave = onSave,
             onNavigateBack = onNavigateBack,
-            typeRows = typeRows
         )
     } else {
         CircularProgressIndicator()
@@ -102,7 +99,6 @@ fun NewActivity(
 fun NewActivity(
     typeActivity: TypeActivity?,
     localizationRepository: LocalizationRepository,
-    typeRows: List<List<ActivityType>>,
     onSave: (TypeActivity) -> Unit,
     onNavigateBack: () -> Unit
 ) {
@@ -264,7 +260,6 @@ fun NewActivity(
                 ActivitySelectorState(selectedActivityType, selectedVehicle),
                 onActivityType = { selectedActivityType = it },
                 onVehicle = { selectedVehicle = it },
-                typeRows = typeRows
             )
 
             AnimatedVisibility(visible = selectedActivityType?.hasFeel() == true) {

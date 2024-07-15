@@ -14,13 +14,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.R
-import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.Recording
 import com.inky.fitnesscalendar.db.entities.TypeRecording
 import com.inky.fitnesscalendar.di.DecisionTrees
 import com.inky.fitnesscalendar.ui.components.ActivitySelector
 import com.inky.fitnesscalendar.ui.components.ActivitySelectorState
 import com.inky.fitnesscalendar.ui.components.OkayCancelRow
+import com.inky.fitnesscalendar.ui.util.localDatabaseValues
 import java.time.Instant
 import java.util.Date
 
@@ -30,7 +30,6 @@ import java.util.Date
  */
 @Composable
 fun QsTileRecordActivityDialog(
-    typeRows: List<List<ActivityType>>,
     onDismiss: () -> Unit,
     onSave: (TypeRecording) -> Unit
 ) {
@@ -43,6 +42,7 @@ fun QsTileRecordActivityDialog(
         )
     }
     val saveEnabled by remember { derivedStateOf { state.shouldSaveBeEnabled() } }
+    val typeRows = localDatabaseValues.current.activityTypeRows
     val filteredTypeRows =
         remember(typeRows) { typeRows.map { row -> row.filter { it.hasDuration } } }
 

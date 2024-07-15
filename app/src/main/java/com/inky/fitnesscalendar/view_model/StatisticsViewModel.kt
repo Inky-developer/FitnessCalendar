@@ -1,7 +1,6 @@
 package com.inky.fitnesscalendar.view_model
 
 import android.content.Context
-import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -49,9 +48,7 @@ class StatisticsViewModel @Inject constructor(
         MutableStateFlow<List<Pair<ActivityStatistics, String>>?>(null)
     val activityStatistics get() = _activityStatistics.filterNotNull()
 
-    private var _activityTypes = mutableStateOf<List<ActivityType>?>(null)
-    val activityTypes
-        get(): State<List<ActivityType>?> = _activityTypes
+    private var activityTypes = mutableStateOf<List<ActivityType>?>(null)
 
     var numDataPoints by mutableIntStateOf(0)
 
@@ -60,7 +57,7 @@ class StatisticsViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             appRepository.getActivityTypes().collect {
-                _activityTypes.value = it
+                activityTypes.value = it
             }
         }
 

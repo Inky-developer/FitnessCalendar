@@ -13,11 +13,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.db.entities.ActivityType
+import com.inky.fitnesscalendar.ui.util.localDatabaseValues
 
 @Composable
 fun ActivityTypeSelector(
     modifier: Modifier = Modifier,
-    typeRows: List<List<ActivityType>>,
+    typeRows: List<List<ActivityType>> = localDatabaseValues.current.activityTypeRows,
     isSelected: (ActivityType) -> Boolean,
     onSelect: (ActivityType) -> Unit,
 ) {
