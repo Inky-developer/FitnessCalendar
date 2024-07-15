@@ -16,6 +16,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.compose.NavHost
@@ -253,7 +254,7 @@ class SharedTransitionData(
 }
 
 @OptIn(ExperimentalSharedTransitionApi::class)
-val localSharedTransition = compositionLocalOf { SharedTransitionData(null, null) }
+val localSharedTransition = staticCompositionLocalOf { SharedTransitionData(null, null) }
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
