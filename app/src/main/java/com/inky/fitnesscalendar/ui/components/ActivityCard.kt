@@ -36,9 +36,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -166,6 +168,21 @@ fun ActivityCard(
                     Text(
                         stringResource(R.string.x_kmh, "%.1f".format(velocity.kmh))
                     )
+                }
+            }
+
+            if (activity.intensity != null) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        painterResource(R.drawable.twotone_lightbulb_24),
+                        stringResource(R.string.intensity),
+                        tint = lerp(
+                            colorResource(R.color.intensity_low),
+                            colorResource(R.color.intensity_high),
+                            activity.intensity.value.toFloat() / 10f
+                        )
+                    )
+                    Text(activity.intensity.value.toString())
                 }
             }
         }

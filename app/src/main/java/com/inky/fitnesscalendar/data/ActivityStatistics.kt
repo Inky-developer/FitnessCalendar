@@ -43,6 +43,14 @@ data class ActivityStatistics(
         return Velocity(metersPerSecond = averageDistance().meters / elapsedSeconds)
     }
 
+    fun averageIntensity(): Double {
+        val intensities = activities.mapNotNull { it.activity.intensity?.value }
+        if (intensities.isEmpty()) {
+            return 0.0
+        }
+        return intensities.sumOf { it.toDouble() } / intensities.size
+    }
+
     fun isEmpty() = activities.isEmpty()
 
     val activitiesByCategory: Map<ActivityCategory, ActivityStatistics>

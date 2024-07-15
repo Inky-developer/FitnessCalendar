@@ -3,6 +3,7 @@ package com.inky.fitnesscalendar.db
 import android.net.Uri
 import androidx.room.TypeConverter
 import com.inky.fitnesscalendar.data.EpochDay
+import com.inky.fitnesscalendar.data.Intensity
 import com.inky.fitnesscalendar.data.measure.Distance
 import java.util.Date
 
@@ -45,5 +46,15 @@ class Converters {
     @TypeConverter
     fun longToDistance(value: Long): Distance {
         return Distance(meters = value)
+    }
+
+    @TypeConverter
+    fun intensityToLong(intensity: Intensity): Byte {
+        return intensity.value
+    }
+
+    @TypeConverter
+    fun byteToIntensity(value: Byte): Intensity {
+        return Intensity(value)
     }
 }

@@ -17,4 +17,6 @@
     <color name="stats_3">#3BA79D</color>
     <color name="stats_4">#5A3B3B</color>
     <color name="stats_5">#C7BD6B</color>
+    <color name="intensity_low">#5E5E5E</color>
+    <color name="intensity_high">#E2C400</color>
 </resources>

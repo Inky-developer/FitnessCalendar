@@ -217,6 +217,11 @@ fun EditTypeDialog(
                 value = state.hasVehicle,
                 onValue = { state = state.copy(hasVehicle = it) }
             )
+            Toggle(
+                name = stringResource(R.string.has_intensity),
+                value = state.hasIntensity,
+                onValue = { state = state.copy(hasIntensity = it) }
+            )
         }
     }
 }

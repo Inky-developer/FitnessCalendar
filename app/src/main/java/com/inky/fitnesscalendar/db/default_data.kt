@@ -12,7 +12,7 @@ fun loadDefaultData(db: SupportSQLiteDatabase, context: Context) {
     try {
         for (type in DefaultActivityType.entries) {
             db.execSQL(
-                "INSERT INTO ActivityType(activity_category, name, emoji, color, has_vehicle, has_duration, has_distance) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                "INSERT INTO ActivityType(activity_category, name, emoji, color, has_vehicle, has_duration, has_distance, has_intensity) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
                 arrayOf(
                     type.activityCategory,
                     context.getString(type.titleId),
@@ -20,7 +20,8 @@ fun loadDefaultData(db: SupportSQLiteDatabase, context: Context) {
                     type.color,
                     type.hasVehicle,
                     type.hasDuration,
-                    type.hasDistance
+                    type.hasDistance,
+                    type.hasIntensity
                 )
             )
         }
@@ -39,6 +40,7 @@ enum class DefaultActivityType(
     val hasVehicle: Boolean = false,
     val hasDuration: Boolean = true,
     val hasDistance: Boolean = false,
+    val hasIntensity: Boolean = false
 ) {
     Cycling(
         ActivityCategory.Sports,

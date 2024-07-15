@@ -7,6 +7,7 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.inky.fitnesscalendar.data.Feel
+import com.inky.fitnesscalendar.data.Intensity
 import com.inky.fitnesscalendar.data.Vehicle
 import com.inky.fitnesscalendar.data.measure.Distance
 import com.inky.fitnesscalendar.data.measure.Duration.Companion.until
@@ -34,11 +35,13 @@ data class Activity(
     @ColumnInfo(name = "feel") val feel: Feel? = null,
     @ColumnInfo(name = "image_uri") val imageUri: Uri? = null,
     @ColumnInfo(name = "distance") val distance: Distance? = null,
+    @ColumnInfo(name = "intensity") val intensity: Intensity? = null,
 ) {
     fun clean(type: ActivityType) = copy(
         vehicle = if (type.hasVehicle) vehicle else null,
         endTime = if (type.hasDuration) endTime else startTime,
-        distance = if (type.hasDistance) distance else null
+        distance = if (type.hasDistance) distance else null,
+        intensity = if (type.hasIntensity) intensity else null,
     )
 
     val duration

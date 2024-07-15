@@ -15,7 +15,8 @@ data class ActivityTypeEditState(
     val color: ActivityTypeColor? = null,
     val hasVehicle: Boolean = false,
     val hasDuration: Boolean = false,
-    val hasDistance: Boolean = false
+    val hasDistance: Boolean = false,
+    val hasIntensity: Boolean = false,
 ) : Parcelable {
     constructor(activityType: ActivityType) : this(
         uid = activityType.uid,
@@ -25,7 +26,8 @@ data class ActivityTypeEditState(
         color = activityType.color,
         hasVehicle = activityType.hasVehicle,
         hasDuration = activityType.hasDuration,
-        hasDistance = activityType.hasDistance
+        hasDistance = activityType.hasDistance,
+        hasIntensity = activityType.hasIntensity
     )
 
     val isNewType get() = uid == null
@@ -46,7 +48,8 @@ data class ActivityTypeEditState(
             color = color,
             hasVehicle = hasVehicle,
             hasDuration = hasDuration,
-            hasDistance = hasDistance
+            hasDistance = hasDistance,
+            hasIntensity = hasIntensity
         )
     }
 }

@@ -158,6 +158,10 @@
     <string name="x_kmh">%1$s km/h</string>
     <string name="average_kmh">Average km/h</string>
     <string name="average_velocity">Average Velocity</string>
+    <string name="has_intensity">Has intensity?</string>
+    <string name="select_intensity">Select Intensity…</string>
+    <string name="intensity">Intensity</string>
+    <string name="average_intensity">Average Intensity</string>
     <plurals name="num_activities">
         <item quantity="one">%1d activity</item>
         <item quantity="other">%1d activities</item>

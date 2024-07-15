@@ -21,6 +21,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -49,6 +50,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import com.inky.fitnesscalendar.R
+import com.inky.fitnesscalendar.data.Intensity
 import com.inky.fitnesscalendar.data.measure.Distance
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.TypeActivity
@@ -148,6 +150,10 @@ fun NewActivity(
         }
     }
 
+    var intensity by rememberSaveable {
+        mutableStateOf(typeActivity?.activity?.intensity?.value)
+    }
+
     var feel by rememberSaveable { mutableStateOf(typeActivity?.activity?.feel) }
 
     var imageUri by rememberSaveable { mutableStateOf(typeActivity?.activity?.imageUri) }
@@ -198,7 +204,8 @@ fun NewActivity(
                 endTime = endDateTimePickerState.selectedDate(),
                 feel = feel,
                 imageUri = imageUri,
-                distance = kilometerStringToDistance(distanceString)
+                distance = kilometerStringToDistance(distanceString),
+                intensity = intensity?.let { Intensity(it) }
             )
 
             onSave(TypeActivity(activity = newActivity, type = selectedActivityType!!))
@@ -291,6 +298,26 @@ fun NewActivity(
                     colors = TextFieldDefaults.colors(unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
                     shape = MaterialTheme.shapes.small
                 )
+            }
+
+            AnimatedVisibility(visible = selectedActivityType?.hasIntensity == true) {
+                OptionGroup(
+                    label = stringResource(R.string.select_intensity),
+                    selectionLabel = intensity?.toString()
+                ) {
+                    Slider(
+                        value = intensity?.toFloat() ?: -1f,
+                        onValueChange = {
+                            intensity = if (it < 0) {
+                                null
+                            } else {
+                                it.toInt().toByte()
+                            }
+                        },
+                        steps = 10,
+                        valueRange = -1f..10f
+                    )
+                }
             }
 
             TextField(
