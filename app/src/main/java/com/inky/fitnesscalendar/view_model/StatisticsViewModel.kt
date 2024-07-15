@@ -1,6 +1,7 @@
 package com.inky.fitnesscalendar.view_model
 
 import android.content.Context
+import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -11,7 +12,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.inky.fitnesscalendar.AppRepository
 import com.inky.fitnesscalendar.data.ActivityStatistics
-import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.preferences.Preference
 import com.inky.fitnesscalendar.view_model.statistics.Grouping
@@ -39,9 +39,9 @@ class StatisticsViewModel @Inject constructor(
     @ApplicationContext val context: Context,
     val appRepository: AppRepository
 ) : ViewModel() {
-    var grouping by mutableStateOf(Grouping(null))
+    var grouping by mutableStateOf<Grouping>(Grouping.All)
     val groupingOptions =
-        derivedStateOf { activityTypes?.let { grouping.options(it) } ?: emptyList() }
+        derivedStateOf { activityTypes.value?.let { grouping.options(it) } ?: emptyList() }
     var period by mutableStateOf(Period.Week)
     var projection by mutableStateOf(Projection.ByTotalActivities)
 
@@ -49,7 +49,9 @@ class StatisticsViewModel @Inject constructor(
         MutableStateFlow<List<Pair<ActivityStatistics, String>>?>(null)
     val activityStatistics get() = _activityStatistics.filterNotNull()
 
-    private var activityTypes: List<ActivityType>? by mutableStateOf(null)
+    private var _activityTypes = mutableStateOf<List<ActivityType>?>(null)
+    val activityTypes
+        get(): State<List<ActivityType>?> = _activityTypes
 
     var numDataPoints by mutableIntStateOf(0)
 
@@ -58,7 +60,7 @@ class StatisticsViewModel @Inject constructor(
     init {
         viewModelScope.launch {
             appRepository.getActivityTypes().collect {
-                activityTypes = it
+                _activityTypes.value = it
             }
         }
 
@@ -79,7 +81,7 @@ class StatisticsViewModel @Inject constructor(
     }
 
     private suspend fun refreshActivities() {
-        val filter = ActivityFilter(categories = listOfNotNull(grouping.category))
+        val filter = grouping.filter()
 
         _activityStatistics.value =
             appRepository
@@ -91,7 +93,7 @@ class StatisticsViewModel @Inject constructor(
     }
 
     private suspend fun refreshModel() {
-        val types = activityTypes ?: return
+        val types = activityTypes.value ?: return
 
         val dataPoints =
             _activityStatistics.value?.map { grouping.apply(it.first) to it.second } ?: return

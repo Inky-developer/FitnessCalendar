@@ -21,6 +21,7 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -48,6 +49,7 @@ import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityCategory
 import com.inky.fitnesscalendar.data.Displayable
 import com.inky.fitnesscalendar.db.entities.Activity
+import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.preferences.Preference
 import com.inky.fitnesscalendar.ui.components.CompactActivityCard
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
@@ -138,8 +140,9 @@ fun StatisticsView(
                 },
                 actions = {
                     ActivityFilterButton(
-                        selectedCategory = viewModel.grouping.category,
-                        onCategory = { viewModel.grouping = Grouping(it) }
+                        grouping = viewModel.grouping,
+                        activityTypes = viewModel.activityTypes.value ?: emptyList(),
+                        onGrouping = { viewModel.grouping = it }
                     )
                     ProjectionSelectButton(viewModel.projection)
                 },
@@ -249,13 +252,14 @@ private fun ProjectionSelectButton(projection: Projection) {
 
 @Composable
 private fun ActivityFilterButton(
-    selectedCategory: ActivityCategory?,
-    onCategory: (ActivityCategory?) -> Unit
+    grouping: Grouping,
+    activityTypes: List<ActivityType>,
+    onGrouping: (Grouping) -> Unit
 ) {
     var menuOpen by rememberSaveable { mutableStateOf(false) }
 
     val filterId =
-        if (selectedCategory == null) R.drawable.outline_filter_off_24 else R.drawable.outline_filter_24
+        if (grouping is Grouping.All) R.drawable.outline_filter_off_24 else R.drawable.outline_filter_24
     IconButton(onClick = { menuOpen = true }) {
         Icon(
             painterResource(filterId),
@@ -266,15 +270,29 @@ private fun ActivityFilterButton(
     DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
         DropdownMenuItem(text = { Text(stringResource(R.string.filter_all)) }, onClick = {
             menuOpen = false
-            onCategory(null)
+            onGrouping(Grouping.All)
         })
+
+        HorizontalDivider()
 
         for (category in ActivityCategory.entries) {
             DropdownMenuItem(
                 text = { Text(category.emoji + " " + stringResource(category.nameId)) },
                 onClick = {
                     menuOpen = false
-                    onCategory(category)
+                    onGrouping(Grouping.Category(category))
+                }
+            )
+        }
+
+        HorizontalDivider()
+
+        for (type in activityTypes) {
+            DropdownMenuItem(
+                text = { Text(type.emoji + " " + type.name) },
+                onClick = {
+                    menuOpen = false
+                    onGrouping(Grouping.Type(type))
                 }
             )
         }

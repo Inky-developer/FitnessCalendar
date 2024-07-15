@@ -2,26 +2,49 @@ package com.inky.fitnesscalendar.view_model.statistics
 
 import com.inky.fitnesscalendar.data.ActivityCategory
 import com.inky.fitnesscalendar.data.ActivityStatistics
-import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.data.Displayable
+import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
+import com.inky.fitnesscalendar.db.entities.ActivityType
 
 /**
  * A grouping of activities.
  *
  * Specifies how the activities should be grouped in the statistics view.
  *
- * Two options:
- *  - When [category] is null, activities will be grouped by their category
- *  - When [category] is not null, activities will be grouped by their type and filtered to be in the category
+ * Three options:
+ *  - All: activities will be grouped by their category
+ *  - Category: activities will be grouped by their type and filtered to be in the category
+ *  - Type: activities will be grouped by their type and filtered by their type
  */
-data class Grouping(val category: ActivityCategory?) {
-    fun apply(statistics: ActivityStatistics): Map<out Any, ActivityStatistics> = when (category) {
-        null -> statistics.activitiesByCategory
-        else -> statistics.activitiesByType
+sealed interface Grouping {
+    fun filter(): ActivityFilter
+
+    fun apply(statistics: ActivityStatistics): Map<out Any, ActivityStatistics>
+
+    fun options(activityTypes: List<ActivityType>): List<Displayable>
+
+    data object All : Grouping {
+        override fun filter() = ActivityFilter()
+
+        override fun apply(statistics: ActivityStatistics) = statistics.activitiesByCategory
+
+        override fun options(activityTypes: List<ActivityType>) = ActivityCategory.entries
     }
 
-    fun options(activityTypes: List<ActivityType>): List<Displayable> = when (category) {
-        null -> ActivityCategory.entries
-        else -> activityTypes.filter { it.activityCategory == category }
+    data class Category(val category: ActivityCategory) : Grouping {
+        override fun filter() = ActivityFilter(categories = listOf(category))
+
+        override fun apply(statistics: ActivityStatistics) = statistics.activitiesByType
+
+        override fun options(activityTypes: List<ActivityType>) =
+            activityTypes.filter { it.activityCategory == category }
+    }
+
+    data class Type(val type: ActivityType) : Grouping {
+        override fun filter() = ActivityFilter(types = listOf(type))
+
+        override fun apply(statistics: ActivityStatistics) = statistics.activitiesByType
+
+        override fun options(activityTypes: List<ActivityType>) = listOf(type)
     }
 }
