@@ -7,9 +7,10 @@ import com.inky.fitnesscalendar.data.measure.Velocity
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.TypeActivity
 import com.inky.fitnesscalendar.util.toDate
+import com.inky.fitnesscalendar.util.toLocalDate
 import java.time.LocalDate
+import java.time.ZoneId
 import java.time.temporal.WeekFields
-import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import kotlin.math.roundToLong
@@ -70,33 +71,34 @@ data class ActivityStatistics(
             .mapValues { ActivityStatistics(it.value) }
 
 
-    val activitiesByDay: Map<Int, ActivityStatistics>
-        get() = keepNewerThanOneYear().groupByCalendarConstant(Calendar.DAY_OF_YEAR)
+    val activitiesByDay: Map<LocalDate, ActivityStatistics>
+        get() = keepNewerThanOneYear().groupByLocalDate { it }
 
-    val activitiesByWeek: Map<Int, ActivityStatistics>
+    val activitiesByWeek: Map<LocalDate, ActivityStatistics>
         get() {
             val dayOfWeekField = WeekFields.of(Locale.getDefault()).dayOfWeek()
             val firstDateToInclude =
                 LocalDate.now().minusYears(1).plusWeeks(1).with(dayOfWeekField, 1).atStartOfDay()
-            return keepNewer(firstDateToInclude.toDate()).groupByCalendarConstant(Calendar.WEEK_OF_YEAR)
+            return keepNewer(firstDateToInclude.toDate()).groupByLocalDate {
+                it.with(dayOfWeekField, 1)
+            }
         }
 
-    val activitiesByMonth: Map<Int, ActivityStatistics>
+    val activitiesByMonth: Map<LocalDate, ActivityStatistics>
         get() {
             val today = LocalDate.now()
             val firstDateToInclude =
                 today.minusYears(1).withDayOfMonth(1).plusMonths(1).atStartOfDay()
             return keepNewer(firstDateToInclude.toDate())
-                .groupByCalendarConstant(Calendar.MONTH)
-                .mapKeys { it.key + 1 }
+                .groupByLocalDate { it.withDayOfMonth(1) }
         }
 
-    val activitiesByYear: Map<Int, ActivityStatistics>
-        get() = groupByCalendarConstant(Calendar.YEAR)
+    val activitiesByYear: Map<LocalDate, ActivityStatistics>
+        get() = groupByLocalDate { it.withDayOfYear(1) }
 
-    private fun groupByCalendarConstant(calendarConstant: Int): Map<Int, ActivityStatistics> {
-        val calendar = Calendar.getInstance()
-        return groupBy { calendar.apply { time = it.activity.startTime }.get(calendarConstant) }
+    private fun groupByLocalDate(func: (LocalDate) -> LocalDate): Map<LocalDate, ActivityStatistics> {
+        val zoneId = ZoneId.systemDefault()
+        return groupBy { func(it.activity.startTime.toLocalDate(zoneId)) }
     }
 
     private fun <T> groupBy(func: (TypeActivity) -> T): Map<T, ActivityStatistics> =
