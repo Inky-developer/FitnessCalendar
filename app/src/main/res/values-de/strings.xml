@@ -173,4 +173,7 @@
     <string name="select_intensity">Intensität auswählen…</string>
     <string name="intensity">Intensität</string>
     <string name="average_intensity">Durchschnittliche Intensität</string>
+    <string name="forward">Weiter</string>
+    <string name="animation_displayed_date">Animation für das Datum</string>
+    <string name="now">Jetzt</string>
 </resources>

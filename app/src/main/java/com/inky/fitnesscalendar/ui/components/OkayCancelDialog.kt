@@ -19,7 +19,12 @@ import com.inky.fitnesscalendar.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun OkayCancelDialog(onDismiss: () -> Unit, onOkay: () -> Unit, content: @Composable () -> Unit) {
+fun OkayCancelDialog(
+    onDismiss: () -> Unit,
+    onOkay: () -> Unit,
+    additionalButtons: @Composable () -> Unit = {},
+    content: @Composable () -> Unit
+) {
     BasicAlertDialog(
         onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
@@ -32,6 +37,8 @@ fun OkayCancelDialog(onDismiss: () -> Unit, onOkay: () -> Unit, content: @Compos
                 content()
 
                 Row(modifier = Modifier.align(Alignment.End)) {
+                    additionalButtons()
+
                     TextButton(onClick = onDismiss) {
                         Text(
                             stringResource(R.string.cancel),

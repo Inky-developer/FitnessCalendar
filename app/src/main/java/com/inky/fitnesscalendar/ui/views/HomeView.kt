@@ -2,12 +2,8 @@ package com.inky.fitnesscalendar.ui.views
 
 import android.util.Log
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
@@ -78,6 +74,7 @@ import com.inky.fitnesscalendar.ui.components.FeelSelector
 import com.inky.fitnesscalendar.ui.components.NewActivityFAB
 import com.inky.fitnesscalendar.ui.components.Timer
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
+import com.inky.fitnesscalendar.ui.util.horizontalOrderedTransitionSpec
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.ui.util.sharedElement
 import com.inky.fitnesscalendar.util.showRecordingNotification
@@ -478,17 +475,7 @@ fun CompactFeelSelector(feel: Feel?, onFeel: (Feel?) -> Unit, modifier: Modifier
     Column(modifier = modifier) {
         AnimatedContent(
             targetState = feel,
-            transitionSpec = {
-                val left = AnimatedContentTransitionScope.SlideDirection.Left
-                val right = AnimatedContentTransitionScope.SlideDirection.Right
-                if (targetState == null || initialState == null) {
-                    fadeIn() togetherWith fadeOut()
-                } else if (targetState!! > initialState!!) {
-                    slideIntoContainer(left) togetherWith slideOutOfContainer(left)
-                } else {
-                    slideIntoContainer(right) togetherWith slideOutOfContainer(right)
-                }
-            },
+            transitionSpec = horizontalOrderedTransitionSpec(),
             label = stringResource(R.string.feel)
         ) { actualFeel ->
             OutlinedButton(

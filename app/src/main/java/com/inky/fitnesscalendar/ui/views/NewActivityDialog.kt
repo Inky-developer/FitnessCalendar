@@ -28,7 +28,6 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -60,17 +59,16 @@ import com.inky.fitnesscalendar.ui.components.ActivitySelector
 import com.inky.fitnesscalendar.ui.components.ActivitySelectorState
 import com.inky.fitnesscalendar.ui.components.BaseEditDialog
 import com.inky.fitnesscalendar.ui.components.DateTimePicker
-import com.inky.fitnesscalendar.ui.components.DateTimePickerState
 import com.inky.fitnesscalendar.ui.components.FeelSelector
 import com.inky.fitnesscalendar.ui.components.ImageViewer
 import com.inky.fitnesscalendar.ui.components.OptionGroup
 import com.inky.fitnesscalendar.util.copyFileToStorage
 import com.inky.fitnesscalendar.util.getOrCreateActivityImagesDir
+import com.inky.fitnesscalendar.util.toDate
+import com.inky.fitnesscalendar.util.toLocalDateTime
 import com.inky.fitnesscalendar.view_model.NewActivityViewModel
 import kotlinx.coroutines.flow.flowOf
-import java.time.Instant
-import java.time.temporal.ChronoUnit
-import java.util.Date
+import java.time.LocalDateTime
 import kotlin.math.roundToInt
 
 @Composable
@@ -120,20 +118,12 @@ fun NewActivity(
             typeActivity?.activity?.vehicle ?: DecisionTrees.vehicle?.classifyNow()
         )
     }
-    val startDateTimePickerState by rememberSaveable(stateSaver = DateTimePickerState.SAVER) {
-        mutableStateOf(
-            DateTimePickerState(
-                initialDateTime = typeActivity?.activity?.startTime?.time ?: Instant.now()
-                    .toEpochMilli()
-            )
-        )
+    var startDateTime by rememberSaveable {
+        mutableStateOf(typeActivity?.activity?.startTime?.toLocalDateTime() ?: LocalDateTime.now())
     }
-    val endDateTimePickerState by rememberSaveable(stateSaver = DateTimePickerState.SAVER) {
+    var endDateTime by rememberSaveable {
         mutableStateOf(
-            DateTimePickerState(
-                initialDateTime = typeActivity?.activity?.endTime?.time
-                    ?: startDateTimePickerState.selectedDateTime
-            )
+            typeActivity?.activity?.endTime?.toLocalDateTime() ?: startDateTime.plusHours(1)
         )
     }
     var description by rememberSaveable {
@@ -177,14 +167,6 @@ fun NewActivity(
             }
         }
 
-    // When the start date time changes, move the end date time along as well
-    LaunchedEffect(startDateTimePickerState.selectedDateTime) {
-        if (endDateTimePickerState.selectedDateTime == endDateTimePickerState.initialDateTime && startDateTimePickerState.selectedDateTime != startDateTimePickerState.initialDateTime) {
-            endDateTimePickerState.initialDateTime =
-                startDateTimePickerState.selectedDateTime + ChronoUnit.HOURS.duration.toMillis()
-        }
-    }
-
     BaseEditDialog(
         saveEnabled = formValid,
         onNavigateBack = onNavigateBack,
@@ -192,7 +174,7 @@ fun NewActivity(
             val oldActivity = when (typeActivity) {
                 null -> Activity(
                     typeId = 0,
-                    startTime = startDateTimePickerState.selectedDate()
+                    startTime = startDateTime.toDate()
                 )
 
                 else -> typeActivity.activity
@@ -201,8 +183,8 @@ fun NewActivity(
                 typeId = selectedActivityType?.uid!!,
                 vehicle = selectedVehicle,
                 description = description,
-                startTime = startDateTimePickerState.selectedDate(),
-                endTime = endDateTimePickerState.selectedDate(),
+                startTime = startDateTime.toDate(),
+                endTime = endDateTime.toDate(),
                 feel = feel,
                 imageUri = imageUri,
                 distance = kilometerStringToDistance(distanceString),
@@ -335,16 +317,18 @@ fun NewActivity(
             )
 
             DateTimeInput(
-                state = startDateTimePickerState,
+                dateTime = startDateTime,
                 localizationRepository = localizationRepository,
-                labelId = R.string.datetime_start
+                labelId = R.string.datetime_start,
+                onDateTime = { startDateTime = it }
             )
 
             AnimatedVisibility(visible = selectedActivityType?.hasDuration == true) {
                 DateTimeInput(
-                    state = endDateTimePickerState,
+                    dateTime = endDateTime,
                     localizationRepository = localizationRepository,
-                    labelId = R.string.datetime_end
+                    labelId = R.string.datetime_end,
+                    onDateTime = { endDateTime = it }
                 )
             }
         }
@@ -363,47 +347,56 @@ fun NewActivity(
 }
 
 @Composable
-fun ColumnScope.DateTimeInput(
-    state: DateTimePickerState,
+private fun ColumnScope.DateTimeInput(
+    dateTime: LocalDateTime,
     localizationRepository: LocalizationRepository,
-    labelId: Int
+    labelId: Int,
+    onDateTime: (LocalDateTime) -> Unit
 ) {
-    val dateTimeStr by remember {
-        derivedStateOf {
-            val date = Date.from(Instant.ofEpochMilli(state.selectedDateTime))
-            val startDateStr = localizationRepository.dateFormatter.format(date.time)
-            val startTimeStr = localizationRepository.timeFormatter.format(date)
+    val dateTimeStr = remember(dateTime) {
+        val date = dateTime.toDate()
+        val startDateStr = localizationRepository.dateFormatter.format(date.time)
+        val startTimeStr = localizationRepository.timeFormatter.format(date)
 
-            startDateStr to startTimeStr
-        }
+        startDateStr to startTimeStr
     }
 
+    var showPicker by rememberSaveable { mutableStateOf(false) }
 
-    DateTimePicker(state = state) {
-        TextButton(
-            onClick = { state.open() },
-            colors = ButtonDefaults.textButtonColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = contentColorFor(MaterialTheme.colorScheme.primaryContainer)
-            ),
-            shape = MaterialTheme.shapes.small,
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .fillMaxWidth()
-                .padding(top = 4.dp),
-        ) {
-            Text(
-                stringResource(
-                    id = labelId,
-                    dateTimeStr.first,
-                    dateTimeStr.second
-                )
+    TextButton(
+        onClick = { showPicker = true },
+        colors = ButtonDefaults.textButtonColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer,
+            contentColor = contentColorFor(MaterialTheme.colorScheme.primaryContainer)
+        ),
+        shape = MaterialTheme.shapes.small,
+        modifier = Modifier
+            .align(Alignment.CenterHorizontally)
+            .fillMaxWidth()
+            .padding(top = 4.dp),
+    ) {
+        Text(
+            stringResource(
+                id = labelId,
+                dateTimeStr.first,
+                dateTimeStr.second
             )
-        }
+        )
+    }
+
+    if (showPicker) {
+        DateTimePicker(
+            initialDateTime = dateTime,
+            onDismiss = { showPicker = false },
+            onOkay = {
+                showPicker = false
+                onDateTime(it)
+            }
+        )
     }
 }
 
-fun kilometerStringToDistance(string: String) = if (string.isBlank()) {
+private fun kilometerStringToDistance(string: String) = if (string.isBlank()) {
     null
 } else {
     string.replace(",", ".").toDoubleOrNull()?.let { Distance(kilometers = it) }

@@ -162,6 +162,9 @@
     <string name="select_intensity">Select Intensity…</string>
     <string name="intensity">Intensity</string>
     <string name="average_intensity">Average Intensity</string>
+    <string name="forward">Forward</string>
+    <string name="animation_displayed_date">Animation for displayed date</string>
+    <string name="now">Now</string>
     <plurals name="num_activities">
         <item quantity="one">%1d activity</item>
         <item quantity="other">%1d activities</item>
