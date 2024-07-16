@@ -304,7 +304,7 @@ private fun ActivityList(
                         Text(
                             LocalizationRepository.localDateFormatter.format(item.date),
                             style = MaterialTheme.typography.titleMedium,
-                            color = contentColorFor(backgroundColor = MaterialTheme.colorScheme.primary)
+                            color = contentColorFor(MaterialTheme.colorScheme.primary)
                         )
 
                         if (feel != null) {

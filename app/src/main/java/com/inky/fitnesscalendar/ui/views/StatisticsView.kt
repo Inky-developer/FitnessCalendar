@@ -192,10 +192,10 @@ fun StatisticsView(
                 stickyHeader(contentType = ContentType.Date) {
                     Text(
                         header,
-                        style = MaterialTheme.typography.labelLarge,
+                        style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier
                             .background(MaterialTheme.colorScheme.primaryContainer)
-                            .padding(all = 8.dp)
+                            .padding(horizontal = 8.dp)
                             .fillMaxWidth()
                     )
                 }
