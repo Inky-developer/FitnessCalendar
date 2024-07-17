@@ -183,4 +183,5 @@
     <string name="delete_place">Ort löschen</string>
     <string name="ask_delete_place">Ort löschen?</string>
     <string name="deleting_place">Ort wird gelöscht</string>
+    <string name="has_place">Hat Ort?</string>
 </resources>

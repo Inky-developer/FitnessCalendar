@@ -45,6 +45,7 @@ data class Activity(
     @ColumnInfo(name = "intensity") val intensity: Intensity? = null,
 ) {
     fun clean(type: ActivityType) = copy(
+        placeId = if (type.hasPlace) placeId else null,
         vehicle = if (type.hasVehicle) vehicle else null,
         endTime = if (type.hasDuration) endTime else startTime,
         distance = if (type.hasDistance) distance else null,

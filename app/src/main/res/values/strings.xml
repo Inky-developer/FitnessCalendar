@@ -172,6 +172,7 @@
     <string name="delete_place">Delete place</string>
     <string name="ask_delete_place">Delete place?</string>
     <string name="deleting_place">Deleting place</string>
+    <string name="has_place">Has place?</string>
     <plurals name="num_activities">
         <item quantity="one">%1d activity</item>
         <item quantity="other">%1d activities</item>

@@ -195,6 +195,11 @@ fun EditTypeDialog(
             }
 
             Toggle(
+                name = stringResource(R.string.has_place),
+                value = state.hasPlace,
+                onValue = { state = state.copy(hasPlace = it) }
+            )
+            Toggle(
                 name = stringResource(R.string.has_duration),
                 value = state.hasDuration,
                 onValue = { state = state.copy(hasDuration = it) }
