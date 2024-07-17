@@ -34,6 +34,7 @@ val selectableViews = listOf(
     Views.Home,
     Views.ActivityLog,
     Views.Statistics,
+    Views.PlaceList,
     Views.ImportExport,
     Views.Settings
 )

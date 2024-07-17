@@ -4,12 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
@@ -22,13 +17,11 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -42,17 +35,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
-import com.inky.fitnesscalendar.data.ActivityTypeColor
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.ui.components.ActivityCategorySelector
 import com.inky.fitnesscalendar.ui.components.ActivityTypeSelector
 import com.inky.fitnesscalendar.ui.components.BaseEditDialog
+import com.inky.fitnesscalendar.ui.components.ColorSelector
 import com.inky.fitnesscalendar.ui.components.OptionGroup
 import com.inky.fitnesscalendar.view_model.settings.ActivityTypeEditState
 import com.inky.fitnesscalendar.view_model.settings.ActivityTypeViewModel
@@ -240,31 +232,6 @@ fun EditTypeDialogMenu(onDeleteType: () -> Unit) {
             leadingIcon = { Icon(Icons.Outlined.Delete, stringResource(R.string.delete)) },
             onClick = onDeleteType
         )
-    }
-}
-
-@Composable
-fun ColorSelector(
-    isSelected: (ActivityTypeColor) -> Boolean,
-    onSelect: (ActivityTypeColor) -> Unit
-) {
-    LazyRow {
-        items(ActivityTypeColor.entries) { color ->
-            FilterChip(
-                selected = isSelected(color),
-                onClick = { onSelect(color) },
-                label = {
-                    Surface(
-                        color = colorResource(color.colorId),
-                        modifier = Modifier
-                            .width(24.dp)
-                            .height(24.dp)
-                            .clip(CircleShape)
-                    ) {}
-                },
-                modifier = Modifier.padding(all = 4.dp)
-            )
-        }
     }
 }
 

@@ -30,4 +30,7 @@ class DatabaseModule {
 
     @Provides
     fun dayDao(database: AppDatabase) = database.dayDao()
+
+    @Provides
+    fun placeDao(database: AppDatabase) = database.placeDao()
 }

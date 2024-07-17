@@ -195,3 +195,11 @@ val MIGRATION_9_10 = object : Migration(9, 10) {
         db.execSQL("CREATE TABLE IF NOT EXISTS `Day` (`day` INTEGER NOT NULL, `description` TEXT NOT NULL, `feel` TEXT, `image_uri` TEXT, PRIMARY KEY(`day`))")
     }
 }
+
+val MIGRATION_12_13 = object : Migration(12, 13) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("CREATE TABLE IF NOT EXISTS `Place` (`uid` INTEGER, `name` TEXT NOT NULL, `color` TEXT NOT NULL, PRIMARY KEY(`uid`))")
+        db.execSQL("ALTER TABLE `Activity` ADD COLUMN `place_id` INTEGER REFERENCES `Place`(`uid`) ON DELETE RESTRICT")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_Activity_place_id` ON `Activity` (`place_id`)")
+    }
+}

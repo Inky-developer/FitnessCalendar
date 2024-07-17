@@ -105,7 +105,7 @@ fun NewActivity(
 ) {
     val context = LocalContext.current
 
-    val title = typeActivity?.type?.let { stringResource(R.string.edit_activity, it.name) }
+    val title = typeActivity?.type?.let { stringResource(R.string.edit_object, it.name) }
         ?: stringResource(R.string.new_activity)
 
     var selectedActivityType by rememberSaveable {

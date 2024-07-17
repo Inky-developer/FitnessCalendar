@@ -4,6 +4,7 @@ import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
 import com.inky.fitnesscalendar.R
 
+// TODO rename, since it is also used by places
 enum class ActivityTypeColor(@ColorRes val colorId: Int, @StringRes val nameId: Int) {
     Color1(R.color.stats_1, R.string.color_orange),
     Color2(R.color.stats_2, R.string.color_green),

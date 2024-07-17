@@ -11,7 +11,7 @@
     <string name="back">Zurück</string>
     <string name="datetime_start">Start: %1$s %2$s</string>
     <string name="datetime_end">Ende: %1$s %2$s</string>
-    <string name="edit_activity">%1$s bearbeiten</string>
+    <string name="edit_object">%1$s bearbeiten</string>
     <string name="ok">OK</string>
     <string name="cancel">Abbrechen</string>
     <string name="save">Speichern</string>
@@ -176,4 +176,11 @@
     <string name="forward">Weiter</string>
     <string name="animation_displayed_date">Animation für das Datum</string>
     <string name="now">Jetzt</string>
+    <string name="cannot_delete_place_because_there_are_still_activities">Löschen fehlgeschlagen. Es müssen zuerst alle Aktivitäten dieser Art gelöscht werden.</string>
+    <string name="places">Orte</string>
+    <string name="new_place">Neuen Ort erstellen</string>
+    <string name="name_of_place">Name des Ortes</string>
+    <string name="delete_place">Ort löschen</string>
+    <string name="ask_delete_place">Ort löschen?</string>
+    <string name="deleting_place">Ort wird gelöscht</string>
 </resources>

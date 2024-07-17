@@ -14,14 +14,15 @@ enum class Views(
     private val arguments: List<Argument<*, *>> = emptyList()
 ) {
     Home(R.string.today, "home"),
-    EditDay(R.string.edit_activity, "edit_activity", listOf(Argument.EPOCH_DAY)),
+    EditDay(R.string.edit_object, "edit_activity", listOf(Argument.EPOCH_DAY)),
     ActivityLog(R.string.activity_log, "activity_log", listOf(Argument.ACTIVITY_ID)),
     FilterActivity(R.string.filter, "filter_activity"),
     NewActivity(R.string.new_activity, "new_activity", listOf(Argument.ACTIVITY_ID)),
     RecordActivity(R.string.record_activity, "record_activity"),
     ImportExport(R.string.import_export, "import_export"),
     Settings(R.string.settings, "settings"),
-    Statistics(R.string.statistics, "statistics", listOf(Argument.INITIAL_PERIOD));
+    Statistics(R.string.statistics, "statistics", listOf(Argument.INITIAL_PERIOD)),
+    PlaceList(R.string.places, "places");
 
     fun getPath(): String = if (arguments.isEmpty()) {
         pathTemplate()

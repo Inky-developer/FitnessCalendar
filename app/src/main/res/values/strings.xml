@@ -10,7 +10,7 @@
     <string name="back">Back</string>
     <string name="datetime_start">Start: %1$s %2$s</string>
     <string name="datetime_end">End: %1$s %2$s</string>
-    <string name="edit_activity">Edit %1$s</string>
+    <string name="edit_object">Edit %1$s</string>
     <string name="ok">OK</string>
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
@@ -126,6 +126,7 @@
     <string name="select_color">Select color…</string>
     <string name="delete_activity_type">Delete activity type</string>
     <string name="cannot_delete_type_because_there_are_still_activities">Cannot delete type. Make sure to delete all activities of this type before.</string>
+    <string name="cannot_delete_place_because_there_are_still_activities">Cannot delete place. Make sure to delete all activities of this type before.</string>
     <string name="add_activity_type">Add activity type</string>
     <string name="new_type">New Type</string>
     <string name="deleting_activity">Deleting activity</string>
@@ -165,6 +166,12 @@
     <string name="forward">Forward</string>
     <string name="animation_displayed_date">Animation for displayed date</string>
     <string name="now">Now</string>
+    <string name="places">Places</string>
+    <string name="new_place">Create new place</string>
+    <string name="name_of_place">Name of place</string>
+    <string name="delete_place">Delete place</string>
+    <string name="ask_delete_place">Delete place?</string>
+    <string name="deleting_place">Deleting place</string>
     <plurals name="num_activities">
         <item quantity="one">%1d activity</item>
         <item quantity="other">%1d activities</item>

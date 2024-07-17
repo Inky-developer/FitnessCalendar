@@ -21,13 +21,20 @@ import java.util.Date
             parentColumns = arrayOf("uid"),
             childColumns = arrayOf("type_id"),
             onDelete = ForeignKey.RESTRICT
+        ),
+        ForeignKey(
+            entity = Place::class,
+            parentColumns = arrayOf("uid"),
+            childColumns = arrayOf("place_id"),
+            onDelete = ForeignKey.RESTRICT
         )
     ],
-    indices = [Index("type_id")]
+    indices = [Index("type_id"), Index("place_id")]
 )
 data class Activity(
     @PrimaryKey val uid: Int? = null,
     @ColumnInfo(name = "type_id") val typeId: Int,
+    @ColumnInfo(name = "place_id") val placeId: Int? = null,
     @ColumnInfo(name = "vehicle") val vehicle: Vehicle? = null,
     @ColumnInfo(name = "description") val description: String = "",
     @ColumnInfo(name = "start_time", index = true) val startTime: Date,

@@ -14,10 +14,12 @@ import com.inky.fitnesscalendar.db.dao.ActivityDao
 import com.inky.fitnesscalendar.db.dao.ActivityTypeDao
 import com.inky.fitnesscalendar.db.dao.DayDao
 import com.inky.fitnesscalendar.db.dao.FilterHistoryDao
+import com.inky.fitnesscalendar.db.dao.PlaceDao
 import com.inky.fitnesscalendar.db.dao.RecordingDao
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.Day
+import com.inky.fitnesscalendar.db.entities.Place
 import com.inky.fitnesscalendar.db.entities.Recording
 import com.inky.fitnesscalendar.db.entities.TypeActivity
 import com.inky.fitnesscalendar.db.entities.TypeRecording
@@ -44,6 +46,7 @@ class AppRepository @Inject constructor(
     private val activityTypeDao: ActivityTypeDao,
     private val filterHistoryDao: FilterHistoryDao,
     private val dayDao: DayDao,
+    private val placeDao: PlaceDao,
     val localizationRepository: LocalizationRepository
 ) {
     suspend fun loadAllActivities() = activityDao.loadActivities()
@@ -168,4 +171,10 @@ class AppRepository @Inject constructor(
     suspend fun saveDay(day: Day) {
         dayDao.upsert(day)
     }
+
+    suspend fun savePlace(place: Place) = placeDao.upsert(place)
+
+    suspend fun deletePlace(place: Place) = placeDao.delete(place)
+
+    fun getPlaces() = placeDao.getAll()
 }
