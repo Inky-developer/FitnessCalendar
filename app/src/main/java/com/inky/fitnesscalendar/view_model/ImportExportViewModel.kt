@@ -5,7 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.inky.fitnesscalendar.AppRepository
 import com.inky.fitnesscalendar.R
-import com.inky.fitnesscalendar.db.entities.TypeActivity
+import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.util.importCsv
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -29,7 +29,7 @@ class ImportExportViewModel @Inject constructor(
     private val _showImportDialog = MutableSharedFlow<Boolean>()
     val showImportDialog = _showImportDialog.asSharedFlow()
 
-    private val _importData = MutableSharedFlow<List<TypeActivity>>()
+    private val _importData = MutableSharedFlow<List<RichActivity>>()
     val importData = _importData.asSharedFlow()
 
     fun import(importData: String) {
@@ -49,7 +49,7 @@ class ImportExportViewModel @Inject constructor(
         _importData.emit(emptyList())
     }
 
-    fun confirmImport(data: List<TypeActivity>) = viewModelScope.launch {
+    fun confirmImport(data: List<RichActivity>) = viewModelScope.launch {
         _showImportDialog.emit(false)
         for (typeActivity in data) {
             repository.saveActivity(typeActivity)

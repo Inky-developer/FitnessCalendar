@@ -52,7 +52,7 @@ import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.Intensity
 import com.inky.fitnesscalendar.data.measure.Distance
 import com.inky.fitnesscalendar.db.entities.Activity
-import com.inky.fitnesscalendar.db.entities.TypeActivity
+import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.di.DecisionTrees
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivitySelector
@@ -75,7 +75,7 @@ import kotlin.math.roundToInt
 fun NewActivity(
     activityId: Int?,
     viewModel: NewActivityViewModel = hiltViewModel(),
-    onSave: (TypeActivity) -> Unit,
+    onSave: (RichActivity) -> Unit,
     onNavigateBack: () -> Unit
 ) {
     val activity =
@@ -86,7 +86,7 @@ fun NewActivity(
 
     if (activityId == null || activity.value != null) {
         NewActivity(
-            typeActivity = activity.value,
+            richActivity = activity.value,
             localizationRepository = viewModel.localizationRepository,
             onSave = onSave,
             onNavigateBack = onNavigateBack,
@@ -98,41 +98,41 @@ fun NewActivity(
 
 @Composable
 fun NewActivity(
-    typeActivity: TypeActivity?,
+    richActivity: RichActivity?,
     localizationRepository: LocalizationRepository,
-    onSave: (TypeActivity) -> Unit,
+    onSave: (RichActivity) -> Unit,
     onNavigateBack: () -> Unit
 ) {
     val context = LocalContext.current
 
-    val title = typeActivity?.type?.let { stringResource(R.string.edit_object, it.name) }
+    val title = richActivity?.type?.let { stringResource(R.string.edit_object, it.name) }
         ?: stringResource(R.string.new_activity)
 
     var selectedActivityType by rememberSaveable {
         mutableStateOf(
-            typeActivity?.type ?: DecisionTrees.activityType?.classifyNow()
+            richActivity?.type ?: DecisionTrees.activityType?.classifyNow()
         )
     }
     var selectedVehicle by rememberSaveable {
         mutableStateOf(
-            typeActivity?.activity?.vehicle ?: DecisionTrees.vehicle?.classifyNow()
+            richActivity?.activity?.vehicle ?: DecisionTrees.vehicle?.classifyNow()
         )
     }
     var startDateTime by rememberSaveable {
-        mutableStateOf(typeActivity?.activity?.startTime?.toLocalDateTime() ?: LocalDateTime.now())
+        mutableStateOf(richActivity?.activity?.startTime?.toLocalDateTime() ?: LocalDateTime.now())
     }
     var endDateTime by rememberSaveable {
         mutableStateOf(
-            typeActivity?.activity?.endTime?.toLocalDateTime() ?: startDateTime.plusHours(1)
+            richActivity?.activity?.endTime?.toLocalDateTime() ?: startDateTime.plusHours(1)
         )
     }
     var description by rememberSaveable {
-        mutableStateOf(typeActivity?.activity?.description ?: "")
+        mutableStateOf(richActivity?.activity?.description ?: "")
     }
 
     var distanceString by rememberSaveable {
         mutableStateOf(
-            typeActivity?.activity?.distance?.kilometers?.toString() ?: ""
+            richActivity?.activity?.distance?.kilometers?.toString() ?: ""
         )
     }
     val isDistanceStringError by remember {
@@ -142,12 +142,12 @@ fun NewActivity(
     }
 
     var intensity by rememberSaveable {
-        mutableStateOf(typeActivity?.activity?.intensity?.value)
+        mutableStateOf(richActivity?.activity?.intensity?.value)
     }
 
-    var feel by rememberSaveable { mutableStateOf(typeActivity?.activity?.feel) }
+    var feel by rememberSaveable { mutableStateOf(richActivity?.activity?.feel) }
 
-    var imageUri by rememberSaveable { mutableStateOf(typeActivity?.activity?.imageUri) }
+    var imageUri by rememberSaveable { mutableStateOf(richActivity?.activity?.imageUri) }
 
     val formValid =
         selectedActivityType != null && (!selectedActivityType!!.hasVehicle || selectedVehicle != null) && !isDistanceStringError
@@ -171,13 +171,13 @@ fun NewActivity(
         saveEnabled = formValid,
         onNavigateBack = onNavigateBack,
         onSave = {
-            val oldActivity = when (typeActivity) {
+            val oldActivity = when (richActivity) {
                 null -> Activity(
                     typeId = 0,
                     startTime = startDateTime.toDate()
                 )
 
-                else -> typeActivity.activity
+                else -> richActivity.activity
             }
             val newActivity = oldActivity.copy(
                 typeId = selectedActivityType?.uid!!,
@@ -191,7 +191,7 @@ fun NewActivity(
                 intensity = intensity?.let { Intensity(it) }
             )
 
-            onSave(TypeActivity(activity = newActivity, type = selectedActivityType!!))
+            onSave(RichActivity(activity = newActivity, type = selectedActivityType!!))
         },
         title = title,
         actions = {
@@ -232,7 +232,7 @@ fun NewActivity(
                         contentDescription = stringResource(R.string.user_uploaded_image),
                         onState = { state ->
                             if (state is AsyncImagePainter.State.Error) {
-                                imageUri = typeActivity?.activity?.imageUri
+                                imageUri = richActivity?.activity?.imageUri
                             }
                         },
                         contentScale = ContentScale.FillHeight,

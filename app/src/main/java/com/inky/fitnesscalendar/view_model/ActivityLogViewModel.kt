@@ -15,7 +15,7 @@ import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilterChip.Companion.toActivityFilterChip
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.Day
-import com.inky.fitnesscalendar.db.entities.TypeActivity
+import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.util.toLocalDate
 import com.inky.fitnesscalendar.view_model.activity_log.ActivityListItem
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -45,7 +45,7 @@ class ActivityLogViewModel @Inject constructor(
     private val _days = MutableStateFlow(emptyMap<EpochDay, Day>())
     val days = _days.asStateFlow()
 
-    private val _activities = MutableStateFlow(emptyList<TypeActivity>())
+    private val _activities = MutableStateFlow(emptyList<RichActivity>())
     val activities = _activities.asStateFlow()
 
     val activityListItems: Flow<List<ActivityListItem>> = activities.map { activityList ->

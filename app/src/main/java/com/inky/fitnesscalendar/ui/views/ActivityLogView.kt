@@ -119,7 +119,7 @@ fun ActivityLog(
             val index =
                 activityListItems
                     .withIndex()
-                    .firstOrNull { (_, item) -> item is ActivityListItem.Activity && item.typeActivity.activity.uid == scrollToId }
+                    .firstOrNull { (_, item) -> item is ActivityListItem.Activity && item.richActivity.activity.uid == scrollToId }
                     ?.index
             if (index != null) {
                 activityListState.animateScrollToItem(index)
@@ -314,25 +314,25 @@ private fun ActivityList(
                 }
 
                 is ActivityListItem.Activity -> item(
-                    key = item.typeActivity.activity.uid ?: -1,
+                    key = item.richActivity.activity.uid ?: -1,
                     contentType = item.contentType
                 ) {
                     ActivityCard(
-                        item.typeActivity,
+                        item.richActivity,
                         onDelete = {
-                            onDeleteActivity(item.typeActivity.activity)
+                            onDeleteActivity(item.richActivity.activity)
                         },
                         onFilter = if (isFilterEmpty) {
                             onEditFilter
                         } else null,
                         onJumpTo = if (!isFilterEmpty) {
-                            { onJumpToActivity(item.typeActivity.activity) }
+                            { onJumpToActivity(item.richActivity.activity) }
                         } else null,
                         onEdit = onEditActivity,
                         localizationRepository = localizationRepository,
                         modifier = Modifier
                             .animateItem()
-                            .sharedElement(SharedContentKey.ActivityCard(item.typeActivity.activity.uid))
+                            .sharedElement(SharedContentKey.ActivityCard(item.richActivity.activity.uid))
                     )
                 }
             }

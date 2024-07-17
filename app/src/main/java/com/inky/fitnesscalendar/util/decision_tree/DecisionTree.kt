@@ -2,7 +2,7 @@ package com.inky.fitnesscalendar.util.decision_tree
 
 import com.inky.fitnesscalendar.data.Vehicle
 import com.inky.fitnesscalendar.db.entities.ActivityType
-import com.inky.fitnesscalendar.db.entities.TypeActivity
+import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.util.removedAt
 import java.time.Instant
 import java.util.Calendar
@@ -49,7 +49,7 @@ sealed class DecisionTree<Classification : Any> {
             return listOf(timeOfDay, weekDay)
         }
 
-        fun learnActivityType(activities: List<TypeActivity>): DecisionTree<ActivityType> {
+        fun learnActivityType(activities: List<RichActivity>): DecisionTree<ActivityType> {
             val examples = Examples(activities.map {
                 val attributes = attributes(it.activity.startTime)
                 Example(it.type, attributes)
@@ -58,7 +58,7 @@ sealed class DecisionTree<Classification : Any> {
             return learn(examples)
         }
 
-        fun learnVehicle(activities: List<TypeActivity>): DecisionTree<Vehicle> {
+        fun learnVehicle(activities: List<RichActivity>): DecisionTree<Vehicle> {
             val examples = Examples(activities.map {
                 val attributes = attributes(it.activity.startTime)
                 Example(it.activity.vehicle, attributes)

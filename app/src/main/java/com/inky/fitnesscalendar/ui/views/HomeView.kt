@@ -65,7 +65,7 @@ import com.inky.fitnesscalendar.data.measure.Duration.Companion.until
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.db.entities.Recording
-import com.inky.fitnesscalendar.db.entities.TypeActivity
+import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.db.entities.TypeRecording
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivityCard
@@ -360,7 +360,7 @@ fun Statistics(name: String, stats: ActivityStatistics, onClick: () -> Unit) {
 
 @Composable
 fun Today(
-    typeActivities: List<TypeActivity>,
+    typeActivities: List<RichActivity>,
     day: Day,
     localizationRepository: LocalizationRepository,
     onDay: (Day) -> Unit,
@@ -452,7 +452,7 @@ fun Today(
                     Column {
                         for (typeActivity in typeActivities) {
                             CompactActivityCard(
-                                typeActivity = typeActivity,
+                                richActivity = typeActivity,
                                 localizationRepository = localizationRepository,
                                 modifier = Modifier.sharedElement(
                                     SharedContentKey.ActivityCard(
@@ -516,29 +516,29 @@ fun CompactFeelSelector(feel: Feel?, onFeel: (Feel?) -> Unit, modifier: Modifier
 
 @Composable
 fun RecentActivityOrNull(
-    typeActivity: TypeActivity?,
+    richActivity: RichActivity?,
     localizationRepository: LocalizationRepository,
     onDelete: (Activity) -> Unit,
     onEdit: (Activity) -> Unit
 ) {
-    if (typeActivity != null) {
+    if (richActivity != null) {
         RecentActivity(
-            typeActivity,
+            richActivity,
             localizationRepository,
-            { onDelete(typeActivity.activity) },
-            { onEdit(typeActivity.activity) })
+            { onDelete(richActivity.activity) },
+            { onEdit(richActivity.activity) })
     }
 }
 
 @Composable
 fun RecentActivity(
-    typeActivity: TypeActivity,
+    richActivity: RichActivity,
     localizationRepository: LocalizationRepository,
     onDelete: () -> Unit,
     onEdit: (Activity) -> Unit,
 ) {
     ActivityCard(
-        typeActivity = typeActivity,
+        richActivity = richActivity,
         localizationRepository = localizationRepository,
         onDelete = onDelete,
         onEdit = onEdit,

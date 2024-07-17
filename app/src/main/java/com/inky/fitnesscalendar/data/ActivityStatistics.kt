@@ -5,7 +5,7 @@ import com.inky.fitnesscalendar.data.measure.Duration
 import com.inky.fitnesscalendar.data.measure.Duration.Companion.until
 import com.inky.fitnesscalendar.data.measure.Velocity
 import com.inky.fitnesscalendar.db.entities.ActivityType
-import com.inky.fitnesscalendar.db.entities.TypeActivity
+import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.util.toDate
 import com.inky.fitnesscalendar.util.toLocalDate
 import java.time.LocalDate
@@ -16,7 +16,7 @@ import java.util.Locale
 import kotlin.math.roundToLong
 
 data class ActivityStatistics(
-    val activities: List<TypeActivity>,
+    val activities: List<RichActivity>,
 ) {
     val size
         get() = activities.size
@@ -101,10 +101,10 @@ data class ActivityStatistics(
         return groupBy { func(it.activity.startTime.toLocalDate(zoneId)) }
     }
 
-    private fun <T> groupBy(func: (TypeActivity) -> T): Map<T, ActivityStatistics> =
+    private fun <T> groupBy(func: (RichActivity) -> T): Map<T, ActivityStatistics> =
         activities.groupBy(func).mapValues { ActivityStatistics(it.value) }
 
-    fun filter(func: (TypeActivity) -> Boolean) = ActivityStatistics(activities.filter(func))
+    fun filter(func: (RichActivity) -> Boolean) = ActivityStatistics(activities.filter(func))
 
     private fun keepNewer(date: Date): ActivityStatistics =
         filter { it.activity.startTime.after(date) }

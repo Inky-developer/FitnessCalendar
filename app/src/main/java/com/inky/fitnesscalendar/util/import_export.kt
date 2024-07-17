@@ -7,7 +7,7 @@ import com.inky.fitnesscalendar.data.Feel
 import com.inky.fitnesscalendar.data.Vehicle
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.ActivityType
-import com.inky.fitnesscalendar.db.entities.TypeActivity
+import com.inky.fitnesscalendar.db.entities.RichActivity
 import java.time.Instant
 import java.util.Date
 
@@ -38,14 +38,14 @@ fun Context.exportCsv(activities: List<Activity>) {
     startActivity(shareIntent)
 }
 
-fun importCsv(rawData: String, types: List<ActivityType>): List<TypeActivity> {
+fun importCsv(rawData: String, types: List<ActivityType>): List<RichActivity> {
     val typeMap = types.associate { it.name to it.uid!! }
     val data = readCSV(rawData)
 
     println("Raw data: $data")
 
     return data.mapNotNull { row -> getActivity(row, typeMap) }.map { activity ->
-        TypeActivity(
+        RichActivity(
             type = types.first { it.uid == activity.typeId },
             activity = activity
         ).clean()

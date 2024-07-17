@@ -175,7 +175,7 @@ fun ImportExport(
                         LazyColumn(modifier = Modifier.weight(1f)) {
                             items(activitiesToImport) { activity ->
                                 CompactActivityCard(
-                                    typeActivity = activity,
+                                    richActivity = activity,
                                     localizationRepository = viewModel.repository.localizationRepository
                                 )
                             }

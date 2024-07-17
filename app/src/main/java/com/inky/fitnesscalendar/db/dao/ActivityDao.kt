@@ -8,7 +8,7 @@ import androidx.room.Transaction
 import androidx.room.Upsert
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.Recording
-import com.inky.fitnesscalendar.db.entities.TypeActivity
+import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.data.Vehicle
 import kotlinx.coroutines.flow.Flow
 import java.util.Date
@@ -20,15 +20,15 @@ abstract class ActivityDao {
 
     @Transaction
     @Query("SELECT * FROM Activity ORDER BY start_time DESC LIMIT :n")
-    abstract suspend fun loadMostRecentActivities(n: Int): List<TypeActivity>
+    abstract suspend fun loadMostRecentActivities(n: Int): List<RichActivity>
 
     @Transaction
     @Query("SELECT * FROM Activity ORDER BY start_time DESC LIMIT 1")
-    abstract fun getMostRecentActivity(): Flow<TypeActivity?>
+    abstract fun getMostRecentActivity(): Flow<RichActivity?>
 
     @Transaction
     @Query("SELECT * FROM Activity ORDER BY start_time DESC")
-    abstract fun getActivities(): Flow<List<TypeActivity>>
+    abstract fun getActivities(): Flow<List<RichActivity>>
 
     @Transaction
     @Query(
@@ -57,11 +57,11 @@ abstract class ActivityDao {
         hasDescription: Boolean?,
         hasFeel: Boolean?,
         hasImage: Boolean?,
-    ): Flow<List<TypeActivity>>
+    ): Flow<List<RichActivity>>
 
     @Transaction
     @Query("SELECT * FROM ACTIVITY WHERE uid=(:id)")
-    abstract fun get(id: Int): Flow<TypeActivity>
+    abstract fun get(id: Int): Flow<RichActivity>
 
     @Query("SELECT image_uri FROM ACTIVITY WHERE image_uri IS NOT NULL")
     abstract suspend fun getImages(): List<Uri>

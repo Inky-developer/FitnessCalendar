@@ -204,7 +204,7 @@ fun StatisticsView(
                     activities.activities,
                     contentType = { ContentType.Activity }) { typeActivity ->
                     CompactActivityCard(
-                        typeActivity = typeActivity,
+                        richActivity = typeActivity,
                         localizationRepository = viewModel.appRepository.localizationRepository,
                         modifier = Modifier.clickable { onViewActivity(typeActivity.activity) }
                     )

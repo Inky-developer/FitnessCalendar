@@ -21,7 +21,7 @@ import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.db.entities.Place
 import com.inky.fitnesscalendar.db.entities.Recording
-import com.inky.fitnesscalendar.db.entities.TypeActivity
+import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.db.entities.TypeRecording
 import com.inky.fitnesscalendar.di.ActivityTypeOrder
 import com.inky.fitnesscalendar.localization.LocalizationRepository
@@ -51,7 +51,7 @@ class AppRepository @Inject constructor(
 ) {
     suspend fun loadAllActivities() = activityDao.loadActivities()
 
-    fun getActivities(filter: ActivityFilter): Flow<List<TypeActivity>> {
+    fun getActivities(filter: ActivityFilter): Flow<List<RichActivity>> {
         // Use simpler query if no filters are needed
         if (filter.isEmpty()) {
             return activityDao.getActivities()
@@ -88,7 +88,7 @@ class AppRepository @Inject constructor(
 
     fun getMostRecentActivity() = activityDao.getMostRecentActivity()
 
-    suspend fun saveActivity(activity: TypeActivity) {
+    suspend fun saveActivity(activity: RichActivity) {
         activityDao.save(activity.clean().activity)
     }
 

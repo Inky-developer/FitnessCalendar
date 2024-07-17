@@ -11,16 +11,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.inky.fitnesscalendar.db.entities.TypeActivity
+import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 
 @Composable
 fun CompactActivityCard(
-    typeActivity: TypeActivity,
+    richActivity: RichActivity,
     localizationRepository: LocalizationRepository,
     modifier: Modifier = Modifier
 ) {
-    val (activity, activityType) = typeActivity
+    val (activity, activityType) = richActivity
 
     val title = remember(activityType) { "${activityType.emoji} ${activityType.name}" }
     val time = remember(activity) {

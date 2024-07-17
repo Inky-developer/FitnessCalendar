@@ -49,14 +49,14 @@ import coil.compose.AsyncImage
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.db.entities.Activity
-import com.inky.fitnesscalendar.db.entities.TypeActivity
+import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.util.skipToLookaheadSize
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ActivityCard(
-    typeActivity: TypeActivity,
+    richActivity: RichActivity,
     onDelete: () -> Unit,
     onEdit: (Activity) -> Unit,
     localizationRepository: LocalizationRepository,
@@ -66,7 +66,7 @@ fun ActivityCard(
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainerLow,
     contentColor: Color = MaterialTheme.colorScheme.primary
 ) {
-    val (activity, activityType) = typeActivity
+    val (activity, activityType) = richActivity
 
     var showContextMenu by rememberSaveable { mutableStateOf(false) }
     var showImageView by rememberSaveable { mutableStateOf(false) }
