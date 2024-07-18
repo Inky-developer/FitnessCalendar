@@ -76,6 +76,8 @@ class AppRepository @Inject constructor(
             isTypesEmpty = filter.types.isEmpty(),
             categories = categories,
             isCategoriesEmpty = categories.isEmpty(),
+            placeIds = filter.places.mapNotNull { it.uid },
+            isPlacesEmpty = filter.places.isEmpty(),
             search = filter.text?.let { "%$it%" },
             searchVehicles = searchVehicles,
             start = rangeDate?.start,

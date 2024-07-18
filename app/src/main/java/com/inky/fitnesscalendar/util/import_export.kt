@@ -45,8 +45,10 @@ fun importCsv(rawData: String, types: List<ActivityType>): List<RichActivity> {
     println("Raw data: $data")
 
     return data.mapNotNull { row -> getActivity(row, typeMap) }.map { activity ->
+        // TODO: Support importing activities with place
         RichActivity(
             type = types.first { it.uid == activity.typeId },
+            place = null,
             activity = activity
         ).clean()
     }.also {

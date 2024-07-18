@@ -4,7 +4,8 @@ import android.content.Context
 import com.inky.fitnesscalendar.data.ActivityCategory
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.FilterHistoryItem
-import com.inky.fitnesscalendar.db.entities.FullFilterHistoryItem
+import com.inky.fitnesscalendar.db.entities.Place
+import com.inky.fitnesscalendar.db.entities.RichFilterHistoryItem
 
 sealed class ActivityFilterChip {
     data class TextFilterChip(val text: String) : ActivityFilterChip()
@@ -14,6 +15,8 @@ sealed class ActivityFilterChip {
     data class CategoryFilterChip(val category: ActivityCategory) : ActivityFilterChip()
 
     data class TypeFilterChip(val type: ActivityType) : ActivityFilterChip()
+
+    data class PlaceFilterChip(val place: Place) : ActivityFilterChip()
 
     data class AttributeFilterChip(val attribute: AttributeFilter.Attribute, val state: Boolean) :
         ActivityFilterChip()
@@ -35,6 +38,11 @@ sealed class ActivityFilterChip {
             typeId = type.uid
         )
 
+        is PlaceFilterChip -> FilterHistoryItem(
+            type = FilterHistoryItem.ItemType.Place,
+            placeId = place.uid
+        )
+
         is AttributeFilterChip -> FilterHistoryItem(
             type = FilterHistoryItem.ItemType.Attribute,
             attribute = attribute,
@@ -51,6 +59,7 @@ sealed class ActivityFilterChip {
         is DateFilterChip -> filter.copy(range = null)
         is TextFilterChip -> filter.copy(text = null)
         is TypeFilterChip -> filter.copy(types = filter.types.filter { it != type })
+        is PlaceFilterChip -> filter.copy(places = filter.places.filter { it != place })
     }
 
     fun addTo(filter: ActivityFilter) = when (this) {
@@ -65,6 +74,7 @@ sealed class ActivityFilterChip {
         is DateFilterChip -> filter.copy(range = option)
         is TextFilterChip -> filter.copy(text = text)
         is TypeFilterChip -> filter.withType(type)
+        is PlaceFilterChip -> filter.withPlace(place)
     }
 
     fun displayText(context: Context) = when (this) {
@@ -73,10 +83,11 @@ sealed class ActivityFilterChip {
         is DateFilterChip -> context.getString(option.nameId)
         is TextFilterChip -> text
         is TypeFilterChip -> type.name
+        is PlaceFilterChip -> place.name
     }
 
     companion object {
-        fun FullFilterHistoryItem.toActivityFilterChip(): ActivityFilterChip? {
+        fun RichFilterHistoryItem.toActivityFilterChip(): ActivityFilterChip? {
             return when (item.type) {
                 FilterHistoryItem.ItemType.Text -> TextFilterChip(text = item.text ?: return null)
                 FilterHistoryItem.ItemType.Date -> DateFilterChip(
@@ -88,6 +99,7 @@ sealed class ActivityFilterChip {
                 )
 
                 FilterHistoryItem.ItemType.Type -> TypeFilterChip(type = type ?: return null)
+                FilterHistoryItem.ItemType.Place -> PlaceFilterChip(place = place ?: return null)
                 FilterHistoryItem.ItemType.Attribute -> AttributeFilterChip(
                     attribute = item.attribute ?: return null,
                     state = item.attributeState ?: return null

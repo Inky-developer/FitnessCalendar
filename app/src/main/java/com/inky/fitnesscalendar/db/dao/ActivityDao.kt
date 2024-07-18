@@ -33,11 +33,13 @@ abstract class ActivityDao {
     @Transaction
     @Query(
         "SELECT Activity.* FROM Activity " +
-                "INNER JOIN ActivityType as type ON Activity.type_id = type.uid " +
+                "INNER JOIN ActivityType AS type ON Activity.type_id = type.uid " +
+                "INNER JOIN Place AS place ON Activity.place_id = place.uid " +
                 "WHERE " +
                 "(type_id IN (:typeIds) OR :isTypesEmpty) AND" +
                 "(type.activity_category in (:categories) or :isCategoriesEmpty) AND" +
-                "(description LIKE :search OR type.name LIKE :search OR vehicle IN (:searchVehicles) OR :search IS NULL) AND" +
+                "(place_id in (:placeIds) OR :isPlacesEmpty) AND" +
+                "(description LIKE :search OR type.name LIKE :search OR place.name LIKE :search OR vehicle IN (:searchVehicles) OR :search IS NULL) AND" +
                 "(end_time >= :start OR :start IS NULL) AND" +
                 "(start_time <= :end OR :end IS NULL) AND" +
                 "((description != '') == :hasDescription OR :hasDescription IS NULL) AND" +
@@ -50,6 +52,8 @@ abstract class ActivityDao {
         isTypesEmpty: Boolean,
         categories: List<String>,
         isCategoriesEmpty: Boolean,
+        placeIds: List<Int>,
+        isPlacesEmpty: Boolean,
         search: String?,
         searchVehicles: List<Vehicle>,
         start: Date?,

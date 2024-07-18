@@ -8,6 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import com.inky.fitnesscalendar.AppRepository
 import com.inky.fitnesscalendar.db.entities.ActivityType
+import com.inky.fitnesscalendar.db.entities.Place
 
 /**
  * Composition local for easier access to common database values
@@ -15,6 +16,7 @@ import com.inky.fitnesscalendar.db.entities.ActivityType
 data class DatabaseValues(
     val activityTypes: List<ActivityType> = emptyList(),
     val activityTypeRows: List<List<ActivityType>> = emptyList(),
+    val places: List<Place> = emptyList()
 )
 
 val localDatabaseValues = compositionLocalOf { DatabaseValues() }
@@ -27,10 +29,14 @@ fun ProvideDatabaseValues(repository: AppRepository, content: @Composable () -> 
     val activityTypeRows by repository
         .getActivityTypeRows()
         .collectAsState(initial = emptyList())
-    val databaseValues = remember(activityTypes, activityTypeRows) {
+    val places by repository
+        .getPlaces()
+        .collectAsState(initial = emptyList())
+    val databaseValues = remember(activityTypes, activityTypeRows, places) {
         DatabaseValues(
             activityTypes = activityTypes,
-            activityTypeRows = activityTypeRows
+            activityTypeRows = activityTypeRows,
+            places = places
         )
     }
 

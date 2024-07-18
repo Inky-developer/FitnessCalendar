@@ -6,11 +6,14 @@ import androidx.room.Relation
 data class RichActivity(
     @Embedded val activity: Activity,
     @Relation(parentColumn = "type_id", entityColumn = "uid")
-    val type: ActivityType
+    val type: ActivityType,
+    @Relation(parentColumn = "place_id", entityColumn = "uid")
+    val place: Place?
 ) {
     init {
-        assert(activity.typeId == type.uid) { "Inconsistent TypeActivity: type is $type, but id is ${activity.typeId}" }
+        assert(activity.typeId == type.uid) { "Inconsistent RichActivity: type is $type, but id is ${activity.typeId}" }
+        assert(activity.placeId == place?.uid) { "Inconsistent RichActivity: place is $place, but id is ${activity.placeId}" }
     }
 
-    fun clean() = copy(type = type, activity = activity.clean(type))
+    fun clean() = copy(type = type, place = place, activity = activity.clean(type))
 }

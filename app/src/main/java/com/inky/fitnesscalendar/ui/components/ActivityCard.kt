@@ -66,7 +66,9 @@ fun ActivityCard(
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainerLow,
     contentColor: Color = MaterialTheme.colorScheme.primary
 ) {
-    val (activity, activityType) = richActivity
+    val activity = richActivity.activity
+    val activityType = richActivity.type
+    val place = richActivity.place
 
     var showContextMenu by rememberSaveable { mutableStateOf(false) }
     var showImageView by rememberSaveable { mutableStateOf(false) }
@@ -185,6 +187,16 @@ fun ActivityCard(
                     Text(activity.intensity.value.toString())
                 }
             }
+        }
+
+        if (place != null) {
+            HorizontalDivider()
+            PlaceInfo(
+                place,
+                modifier = Modifier
+                    .padding(all = 8.dp)
+                    .fillMaxWidth()
+            )
         }
 
         if (description.isNotEmpty()) {

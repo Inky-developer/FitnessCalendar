@@ -74,6 +74,7 @@ import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivityCard
 import com.inky.fitnesscalendar.ui.components.NewActivityFAB
+import com.inky.fitnesscalendar.ui.components.PlaceIcon
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.ui.util.sharedElement
@@ -402,6 +403,8 @@ private fun FilterChipIcon(chip: ActivityFilterChip) {
             chip.type.emoji,
             style = MaterialTheme.typography.titleLarge
         )
+
+        is ActivityFilterChip.PlaceFilterChip -> PlaceIcon(chip.place)
     }
 }
 

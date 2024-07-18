@@ -184,4 +184,7 @@
     <string name="ask_delete_place">Ort löschen?</string>
     <string name="deleting_place">Ort wird gelöscht</string>
     <string name="has_place">Hat Ort?</string>
+    <string name="place">Ort</string>
+    <string name="select_place">Ort auswählen…</string>
+    <string name="filter_by_places">Orte filtern…</string>
 </resources>

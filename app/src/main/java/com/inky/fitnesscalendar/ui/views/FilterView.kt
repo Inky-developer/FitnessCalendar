@@ -12,6 +12,7 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -29,6 +30,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
@@ -36,10 +38,13 @@ import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.data.activity_filter.AttributeFilter
 import com.inky.fitnesscalendar.data.activity_filter.DateRangeOption
+import com.inky.fitnesscalendar.db.entities.Place
 import com.inky.fitnesscalendar.ui.components.ActivityCategorySelector
 import com.inky.fitnesscalendar.ui.components.ActivityTypeSelector
 import com.inky.fitnesscalendar.ui.components.OptionGroup
+import com.inky.fitnesscalendar.ui.components.PlaceIcon
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
+import com.inky.fitnesscalendar.ui.util.localDatabaseValues
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 
 
@@ -113,6 +118,9 @@ fun FilterView(
                     context.getString(it.nameId)
                 }
             }
+            val placeSelectionLabel = remember(filter) {
+                if (filter.places.isEmpty()) null else filter.places.joinToString(",") { it.name }
+            }
             val attributeSelectionLabel = remember(filter) {
                 val entries = filter.attributes.entries()
                     .filter { (_, state) -> state != AttributeFilter.TriState.Undefined }
@@ -137,6 +145,24 @@ fun FilterView(
                         }
                         filter = filter.copy(types = newSelection)
                     },
+                )
+            }
+
+            OptionGroup(
+                label = stringResource(R.string.filter_by_places),
+                selectionLabel = placeSelectionLabel,
+                modifier = Modifier.padding(all = 8.dp)
+            ) {
+                PlacesSelector(
+                    isSelected = { filter.places.contains(it) },
+                    onSelect = { place ->
+                        val oldSelection = filter.places
+                        val newSelection = oldSelection.filter { it != place }.toMutableList()
+                        if (newSelection.size == oldSelection.size) {
+                            newSelection.add(place)
+                        }
+                        filter = filter.copy(places = newSelection)
+                    }
                 )
             }
 
@@ -226,7 +252,33 @@ fun FilterView(
     }
 }
 
-val dateRangeOptions by lazy {
+@Composable
+private fun PlacesSelector(isSelected: (Place) -> Boolean, onSelect: (Place) -> Unit) {
+    val places = localDatabaseValues.current.places
+    LazyRow {
+        items(places) { place ->
+            FilterChip(
+                selected = isSelected(place),
+                onClick = { onSelect(place) },
+                label = {
+                    Text(
+                        place.name,
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                },
+                leadingIcon = { PlaceIcon(place) },
+                border = FilterChipDefaults.filterChipBorder(
+                    enabled = true,
+                    selected = isSelected(place),
+                    borderColor = colorResource(place.color.colorId)
+                ),
+                modifier = Modifier.padding(all = 4.dp)
+            )
+        }
+    }
+}
+
+private val dateRangeOptions by lazy {
     listOf(
         DateRangeOption.SevenDays,
         DateRangeOption.LastWeek,

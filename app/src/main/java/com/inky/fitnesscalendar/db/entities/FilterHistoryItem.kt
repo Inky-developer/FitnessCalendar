@@ -12,13 +12,21 @@ import java.time.Instant
 import java.util.Date
 
 @Entity(
-    foreignKeys = [ForeignKey(
-        entity = ActivityType::class,
-        parentColumns = arrayOf("uid"),
-        childColumns = arrayOf("type_id"),
-        onDelete = ForeignKey.CASCADE
-    )],
-    indices = [Index("last_updated"), Index("type_id")]
+    foreignKeys = [
+        ForeignKey(
+            entity = ActivityType::class,
+            parentColumns = arrayOf("uid"),
+            childColumns = arrayOf("type_id"),
+            onDelete = ForeignKey.CASCADE
+        ),
+        ForeignKey(
+            entity = Place::class,
+            parentColumns = arrayOf("uid"),
+            childColumns = arrayOf("place_id"),
+            onDelete = ForeignKey.CASCADE
+        )
+    ],
+    indices = [Index("last_updated"), Index("type_id"), Index("place_id")]
 )
 data class FilterHistoryItem(
     @ColumnInfo(name = "uid") @PrimaryKey val uid: Int? = null,
@@ -27,6 +35,7 @@ data class FilterHistoryItem(
     @ColumnInfo(name = "date_range_option") val dateRangeOption: DateRangeOption? = null,
     @ColumnInfo(name = "category") val category: ActivityCategory? = null,
     @ColumnInfo(name = "type_id") val typeId: Int? = null,
+    @ColumnInfo(name = "place_id") val placeId: Int? = null,
     @ColumnInfo(name = "attribute") val attribute: AttributeFilter.Attribute? = null,
     @ColumnInfo(name = "attribute_state") val attributeState: Boolean? = null,
     @ColumnInfo(name = "last_updated") val lastUpdated: Date = Date.from(Instant.now()),
@@ -36,6 +45,7 @@ data class FilterHistoryItem(
         Date,
         Category,
         Type,
+        Place,
         Attribute
     }
 }
