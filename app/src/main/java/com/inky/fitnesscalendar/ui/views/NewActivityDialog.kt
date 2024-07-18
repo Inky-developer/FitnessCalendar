@@ -266,7 +266,7 @@ fun NewActivity(
                 onVehicle = { selectedVehicle = it },
             )
 
-            AnimatedVisibility(visible = selectedActivityType?.hasPlace == true) {
+            AnimatedVisibility(visible = selectedActivityType?.hasPlace == true && localDatabaseValues.current.places.isNotEmpty()) {
                 PlaceSelector(currentPlace = place, onPlace = { place = it })
             }
 
