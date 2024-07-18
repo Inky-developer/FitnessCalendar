@@ -34,7 +34,7 @@ abstract class ActivityDao {
     @Query(
         "SELECT Activity.* FROM Activity " +
                 "INNER JOIN ActivityType AS type ON Activity.type_id = type.uid " +
-                "INNER JOIN Place AS place ON Activity.place_id = place.uid " +
+                "LEFT JOIN Place AS place ON Activity.place_id = place.uid " +
                 "WHERE " +
                 "(type_id IN (:typeIds) OR :isTypesEmpty) AND" +
                 "(type.activity_category in (:categories) or :isCategoriesEmpty) AND" +
