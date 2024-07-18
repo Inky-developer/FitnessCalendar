@@ -1,4 +1,4 @@
-package com.inky.fitnesscalendar.ui.views
+package com.inky.fitnesscalendar.ui.views.settings
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Box
@@ -44,8 +44,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.ui.components.CompactActivityCard
 import com.inky.fitnesscalendar.ui.components.OkayCancelRow
-import com.inky.fitnesscalendar.ui.util.SharedContentKey
-import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.util.exportCsv
 import com.inky.fitnesscalendar.view_model.ImportExportViewModel
 import kotlinx.coroutines.launch
@@ -88,7 +86,6 @@ fun ImportExport(
                     }
                 },
                 scrollBehavior = scrollBehavior,
-                modifier = Modifier.sharedBounds(SharedContentKey.AppBar)
             )
         },
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },

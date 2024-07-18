@@ -34,8 +34,6 @@ val selectableViews = listOf(
     Views.Home,
     Views.ActivityLog,
     Views.Statistics,
-    Views.PlaceList,
-    Views.ImportExport,
     Views.Settings
 )
 
@@ -79,7 +77,7 @@ fun NavigationDrawer(
                         label = { Text(stringResource(view.nameId)) },
                         selected = currentView == view,
                         onClick = { if (currentView != view) onNavigate(view) },
-                        modifier = Modifier.padding(horizontal = 8.dp)
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                     )
 
                 }

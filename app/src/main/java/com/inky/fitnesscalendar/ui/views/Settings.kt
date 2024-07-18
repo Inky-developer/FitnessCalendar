@@ -8,6 +8,8 @@ import androidx.navigation.compose.composable
 import androidx.navigation.navigation
 import com.inky.fitnesscalendar.ui.ProvideSharedContent
 import com.inky.fitnesscalendar.ui.views.settings.ActivityTypeView
+import com.inky.fitnesscalendar.ui.views.settings.ImportExport
+import com.inky.fitnesscalendar.ui.views.settings.PlaceListView
 import com.inky.fitnesscalendar.ui.views.settings.SettingsDebug
 import com.inky.fitnesscalendar.ui.views.settings.SettingsView
 import com.inky.fitnesscalendar.ui.views.settings.SettingsViews
@@ -28,7 +30,9 @@ fun NavGraphBuilder.settingsDestination(
                 SettingsView(
                     onOpenDrawer,
                     onNavigateTypes = { onNavigate(SettingsViews.ActivityType.navId) },
-                    onNavigateDebug = { onNavigate(SettingsViews.Debug.navId) }
+                    onNavigateDebug = { onNavigate(SettingsViews.Debug.navId) },
+                    onNavigatePlaces = { onNavigate(SettingsViews.PlaceList.navId) },
+                    onNavigateImportExport = { onNavigate(SettingsViews.ImportExport.navId) }
                 )
             }
         }
@@ -47,6 +51,16 @@ fun NavGraphBuilder.settingsDestination(
             exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.End) }
         ) {
             ActivityTypeView(onBack = onBack)
+        }
+
+        composable(SettingsViews.PlaceList.navId) {
+            PlaceListView(onOpenDrawer = onOpenDrawer)
+        }
+
+        composable(SettingsViews.ImportExport.navId) {
+            ImportExport(
+                onOpenDrawer = onOpenDrawer
+            )
         }
     }
 }

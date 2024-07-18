@@ -1,4 +1,4 @@
-package com.inky.fitnesscalendar.ui.views
+package com.inky.fitnesscalendar.ui.views.settings
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -53,8 +53,6 @@ import com.inky.fitnesscalendar.db.entities.Place
 import com.inky.fitnesscalendar.ui.components.BaseEditDialog
 import com.inky.fitnesscalendar.ui.components.ColorSelector
 import com.inky.fitnesscalendar.ui.components.OptionGroup
-import com.inky.fitnesscalendar.ui.util.SharedContentKey
-import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.view_model.PlaceListViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -87,7 +85,6 @@ fun PlaceListView(viewModel: PlaceListViewModel = hiltViewModel(), onOpenDrawer:
                     }
                 },
                 scrollBehavior = scrollBehavior,
-                modifier = Modifier.sharedBounds(SharedContentKey.AppBar)
             )
         },
         snackbarHost = { SnackbarHost(hostState = viewModel.snackbarHostState) },

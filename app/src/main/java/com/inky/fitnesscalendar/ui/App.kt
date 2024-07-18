@@ -29,9 +29,7 @@ import com.inky.fitnesscalendar.ui.views.ActivityLog
 import com.inky.fitnesscalendar.ui.views.EditDayDialog
 import com.inky.fitnesscalendar.ui.views.FilterView
 import com.inky.fitnesscalendar.ui.views.Home
-import com.inky.fitnesscalendar.ui.views.ImportExport
 import com.inky.fitnesscalendar.ui.views.NewActivity
-import com.inky.fitnesscalendar.ui.views.PlaceListView
 import com.inky.fitnesscalendar.ui.views.RecordActivity
 import com.inky.fitnesscalendar.ui.views.StatisticsView
 import com.inky.fitnesscalendar.ui.views.Views
@@ -222,14 +220,6 @@ private fun AppNavigation(
                     onNavigateBack = { navController.popBackStack() },
                 )
             }
-            composable(Views.ImportExport.pathTemplate()) {
-                onCurrentView(Views.ImportExport)
-                ProvideSharedContent(sharedContentScope = this@SharedTransitionLayout) {
-                    ImportExport(
-                        onOpenDrawer = openDrawer
-                    )
-                }
-            }
             composable(
                 Views.Statistics.pathTemplate(),
                 arguments = Views.Statistics.navArgs()
@@ -256,13 +246,6 @@ private fun AppNavigation(
                 onBack = { navController.popBackStack() },
                 onOpen = { onCurrentView(Views.Settings) }
             )
-            composable(Views.PlaceList.pathTemplate()) {
-                onCurrentView(Views.PlaceList)
-
-                ProvideSharedContent(sharedContentScope = this@SharedTransitionLayout) {
-                    PlaceListView(onOpenDrawer = openDrawer)
-                }
-            }
         }
     }
 }
