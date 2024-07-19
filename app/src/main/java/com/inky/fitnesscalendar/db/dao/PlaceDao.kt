@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PlaceDao {
-    @Query("SELECT * FROM place")
+    @Query("SELECT * FROM place ORDER BY name")
     fun getAll(): Flow<List<Place>>
 
     @Upsert
