@@ -13,19 +13,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.R
-import com.inky.fitnesscalendar.db.entities.Recording
-import com.inky.fitnesscalendar.db.entities.TypeRecording
+import com.inky.fitnesscalendar.db.entities.RichRecording
 import com.inky.fitnesscalendar.di.DecisionTrees
 import com.inky.fitnesscalendar.ui.components.ActivitySelector
 import com.inky.fitnesscalendar.ui.components.ActivitySelectorState
 import com.inky.fitnesscalendar.ui.components.BaseEditDialog
 import com.inky.fitnesscalendar.ui.util.localDatabaseValues
-import java.time.Instant
-import java.util.Date
 
 @Composable
 fun RecordActivity(
-    onStart: (TypeRecording) -> Unit,
+    onStart: (RichRecording) -> Unit,
     onNavigateBack: () -> Unit
 ) {
     var state by remember {
@@ -33,6 +30,7 @@ fun RecordActivity(
             ActivitySelectorState(
                 activityType = DecisionTrees.activityType?.classifyNow()?.takeIf { it.hasDuration },
                 vehicle = DecisionTrees.vehicle?.classifyNow(),
+                place = null
             )
         )
     }
@@ -58,15 +56,7 @@ fun RecordActivity(
     BaseEditDialog(
         title = title,
         onNavigateBack = onNavigateBack,
-        onSave = {
-            val type = state.activityType!!
-            val recording = Recording(
-                typeId = type.uid!!,
-                vehicle = state.vehicle,
-                startTime = Date.from(Instant.now())
-            )
-            onStart(TypeRecording(recording = recording, type = type))
-        },
+        onSave = { onStart(state.toRecording()!!) },
         saveEnabled = enabled,
         actions = {},
         saveText = { Text(stringResource(R.string.action_record)) }
@@ -74,9 +64,8 @@ fun RecordActivity(
         ActivitySelector(
             state,
             typeRows = relevantTypeRows,
-            onActivityType = { state = state.copy(activityType = it) },
-            onVehicle = { state = state.copy(vehicle = it) },
-            modifier = Modifier.padding(all = 8.dp)
+            modifier = Modifier.padding(all = 8.dp),
+            onState = { state = it }
         )
     }
 }

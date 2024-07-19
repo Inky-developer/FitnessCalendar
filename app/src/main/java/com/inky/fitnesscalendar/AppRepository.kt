@@ -22,7 +22,7 @@ import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.db.entities.Place
 import com.inky.fitnesscalendar.db.entities.Recording
 import com.inky.fitnesscalendar.db.entities.RichActivity
-import com.inky.fitnesscalendar.db.entities.TypeRecording
+import com.inky.fitnesscalendar.db.entities.RichRecording
 import com.inky.fitnesscalendar.di.ActivityTypeOrder
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.util.hideRecordingNotification
@@ -104,12 +104,12 @@ class AppRepository @Inject constructor(
 
     suspend fun getActivityImages() = activityDao.getImages()
 
-    suspend fun startRecording(typeRecording: TypeRecording, context: Context) {
-        val recordingId = recordingDao.insert(typeRecording.recording).toInt()
+    suspend fun startRecording(richRecording: RichRecording, context: Context) {
+        val recordingId = recordingDao.insert(richRecording.recording).toInt()
         context.showRecordingNotification(
             recordingId,
-            typeRecording.type,
-            typeRecording.recording.startTime.time
+            richRecording.type,
+            richRecording.recording.startTime.time
         )
     }
 

@@ -1,15 +1,25 @@
 package com.inky.fitnesscalendar.ui.components
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -17,11 +27,33 @@ import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.Vehicle
 import com.inky.fitnesscalendar.db.entities.ActivityType
+import com.inky.fitnesscalendar.db.entities.Place
+import com.inky.fitnesscalendar.db.entities.Recording
+import com.inky.fitnesscalendar.db.entities.RichRecording
 import com.inky.fitnesscalendar.ui.util.localDatabaseValues
+import java.time.Instant
+import java.util.Date
 
-data class ActivitySelectorState(val activityType: ActivityType?, val vehicle: Vehicle?) {
+data class ActivitySelectorState(
+    val activityType: ActivityType?,
+    val vehicle: Vehicle?,
+    val place: Place?
+) {
     fun shouldSaveBeEnabled() =
         activityType != null && (!activityType.hasVehicle || vehicle != null)
+
+    fun toRecording(): RichRecording? {
+        return RichRecording(
+            recording = Recording(
+                typeId = activityType?.uid ?: return null,
+                placeId = place?.uid,
+                vehicle = vehicle,
+                startTime = Date.from(Instant.now())
+            ),
+            type = activityType,
+            place = place
+        )
+    }
 }
 
 @Composable
@@ -30,8 +62,7 @@ fun ActivitySelector(
     modifier: Modifier = Modifier,
     background: Color = optionGroupDefaultBackground(),
     typeRows: List<List<ActivityType>> = localDatabaseValues.current.activityTypeRows,
-    onActivityType: (ActivityType) -> Unit,
-    onVehicle: (Vehicle) -> Unit,
+    onState: (ActivitySelectorState) -> Unit
 ) {
     val vehicles = remember { Vehicle.entries.toList() }
 
@@ -44,8 +75,12 @@ fun ActivitySelector(
             ActivityTypeSelector(
                 typeRows = typeRows,
                 isSelected = { it == state.activityType },
-                onSelect = onActivityType
+                onSelect = { onState(state.copy(activityType = it)) }
             )
+        }
+
+        AnimatedVisibility(visible = state.activityType?.hasPlace == true && localDatabaseValues.current.places.isNotEmpty()) {
+            PlaceSelector(currentPlace = state.place, onPlace = { onState(state.copy(place = it)) })
         }
 
         AnimatedVisibility(state.activityType?.hasVehicle == true) {
@@ -58,7 +93,7 @@ fun ActivitySelector(
                     items(vehicles) {
                         FilterChip(
                             selected = state.vehicle == it,
-                            onClick = { onVehicle(it) },
+                            onClick = { onState(state.copy(vehicle = it)) },
                             label = {
                                 Text(
                                     it.emoji,
@@ -70,6 +105,46 @@ fun ActivitySelector(
                     }
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun PlaceSelector(currentPlace: Place?, onPlace: (Place) -> Unit) {
+    val places = localDatabaseValues.current.places
+    var showDialog by rememberSaveable { mutableStateOf(false) }
+
+    TextButton(
+        onClick = { showDialog = true },
+        colors = ButtonDefaults.textButtonColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+        shape = MaterialTheme.shapes.small,
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        AnimatedContent(
+            targetState = currentPlace,
+            label = stringResource(R.string.place)
+        ) { place ->
+            if (place != null) {
+                PlaceInfo(place)
+            } else {
+                Text(stringResource(R.string.select_place))
+            }
+        }
+    }
+
+    DropdownMenu(
+        expanded = showDialog,
+        onDismissRequest = { showDialog = false },
+    ) {
+        for (place in places) {
+            DropdownMenuItem(
+                text = { Text(place.name) },
+                leadingIcon = { PlaceIcon(place) },
+                onClick = {
+                    showDialog = false
+                    onPlace(place)
+                },
+            )
         }
     }
 }

@@ -24,7 +24,7 @@ import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.inky.fitnesscalendar.AppRepository
 import com.inky.fitnesscalendar.R
-import com.inky.fitnesscalendar.db.entities.TypeRecording
+import com.inky.fitnesscalendar.db.entities.RichRecording
 import com.inky.fitnesscalendar.ui.theme.FitnessCalendarTheme
 import com.inky.fitnesscalendar.ui.util.ProvideDatabaseValues
 import com.inky.fitnesscalendar.ui.views.QsTileRecordActivityDialog
@@ -60,9 +60,9 @@ class RecordTileService : TileService() {
         job.cancel()
     }
 
-    private fun startRecording(typeRecording: TypeRecording) = scope.launch {
+    private fun startRecording(richRecording: RichRecording) = scope.launch {
         repository.startRecording(
-            typeRecording,
+            richRecording,
             this@RecordTileService
         )
     }
@@ -70,7 +70,7 @@ class RecordTileService : TileService() {
     class TileServiceDialog(
         context: Context,
         val repository: AppRepository,
-        val onStartRecording: (TypeRecording) -> Unit
+        val onStartRecording: (RichRecording) -> Unit
     ) : Dialog(context, R.style.FullHeightDialog) {
         private val lifecycleOwner = MyHackyLifecycleOwner()
 

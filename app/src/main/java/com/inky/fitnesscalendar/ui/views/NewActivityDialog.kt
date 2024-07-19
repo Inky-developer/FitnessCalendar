@@ -3,7 +3,6 @@ package com.inky.fitnesscalendar.ui.views
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -53,7 +52,6 @@ import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.Intensity
 import com.inky.fitnesscalendar.data.measure.Distance
 import com.inky.fitnesscalendar.db.entities.Activity
-import com.inky.fitnesscalendar.db.entities.Place
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.di.DecisionTrees
 import com.inky.fitnesscalendar.localization.LocalizationRepository
@@ -64,9 +62,6 @@ import com.inky.fitnesscalendar.ui.components.DateTimePicker
 import com.inky.fitnesscalendar.ui.components.FeelSelector
 import com.inky.fitnesscalendar.ui.components.ImageViewer
 import com.inky.fitnesscalendar.ui.components.OptionGroup
-import com.inky.fitnesscalendar.ui.components.PlaceIcon
-import com.inky.fitnesscalendar.ui.components.PlaceInfo
-import com.inky.fitnesscalendar.ui.util.localDatabaseValues
 import com.inky.fitnesscalendar.util.copyFileToStorage
 import com.inky.fitnesscalendar.util.getOrCreateActivityImagesDir
 import com.inky.fitnesscalendar.util.toDate
@@ -261,14 +256,13 @@ fun NewActivity(
             }
 
             ActivitySelector(
-                ActivitySelectorState(selectedActivityType, selectedVehicle),
-                onActivityType = { selectedActivityType = it },
-                onVehicle = { selectedVehicle = it },
+                ActivitySelectorState(selectedActivityType, selectedVehicle, place),
+                onState = {
+                    selectedActivityType = it.activityType
+                    selectedVehicle = it.vehicle
+                    place = it.place
+                }
             )
-
-            AnimatedVisibility(visible = selectedActivityType?.hasPlace == true && localDatabaseValues.current.places.isNotEmpty()) {
-                PlaceSelector(currentPlace = place, onPlace = { place = it })
-            }
 
             AnimatedVisibility(visible = selectedActivityType?.hasFeel() == true) {
                 OptionGroup(
@@ -361,46 +355,6 @@ fun NewActivity(
                 showImageViewer = false
             }
         )
-    }
-}
-
-@Composable
-private fun PlaceSelector(currentPlace: Place?, onPlace: (Place) -> Unit) {
-    val places = localDatabaseValues.current.places
-    var showDialog by rememberSaveable { mutableStateOf(false) }
-
-    TextButton(
-        onClick = { showDialog = true },
-        colors = ButtonDefaults.textButtonColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
-        shape = MaterialTheme.shapes.small,
-        modifier = Modifier.fillMaxWidth()
-    ) {
-        AnimatedContent(
-            targetState = currentPlace,
-            label = stringResource(R.string.place)
-        ) { place ->
-            if (place != null) {
-                PlaceInfo(place)
-            } else {
-                Text(stringResource(R.string.select_place))
-            }
-        }
-    }
-
-    DropdownMenu(
-        expanded = showDialog,
-        onDismissRequest = { showDialog = false },
-    ) {
-        for (place in places) {
-            DropdownMenuItem(
-                text = { Text(place.name) },
-                leadingIcon = { PlaceIcon(place) },
-                onClick = {
-                    showDialog = false
-                    onPlace(place)
-                },
-            )
-        }
     }
 }
 

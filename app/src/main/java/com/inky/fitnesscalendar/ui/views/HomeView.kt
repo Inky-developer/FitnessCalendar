@@ -66,7 +66,7 @@ import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.db.entities.Recording
 import com.inky.fitnesscalendar.db.entities.RichActivity
-import com.inky.fitnesscalendar.db.entities.TypeRecording
+import com.inky.fitnesscalendar.db.entities.RichRecording
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivityCard
 import com.inky.fitnesscalendar.ui.components.CompactActivityCard
@@ -172,7 +172,7 @@ fun Home(
 
             AnimatedVisibility(visible = typeRecordings?.isNotEmpty() ?: false) {
                 Recordings(
-                    typeRecordings = typeRecordings ?: emptyList(),
+                    richRecordings = typeRecordings ?: emptyList(),
                     localizationRepository = viewModel.repository.localizationRepository,
                     onAbort = { viewModel.abortRecording(it) },
                     onSave = { viewModel.saveRecording(it) }
@@ -210,7 +210,7 @@ fun Home(
 
 @Composable
 fun Recordings(
-    typeRecordings: List<TypeRecording>,
+    richRecordings: List<RichRecording>,
     localizationRepository: LocalizationRepository,
     onAbort: (Recording) -> Unit,
     onSave: (Recording) -> Unit
@@ -221,7 +221,7 @@ fun Recordings(
             .padding(all = 8.dp)
             .fillMaxWidth()
     ) {
-        for (typeRecording in typeRecordings) {
+        for (typeRecording in richRecordings) {
             Timer { time ->
                 RecordingStatus(
                     typeRecording,
@@ -237,7 +237,7 @@ fun Recordings(
 
 @Composable
 fun RecordingStatus(
-    typeRecording: TypeRecording,
+    richRecording: RichRecording,
     localizationRepository: LocalizationRepository,
     currentTimeMs: Long,
     onAbort: () -> Unit,
@@ -245,12 +245,12 @@ fun RecordingStatus(
 ) {
     val timeString by remember {
         derivedStateOf {
-            localizationRepository.formatRelativeDate(typeRecording.recording.startTime)
+            localizationRepository.formatRelativeDate(richRecording.recording.startTime)
         }
     }
     val durationString by remember(currentTimeMs) {
         derivedStateOf {
-            localizationRepository.formatDuration(typeRecording.recording.startTime)
+            localizationRepository.formatDuration(richRecording.recording.startTime)
         }
     }
     Column(modifier = Modifier.padding(all = 8.dp)) {
@@ -267,7 +267,7 @@ fun RecordingStatus(
                     modifier = Modifier.align(Alignment.CenterVertically)
                 )
                 Text(
-                    typeRecording.type.name,
+                    richRecording.type.name,
                     modifier = Modifier.align(Alignment.CenterVertically)
                 )
             }

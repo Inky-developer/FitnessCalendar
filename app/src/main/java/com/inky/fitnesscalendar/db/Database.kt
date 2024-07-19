@@ -22,7 +22,7 @@ import com.inky.fitnesscalendar.db.entities.Recording
 import com.inky.fitnesscalendar.util.DATABASE_NAME
 
 @Database(
-    version = 15,
+    version = 16,
     entities = [Activity::class, Recording::class, ActivityType::class, FilterHistoryItem::class, Day::class, Place::class],
     autoMigrations = [
         AutoMigration(from = 2, to = 3),
@@ -31,7 +31,8 @@ import com.inky.fitnesscalendar.util.DATABASE_NAME
         AutoMigration(from = 10, to = 11),
         AutoMigration(from = 11, to = 12),
         AutoMigration(from = 13, to = 14),
-        AutoMigration(from = 14, to = 15)
+        AutoMigration(from = 14, to = 15),
+        AutoMigration(from = 15, to = 16),
     ]
 )
 @TypeConverters(Converters::class)
