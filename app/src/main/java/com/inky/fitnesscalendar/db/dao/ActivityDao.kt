@@ -6,10 +6,10 @@ import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Upsert
+import com.inky.fitnesscalendar.data.Vehicle
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.Recording
 import com.inky.fitnesscalendar.db.entities.RichActivity
-import com.inky.fitnesscalendar.data.Vehicle
 import kotlinx.coroutines.flow.Flow
 import java.util.Date
 
@@ -44,7 +44,8 @@ abstract class ActivityDao {
                 "(start_time <= :end OR :end IS NULL) AND" +
                 "((description != '') == :hasDescription OR :hasDescription IS NULL) AND" +
                 "((feel IS NOT NULL) == :hasFeel OR :hasFeel IS NULL) AND" +
-                "((image_uri IS NOT NULL) == :hasImage OR :hasImage IS NULL) " +
+                "((image_uri IS NOT NULL) == :hasImage OR :hasImage IS NULL) AND" +
+                "((place_id IS NOT NULL) == :hasPlace OR :hasPlace IS NULL) " +
                 "ORDER BY start_time DESC"
     )
     abstract fun getFiltered(
@@ -61,6 +62,7 @@ abstract class ActivityDao {
         hasDescription: Boolean?,
         hasFeel: Boolean?,
         hasImage: Boolean?,
+        hasPlace: Boolean?
     ): Flow<List<RichActivity>>
 
     @Transaction

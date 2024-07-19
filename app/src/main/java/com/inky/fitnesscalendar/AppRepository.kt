@@ -70,6 +70,7 @@ class AppRepository @Inject constructor(
         val hasDescription = filter.attributes.description.toBooleanOrNull()
         val hasFeel = filter.attributes.feel.toBooleanOrNull()
         val hasImage = filter.attributes.image.toBooleanOrNull()
+        val hasPlace = filter.attributes.place.toBooleanOrNull()
 
         return activityDao.getFiltered(
             typeIds = filter.types.mapNotNull { it.uid },
@@ -84,7 +85,8 @@ class AppRepository @Inject constructor(
             end = rangeDate?.end,
             hasDescription = hasDescription,
             hasFeel = hasFeel,
-            hasImage = hasImage
+            hasImage = hasImage,
+            hasPlace = hasPlace,
         )
     }
 
