@@ -186,5 +186,5 @@
     <string name="has_place">Hat Ort?</string>
     <string name="place">Ort</string>
     <string name="select_place">Ort auswählen…</string>
-    <string name="filter_by_places">Orte filtern…</string>
+    <string name="filter_by_places">Nach Orten filtern…</string>
 </resources>
