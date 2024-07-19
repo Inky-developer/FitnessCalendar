@@ -63,7 +63,7 @@ fun ActivityCard(
     modifier: Modifier = Modifier,
     onJumpTo: (() -> Unit)? = null,
     onFilter: ((ActivityFilter) -> Unit)? = null,
-    containerColor: Color = MaterialTheme.colorScheme.surfaceContainerLow,
+    containerColor: Color = MaterialTheme.colorScheme.surfaceContainer,
     contentColor: Color = MaterialTheme.colorScheme.primary
 ) {
     val activity = richActivity.activity
