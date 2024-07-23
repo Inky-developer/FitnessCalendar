@@ -13,13 +13,13 @@ enum class Projection(
     @StringRes val legendTextId: Int,
     @StringRes val labelTextId: Int,
     @DrawableRes val iconId: Int,
-    val verticalStepSize: Float?
+    val verticalStepSize: Double?
 ) {
     ByTotalActivities(
         R.string.number_of_activities,
         R.string.by_total_activities,
         R.drawable.outline_numbers_24,
-        2f
+        2.0
     ),
     ByTotalTime(
         R.string.total_hours,
@@ -55,7 +55,7 @@ enum class Projection(
         R.string.average_intensity,
         R.string.average_intensity,
         R.drawable.twotone_lightbulb_24,
-        1f
+        1.0
     );
 
     fun apply(statistics: ActivityStatistics): Double = when (this) {

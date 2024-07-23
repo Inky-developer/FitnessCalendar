@@ -18,13 +18,13 @@ import java.util.Locale
 enum class Period(
     val nameId: Int,
     val xLabelId: Int,
-    val numVisibleEntries: Float,
+    val numVisibleEntries: Double,
     private val temporalUnit: TemporalUnit
 ) {
-    Day(R.string.days, R.string.day, 7f, ChronoUnit.DAYS),
-    Week(R.string.weeks, R.string.week, 5f, ChronoUnit.WEEKS),
-    Month(R.string.months, R.string.month, 6f, ChronoUnit.MONTHS),
-    Year(R.string.years, R.string.year, 4f, ChronoUnit.YEARS);
+    Day(R.string.days, R.string.day, 7.0, ChronoUnit.DAYS),
+    Week(R.string.weeks, R.string.week, 5.0, ChronoUnit.WEEKS),
+    Month(R.string.months, R.string.month, 6.0, ChronoUnit.MONTHS),
+    Year(R.string.years, R.string.year, 4.0, ChronoUnit.YEARS);
 
     /**
      * Groups the given statistics to a list of value and x-axis label for that group

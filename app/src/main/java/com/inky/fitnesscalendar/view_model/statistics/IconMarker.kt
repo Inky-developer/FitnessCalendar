@@ -13,16 +13,15 @@ class IconMarker(private val indicator: TextComponent, private val emojis: List<
             return
         }
 
-        val indicatorHeight = indicator.textSizeSp
-
         with(context) {
-            val bounds = context.chartBounds
+            val bounds = context.layerBounds
             var bottomEdge = bounds.bottom
             targets.forEach { target ->
                 when (target) {
                     is ColumnCartesianLayerMarkerTarget -> {
                         target.columns.zip(emojis).forEach { (column, emoji) ->
                             val columnHeight = bottomEdge - column.canvasY
+                            val indicatorHeight = indicator.getHeight(this, emoji)
                             if (columnHeight > indicatorHeight) {
                                 val posY = (column.canvasY + bottomEdge) / 2f
                                 drawIndicator(target.canvasX, posY, emoji)
@@ -38,7 +37,7 @@ class IconMarker(private val indicator: TextComponent, private val emojis: List<
     }
 
     private fun CartesianDrawContext.drawIndicator(x: Float, y: Float, emoji: String) {
-        indicator.drawText(
+        indicator.draw(
             this,
             emoji,
             x,

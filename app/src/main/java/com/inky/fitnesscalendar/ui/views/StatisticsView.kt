@@ -70,6 +70,7 @@ import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoZoomState
 import com.patrykandpatrick.vico.compose.common.component.rememberShapeComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
+import com.patrykandpatrick.vico.compose.common.data.rememberExtraLambda
 import com.patrykandpatrick.vico.compose.common.of
 import com.patrykandpatrick.vico.compose.common.rememberHorizontalLegend
 import com.patrykandpatrick.vico.compose.common.rememberLegendItem
@@ -79,7 +80,7 @@ import com.patrykandpatrick.vico.core.cartesian.CartesianMeasureContext
 import com.patrykandpatrick.vico.core.cartesian.HorizontalLayout
 import com.patrykandpatrick.vico.core.cartesian.Scroll
 import com.patrykandpatrick.vico.core.cartesian.Zoom
-import com.patrykandpatrick.vico.core.cartesian.axis.AxisItemPlacer
+import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
 import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.layer.ColumnCartesianLayer
@@ -347,10 +348,6 @@ private fun Graph(
 
     val persistentMarker =
         rememberPersistentCartesianMarker(groupingOptions.map { it.getShortText() })
-    val persistentMarkers =
-        remember(numDataPoints, persistentMarker) {
-            (0..<numDataPoints).map { it.toFloat() }.associateWith { persistentMarker }
-        }
 
     CartesianChartHost(
         modifier = modifier,
@@ -360,15 +357,15 @@ private fun Graph(
                 mergeMode = { ColumnCartesianLayer.MergeMode.Stacked }
             ),
             startAxis = rememberStartAxis(
-                itemPlacer = AxisItemPlacer.Vertical.step({ projection.verticalStepSize }),
+                itemPlacer = VerticalAxis.ItemPlacer.step({ projection.verticalStepSize }),
                 horizontalLabelPosition = VerticalAxis.HorizontalLabelPosition.Inside,
             ),
             bottomAxis = rememberBottomAxis(
                 guideline = null,
                 titleComponent = rememberTextComponent(
                     background = rememberShapeComponent(
-                        Shape.Pill,
-                        MaterialTheme.colorScheme.secondaryContainer
+                        color = MaterialTheme.colorScheme.secondaryContainer,
+                        shape = Shape.Pill,
                     ),
                     color = MaterialTheme.colorScheme.onSecondaryContainer,
                     padding = Dimensions.of(horizontal = 8.dp, vertical = 2.dp),
@@ -379,17 +376,19 @@ private fun Graph(
                 valueFormatter = { x, chartValues, _ ->
                     chartValues.model.extraStore[StatisticsViewModel.labelListKey][x.toInt()]
                 },
-                itemPlacer = AxisItemPlacer.Horizontal.default(addExtremeLabelPadding = true),
+                itemPlacer = HorizontalAxis.ItemPlacer.default(addExtremeLabelPadding = true),
             ),
             legend = rememberLegend(groupingOptions),
-            persistentMarkers = persistentMarkers
+            persistentMarkers = rememberExtraLambda(numDataPoints, persistentMarker) {
+                (0..<numDataPoints).forEach { persistentMarker at it.toFloat() }
+            },
+            horizontalLayout = HorizontalLayout.fullWidth(),
+            marker = rememberMarker(projection),
         ),
         modelProducer = modelProducer,
         runInitialAnimation = true,
-        horizontalLayout = HorizontalLayout.fullWidth(),
         scrollState = scrollState,
         zoomState = rememberVicoZoomState(initialZoom = remember(period) { Zoom.x(period.numVisibleEntries) }),
-        marker = rememberMarker(projection),
     )
 }
 
@@ -401,13 +400,16 @@ private fun rememberLegend(
     rememberHorizontalLegend<CartesianMeasureContext, CartesianDrawContext>(
         items = groupingOptions.map { group ->
             rememberLegendItem(
-                icon = rememberShapeComponent(Shape.Pill, Color(group.getColor(context))),
-                label = rememberTextComponent(
+                icon = rememberShapeComponent(
+                    shape = Shape.Pill,
+                    color = Color(group.getColor(context))
+                ),
+                labelComponent = rememberTextComponent(
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     textSize = 12.sp,
                     typeface = Typeface.MONOSPACE,
                 ),
-                labelText = group.getText(context),
+                label = group.getText(context),
             )
         },
         iconSize = 8.dp,
