@@ -15,8 +15,9 @@ import java.util.Date
 
 @Dao
 abstract class ActivityDao {
+    @Transaction
     @Query("SELECT * FROM Activity ORDER BY start_time DESC")
-    abstract suspend fun loadActivities(): List<Activity>
+    abstract suspend fun loadActivities(): List<RichActivity>
 
     @Transaction
     @Query("SELECT * FROM Activity ORDER BY start_time DESC LIMIT :n")

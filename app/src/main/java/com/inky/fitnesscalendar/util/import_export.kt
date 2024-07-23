@@ -13,18 +13,18 @@ import java.util.Date
 
 private const val TAG = "import_export"
 
-fun Context.exportCsv(activities: List<Activity>) {
+fun Context.exportCsv(activities: List<RichActivity>) {
     val csvData =
-        CSVWriter(listOf("typeUid", "typeId", "vehicle", "description", "start", "end", "feel")) {
+        CSVWriter(listOf("uid", "type", "vehicle", "description", "start", "end", "feel")) {
             rows(activities) {
                 listOf(
-                    it.uid,
-                    it.typeId,
-                    it.vehicle,
-                    it.description,
-                    it.startTime,
-                    it.endTime,
-                    it.feel
+                    it.activity.uid,
+                    it.type.name,
+                    it.activity.vehicle,
+                    it.activity.description,
+                    it.activity.startTime,
+                    it.activity.endTime,
+                    it.activity.feel
                 )
             }
         }.toString()
@@ -57,10 +57,12 @@ fun importCsv(rawData: String, types: List<ActivityType>): List<RichActivity> {
 }
 
 private fun getActivity(data: Map<String, String?>, typeMap: Map<String, Int>): Activity? {
-    val uid = data["typeUid"]?.toInt()
-    val typeId = data["typeId"]?.let {
-        it.toIntOrNull() ?: typeMap[it]
-    } ?: return null
+    val uid = data["uid"]?.toInt()
+    val typeId = typeMap[data["type"]]
+    if (typeId == null) {
+        Log.i(TAG, "Skipped activity with unknown type ${data["type"]}")
+        return null
+    }
     val vehicle = data["vehicle"]?.let { Vehicle.valueOf(it) }
     val start = Date.from(Instant.ofEpochMilli(data["start"]?.toLong() ?: return null))
     val end = Date.from(Instant.ofEpochMilli(data["end"]?.toLong() ?: return null))
