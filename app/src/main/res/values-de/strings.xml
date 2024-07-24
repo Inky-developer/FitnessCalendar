@@ -187,4 +187,9 @@
     <string name="place">Ort</string>
     <string name="select_place">Ort auswählen…</string>
     <string name="filter_by_places">Nach Orten filtern…</string>
+    <string name="setting_title_store_location_information">Standortinformationen speichern</string>
+    <string name="setting_description_store_location_information">Wenn aktiv, speichert das aktuelle WLAN-Netzwerk beim Starten einer Aktivität</string>
+    <string name="action_continue">Weiter</string>
+    <string name="wifi_information_permission_help_title">Diese Aktion erfordert Berechtigung auf Standortzugriff</string>
+    <string name="wifi_information_permission_help_description">Um auf das aktuelle WLAN-Netzwerk zugreifen zu dürfen, benötigt die App die Standortzugriffsberechtigung.</string>
 </resources>

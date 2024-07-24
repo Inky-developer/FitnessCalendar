@@ -176,6 +176,11 @@
     <string name="place">Place</string>
     <string name="select_place">Select Place…</string>
     <string name="filter_by_places">Filter by places…</string>
+    <string name="setting_title_store_location_information">Store location information</string>
+    <string name="setting_description_store_location_information">If active, saves the current wifi network when starting a recording. This will be used automatically predict places.</string>
+    <string name="action_continue">Continue</string>
+    <string name="wifi_information_permission_help_title">This action requires location permission</string>
+    <string name="wifi_information_permission_help_description">In order to access wifi information, this app needs to have location permission.</string>
     <plurals name="num_activities">
         <item quantity="one">%1d activity</item>
         <item quantity="other">%1d activities</item>

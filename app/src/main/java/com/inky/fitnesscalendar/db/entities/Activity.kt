@@ -43,6 +43,8 @@ data class Activity(
     @ColumnInfo(name = "image_uri") val imageUri: Uri? = null,
     @ColumnInfo(name = "distance") val distance: Distance? = null,
     @ColumnInfo(name = "intensity") val intensity: Intensity? = null,
+    // The unique identifier of the wifi network the device was connected to when starting the activity
+    @ColumnInfo(name = "wifi_bssid") val wifiBssid: String? = null,
 ) {
     fun clean(type: ActivityType) = copy(
         placeId = if (type.hasPlace) placeId else null,

@@ -112,6 +112,7 @@ dependencies {
     implementation(libs.vico.core)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.coil.compose)
+    implementation(libs.google.accompanist.permissions)
 
     ksp(libs.hilt.android.compiler)
     ksp(libs.androidx.room.compiler)
