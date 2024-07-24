@@ -54,6 +54,7 @@ import com.inky.fitnesscalendar.data.measure.Distance
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.di.DecisionTrees
+import com.inky.fitnesscalendar.di.DecisionTrees.classifyNow
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivitySelector
 import com.inky.fitnesscalendar.ui.components.ActivitySelectorState

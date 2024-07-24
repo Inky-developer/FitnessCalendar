@@ -15,6 +15,7 @@ import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.db.entities.RichRecording
 import com.inky.fitnesscalendar.di.DecisionTrees
+import com.inky.fitnesscalendar.di.DecisionTrees.classifyNow
 import com.inky.fitnesscalendar.ui.components.ActivitySelector
 import com.inky.fitnesscalendar.ui.components.ActivitySelectorState
 import com.inky.fitnesscalendar.ui.components.BaseEditDialog

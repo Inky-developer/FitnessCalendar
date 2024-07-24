@@ -1,12 +1,6 @@
 package com.inky.fitnesscalendar.util.decision_tree
 
-import com.inky.fitnesscalendar.data.Vehicle
-import com.inky.fitnesscalendar.db.entities.ActivityType
-import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.util.removedAt
-import java.time.Instant
-import java.util.Calendar
-import java.util.Date
 
 sealed class DecisionTree<Classification : Any> {
     data class Leaf<T : Any>(val value: T?) : DecisionTree<T>()
@@ -17,7 +11,7 @@ sealed class DecisionTree<Classification : Any> {
         val default: T?
     ) : DecisionTree<T>()
 
-    private fun classify(data: List<Any>): Classification? {
+    fun classify(data: List<Any>): Classification? {
         return when (this) {
             is Leaf -> value
             is Node -> {
@@ -27,47 +21,8 @@ sealed class DecisionTree<Classification : Any> {
         }
     }
 
-    fun classifyNow() = classify(attributes(Date.from(Instant.now())))
-
     companion object {
-        fun attributes(date: Date): List<Any> {
-            val calendar = Calendar.getInstance().apply {
-                time = date
-            }
-            val minuteOfDay =
-                calendar.get(Calendar.HOUR_OF_DAY) * 60 + calendar.get(Calendar.MINUTE)
-            // Segments:
-            // 0: [2-6) Uhr
-            // 1: [6-10) Uhr
-            // 2: [10-14) Uhr
-            // 3: [14-18) Uhr
-            // 4: [18-22) Uhr
-            // 5: [22-2) Uhr
-            val timeOfDay =
-                ((22.0 * 60 + minuteOfDay.toDouble()).mod(24.0 * 60) / (4 * 60)).toInt()
-            val weekDay = calendar.get(Calendar.DAY_OF_WEEK)
-            return listOf(timeOfDay, weekDay)
-        }
-
-        fun learnActivityType(activities: List<RichActivity>): DecisionTree<ActivityType> {
-            val examples = Examples(activities.map {
-                val attributes = attributes(it.activity.startTime)
-                Example(it.type, attributes)
-            })
-
-            return learn(examples)
-        }
-
-        fun learnVehicle(activities: List<RichActivity>): DecisionTree<Vehicle> {
-            val examples = Examples(activities.map {
-                val attributes = attributes(it.activity.startTime)
-                Example(it.activity.vehicle, attributes)
-            })
-
-            return learn(examples)
-        }
-
-        private fun <T : Any> learn(examples: Examples<T>): DecisionTree<T> {
+        fun <T : Any> learn(examples: Examples<T>): DecisionTree<T> {
             if (examples.isEmpty()) {
                 return Leaf(value = null)
             }

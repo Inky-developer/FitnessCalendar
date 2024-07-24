@@ -10,6 +10,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.di.DecisionTrees
+import com.inky.fitnesscalendar.di.DecisionTrees.classifyNow
 import com.inky.fitnesscalendar.ui.components.debug.DecisionTreeVisualization
 import java.time.DayOfWeek
 import java.time.format.TextStyle
@@ -33,25 +34,25 @@ fun SettingsDebug() {
 
         val tree = DecisionTrees.activityType
         if (tree != null) {
-            DecisionTreeVisualization(
-                tree,
-                remember {
-                    listOf(
-                        "Time of day" to mapOf(
-                            0 to "02:00 - 06:00",
-                            1 to "06:00 - 10:00",
-                            2 to "10:00 - 14:00",
-                            3 to "14:00 - 18:00",
-                            4 to "18:00 - 22:00",
-                            5 to "22:00 - 02:00"
-                        ),
-                        "Day of week" to (1..7).associateWith {
-                            DayOfWeek.of((it as Int + 5) % 7 + 1)
-                                .getDisplayName(TextStyle.FULL, Locale.getDefault())
-                        }
-                    )
-                }
-            )
+            DecisionTreeVisualization(tree, remember {
+                listOf("Time of day" to mapOf(
+                    0 to "02:00 - 06:00",
+                    1 to "06:00 - 10:00",
+                    2 to "10:00 - 14:00",
+                    3 to "14:00 - 18:00",
+                    4 to "18:00 - 22:00",
+                    5 to "22:00 - 02:00"
+                ),
+                    "Day of week" to ((1..7).map { DayOfWeek.of((it as Int + 5) % 7 + 1) }
+                        .associateWith {
+                            (it as DayOfWeek).getDisplayName(
+                                TextStyle.SHORT,
+                                Locale.getDefault()
+                            )
+                        })
+                )
+
+            })
         }
     }
 }
