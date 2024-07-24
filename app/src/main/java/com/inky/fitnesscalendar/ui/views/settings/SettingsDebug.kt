@@ -8,6 +8,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.di.DecisionTrees
 import com.inky.fitnesscalendar.di.DecisionTrees.classifyNow
@@ -18,13 +19,14 @@ import java.util.Locale
 
 @Composable
 fun SettingsDebug() {
+    val context = LocalContext.current
     var classification by remember { mutableStateOf<ActivityType?>(null) }
 
 
     Column {
         TextButton(onClick = {
             DecisionTrees.activityType?.let {
-                classification = it.classifyNow()
+                classification = it.classifyNow(context)
             }
         }) {
             Text("Classify")
@@ -34,25 +36,27 @@ fun SettingsDebug() {
 
         val tree = DecisionTrees.activityType
         if (tree != null) {
-            DecisionTreeVisualization(tree, remember {
-                listOf("Time of day" to mapOf(
-                    0 to "02:00 - 06:00",
-                    1 to "06:00 - 10:00",
-                    2 to "10:00 - 14:00",
-                    3 to "14:00 - 18:00",
-                    4 to "18:00 - 22:00",
-                    5 to "22:00 - 02:00"
-                ),
-                    "Day of week" to ((1..7).map { DayOfWeek.of((it as Int + 5) % 7 + 1) }
-                        .associateWith {
-                            (it as DayOfWeek).getDisplayName(
-                                TextStyle.SHORT,
-                                Locale.getDefault()
-                            )
-                        })
-                )
-
-            })
+            DecisionTreeVisualization(
+                tree = tree,
+                attributes = remember {
+                    listOf(
+                        "Time of day" to { it: Any? ->
+                            mapOf(
+                                0 to "02:00 - 06:00",
+                                1 to "06:00 - 10:00",
+                                2 to "10:00 - 14:00",
+                                3 to "14:00 - 18:00",
+                                4 to "18:00 - 22:00",
+                                5 to "22:00 - 02:00"
+                            )[it] ?: "<error>"
+                        },
+                        "Day of week" to { it: Any? ->
+                            (it as DayOfWeek).getDisplayName(TextStyle.SHORT, Locale.getDefault())
+                        },
+                        "Wifi ID" to { it: Any? -> it?.toString() ?: "<No Wifi>" }
+                    )
+                }
+            )
         }
     }
 }

@@ -1,11 +1,13 @@
 package com.inky.fitnesscalendar.di
 
+import android.content.Context
 import com.inky.fitnesscalendar.data.Vehicle
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.util.decision_tree.DecisionTree
 import com.inky.fitnesscalendar.util.decision_tree.Example
 import com.inky.fitnesscalendar.util.decision_tree.Examples
+import com.inky.fitnesscalendar.util.getCurrentBssid
 import com.inky.fitnesscalendar.util.toLocalDateTime
 import java.time.LocalDateTime
 
@@ -25,7 +27,8 @@ object DecisionTrees {
         activities: List<RichActivity>,
     ): DecisionTree<ActivityType> {
         val examples = Examples(activities.map {
-            val attributes = attributes(it.activity.startTime.toLocalDateTime())
+            val attributes =
+                attributes(it.activity.startTime.toLocalDateTime(), it.activity.wifiBssid)
             Example(it.type, attributes)
         })
 
@@ -36,14 +39,15 @@ object DecisionTrees {
         activities: List<RichActivity>,
     ): DecisionTree<Vehicle> {
         val examples = Examples(activities.map {
-            val attributes = attributes(it.activity.startTime.toLocalDateTime())
+            val attributes =
+                attributes(it.activity.startTime.toLocalDateTime(), it.activity.wifiBssid)
             Example(it.activity.vehicle, attributes)
         })
 
         return DecisionTree.learn(examples)
     }
 
-    private fun attributes(date: LocalDateTime): List<Any> {
+    private fun attributes(date: LocalDateTime, wifiBssid: String?): List<Any?> {
         val hourOfDay = date.toLocalTime().hour
         // Segments:
         // 0: [2-6) Uhr
@@ -55,8 +59,9 @@ object DecisionTrees {
         val timeOfDay =
             ((22.0 + hourOfDay.toDouble()).mod(24.0) / 4).toInt()
         val weekDay = date.dayOfWeek
-        return listOf(timeOfDay, weekDay)
+        return listOf(timeOfDay, weekDay, wifiBssid)
     }
 
-    fun <T : Any> DecisionTree<T>.classifyNow() = classify(attributes(LocalDateTime.now()))
+    fun <T : Any> DecisionTree<T>.classifyNow(context: Context) =
+        classify(attributes(LocalDateTime.now(), context.getCurrentBssid()))
 }

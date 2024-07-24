@@ -26,11 +26,13 @@ fun RecordActivity(
     onStart: (RichRecording) -> Unit,
     onNavigateBack: () -> Unit
 ) {
+    val context = LocalContext.current
     var state by remember {
         mutableStateOf(
             ActivitySelectorState(
-                activityType = DecisionTrees.activityType?.classifyNow()?.takeIf { it.hasDuration },
-                vehicle = DecisionTrees.vehicle?.classifyNow(),
+                activityType = DecisionTrees.activityType?.classifyNow(context)
+                    ?.takeIf { it.hasDuration },
+                vehicle = DecisionTrees.vehicle?.classifyNow(context),
                 place = null
             )
         )
@@ -40,7 +42,6 @@ fun RecordActivity(
     val relevantTypeRows =
         remember(typeRows) { typeRows.map { row -> row.filter { it.hasDuration } } }
 
-    val context = LocalContext.current
     val title = remember(state) {
         when (val type = state.activityType) {
             null -> context.getString(R.string.record_activity)

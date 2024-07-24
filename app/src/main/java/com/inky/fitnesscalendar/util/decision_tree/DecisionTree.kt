@@ -7,11 +7,11 @@ sealed class DecisionTree<Classification : Any> {
 
     data class Node<T : Any>(
         val attributeIndex: Int,
-        val children: Map<Any, DecisionTree<T>>,
+        val children: Map<Any?, DecisionTree<T>>,
         val default: T?
     ) : DecisionTree<T>()
 
-    fun classify(data: List<Any>): Classification? {
+    fun classify(data: List<Any?>): Classification? {
         return when (this) {
             is Leaf -> value
             is Node -> {

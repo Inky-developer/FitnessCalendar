@@ -111,12 +111,12 @@ fun NewActivity(
 
     var selectedActivityType by rememberSaveable {
         mutableStateOf(
-            richActivity?.type ?: DecisionTrees.activityType?.classifyNow()
+            richActivity?.type ?: DecisionTrees.activityType?.classifyNow(context)
         )
     }
     var selectedVehicle by rememberSaveable {
         mutableStateOf(
-            richActivity?.activity?.vehicle ?: DecisionTrees.vehicle?.classifyNow()
+            richActivity?.activity?.vehicle ?: DecisionTrees.vehicle?.classifyNow(context)
         )
     }
     var startDateTime by rememberSaveable {

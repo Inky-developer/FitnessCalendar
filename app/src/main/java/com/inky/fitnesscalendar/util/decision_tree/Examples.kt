@@ -14,11 +14,11 @@ data class Examples<T : Any>(val values: List<Example<T>>) {
             .map { it.value.size.toDouble() / values.size.toDouble() }
     }
 
-    fun groupByAttribute(attributeIndex: Int): Map<Any, List<Example<T>>> {
+    fun groupByAttribute(attributeIndex: Int): Map<Any?, List<Example<T>>> {
         return values.groupBy { it.attributes[attributeIndex] }
     }
 
-    fun splitByAttribute(attributeIndex: Int): Map<Any, Examples<T>> {
+    fun splitByAttribute(attributeIndex: Int): Map<Any?, Examples<T>> {
         return groupByAttribute(attributeIndex).mapValues { (_, v) ->
             Examples(v.map { it.withoutAttribute(attributeIndex) })
         }

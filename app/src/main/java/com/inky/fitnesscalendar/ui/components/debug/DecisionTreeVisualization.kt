@@ -16,7 +16,7 @@ import com.inky.fitnesscalendar.util.removedAt
 @Composable
 fun DecisionTreeVisualization(
     tree: DecisionTree<ActivityType>,
-    attributes: List<Pair<String, Map<Any, String>>>
+    attributes: List<Pair<String, (Any?) -> String>>
 ) {
     val scrollState = rememberScrollState()
     Column(modifier = Modifier.verticalScroll(scrollState)) {
@@ -35,12 +35,12 @@ private fun Leaf(leaf: DecisionTree.Leaf<ActivityType>) {
 @Composable
 private fun Node(
     node: DecisionTree.Node<ActivityType>,
-    attributes: List<Pair<String, Map<Any, String>>>
+    attributes: List<Pair<String, (Any?) -> String>>
 ) {
-    val (attributeName, attributeValueNames) = attributes[node.attributeIndex]
+    val (attributeName, getAttributeName) = attributes[node.attributeIndex]
     Column {
         for ((attr, child) in node.children.toList().sortedBy { it.first.toString() }) {
-            Text("if $attributeName == ${attributeValueNames[attr]}")
+            Text("if $attributeName == ${getAttributeName(attr)}")
             Row(modifier = Modifier.padding(start = 32.dp)) {
                 when (child) {
                     is DecisionTree.Leaf -> Leaf(child)
