@@ -86,7 +86,6 @@ private const val TAG = "HOME"
 @Composable
 fun Home(
     viewModel: HomeViewModel = hiltViewModel(),
-    isNewActivityOpen: Boolean,
     onNewActivity: () -> Unit,
     onEditActivity: (Activity) -> Unit,
     onEditDay: (EpochDay) -> Unit,
@@ -154,11 +153,7 @@ fun Home(
                 modifier = Modifier.sharedBounds(SharedContentKey.AppBar)
             )
         },
-        floatingActionButton = {
-            NewActivityFAB(
-                onClick = onNewActivity, menuOpen = isNewActivityOpen
-            )
-        },
+        floatingActionButton = { NewActivityFAB(onClick = onNewActivity) },
         snackbarHost = { SnackbarHost(viewModel.snackbarHostState) },
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { paddingValues ->

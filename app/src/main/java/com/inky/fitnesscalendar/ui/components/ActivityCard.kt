@@ -214,7 +214,7 @@ fun ActivityCard(
             AsyncImage(
                 model = activity.imageUri,
                 contentDescription = stringResource(id = R.string.user_uploaded_image),
-                contentScale = ContentScale.Crop,
+                contentScale = ContentScale.FillWidth,
                 modifier = Modifier
                     .padding(all = 8.dp)
                     .fillMaxWidth()

@@ -4,28 +4,42 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Done
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -38,6 +52,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -57,11 +72,11 @@ import com.inky.fitnesscalendar.di.DecisionTrees
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivitySelector
 import com.inky.fitnesscalendar.ui.components.ActivitySelectorState
-import com.inky.fitnesscalendar.ui.components.BaseEditDialog
 import com.inky.fitnesscalendar.ui.components.DateTimePicker
 import com.inky.fitnesscalendar.ui.components.FeelSelector
 import com.inky.fitnesscalendar.ui.components.ImageViewer
 import com.inky.fitnesscalendar.ui.components.OptionGroup
+import com.inky.fitnesscalendar.ui.components.optionGroupDefaultBackground
 import com.inky.fitnesscalendar.util.copyFileToStorage
 import com.inky.fitnesscalendar.util.getOrCreateActivityImagesDir
 import com.inky.fitnesscalendar.util.toDate
@@ -96,6 +111,7 @@ fun NewActivity(
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NewActivity(
     richActivity: RichActivity?,
@@ -167,88 +183,143 @@ fun NewActivity(
             }
         }
 
-    BaseEditDialog(
-        saveEnabled = formValid,
-        onNavigateBack = onNavigateBack,
-        onSave = {
-            val oldActivity = when (richActivity) {
-                null -> Activity(
-                    typeId = 0,
-                    startTime = startDateTime.toDate()
-                )
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    val topAppBarColors = TopAppBarDefaults.topAppBarColors(
+        scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,
+        titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+    )
 
-                else -> richActivity.activity
-            }
-            val newActivity = oldActivity.copy(
-                typeId = selectedActivityType?.uid!!,
-                placeId = selectedPlace?.uid,
-                vehicle = selectedVehicle,
-                description = description,
-                startTime = startDateTime.toDate(),
-                endTime = endDateTime.toDate(),
-                feel = feel,
-                imageUri = imageUri,
-                distance = kilometerStringToDistance(distanceString),
-                intensity = intensity?.let { Intensity(it) }
-            )
-
-            onSave(
-                RichActivity(
-                    activity = newActivity,
-                    place = selectedPlace,
-                    type = selectedActivityType!!
-                )
-            )
-        },
-        title = title,
-        actions = {
-            IconButton(onClick = { contextMenuOpen = true }) {
-                Icon(Icons.Outlined.Menu, stringResource(R.string.open_context_menu))
-            }
-            DropdownMenu(
-                expanded = contextMenuOpen,
-                onDismissRequest = { contextMenuOpen = false }) {
-                DropdownMenuItem(
-                    text = { Text(stringResource(R.string.add_image)) },
-                    leadingIcon = {
-                        Icon(
-                            painterResource(R.drawable.outline_add_image_24),
-                            stringResource(R.string.add_image)
-                        )
-                    },
-                    onClick = {
-                        contextMenuOpen = false
-                        imagePickerLauncher.launch(
-                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text(title) },
+                colors = topAppBarColors,
+                scrollBehavior = scrollBehavior,
+                navigationIcon = {
+                    IconButton(onClick = onNavigateBack) {
+                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.back))
+                    }
+                },
+                actions = {
+                    IconButton(onClick = { contextMenuOpen = true }) {
+                        Icon(Icons.Outlined.Menu, stringResource(R.string.open_context_menu))
+                    }
+                    DropdownMenu(
+                        expanded = contextMenuOpen,
+                        onDismissRequest = { contextMenuOpen = false }) {
+                        DropdownMenuItem(
+                            text = { Text(stringResource(R.string.add_image)) },
+                            leadingIcon = {
+                                Icon(
+                                    painterResource(R.drawable.outline_add_image_24),
+                                    stringResource(R.string.add_image)
+                                )
+                            },
+                            onClick = {
+                                contextMenuOpen = false
+                                imagePickerLauncher.launch(
+                                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                                )
+                            }
                         )
                     }
-                )
+                }
+            )
+        },
+        floatingActionButton = {
+            AnimatedVisibility(visible = formValid, enter = fadeIn(), exit = fadeOut()) {
+                ExtendedFloatingActionButton(
+                    onClick = {
+                        val oldActivity = when (richActivity) {
+                            null -> Activity(
+                                typeId = 0,
+                                startTime = startDateTime.toDate()
+                            )
+
+                            else -> richActivity.activity
+                        }
+                        val newActivity = oldActivity.copy(
+                            typeId = selectedActivityType?.uid!!,
+                            placeId = selectedPlace?.uid,
+                            vehicle = selectedVehicle,
+                            description = description,
+                            startTime = startDateTime.toDate(),
+                            endTime = endDateTime.toDate(),
+                            feel = feel,
+                            imageUri = imageUri,
+                            distance = kilometerStringToDistance(distanceString),
+                            intensity = intensity?.let { Intensity(it) }
+                        )
+
+                        onSave(
+                            RichActivity(
+                                activity = newActivity,
+                                place = selectedPlace,
+                                type = selectedActivityType!!
+                            )
+                        )
+                    }
+                ) {
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        Icon(Icons.Outlined.Done, stringResource(R.string.save))
+                        Text(
+                            stringResource(R.string.save),
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.padding(start = 8.dp)
+                        )
+                    }
+                }
             }
-        }
-    ) {
+        },
+        floatingActionButtonPosition = FabPosition.Center,
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+    ) { paddingValues ->
         Column(
             modifier = Modifier
-                .padding(all = 8.dp)
-                .weight(1f, fill = false)
+                .padding(paddingValues)
+                .padding(horizontal = 8.dp)
                 .verticalScroll(scrollState)
         ) {
             if (imageUri != null) {
-                Column {
-                    AsyncImage(
-                        model = imageUri!!,
-                        contentDescription = stringResource(R.string.user_uploaded_image),
-                        onState = { state ->
-                            if (state is AsyncImagePainter.State.Error) {
-                                imageUri = richActivity?.activity?.imageUri
-                            }
-                        },
-                        contentScale = ContentScale.FillHeight,
-                        modifier = Modifier
-                            .padding(bottom = 16.dp)
-                            .clip(MaterialTheme.shapes.large)
-                            .clickable {
-                                showImageViewer = true
-                            }
+                AsyncImage(
+                    model = imageUri!!,
+                    contentDescription = stringResource(R.string.user_uploaded_image),
+                    onState = { state ->
+                        if (state is AsyncImagePainter.State.Error) {
+                            imageUri = richActivity?.activity?.imageUri
+                        }
+                    },
+                    contentScale = ContentScale.FillWidth,
+                    modifier = Modifier
+                        .padding(vertical = 4.dp)
+                        .fillMaxWidth()
+                        .heightIn(max = 256.dp)
+                        .clip(MaterialTheme.shapes.large)
+                        .clickable {
+                            showImageViewer = true
+                        }
+                )
+            }
+
+            Row(
+                modifier = Modifier
+                    .padding(vertical = 4.dp)
+                    .fillMaxWidth()
+            ) {
+                DateTimeInput(
+                    dateTime = startDateTime,
+                    localizationRepository = localizationRepository,
+                    labelId = R.string.datetime_start,
+                    onDateTime = { startDateTime = it },
+                )
+
+                AnimatedVisibility(visible = selectedActivityType?.hasDuration == true) {
+                    DateTimeInput(
+                        dateTime = endDateTime,
+                        localizationRepository = localizationRepository,
+                        labelId = R.string.datetime_end,
+                        onDateTime = { endDateTime = it },
+                        modifier = Modifier.padding(start = 8.dp)
                     )
                 }
             }
@@ -288,7 +359,7 @@ fun NewActivity(
                         .padding(vertical = 4.dp),
                     singleLine = true,
                     keyboardOptions = remember { KeyboardOptions(keyboardType = KeyboardType.Number) },
-                    colors = TextFieldDefaults.colors(unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+                    colors = TextFieldDefaults.colors(unfocusedContainerColor = optionGroupDefaultBackground()),
                     shape = MaterialTheme.shapes.small
                 )
             }
@@ -322,46 +393,33 @@ fun NewActivity(
                     .padding(vertical = 4.dp),
                 maxLines = 8,
                 keyboardOptions = remember { KeyboardOptions(capitalization = KeyboardCapitalization.Sentences) },
-                colors = TextFieldDefaults.colors(unfocusedContainerColor = MaterialTheme.colorScheme.surfaceContainerHigh),
+                colors = TextFieldDefaults.colors(unfocusedContainerColor = optionGroupDefaultBackground()),
                 shape = MaterialTheme.shapes.small
             )
 
-            DateTimeInput(
-                dateTime = startDateTime,
-                localizationRepository = localizationRepository,
-                labelId = R.string.datetime_start,
-                onDateTime = { startDateTime = it }
-            )
-
-            AnimatedVisibility(visible = selectedActivityType?.hasDuration == true) {
-                DateTimeInput(
-                    dateTime = endDateTime,
-                    localizationRepository = localizationRepository,
-                    labelId = R.string.datetime_end,
-                    onDateTime = { endDateTime = it }
-                )
-            }
+            Spacer(modifier = Modifier.height(128.dp))
         }
-    }
 
-    if (showImageViewer && imageUri != null) {
-        ImageViewer(
-            imageUri!!,
-            onDismiss = { showImageViewer = false },
-            onDelete = {
-                imageUri = null
-                showImageViewer = false
-            }
-        )
+        if (showImageViewer && imageUri != null) {
+            ImageViewer(
+                imageUri!!,
+                onDismiss = { showImageViewer = false },
+                onDelete = {
+                    imageUri = null
+                    showImageViewer = false
+                },
+            )
+        }
     }
 }
 
 @Composable
-private fun ColumnScope.DateTimeInput(
+private fun RowScope.DateTimeInput(
     dateTime: LocalDateTime,
     localizationRepository: LocalizationRepository,
     labelId: Int,
-    onDateTime: (LocalDateTime) -> Unit
+    onDateTime: (LocalDateTime) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val dateTimeStr = remember(dateTime) {
         val date = dateTime.toDate()
@@ -376,14 +434,11 @@ private fun ColumnScope.DateTimeInput(
     TextButton(
         onClick = { showPicker = true },
         colors = ButtonDefaults.textButtonColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer,
-            contentColor = contentColorFor(MaterialTheme.colorScheme.primaryContainer)
+            containerColor = optionGroupDefaultBackground(),
+            contentColor = contentColorFor(optionGroupDefaultBackground())
         ),
         shape = MaterialTheme.shapes.small,
-        modifier = Modifier
-            .align(Alignment.CenterHorizontally)
-            .fillMaxWidth()
-            .padding(top = 4.dp),
+        modifier = modifier.weight(1f)
     ) {
         Text(
             stringResource(

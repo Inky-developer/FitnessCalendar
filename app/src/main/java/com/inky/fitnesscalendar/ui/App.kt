@@ -88,7 +88,6 @@ private fun AppNavigation(
     openDrawer: () -> Unit,
     onCurrentView: (Views) -> Unit,
 ) {
-    var isNewActivityOpen by rememberSaveable { mutableStateOf(false) }
     var filterState by rememberSaveable { mutableStateOf(ActivityFilter()) }
 
     val scope = rememberCoroutineScope()
@@ -103,7 +102,6 @@ private fun AppNavigation(
                 onCurrentView(Views.Home)
                 ProvideSharedContent(sharedContentScope = this@SharedTransitionLayout) {
                     Home(
-                        isNewActivityOpen = isNewActivityOpen,
                         onNewActivity = { navController.navigate(Views.NewActivity.getPath(-1)) },
                         onEditActivity = {
                             navController.navigate(Views.NewActivity.getPath(it.uid ?: -1))
@@ -159,7 +157,6 @@ private fun AppNavigation(
                             filterState = it
                             viewModel.addToFilterHistory(filterState)
                         },
-                        isNewActivityOpen = isNewActivityOpen
                     )
                 }
             }
@@ -184,11 +181,13 @@ private fun AppNavigation(
                     )
                 }
             }
-            dialog(
-                Views.NewActivity.pathTemplate(), arguments = Views.NewActivity.navArgs()
+            composable(
+                Views.NewActivity.pathTemplate(),
+                arguments = Views.NewActivity.navArgs(),
+                enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Up) },
+                exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Down) }
             ) { backStackEntry ->
                 onCurrentView(Views.NewActivity)
-                isNewActivityOpen = true
                 val activityId =
                     backStackEntry.arguments?.let { Views.Argument.ACTIVITY_ID.extract(it) }
                 NewActivity(
@@ -197,11 +196,9 @@ private fun AppNavigation(
                         scope.launch {
                             viewModel.repository.saveActivity(it)
                         }
-                        isNewActivityOpen = false
                         navController.popBackStack()
                     },
                     onNavigateBack = {
-                        isNewActivityOpen = false
                         navController.popBackStack()
                     }
                 )

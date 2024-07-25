@@ -135,7 +135,7 @@ private fun PlaceSelector(currentPlace: Place?, onPlace: (Place?) -> Unit) {
 
     TextButton(
         onClick = { showDialog = true },
-        colors = ButtonDefaults.textButtonColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+        colors = ButtonDefaults.textButtonColors(containerColor = optionGroupDefaultBackground()),
         shape = MaterialTheme.shapes.small,
         modifier = Modifier.fillMaxWidth()
     ) {
@@ -154,6 +154,7 @@ private fun PlaceSelector(currentPlace: Place?, onPlace: (Place?) -> Unit) {
     DropdownMenu(
         expanded = showDialog,
         onDismissRequest = { showDialog = false },
+        modifier = Modifier.fillMaxWidth()
     ) {
         if (currentPlace != null) {
             DropdownMenuItem(
@@ -162,7 +163,7 @@ private fun PlaceSelector(currentPlace: Place?, onPlace: (Place?) -> Unit) {
                 onClick = {
                     showDialog = false
                     onPlace(null)
-                }
+                },
             )
         }
 

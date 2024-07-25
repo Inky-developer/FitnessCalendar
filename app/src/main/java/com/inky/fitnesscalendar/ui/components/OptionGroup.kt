@@ -12,7 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun optionGroupDefaultBackground() = MaterialTheme.colorScheme.surfaceContainerHigh
+fun optionGroupDefaultBackground() = MaterialTheme.colorScheme.surfaceContainer
 
 @Composable
 fun OptionGroup(

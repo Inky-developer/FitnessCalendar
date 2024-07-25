@@ -88,7 +88,6 @@ import kotlinx.coroutines.launch
 fun ActivityLog(
     viewModel: ActivityLogViewModel = hiltViewModel(),
     filter: ActivityFilter,
-    isNewActivityOpen: Boolean,
     onEditFilter: (ActivityFilter) -> Unit,
     onOpenDrawer: () -> Unit,
     onNewActivity: () -> Unit,
@@ -196,12 +195,7 @@ fun ActivityLog(
                         )
                     }
                 }
-                NewActivityFAB(
-                    onClick = {
-                        onNewActivity()
-                    },
-                    menuOpen = isNewActivityOpen,
-                )
+                NewActivityFAB(onClick = { onNewActivity() })
             }
         },
         snackbarHost = { SnackbarHost(hostState = viewModel.snackbarHostState) },
