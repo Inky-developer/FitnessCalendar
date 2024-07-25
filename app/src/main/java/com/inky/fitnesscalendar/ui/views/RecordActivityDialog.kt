@@ -41,9 +41,7 @@ fun RecordActivity(
     }
 
     val enabled by remember {
-        derivedStateOf {
-            state.shouldSaveBeEnabled()
-        }
+        derivedStateOf { state.shouldSaveBeEnabled() }
     }
 
     BaseEditDialog(

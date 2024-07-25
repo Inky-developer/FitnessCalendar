@@ -39,7 +39,6 @@ import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -243,16 +242,13 @@ fun RecordingStatus(
     onAbort: () -> Unit,
     onSave: () -> Unit
 ) {
-    val timeString by remember {
-        derivedStateOf {
-            localizationRepository.formatRelativeDate(richRecording.recording.startTime)
-        }
+    val timeString =
+        remember { localizationRepository.formatRelativeDate(richRecording.recording.startTime) }
+
+    val durationString = remember(currentTimeMs) {
+        localizationRepository.formatDuration(richRecording.recording.startTime)
     }
-    val durationString by remember(currentTimeMs) {
-        derivedStateOf {
-            localizationRepository.formatDuration(richRecording.recording.startTime)
-        }
-    }
+
     Column(modifier = Modifier.padding(all = 8.dp)) {
         Row(
             horizontalArrangement = Arrangement.SpaceBetween,

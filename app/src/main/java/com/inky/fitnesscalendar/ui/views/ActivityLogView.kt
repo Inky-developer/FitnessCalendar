@@ -107,7 +107,7 @@ fun ActivityLog(
 
     val activities by viewModel.activities.collectAsState()
     val activityListItems by viewModel.activityListItems.collectAsState(initial = emptyList())
-    val activitiesEmpty by remember(activities) { derivedStateOf { activities.isEmpty() } }
+    val activitiesEmpty by remember { derivedStateOf { activities.isEmpty() } }
 
     val days by viewModel.days.collectAsState()
 
@@ -281,7 +281,7 @@ private fun ActivityList(
     onEditActivity: (Activity) -> Unit,
     onDeleteActivity: (RichActivity) -> Unit
 ) {
-    val isFilterEmpty by remember { derivedStateOf { filter.isEmpty() } }
+    val isFilterEmpty = remember(filter) { filter.isEmpty() }
 
     LazyColumn(
         state = listState,

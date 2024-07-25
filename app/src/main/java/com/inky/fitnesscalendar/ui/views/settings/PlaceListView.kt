@@ -222,7 +222,7 @@ private fun EditPlaceDialog(initialPlace: Place?, onDismiss: () -> Unit, onSave:
     var name by rememberSaveable(initialPlace) { mutableStateOf(initialPlace?.name ?: "") }
     var color by rememberSaveable(initialPlace) { mutableStateOf(initialPlace?.color) }
 
-    val saveEnabled by remember(name, color) {
+    val saveEnabled by remember {
         derivedStateOf { name.isNotBlank() && color != null }
     }
 
