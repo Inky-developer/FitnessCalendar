@@ -149,24 +149,6 @@ fun FilterView(
             }
 
             OptionGroup(
-                label = stringResource(R.string.filter_by_places),
-                selectionLabel = placeSelectionLabel,
-                modifier = Modifier.padding(all = 8.dp)
-            ) {
-                PlacesSelector(
-                    isSelected = { filter.places.contains(it) },
-                    onSelect = { place ->
-                        val oldSelection = filter.places
-                        val newSelection = oldSelection.filter { it != place }.toMutableList()
-                        if (newSelection.size == oldSelection.size) {
-                            newSelection.add(place)
-                        }
-                        filter = filter.copy(places = newSelection)
-                    }
-                )
-            }
-
-            OptionGroup(
                 label = stringResource(R.string.filter_by_categories),
                 selectionLabel = categorySelectionLabel,
                 modifier = Modifier.padding(all = 8.dp)
@@ -181,6 +163,24 @@ fun FilterView(
                             newSelection.add(category)
                         }
                         filter = filter.copy(categories = newSelection)
+                    }
+                )
+            }
+
+            OptionGroup(
+                label = stringResource(R.string.filter_by_places),
+                selectionLabel = placeSelectionLabel,
+                modifier = Modifier.padding(all = 8.dp)
+            ) {
+                PlacesSelector(
+                    isSelected = { filter.places.contains(it) },
+                    onSelect = { place ->
+                        val oldSelection = filter.places
+                        val newSelection = oldSelection.filter { it != place }.toMutableList()
+                        if (newSelection.size == oldSelection.size) {
+                            newSelection.add(place)
+                        }
+                        filter = filter.copy(places = newSelection)
                     }
                 )
             }
