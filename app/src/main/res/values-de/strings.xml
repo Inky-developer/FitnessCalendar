@@ -194,4 +194,5 @@
     <string name="wifi_information_permission_help_description">Um auf das aktuelle WLAN-Netzwerk zugreifen zu dürfen, benötigt die App die Standortzugriffsberechtigung.</string>
     <string name="undo">Rückgängig machen</string>
     <string name="recent_activity">Kürzliche Aktivität</string>
+    <string name="no_place">Kein Ort</string>
 </resources>

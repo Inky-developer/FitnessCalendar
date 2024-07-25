@@ -183,6 +183,7 @@
     <string name="wifi_information_permission_help_description">In order to access wifi information, this app needs to have location permission.</string>
     <string name="undo">Undo</string>
     <string name="recent_activity">Recent activity</string>
+    <string name="no_place">No place</string>
     <plurals name="num_activities">
         <item quantity="one">%1d activity</item>
         <item quantity="other">%1d activities</item>

@@ -8,10 +8,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -126,7 +129,7 @@ fun ActivitySelector(
 }
 
 @Composable
-private fun PlaceSelector(currentPlace: Place?, onPlace: (Place) -> Unit) {
+private fun PlaceSelector(currentPlace: Place?, onPlace: (Place?) -> Unit) {
     val places = localDatabaseValues.current.places
     var showDialog by rememberSaveable { mutableStateOf(false) }
 
@@ -152,6 +155,17 @@ private fun PlaceSelector(currentPlace: Place?, onPlace: (Place) -> Unit) {
         expanded = showDialog,
         onDismissRequest = { showDialog = false },
     ) {
+        if (currentPlace != null) {
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.no_place)) },
+                leadingIcon = { Icon(Icons.Outlined.Clear, stringResource(R.string.no_place)) },
+                onClick = {
+                    showDialog = false
+                    onPlace(null)
+                }
+            )
+        }
+
         for (place in places) {
             DropdownMenuItem(
                 text = { Text(place.name) },
