@@ -521,12 +521,18 @@ fun RecentActivityOrNull(
     onDelete: (RichActivity) -> Unit,
     onEdit: (Activity) -> Unit
 ) {
-    if (richActivity != null) {
-        RecentActivity(
-            richActivity,
-            localizationRepository,
-            { onDelete(richActivity) },
-            { onEdit(richActivity.activity) })
+    AnimatedContent(
+        targetState = richActivity,
+        label = stringResource(R.string.recent_activity)
+    ) { actualActivity ->
+        if (actualActivity != null) {
+            RecentActivity(
+                actualActivity,
+                localizationRepository,
+                { onDelete(actualActivity) },
+                { onEdit(actualActivity.activity) }
+            )
+        }
     }
 }
 
