@@ -71,6 +71,7 @@ import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilterChip
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.Day
+import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivityCard
 import com.inky.fitnesscalendar.ui.components.NewActivityFAB
@@ -278,7 +279,7 @@ private fun ActivityList(
     onJumpToActivity: (Activity) -> Unit,
     onEditFilter: (ActivityFilter) -> Unit,
     onEditActivity: (Activity) -> Unit,
-    onDeleteActivity: (Activity) -> Unit
+    onDeleteActivity: (RichActivity) -> Unit
 ) {
     val isFilterEmpty by remember { derivedStateOf { filter.isEmpty() } }
 
@@ -321,7 +322,7 @@ private fun ActivityList(
                     ActivityCard(
                         item.richActivity,
                         onDelete = {
-                            onDeleteActivity(item.richActivity.activity)
+                            onDeleteActivity(item.richActivity)
                         },
                         onFilter = if (isFilterEmpty) {
                             onEditFilter

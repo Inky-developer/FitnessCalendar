@@ -129,8 +129,8 @@
     <string name="cannot_delete_place_because_there_are_still_activities">Cannot delete place. Make sure to delete all activities of this type before.</string>
     <string name="add_activity_type">Add activity type</string>
     <string name="new_type">New Type</string>
-    <string name="deleting_activity">Deleting activity</string>
-    <string name="deleting_activity_type">Deleting activity type</string>
+    <string name="deleted_activity">Deleted activity</string>
+    <string name="deleted_activity_type">Deleted activity type</string>
     <string name="color">Color</string>
     <string name="color_orange">Orange</string>
     <string name="color_green">Green</string>
@@ -171,7 +171,7 @@
     <string name="name_of_place">Name of place</string>
     <string name="delete_place">Delete place</string>
     <string name="ask_delete_place">Delete place?</string>
-    <string name="deleting_place">Deleting place</string>
+    <string name="deleted_place">Deleted place</string>
     <string name="has_place">Has place?</string>
     <string name="place">Place</string>
     <string name="select_place">Select Place…</string>
@@ -181,6 +181,7 @@
     <string name="action_continue">Continue</string>
     <string name="wifi_information_permission_help_title">This action requires location permission</string>
     <string name="wifi_information_permission_help_description">In order to access wifi information, this app needs to have location permission.</string>
+    <string name="undo">Undo</string>
     <plurals name="num_activities">
         <item quantity="one">%1d activity</item>
         <item quantity="other">%1d activities</item>

@@ -41,14 +41,15 @@ class PlaceListViewModel @Inject constructor(
 
     fun delete(place: Place) = viewModelScope.launch {
         try {
+            repository.deletePlace(place)
             val result = snackbarHostState.showSnackbar(
-                message = context.getString(R.string.deleting_place),
-                actionLabel = context.getString(R.string.cancel),
+                message = context.getString(R.string.deleted_place),
+                actionLabel = context.getString(R.string.undo),
                 duration = SnackbarDuration.Short
             )
             when (result) {
-                SnackbarResult.ActionPerformed -> {}
-                SnackbarResult.Dismissed -> repository.deletePlace(place)
+                SnackbarResult.ActionPerformed -> repository.savePlace(place)
+                SnackbarResult.Dismissed -> {}
             }
         } catch (e: SQLiteConstraintException) {
             snackbarHostState.showSnackbar(message = context.getString(R.string.cannot_delete_place_because_there_are_still_activities))

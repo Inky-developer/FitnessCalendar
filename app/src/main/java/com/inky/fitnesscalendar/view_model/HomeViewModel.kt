@@ -1,19 +1,13 @@
 package com.inky.fitnesscalendar.view_model
 
 import android.content.Context
-import androidx.compose.material3.SnackbarDuration
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.inky.fitnesscalendar.AppRepository
-import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityStatistics
 import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.data.activity_filter.DateRangeOption
 import com.inky.fitnesscalendar.data.measure.Duration.Companion.until
-import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.db.entities.Recording
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -33,9 +27,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
-    val repository: AppRepository
-) : ViewModel() {
+    @ApplicationContext context: Context,
+    repository: AppRepository
+) : BaseViewModel(context, repository) {
     val weekStats = loadWeekStats()
     val monthStats = loadMonthStats()
     val activitiesToday = repository.getActivities(ActivityFilter(range = DateRangeOption.Today))
@@ -52,28 +46,12 @@ class HomeViewModel @Inject constructor(
     }
     val recordings = repository.getRecordings()
 
-    val snackbarHostState = SnackbarHostState()
-
     init {
         repository.getDay(EpochDay.today()).onEach { _today.emit(it) }.launchIn(viewModelScope)
     }
 
     fun updateDay(day: Day) = viewModelScope.launch {
         repository.saveDay(day)
-    }
-
-    fun deleteActivity(activity: Activity) {
-        viewModelScope.launch {
-            val result = snackbarHostState.showSnackbar(
-                context.getString(R.string.deleting_activity),
-                actionLabel = context.getString(R.string.abort),
-                duration = SnackbarDuration.Short
-            )
-            when (result) {
-                SnackbarResult.ActionPerformed -> {}
-                SnackbarResult.Dismissed -> repository.deleteActivity(activity)
-            }
-        }
     }
 
     fun abortRecording(recording: Recording) {

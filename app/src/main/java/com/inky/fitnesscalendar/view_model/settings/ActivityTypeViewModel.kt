@@ -30,14 +30,15 @@ class ActivityTypeViewModel @Inject constructor(
     fun delete(activityType: ActivityType) {
         viewModelScope.launch {
             try {
+                repository.deleteActivityType(activityType)
                 val result = snackbarHostState.showSnackbar(
-                    message = context.getString(R.string.deleting_activity_type),
-                    actionLabel = context.getString(R.string.cancel),
+                    message = context.getString(R.string.deleted_activity_type),
+                    actionLabel = context.getString(R.string.undo),
                     duration = SnackbarDuration.Short
                 )
                 when (result) {
-                    SnackbarResult.ActionPerformed -> {}
-                    SnackbarResult.Dismissed -> repository.deleteActivityType(activityType)
+                    SnackbarResult.ActionPerformed -> repository.saveActivityType(activityType)
+                    SnackbarResult.Dismissed -> {}
                 }
             } catch (e: SQLiteConstraintException) {
                 snackbarHostState.showSnackbar(message = context.getString(R.string.cannot_delete_type_because_there_are_still_activities))

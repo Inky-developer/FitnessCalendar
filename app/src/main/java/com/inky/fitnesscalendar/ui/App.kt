@@ -34,12 +34,12 @@ import com.inky.fitnesscalendar.ui.views.RecordActivity
 import com.inky.fitnesscalendar.ui.views.StatisticsView
 import com.inky.fitnesscalendar.ui.views.Views
 import com.inky.fitnesscalendar.ui.views.settingsDestination
-import com.inky.fitnesscalendar.view_model.GenericViewModel
+import com.inky.fitnesscalendar.view_model.BaseViewModel
 import kotlinx.coroutines.launch
 
 
 @Composable
-fun App(viewModel: GenericViewModel = hiltViewModel()) {
+fun App(viewModel: BaseViewModel = hiltViewModel()) {
     val navController = rememberNavController()
     val scope = rememberCoroutineScope()
 
@@ -83,7 +83,7 @@ fun App(viewModel: GenericViewModel = hiltViewModel()) {
 @Composable
 @OptIn(ExperimentalSharedTransitionApi::class)
 private fun AppNavigation(
-    viewModel: GenericViewModel = hiltViewModel(),
+    viewModel: BaseViewModel = hiltViewModel(),
     navController: NavHostController,
     openDrawer: () -> Unit,
     onCurrentView: (Views) -> Unit,

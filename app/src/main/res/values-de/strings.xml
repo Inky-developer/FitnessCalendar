@@ -139,8 +139,8 @@
     <string name="cannot_delete_type_because_there_are_still_activities">Löschen fehlgeschlagen. Es müssen zuerst alle Aktivitäten dieser Art gelöscht werden.</string>
     <string name="add_activity_type">Aktivitätsart hinzufügen</string>
     <string name="new_type">Neue Aktivitätsart</string>
-    <string name="deleting_activity">Aktivität wird gelöscht</string>
-    <string name="deleting_activity_type">Aktivitätsart wird gelöscht</string>
+    <string name="deleted_activity">Aktivität wurde gelöscht</string>
+    <string name="deleted_activity_type">Aktivitätsart wurde gelöscht</string>
     <string name="color">Farbe</string>
     <string name="color_orange">Orange</string>
     <string name="color_green">Grün</string>
@@ -182,7 +182,7 @@
     <string name="name_of_place">Name des Ortes</string>
     <string name="delete_place">Ort löschen</string>
     <string name="ask_delete_place">Ort löschen?</string>
-    <string name="deleting_place">Ort wird gelöscht</string>
+    <string name="deleted_place">Ort wurde gelöscht</string>
     <string name="has_place">Hat Ort?</string>
     <string name="place">Ort</string>
     <string name="select_place">Ort auswählen…</string>
@@ -192,4 +192,5 @@
     <string name="action_continue">Weiter</string>
     <string name="wifi_information_permission_help_title">Diese Aktion erfordert Berechtigung auf Standortzugriff</string>
     <string name="wifi_information_permission_help_description">Um auf das aktuelle WLAN-Netzwerk zugreifen zu dürfen, benötigt die App die Standortzugriffsberechtigung.</string>
+    <string name="undo">Rückgängig machen</string>
 </resources>

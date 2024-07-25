@@ -518,14 +518,14 @@ fun CompactFeelSelector(feel: Feel?, onFeel: (Feel?) -> Unit, modifier: Modifier
 fun RecentActivityOrNull(
     richActivity: RichActivity?,
     localizationRepository: LocalizationRepository,
-    onDelete: (Activity) -> Unit,
+    onDelete: (RichActivity) -> Unit,
     onEdit: (Activity) -> Unit
 ) {
     if (richActivity != null) {
         RecentActivity(
             richActivity,
             localizationRepository,
-            { onDelete(richActivity.activity) },
+            { onDelete(richActivity) },
             { onEdit(richActivity.activity) })
     }
 }

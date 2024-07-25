@@ -30,12 +30,12 @@ import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.ui.components.BaseEditDialog
 import com.inky.fitnesscalendar.ui.components.FeelSelector
 import com.inky.fitnesscalendar.ui.components.OptionGroup
-import com.inky.fitnesscalendar.view_model.GenericViewModel
+import com.inky.fitnesscalendar.view_model.BaseViewModel
 import kotlinx.parcelize.Parcelize
 
 @Composable
 fun EditDayDialog(
-    viewModel: GenericViewModel = hiltViewModel(),
+    viewModel: BaseViewModel = hiltViewModel(),
     epochDay: EpochDay,
     onNavigateBack: () -> Unit
 ) {
@@ -53,7 +53,7 @@ fun EditDayDialog(
 
 @Composable
 fun EditDayDialog(
-    viewModel: GenericViewModel,
+    viewModel: BaseViewModel,
     day: Day,
     onNavigateBack: () -> Unit
 ) {
