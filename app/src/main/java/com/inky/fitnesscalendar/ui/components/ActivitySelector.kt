@@ -1,5 +1,6 @@
 package com.inky.fitnesscalendar.ui.components
 
+import android.content.Context
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
@@ -30,6 +31,7 @@ import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.Place
 import com.inky.fitnesscalendar.db.entities.Recording
 import com.inky.fitnesscalendar.db.entities.RichRecording
+import com.inky.fitnesscalendar.di.DecisionTrees
 import com.inky.fitnesscalendar.ui.util.localDatabaseValues
 import java.time.Instant
 import java.util.Date
@@ -53,6 +55,20 @@ data class ActivitySelectorState(
             type = activityType,
             place = place
         )
+    }
+
+    companion object {
+        fun fromPrediction(
+            context: Context,
+            requireTypeHasDuration: Boolean
+        ): ActivitySelectorState {
+            val prediction = DecisionTrees.classifyNow(context)
+            return ActivitySelectorState(
+                activityType = prediction.activityType?.takeIf { !requireTypeHasDuration || it.hasDuration },
+                vehicle = prediction.vehicle,
+                place = prediction.place
+            )
+        }
     }
 }
 

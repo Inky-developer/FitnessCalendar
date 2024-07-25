@@ -54,7 +54,6 @@ import com.inky.fitnesscalendar.data.measure.Distance
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.di.DecisionTrees
-import com.inky.fitnesscalendar.di.DecisionTrees.classifyNow
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivitySelector
 import com.inky.fitnesscalendar.ui.components.ActivitySelectorState
@@ -105,19 +104,19 @@ fun NewActivity(
     onNavigateBack: () -> Unit
 ) {
     val context = LocalContext.current
+    val activityPrediction = remember { DecisionTrees.classifyNow(context) }
 
     val title = richActivity?.type?.let { stringResource(R.string.edit_object, it.name) }
         ?: stringResource(R.string.new_activity)
 
     var selectedActivityType by rememberSaveable {
-        mutableStateOf(
-            richActivity?.type ?: DecisionTrees.activityType?.classifyNow(context)
-        )
+        mutableStateOf(richActivity?.type ?: activityPrediction.activityType)
     }
     var selectedVehicle by rememberSaveable {
-        mutableStateOf(
-            richActivity?.activity?.vehicle ?: DecisionTrees.vehicle?.classifyNow(context)
-        )
+        mutableStateOf(richActivity?.activity?.vehicle ?: activityPrediction.vehicle)
+    }
+    var selectedPlace by rememberSaveable {
+        mutableStateOf(richActivity?.place ?: activityPrediction.place)
     }
     var startDateTime by rememberSaveable {
         mutableStateOf(richActivity?.activity?.startTime?.toLocalDateTime() ?: LocalDateTime.now())
@@ -141,8 +140,6 @@ fun NewActivity(
             distanceString.isNotBlank() && kilometerStringToDistance(distanceString) == null
         }
     }
-
-    var place by rememberSaveable { mutableStateOf(richActivity?.place) }
 
     var intensity by rememberSaveable {
         mutableStateOf(richActivity?.activity?.intensity?.value)
@@ -184,7 +181,7 @@ fun NewActivity(
             }
             val newActivity = oldActivity.copy(
                 typeId = selectedActivityType?.uid!!,
-                placeId = place?.uid,
+                placeId = selectedPlace?.uid,
                 vehicle = selectedVehicle,
                 description = description,
                 startTime = startDateTime.toDate(),
@@ -198,7 +195,7 @@ fun NewActivity(
             onSave(
                 RichActivity(
                     activity = newActivity,
-                    place = place,
+                    place = selectedPlace,
                     type = selectedActivityType!!
                 )
             )
@@ -257,11 +254,11 @@ fun NewActivity(
             }
 
             ActivitySelector(
-                ActivitySelectorState(selectedActivityType, selectedVehicle, place),
+                ActivitySelectorState(selectedActivityType, selectedVehicle, selectedPlace),
                 onState = {
                     selectedActivityType = it.activityType
                     selectedVehicle = it.vehicle
-                    place = it.place
+                    selectedPlace = it.place
                 }
             )
 

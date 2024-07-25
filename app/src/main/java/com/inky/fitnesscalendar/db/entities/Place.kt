@@ -13,4 +13,6 @@ data class Place(
     @PrimaryKey val uid: Int? = null,
     @ColumnInfo(name = "name") val name: String,
     @ColumnInfo(name = "color") val color: ActivityTypeColor
-) : Parcelable
+) : Parcelable {
+    override fun toString() = name
+}

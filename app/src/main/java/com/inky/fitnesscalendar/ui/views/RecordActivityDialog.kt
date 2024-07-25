@@ -14,8 +14,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.db.entities.RichRecording
-import com.inky.fitnesscalendar.di.DecisionTrees
-import com.inky.fitnesscalendar.di.DecisionTrees.classifyNow
 import com.inky.fitnesscalendar.ui.components.ActivitySelector
 import com.inky.fitnesscalendar.ui.components.ActivitySelectorState
 import com.inky.fitnesscalendar.ui.components.BaseEditDialog
@@ -28,14 +26,7 @@ fun RecordActivity(
 ) {
     val context = LocalContext.current
     var state by remember {
-        mutableStateOf(
-            ActivitySelectorState(
-                activityType = DecisionTrees.activityType?.classifyNow(context)
-                    ?.takeIf { it.hasDuration },
-                vehicle = DecisionTrees.vehicle?.classifyNow(context),
-                place = null
-            )
-        )
+        mutableStateOf(ActivitySelectorState.fromPrediction(context, requireTypeHasDuration = true))
     }
 
     val typeRows = localDatabaseValues.current.activityTypeRows

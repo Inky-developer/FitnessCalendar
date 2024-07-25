@@ -31,4 +31,6 @@ data class ActivityType(
     override fun getText(context: Context) = name
 
     override fun getShortText() = emoji
+
+    override fun toString() = name
 }
