@@ -7,6 +7,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -25,7 +26,7 @@ fun RecordActivity(
     onNavigateBack: () -> Unit
 ) {
     val context = LocalContext.current
-    var state by remember {
+    var state by rememberSaveable {
         mutableStateOf(ActivitySelectorState.fromPrediction(context, requireTypeHasDuration = true))
     }
 
@@ -41,7 +42,7 @@ fun RecordActivity(
     }
 
     val enabled by remember {
-        derivedStateOf { state.shouldSaveBeEnabled() }
+        derivedStateOf { state.isValid() }
     }
 
     BaseEditDialog(

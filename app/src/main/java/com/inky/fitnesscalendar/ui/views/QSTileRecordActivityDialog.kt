@@ -9,6 +9,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -31,10 +32,10 @@ fun QsTileRecordActivityDialog(
     onSave: (RichRecording) -> Unit
 ) {
     val context = LocalContext.current
-    var state by remember {
+    var state by rememberSaveable {
         mutableStateOf(ActivitySelectorState.fromPrediction(context, requireTypeHasDuration = true))
     }
-    val saveEnabled by remember { derivedStateOf { state.shouldSaveBeEnabled() } }
+    val saveEnabled by remember { derivedStateOf { state.isValid() } }
     val typeRows = localDatabaseValues.current.activityTypeRows
     val filteredTypeRows =
         remember(typeRows) { typeRows.map { row -> row.filter { it.hasDuration } } }

@@ -1,6 +1,7 @@
 package com.inky.fitnesscalendar.ui.components
 
 import android.content.Context
+import android.os.Parcelable
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
@@ -37,15 +38,17 @@ import com.inky.fitnesscalendar.db.entities.Recording
 import com.inky.fitnesscalendar.db.entities.RichRecording
 import com.inky.fitnesscalendar.di.DecisionTrees
 import com.inky.fitnesscalendar.ui.util.localDatabaseValues
+import kotlinx.parcelize.Parcelize
 import java.time.Instant
 import java.util.Date
 
+@Parcelize
 data class ActivitySelectorState(
     val activityType: ActivityType?,
     val vehicle: Vehicle?,
     val place: Place?
-) {
-    fun shouldSaveBeEnabled() =
+) : Parcelable {
+    fun isValid() =
         activityType != null && (!activityType.hasVehicle || vehicle != null)
 
     fun toRecording(): RichRecording? {

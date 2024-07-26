@@ -1,5 +1,7 @@
 package com.inky.fitnesscalendar.ui.views
 
+import android.net.Uri
+import android.os.Parcelable
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -43,8 +45,9 @@ import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -65,6 +68,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import com.inky.fitnesscalendar.R
+import com.inky.fitnesscalendar.data.Feel
 import com.inky.fitnesscalendar.data.Intensity
 import com.inky.fitnesscalendar.data.measure.Distance
 import com.inky.fitnesscalendar.db.entities.Activity
@@ -84,6 +88,8 @@ import com.inky.fitnesscalendar.util.toDate
 import com.inky.fitnesscalendar.util.toLocalDateTime
 import com.inky.fitnesscalendar.view_model.NewActivityViewModel
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.parcelize.IgnoredOnParcel
+import kotlinx.parcelize.Parcelize
 import java.time.LocalDateTime
 import kotlin.math.roundToInt
 
@@ -126,53 +132,14 @@ fun NewActivity(
     val context = LocalContext.current
     val activityPrediction = remember { DecisionTrees.classifyNow(context) }
 
-    val title = richActivity?.type?.let { stringResource(R.string.edit_object, it.name) }
-        ?: stringResource(R.string.new_activity)
-
-    var selectedActivityType by rememberSaveable {
-        mutableStateOf(richActivity?.type ?: activityPrediction.activityType)
-    }
-    var selectedVehicle by rememberSaveable {
-        mutableStateOf(richActivity?.activity?.vehicle ?: activityPrediction.vehicle)
-    }
-    var selectedPlace by rememberSaveable {
-        mutableStateOf(richActivity?.place ?: activityPrediction.place)
-    }
-    var startDateTime by rememberSaveable {
-        mutableStateOf(richActivity?.activity?.startTime?.toLocalDateTime() ?: LocalDateTime.now())
-    }
-    var endDateTime by rememberSaveable {
-        mutableStateOf(
-            richActivity?.activity?.endTime?.toLocalDateTime() ?: startDateTime.plusHours(1)
-        )
-    }
-    var description by rememberSaveable {
-        mutableStateOf(richActivity?.activity?.description ?: "")
+    val title = remember(richActivity) {
+        richActivity?.type?.let { context.getString(R.string.edit_object, it.name) }
+            ?: context.getString(R.string.new_activity)
     }
 
-    var distanceString by rememberSaveable {
-        mutableStateOf(
-            richActivity?.activity?.distance?.kilometers?.toString() ?: ""
-        )
+    var editState by rememberSaveable {
+        mutableStateOf(ActivityEditState(richActivity, activityPrediction))
     }
-    val isDistanceStringError by remember {
-        derivedStateOf {
-            distanceString.isNotBlank() && kilometerStringToDistance(distanceString) == null
-        }
-    }
-
-    var intensity by rememberSaveable {
-        mutableStateOf(richActivity?.activity?.intensity?.value)
-    }
-
-    var feel by rememberSaveable { mutableStateOf(richActivity?.activity?.feel) }
-
-    var imageUri by rememberSaveable { mutableStateOf(richActivity?.activity?.imageUri) }
-
-    val formValid = selectedActivityType != null
-            && (!selectedActivityType!!.hasVehicle || selectedVehicle != null)
-            && !isDistanceStringError
-            && !endDateTime.isBefore(startDateTime)
 
     val scrollState = rememberScrollState()
 
@@ -185,7 +152,7 @@ fun NewActivity(
                 context.copyFileToStorage(it, context.getOrCreateActivityImagesDir())
             }
             if (actualUri != null) {
-                imageUri = actualUri
+                editState = editState.copy(imageUri = actualUri)
             }
         }
 
@@ -233,37 +200,12 @@ fun NewActivity(
             )
         },
         floatingActionButton = {
-            AnimatedVisibility(visible = formValid, enter = fadeIn(), exit = fadeOut()) {
+            AnimatedVisibility(visible = editState.isValid, enter = fadeIn(), exit = fadeOut()) {
                 ExtendedFloatingActionButton(
                     onClick = {
-                        val oldActivity = when (richActivity) {
-                            null -> Activity(
-                                typeId = 0,
-                                startTime = startDateTime.toDate()
-                            )
-
-                            else -> richActivity.activity
+                        if (editState.isValid) {
+                            onSave(editState.toActivity(richActivity))
                         }
-                        val newActivity = oldActivity.copy(
-                            typeId = selectedActivityType?.uid!!,
-                            placeId = selectedPlace?.uid,
-                            vehicle = selectedVehicle,
-                            description = description,
-                            startTime = startDateTime.toDate(),
-                            endTime = endDateTime.toDate(),
-                            feel = feel,
-                            imageUri = imageUri,
-                            distance = kilometerStringToDistance(distanceString),
-                            intensity = intensity?.let { Intensity(it) }
-                        )
-
-                        onSave(
-                            RichActivity(
-                                activity = newActivity,
-                                place = selectedPlace,
-                                type = selectedActivityType!!
-                            )
-                        )
                     }
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -286,13 +228,14 @@ fun NewActivity(
                 .padding(horizontal = 8.dp)
                 .verticalScroll(scrollState)
         ) {
+            val imageUri = editState.imageUri
             if (imageUri != null) {
                 AsyncImage(
-                    model = imageUri!!,
+                    model = imageUri,
                     contentDescription = stringResource(R.string.user_uploaded_image),
                     onState = { state ->
                         if (state is AsyncImagePainter.State.Error) {
-                            imageUri = richActivity?.activity?.imageUri
+                            editState = editState.copy(imageUri = richActivity?.activity?.imageUri)
                         }
                     },
                     contentScale = ContentScale.FillWidth,
@@ -313,41 +256,42 @@ fun NewActivity(
                     .fillMaxWidth()
             ) {
                 DateTimeInput(
-                    dateTime = startDateTime,
+                    dateTime = editState.startDateTime,
                     localizationRepository = localizationRepository,
                     labelId = R.string.datetime_start,
-                    onDateTime = { startDateTime = it },
+                    onDateTime = { editState = editState.copy(startDateTime = it) },
+                    modifier = Modifier.weight(1f)
                 )
 
-                AnimatedVisibility(visible = selectedActivityType?.hasDuration == true) {
+                AnimatedVisibility(
+                    visible = editState.activitySelectorState.activityType?.hasDuration == true,
+                    modifier = Modifier
+                        .padding(start = 8.dp)
+                        .weight(1f)
+                ) {
                     DateTimeInput(
-                        dateTime = endDateTime,
+                        dateTime = editState.endDateTime,
                         localizationRepository = localizationRepository,
                         labelId = R.string.datetime_end,
-                        onDateTime = { endDateTime = it },
-                        isError = endDateTime.isBefore(startDateTime),
-                        modifier = Modifier.padding(start = 8.dp)
+                        onDateTime = { editState = editState.copy(endDateTime = it) },
+                        isError = editState.isEndDateTimeError,
                     )
                 }
             }
 
             ActivitySelector(
-                ActivitySelectorState(selectedActivityType, selectedVehicle, selectedPlace),
-                onState = {
-                    selectedActivityType = it.activityType
-                    selectedVehicle = it.vehicle
-                    selectedPlace = it.place
-                },
+                editState.activitySelectorState,
+                onState = { editState = editState.copy(activitySelectorState = it) },
                 onNavigateNewPlace = onNavigateNewPlace
             )
 
-            AnimatedVisibility(visible = selectedActivityType?.hasFeel() == true) {
+            AnimatedVisibility(visible = editState.activitySelectorState.activityType?.hasFeel() == true) {
                 OptionGroup(
                     label = stringResource(R.string.select_feel),
-                    selectionLabel = feel?.let { stringResource(it.nameId) }) {
+                    selectionLabel = editState.feel?.let { stringResource(it.nameId) }) {
                     FeelSelector(
-                        feel = feel,
-                        onChange = { feel = it },
+                        feel = editState.feel,
+                        onChange = { editState = editState.copy(feel = it) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .align(Alignment.CenterHorizontally)
@@ -355,11 +299,11 @@ fun NewActivity(
                 }
             }
 
-            AnimatedVisibility(visible = selectedActivityType?.hasDistance == true) {
+            AnimatedVisibility(visible = editState.activitySelectorState.activityType?.hasDistance == true) {
                 TextField(
-                    value = distanceString,
-                    onValueChange = { distanceString = it },
-                    isError = isDistanceStringError,
+                    value = editState.distanceString,
+                    onValueChange = { editState = editState.copy(distanceString = it) },
+                    isError = editState.isDistanceStringError,
                     placeholder = { Text(stringResource(R.string.placeholder_distance)) },
                     suffix = { Text(stringResource(R.string.km)) },
                     modifier = Modifier
@@ -372,19 +316,21 @@ fun NewActivity(
                 )
             }
 
-            AnimatedVisibility(visible = selectedActivityType?.hasIntensity == true) {
+            AnimatedVisibility(visible = editState.activitySelectorState.activityType?.hasIntensity == true) {
                 OptionGroup(
                     label = stringResource(R.string.select_intensity),
-                    selectionLabel = intensity?.toString()
+                    selectionLabel = editState.intensity?.value?.toString()
                 ) {
                     Slider(
-                        value = intensity?.toFloat() ?: -1f,
+                        value = editState.intensity?.value?.toFloat() ?: -1f,
                         onValueChange = {
-                            intensity = if (it < 0) {
-                                null
-                            } else {
-                                it.roundToInt().toByte()
-                            }
+                            editState = editState.copy(
+                                intensity = if (it < 0) {
+                                    null
+                                } else {
+                                    Intensity(it.roundToInt().toByte())
+                                }
+                            )
                         },
                         steps = 10,
                         valueRange = -1f..10f
@@ -393,8 +339,8 @@ fun NewActivity(
             }
 
             TextField(
-                value = description,
-                onValueChange = { description = it },
+                value = editState.description,
+                onValueChange = { editState = editState.copy(description = it) },
                 placeholder = { Text(stringResource(R.string.placeholder_description)) },
                 keyboardOptions = remember { KeyboardOptions(capitalization = KeyboardCapitalization.Sentences) },
                 colors = TextFieldDefaults.colors(unfocusedContainerColor = optionGroupDefaultBackground()),
@@ -407,12 +353,12 @@ fun NewActivity(
             Spacer(modifier = Modifier.height(128.dp))
         }
 
-        if (showImageViewer && imageUri != null) {
+        if (showImageViewer && editState.imageUri != null) {
             ImageViewer(
-                imageUri!!,
+                editState.imageUri!!,
                 onDismiss = { showImageViewer = false },
                 onDelete = {
-                    imageUri = null
+                    editState = editState.copy(imageUri = null)
                     showImageViewer = false
                 },
             )
@@ -455,7 +401,7 @@ private fun RowScope.DateTimeInput(
         ),
         border = border,
         shape = MaterialTheme.shapes.small,
-        modifier = modifier.weight(1f)
+        modifier = modifier
     ) {
         Text(
             stringResource(
@@ -482,4 +428,78 @@ private fun kilometerStringToDistance(string: String) = if (string.isBlank()) {
     null
 } else {
     string.replace(",", ".").toDoubleOrNull()?.let { Distance(kilometers = it) }
+}
+
+@Stable
+@Immutable
+@Parcelize
+private data class ActivityEditState(
+    val activitySelectorState: ActivitySelectorState,
+    val startDateTime: LocalDateTime,
+    val endDateTime: LocalDateTime,
+    val description: String,
+    val distanceString: String,
+    val intensity: Intensity?,
+    val feel: Feel?,
+    val imageUri: Uri?,
+) : Parcelable {
+    constructor(
+        activity: RichActivity?,
+        prediction: DecisionTrees.Prediction,
+        now: LocalDateTime = LocalDateTime.now()
+    ) : this(
+        activitySelectorState = ActivitySelectorState(
+            activityType = activity?.type ?: prediction.activityType,
+            vehicle = activity?.activity?.vehicle ?: prediction.vehicle,
+            place = activity?.place ?: prediction.place
+        ),
+        startDateTime = activity?.activity?.startTime?.toLocalDateTime() ?: now,
+        endDateTime = activity?.activity?.endTime?.toLocalDateTime() ?: now.plusHours(1),
+        description = activity?.activity?.description ?: "",
+        distanceString = activity?.activity?.distance?.toString() ?: "",
+        intensity = activity?.activity?.intensity,
+        feel = activity?.activity?.feel,
+        imageUri = activity?.activity?.imageUri
+    )
+
+    @IgnoredOnParcel
+    val isDistanceStringError =
+        distanceString.isNotBlank() && kilometerStringToDistance(distanceString) == null
+
+    @IgnoredOnParcel
+    val isEndDateTimeError = endDateTime.isBefore(startDateTime)
+
+    @IgnoredOnParcel
+    val isValid = activitySelectorState.isValid()
+            && !isDistanceStringError
+            && !isEndDateTimeError
+
+    /**
+     * Converts this state into an activity. Panics if the state does not represent a valid activity
+     */
+    fun toActivity(initialActivity: RichActivity?): RichActivity {
+        val oldActivity = when (initialActivity) {
+            null -> Activity(typeId = 0, startTime = startDateTime.toDate())
+            else -> initialActivity.activity
+        }
+
+        val newActivity = oldActivity.copy(
+            typeId = activitySelectorState.activityType?.uid!!,
+            placeId = activitySelectorState.place?.uid,
+            vehicle = activitySelectorState.vehicle,
+            description = description,
+            startTime = startDateTime.toDate(),
+            endTime = endDateTime.toDate(),
+            imageUri = imageUri,
+            feel = feel,
+            distance = kilometerStringToDistance(distanceString),
+            intensity = intensity
+        )
+
+        return RichActivity(
+            activity = newActivity,
+            place = activitySelectorState.place,
+            type = activitySelectorState.activityType
+        )
+    }
 }
