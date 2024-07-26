@@ -392,13 +392,12 @@ fun NewActivity(
                 value = description,
                 onValueChange = { description = it },
                 placeholder = { Text(stringResource(R.string.placeholder_description)) },
+                keyboardOptions = remember { KeyboardOptions(capitalization = KeyboardCapitalization.Sentences) },
+                colors = TextFieldDefaults.colors(unfocusedContainerColor = optionGroupDefaultBackground()),
+                shape = MaterialTheme.shapes.small,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 4.dp),
-                maxLines = 8,
-                keyboardOptions = remember { KeyboardOptions(capitalization = KeyboardCapitalization.Sentences) },
-                colors = TextFieldDefaults.colors(unfocusedContainerColor = optionGroupDefaultBackground()),
-                shape = MaterialTheme.shapes.small
             )
 
             Spacer(modifier = Modifier.height(128.dp))
