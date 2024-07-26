@@ -12,7 +12,6 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -48,6 +47,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -136,16 +136,14 @@ fun NewActivity(
         richActivity?.type?.let { context.getString(R.string.edit_object, it.name) }
             ?: context.getString(R.string.new_activity)
     }
+    val initialState = remember { ActivityEditState(richActivity, activityPrediction) }
 
-    var editState by rememberSaveable {
-        mutableStateOf(ActivityEditState(richActivity, activityPrediction))
-    }
-
+    var editState by rememberSaveable { mutableStateOf(initialState) }
     val scrollState = rememberScrollState()
-
     var contextMenuOpen by rememberSaveable { mutableStateOf(false) }
     var showImageViewer by rememberSaveable { mutableStateOf(false) }
 
+    val showSaveButton by remember { derivedStateOf { (richActivity == null || editState != initialState) && editState.isValid } }
     val imagePickerLauncher =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.PickVisualMedia()) { uri ->
             val actualUri = uri?.let {
@@ -200,7 +198,7 @@ fun NewActivity(
             )
         },
         floatingActionButton = {
-            AnimatedVisibility(visible = editState.isValid, enter = fadeIn(), exit = fadeOut()) {
+            AnimatedVisibility(visible = showSaveButton, enter = fadeIn(), exit = fadeOut()) {
                 ExtendedFloatingActionButton(
                     onClick = {
                         if (editState.isValid) {
@@ -367,7 +365,7 @@ fun NewActivity(
 }
 
 @Composable
-private fun RowScope.DateTimeInput(
+private fun DateTimeInput(
     dateTime: LocalDateTime,
     localizationRepository: LocalizationRepository,
     labelId: Int,
