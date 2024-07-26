@@ -21,7 +21,7 @@ composeCompiler {
 
 android {
     namespace = "com.inky.fitnesscalendar"
-    compileSdk = 34
+    compileSdk = 35
 
     androidResources {
         @Suppress("UnstableApiUsage")
@@ -30,7 +30,7 @@ android {
     defaultConfig {
         applicationId = "com.inky.fitnesscalendar"
         minSdk = 27
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
