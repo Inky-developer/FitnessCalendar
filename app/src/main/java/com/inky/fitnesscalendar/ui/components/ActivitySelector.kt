@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
@@ -81,7 +82,8 @@ fun ActivitySelector(
     modifier: Modifier = Modifier,
     background: Color = optionGroupDefaultBackground(),
     typeRows: List<List<ActivityType>> = localDatabaseValues.current.activityTypeRows,
-    onState: (ActivitySelectorState) -> Unit
+    onState: (ActivitySelectorState) -> Unit,
+    onNavigateNewPlace: (() -> Unit)? = null,
 ) {
     val vehicles = remember { Vehicle.entries.toList() }
 
@@ -99,7 +101,11 @@ fun ActivitySelector(
         }
 
         AnimatedVisibility(visible = state.activityType?.hasPlace == true && localDatabaseValues.current.places.isNotEmpty()) {
-            PlaceSelector(currentPlace = state.place, onPlace = { onState(state.copy(place = it)) })
+            PlaceSelector(
+                currentPlace = state.place,
+                onPlace = { onState(state.copy(place = it)) },
+                onNavigateNewPlace = onNavigateNewPlace
+            )
         }
 
         AnimatedVisibility(state.activityType?.hasVehicle == true) {
@@ -129,7 +135,11 @@ fun ActivitySelector(
 }
 
 @Composable
-private fun PlaceSelector(currentPlace: Place?, onPlace: (Place?) -> Unit) {
+private fun PlaceSelector(
+    currentPlace: Place?,
+    onPlace: (Place?) -> Unit,
+    onNavigateNewPlace: (() -> Unit)? = null
+) {
     val places = localDatabaseValues.current.places
     var showDialog by rememberSaveable { mutableStateOf(false) }
 
@@ -164,6 +174,12 @@ private fun PlaceSelector(currentPlace: Place?, onPlace: (Place?) -> Unit) {
                     showDialog = false
                     onPlace(null)
                 },
+            )
+        } else if (onNavigateNewPlace != null) {
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.new_place)) },
+                leadingIcon = { Icon(Icons.Outlined.Add, stringResource(R.string.new_place)) },
+                onClick = onNavigateNewPlace,
             )
         }
 

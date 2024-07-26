@@ -8,6 +8,7 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.room)
     alias(libs.plugins.ksp)
+    kotlin("plugin.serialization") version "2.0.0"
 }
 
 room {
@@ -113,6 +114,7 @@ dependencies {
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.coil.compose)
     implementation(libs.google.accompanist.permissions)
+    implementation(libs.kotlinx.serialization.json)
 
     ksp(libs.hilt.android.compiler)
     ksp(libs.androidx.room.compiler)

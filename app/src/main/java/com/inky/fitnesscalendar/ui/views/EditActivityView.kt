@@ -91,7 +91,8 @@ fun NewActivity(
     activityId: Int?,
     viewModel: NewActivityViewModel = hiltViewModel(),
     onSave: (RichActivity) -> Unit,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    onNavigateNewPlace: () -> Unit
 ) {
     val activity =
         (activityId?.let { viewModel.repository.getActivity(it) } ?: flowOf(null)).collectAsState(
@@ -105,6 +106,7 @@ fun NewActivity(
             localizationRepository = viewModel.localizationRepository,
             onSave = onSave,
             onNavigateBack = onNavigateBack,
+            onNavigateNewPlace = onNavigateNewPlace,
         )
     } else {
         CircularProgressIndicator()
@@ -117,7 +119,8 @@ fun NewActivity(
     richActivity: RichActivity?,
     localizationRepository: LocalizationRepository,
     onSave: (RichActivity) -> Unit,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    onNavigateNewPlace: () -> Unit,
 ) {
     val context = LocalContext.current
     val activityPrediction = remember { DecisionTrees.classifyNow(context) }
@@ -330,7 +333,8 @@ fun NewActivity(
                     selectedActivityType = it.activityType
                     selectedVehicle = it.vehicle
                     selectedPlace = it.place
-                }
+                },
+                onNavigateNewPlace = onNavigateNewPlace
             )
 
             AnimatedVisibility(visible = selectedActivityType?.hasFeel() == true) {

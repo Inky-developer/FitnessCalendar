@@ -184,6 +184,8 @@ class AppRepository @Inject constructor(
         dayDao.upsert(day)
     }
 
+    fun getPlace(id: Int) = placeDao.get(id)
+
     suspend fun savePlace(place: Place) = placeDao.upsert(place)
 
     suspend fun deletePlace(place: Place) = placeDao.delete(place)

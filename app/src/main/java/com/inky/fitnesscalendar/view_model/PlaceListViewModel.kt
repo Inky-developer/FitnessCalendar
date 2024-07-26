@@ -35,6 +35,8 @@ class PlaceListViewModel @Inject constructor(
         }.launchIn(viewModelScope)
     }
 
+    fun get(placeId: Int) = repository.getPlace(placeId)
+
     fun save(place: Place) = viewModelScope.launch {
         repository.savePlace(place)
     }

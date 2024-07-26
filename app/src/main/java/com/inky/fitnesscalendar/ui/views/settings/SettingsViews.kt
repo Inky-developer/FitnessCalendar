@@ -1,9 +1,26 @@
 package com.inky.fitnesscalendar.ui.views.settings
 
-enum class SettingsViews(val navId: String) {
-    Main("settings_main"),
-    Debug("settings_debug"),
-    ActivityType("settings_activity_type"),
-    PlaceList("settings_place_list"),
-    ImportExport("settings_import_export")
+import kotlinx.serialization.Serializable
+
+@Serializable
+sealed interface SettingsViews {
+    @Serializable
+    object Main
+
+    @Serializable
+    object Debug
+
+    @Serializable
+    object ActivityType
+
+    @Serializable
+    object PlaceList
+
+    @Serializable
+    data class PlaceDialog(val primitivePlaceId: Int = -1) {
+        val placeId get() = if (primitivePlaceId == -1) null else primitivePlaceId
+    }
+
+    @Serializable
+    object ImportExport
 }

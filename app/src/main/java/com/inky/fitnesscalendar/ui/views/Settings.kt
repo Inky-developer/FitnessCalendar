@@ -5,9 +5,12 @@ import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.dialog
 import androidx.navigation.navigation
+import androidx.navigation.toRoute
 import com.inky.fitnesscalendar.ui.ProvideSharedContent
 import com.inky.fitnesscalendar.ui.views.settings.ActivityTypeView
+import com.inky.fitnesscalendar.ui.views.settings.EditPlaceDialog
 import com.inky.fitnesscalendar.ui.views.settings.ImportExport
 import com.inky.fitnesscalendar.ui.views.settings.PlaceListView
 import com.inky.fitnesscalendar.ui.views.settings.SettingsDebug
@@ -18,46 +21,54 @@ import com.inky.fitnesscalendar.ui.views.settings.SettingsViews
 @OptIn(ExperimentalSharedTransitionApi::class)
 fun NavGraphBuilder.settingsDestination(
     sharedContentScope: SharedTransitionScope,
-    onNavigate: (String) -> Unit,
+    onNavigate: (Any) -> Unit,
     onOpenDrawer: () -> Unit,
     onBack: () -> Unit,
     onOpen: () -> Unit,
 ) {
-    navigation(startDestination = SettingsViews.Main.navId, route = Views.Settings.getPath()) {
-        composable(route = SettingsViews.Main.navId) {
+    navigation<Views.Settings>(startDestination = SettingsViews.Main) {
+        composable<SettingsViews.Main> {
             onOpen()
             ProvideSharedContent(sharedContentScope = sharedContentScope) {
                 SettingsView(
                     onOpenDrawer,
-                    onNavigateTypes = { onNavigate(SettingsViews.ActivityType.navId) },
-                    onNavigateDebug = { onNavigate(SettingsViews.Debug.navId) },
-                    onNavigatePlaces = { onNavigate(SettingsViews.PlaceList.navId) },
-                    onNavigateImportExport = { onNavigate(SettingsViews.ImportExport.navId) }
+                    onNavigateTypes = { onNavigate(SettingsViews.ActivityType) },
+                    onNavigateDebug = { onNavigate(SettingsViews.Debug) },
+                    onNavigatePlaces = { onNavigate(SettingsViews.PlaceList) },
+                    onNavigateImportExport = { onNavigate(SettingsViews.ImportExport) }
                 )
             }
         }
 
-        composable(
-            route = SettingsViews.Debug.navId,
+        composable<SettingsViews.Debug>(
             enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Start) },
             exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.End) }
         ) {
             SettingsDebug()
         }
 
-        composable(
-            route = SettingsViews.ActivityType.navId,
+        composable<SettingsViews.ActivityType>(
             enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Start) },
             exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.End) }
         ) {
             ActivityTypeView(onBack = onBack)
         }
 
-        composable(SettingsViews.PlaceList.navId) {
-            PlaceListView(onOpenDrawer = onOpenDrawer)
+        composable<SettingsViews.PlaceList> {
+            PlaceListView(
+                onOpenDrawer = onOpenDrawer,
+                onEditPlace = { onNavigate(SettingsViews.PlaceDialog(it?.uid ?: -1)) })
         }
 
-        composable(SettingsViews.ImportExport.navId) {
+        dialog<SettingsViews.PlaceDialog> { backStackEntry ->
+            val route: SettingsViews.PlaceDialog = backStackEntry.toRoute()
+            EditPlaceDialog(
+                initialPlaceId = route.placeId,
+                onDismiss = onBack,
+            )
+        }
+
+        composable<SettingsViews.ImportExport> {
             ImportExport(
                 onOpenDrawer = onOpenDrawer
             )

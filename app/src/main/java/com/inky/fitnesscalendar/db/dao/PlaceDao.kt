@@ -12,6 +12,9 @@ interface PlaceDao {
     @Query("SELECT * FROM place ORDER BY name")
     fun getAll(): Flow<List<Place>>
 
+    @Query("SELECT * FROM place WHERE uid = :id")
+    fun get(id: Int): Flow<Place>
+
     @Upsert
     suspend fun upsert(place: Place)
 
