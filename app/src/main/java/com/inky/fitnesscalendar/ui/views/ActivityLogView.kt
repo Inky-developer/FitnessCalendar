@@ -62,6 +62,7 @@ import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -246,6 +247,7 @@ fun ActivityLog(
                 ActivityList(
                     listState = activityListState,
                     activityListItems = activityListItems,
+                    numActivities = activities.size,
                     days = days,
                     filter = filter,
                     localizationRepository = viewModel.repository.localizationRepository,
@@ -267,6 +269,7 @@ fun ActivityLog(
 private fun ActivityList(
     listState: LazyListState,
     activityListItems: List<ActivityListItem>,
+    numActivities: Int,
     days: Map<EpochDay, Day>,
     filter: ActivityFilter,
     localizationRepository: LocalizationRepository,
@@ -277,10 +280,27 @@ private fun ActivityList(
 ) {
     val isFilterEmpty = remember(filter) { filter.isEmpty() }
 
+    LaunchedEffect(key1 = null) {
+        listState.scrollToItem(1)
+    }
+
     LazyColumn(
         state = listState,
         contentPadding = PaddingValues(bottom = 128.dp),
     ) {
+        item(contentType = -1) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                modifier = Modifier
+                    .padding(all = 8.dp)
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    pluralStringResource(R.plurals.num_activities, numActivities, numActivities),
+                    style = MaterialTheme.typography.titleMedium
+                )
+            }
+        }
         for (item in activityListItems) {
             when (item) {
                 is ActivityListItem.DateHeader -> stickyHeader(
