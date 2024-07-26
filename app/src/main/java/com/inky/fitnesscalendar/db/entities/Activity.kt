@@ -49,7 +49,7 @@ data class Activity(
     fun clean(type: ActivityType) = copy(
         placeId = if (type.hasPlace) placeId else null,
         vehicle = if (type.hasVehicle) vehicle else null,
-        endTime = if (type.hasDuration) endTime else startTime,
+        endTime = maxOf(if (type.hasDuration) endTime else startTime, startTime),
         distance = if (type.hasDistance) distance else null,
         intensity = if (type.hasIntensity) intensity else null,
     )

@@ -6,6 +6,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -168,8 +169,10 @@ fun NewActivity(
 
     var imageUri by rememberSaveable { mutableStateOf(richActivity?.activity?.imageUri) }
 
-    val formValid =
-        selectedActivityType != null && (!selectedActivityType!!.hasVehicle || selectedVehicle != null) && !isDistanceStringError
+    val formValid = selectedActivityType != null
+            && (!selectedActivityType!!.hasVehicle || selectedVehicle != null)
+            && !isDistanceStringError
+            && !endDateTime.isBefore(startDateTime)
 
     val scrollState = rememberScrollState()
 
@@ -322,6 +325,7 @@ fun NewActivity(
                         localizationRepository = localizationRepository,
                         labelId = R.string.datetime_end,
                         onDateTime = { endDateTime = it },
+                        isError = endDateTime.isBefore(startDateTime),
                         modifier = Modifier.padding(start = 8.dp)
                     )
                 }
@@ -422,7 +426,8 @@ private fun RowScope.DateTimeInput(
     localizationRepository: LocalizationRepository,
     labelId: Int,
     onDateTime: (LocalDateTime) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    isError: Boolean = false,
 ) {
     val dateTimeStr = remember(dateTime) {
         val date = dateTime.toDate()
@@ -430,6 +435,14 @@ private fun RowScope.DateTimeInput(
         val startTimeStr = localizationRepository.timeFormatter.format(date)
 
         startDateStr to startTimeStr
+    }
+    val errorColor = MaterialTheme.colorScheme.error
+    val border = remember(isError) {
+        if (isError) {
+            BorderStroke(width = 1.dp, color = errorColor)
+        } else {
+            null
+        }
     }
 
     var showPicker by rememberSaveable { mutableStateOf(false) }
@@ -440,6 +453,7 @@ private fun RowScope.DateTimeInput(
             containerColor = optionGroupDefaultBackground(),
             contentColor = contentColorFor(optionGroupDefaultBackground())
         ),
+        border = border,
         shape = MaterialTheme.shapes.small,
         modifier = modifier.weight(1f)
     ) {
