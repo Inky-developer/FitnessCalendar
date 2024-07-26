@@ -21,7 +21,7 @@ composeCompiler {
 
 android {
     namespace = "com.inky.fitnesscalendar"
-    compileSdk = 35
+    compileSdk = 34
 
     androidResources {
         @Suppress("UnstableApiUsage")
