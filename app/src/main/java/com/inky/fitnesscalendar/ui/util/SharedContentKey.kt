@@ -5,12 +5,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.inky.fitnesscalendar.ui.localSharedTransition
 
-open class SharedContentKey {
+sealed class SharedContentKey {
     data class ActivityCard(val id: Int?) : SharedContentKey()
 
-    object NewActivityFAB : SharedContentKey()
+    data object NewActivityFAB : SharedContentKey()
 
-    object AppBar : SharedContentKey()
+    data object AppBar : SharedContentKey()
 }
 
 
