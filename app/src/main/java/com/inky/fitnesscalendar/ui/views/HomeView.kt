@@ -539,7 +539,7 @@ fun RecentActivity(
         localizationRepository = localizationRepository,
         onDelete = onDelete,
         onEdit = onEdit,
-        containerColor = MaterialTheme.colorScheme.primaryContainer,
-        contentColor = contentColorFor(MaterialTheme.colorScheme.primaryContainer),
+        containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+        contentColor = contentColorFor(MaterialTheme.colorScheme.tertiaryContainer),
     )
 }
