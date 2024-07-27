@@ -40,7 +40,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -68,8 +71,10 @@ import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.db.entities.RichRecording
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivityCard
+import com.inky.fitnesscalendar.ui.components.ActivityImage
 import com.inky.fitnesscalendar.ui.components.CompactActivityCard
 import com.inky.fitnesscalendar.ui.components.FeelSelector
+import com.inky.fitnesscalendar.ui.components.ImageViewer
 import com.inky.fitnesscalendar.ui.components.NewActivityFAB
 import com.inky.fitnesscalendar.ui.components.Timer
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
@@ -358,6 +363,8 @@ fun Today(
     onEditDay: (EpochDay) -> Unit,
     onNavigateActivity: () -> Unit,
 ) {
+    var showImageViewer by rememberSaveable { mutableStateOf(false) }
+
     Card(
         onClick = onNavigateActivity,
         colors = CardDefaults.cardColors(
@@ -391,6 +398,15 @@ fun Today(
                 modifier = Modifier.padding(horizontal = 4.dp)
             ) {
                 Icon(Icons.Outlined.Edit, stringResource(R.string.edit_day))
+            }
+        }
+
+        AnimatedContent(
+            targetState = day.imageUri,
+            label = stringResource(R.string.image)
+        ) { imageUri ->
+            if (imageUri != null) {
+                ActivityImage(uri = imageUri, onClick = { showImageViewer = true })
             }
         }
 
@@ -456,6 +472,10 @@ fun Today(
                 }
             }
         }
+    }
+
+    if (showImageViewer && day.imageUri != null) {
+        ImageViewer(imageUri = day.imageUri, onDismiss = { showImageViewer = false })
     }
 }
 

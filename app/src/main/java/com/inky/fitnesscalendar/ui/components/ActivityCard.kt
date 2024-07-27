@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
@@ -34,18 +33,15 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import coil.compose.AsyncImage
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.db.entities.Activity
@@ -71,7 +67,7 @@ fun ActivityCard(
     val place = richActivity.place
 
     var showContextMenu by rememberSaveable { mutableStateOf(false) }
-    var showImageView by rememberSaveable { mutableStateOf(false) }
+    var showImageViewer by rememberSaveable { mutableStateOf(false) }
 
     val title = remember(activityType) { "${activityType.emoji} ${activityType.name}" }
     val time = remember(activity) {
@@ -211,18 +207,9 @@ fun ActivityCard(
 
         if (activity.imageUri != null) {
             HorizontalDivider()
-            AsyncImage(
-                model = activity.imageUri,
-                contentDescription = stringResource(id = R.string.user_uploaded_image),
-                contentScale = ContentScale.FillWidth,
-                modifier = Modifier
-                    .padding(all = 8.dp)
-                    .fillMaxWidth()
-                    .heightIn(max = 256.dp)
-                    .clip(MaterialTheme.shapes.large)
-                    .clickable {
-                        showImageView = true
-                    }
+            ActivityImage(
+                uri = activity.imageUri,
+                onClick = { showImageViewer = true }
             )
         }
     }
@@ -249,8 +236,8 @@ fun ActivityCard(
         )
     }
 
-    if (showImageView && activity.imageUri != null) {
-        ImageViewer(imageUri = activity.imageUri, onDismiss = { showImageView = false })
+    if (showImageViewer && activity.imageUri != null) {
+        ImageViewer(imageUri = activity.imageUri, onDismiss = { showImageViewer = false })
     }
 }
 

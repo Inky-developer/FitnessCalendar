@@ -2,21 +2,16 @@ package com.inky.fitnesscalendar.ui.views
 
 import android.net.Uri
 import android.os.Parcelable
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -29,7 +24,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
@@ -56,17 +50,13 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.Feel
@@ -76,15 +66,16 @@ import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.di.DecisionTrees
 import com.inky.fitnesscalendar.localization.LocalizationRepository
+import com.inky.fitnesscalendar.ui.components.ActivityImage
 import com.inky.fitnesscalendar.ui.components.ActivitySelector
 import com.inky.fitnesscalendar.ui.components.ActivitySelectorState
 import com.inky.fitnesscalendar.ui.components.DateTimePicker
 import com.inky.fitnesscalendar.ui.components.FeelSelector
 import com.inky.fitnesscalendar.ui.components.ImageViewer
 import com.inky.fitnesscalendar.ui.components.OptionGroup
+import com.inky.fitnesscalendar.ui.components.SelectImageDropdownMenuItem
 import com.inky.fitnesscalendar.ui.components.optionGroupDefaultBackground
-import com.inky.fitnesscalendar.util.copyFileToStorage
-import com.inky.fitnesscalendar.util.getOrCreateActivityImagesDir
+import com.inky.fitnesscalendar.ui.components.rememberImagePickerLauncher
 import com.inky.fitnesscalendar.util.toDate
 import com.inky.fitnesscalendar.util.toLocalDateTime
 import com.inky.fitnesscalendar.view_model.NewActivityViewModel
@@ -145,15 +136,9 @@ fun NewActivity(
     var showImageViewer by rememberSaveable { mutableStateOf(false) }
 
     val showSaveButton by remember { derivedStateOf { (richActivity == null || editState != initialState) && editState.isValid } }
-    val imagePickerLauncher =
-        rememberLauncherForActivityResult(contract = ActivityResultContracts.PickVisualMedia()) { uri ->
-            val actualUri = uri?.let {
-                context.copyFileToStorage(it, context.getOrCreateActivityImagesDir())
-            }
-            if (actualUri != null) {
-                editState = editState.copy(imageUri = actualUri)
-            }
-        }
+    val imagePickerLauncher = rememberImagePickerLauncher(onUri = {
+        editState = editState.copy(imageUri = it)
+    })
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val topAppBarColors = TopAppBarDefaults.topAppBarColors(
@@ -179,20 +164,9 @@ fun NewActivity(
                     DropdownMenu(
                         expanded = contextMenuOpen,
                         onDismissRequest = { contextMenuOpen = false }) {
-                        DropdownMenuItem(
-                            text = { Text(stringResource(R.string.add_image)) },
-                            leadingIcon = {
-                                Icon(
-                                    painterResource(R.drawable.outline_add_image_24),
-                                    stringResource(R.string.add_image)
-                                )
-                            },
-                            onClick = {
-                                contextMenuOpen = false
-                                imagePickerLauncher.launch(
-                                    PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
-                                )
-                            }
+                        SelectImageDropdownMenuItem(
+                            imagePickerLauncher = imagePickerLauncher,
+                            onDismissMenu = { contextMenuOpen = false },
                         )
                     }
                 }
@@ -229,23 +203,16 @@ fun NewActivity(
         ) {
             val imageUri = editState.imageUri
             if (imageUri != null) {
-                AsyncImage(
-                    model = imageUri,
-                    contentDescription = stringResource(R.string.user_uploaded_image),
+                ActivityImage(
+                    uri = imageUri,
                     onState = { state ->
                         if (state is AsyncImagePainter.State.Error) {
                             editState = editState.copy(imageUri = richActivity?.activity?.imageUri)
                         }
                     },
-                    contentScale = ContentScale.FillWidth,
-                    modifier = Modifier
-                        .padding(vertical = 4.dp)
-                        .fillMaxWidth()
-                        .heightIn(max = 256.dp)
-                        .clip(MaterialTheme.shapes.large)
-                        .clickable {
-                            showImageViewer = true
-                        }
+                    onClick = {
+                        showImageViewer = true
+                    }
                 )
             }
 
