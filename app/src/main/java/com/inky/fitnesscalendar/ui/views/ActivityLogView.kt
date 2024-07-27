@@ -99,7 +99,7 @@ fun ActivityLog(
     val scope = rememberCoroutineScope()
 
     val activityListState by viewModel.activityListState
-    val isAtTopOfList by remember { derivedStateOf { activityListState.firstVisibleItemIndex == 0 } }
+    val isAtTopOfList by remember { derivedStateOf { activityListState.firstVisibleItemIndex <= 1 } }
 
     LaunchedEffect(filter) {
         viewModel.setFilter(filter)
@@ -124,11 +124,11 @@ fun ActivityLog(
                     .firstOrNull { (_, item) -> item is ActivityListItem.Activity && item.richActivity.activity.uid == scrollToId }
                     ?.index
             if (index != null) {
-                activityListState.animateScrollToItem(index)
+                activityListState.animateScrollToItem(index + 1)
                 scrollToId = null
             }
         } else if (activities.firstOrNull()?.activity?.uid != latestActivity?.uid) {
-            activityListState.animateScrollToItem(0)
+            activityListState.animateScrollToItem(1)
         }
         latestActivity = activities.firstOrNull()?.activity
     }
@@ -185,7 +185,7 @@ fun ActivityLog(
                 ) {
                     SmallFloatingActionButton(onClick = {
                         scope.launch {
-                            activityListState.animateScrollToItem(0)
+                            activityListState.animateScrollToItem(1)
                             scrollBehavior.state.contentOffset = 0f
                             scrollBehavior.state.heightOffset = 0f
                         }
