@@ -15,5 +15,9 @@ data class RichActivity(
         assert(activity.placeId == place?.uid) { "Inconsistent RichActivity: place is $place, but id is ${activity.placeId}" }
     }
 
-    fun clean() = copy(type = type, place = place, activity = activity.clean(type))
+    fun clean() = copy(
+        type = type,
+        place = if (type.hasPlace) place else null,
+        activity = activity.clean(type)
+    )
 }
