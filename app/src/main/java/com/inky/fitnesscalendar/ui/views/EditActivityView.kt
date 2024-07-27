@@ -5,6 +5,7 @@ import android.os.Parcelable
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -248,32 +249,40 @@ fun NewActivity(
                 )
             }
 
-            Row(
-                modifier = Modifier
-                    .padding(vertical = 4.dp)
-                    .fillMaxWidth()
-            ) {
-                DateTimeInput(
-                    dateTime = editState.startDateTime,
-                    localizationRepository = localizationRepository,
-                    labelId = R.string.datetime_start,
-                    onDateTime = { editState = editState.copy(startDateTime = it) },
-                    modifier = Modifier.weight(1f)
-                )
-
-                AnimatedVisibility(
-                    visible = editState.activitySelectorState.activityType?.hasDuration == true,
+            AnimatedContent(
+                targetState = editState.activitySelectorState.activityType?.hasDuration == true,
+                label = stringResource(R.string.select_date)
+            ) { hasDuration ->
+                Row(
                     modifier = Modifier
-                        .padding(start = 8.dp)
-                        .weight(1f)
+                        .padding(vertical = 4.dp)
+                        .fillMaxWidth()
                 ) {
+                    val dateLabelId = if (hasDuration) {
+                        R.string.datetime_start
+                    } else {
+                        R.string.datetime_date
+                    }
                     DateTimeInput(
-                        dateTime = editState.endDateTime,
+                        dateTime = editState.startDateTime,
                         localizationRepository = localizationRepository,
-                        labelId = R.string.datetime_end,
-                        onDateTime = { editState = editState.copy(endDateTime = it) },
-                        isError = editState.isEndDateTimeError,
+                        labelId = dateLabelId,
+                        onDateTime = { editState = editState.copy(startDateTime = it) },
+                        modifier = Modifier.weight(1f)
                     )
+
+                    if (hasDuration) {
+                        DateTimeInput(
+                            dateTime = editState.endDateTime,
+                            localizationRepository = localizationRepository,
+                            labelId = R.string.datetime_end,
+                            onDateTime = { editState = editState.copy(endDateTime = it) },
+                            isError = editState.isEndDateTimeError,
+                            modifier = Modifier
+                                .padding(start = 8.dp)
+                                .weight(1f)
+                        )
+                    }
                 }
             }
 

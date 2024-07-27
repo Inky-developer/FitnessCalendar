@@ -9,6 +9,7 @@
     <string name="activity_cycling">Fahrrad Fahren</string>
     <string name="activity_running">Laufen</string>
     <string name="back">Zurück</string>
+    <string name="datetime_date">Datum: %1$s %2$s</string>
     <string name="datetime_start">Start: %1$s %2$s</string>
     <string name="datetime_end">Ende: %1$s %2$s</string>
     <string name="edit_object">%1$s bearbeiten</string>
