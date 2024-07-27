@@ -454,7 +454,7 @@ private data class ActivityEditState(
         startDateTime = activity?.activity?.startTime?.toLocalDateTime() ?: now,
         endDateTime = activity?.activity?.endTime?.toLocalDateTime() ?: now.plusHours(1),
         description = activity?.activity?.description ?: "",
-        distanceString = activity?.activity?.distance?.toString() ?: "",
+        distanceString = activity?.activity?.distance?.kilometers?.toString() ?: "",
         intensity = activity?.activity?.intensity,
         feel = activity?.activity?.feel,
         imageUri = activity?.activity?.imageUri
