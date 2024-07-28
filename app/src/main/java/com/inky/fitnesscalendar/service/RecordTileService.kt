@@ -1,8 +1,11 @@
 package com.inky.fitnesscalendar.service
 
 import android.app.Dialog
+import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
+import android.os.IBinder
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
 import androidx.compose.foundation.background
@@ -48,6 +51,12 @@ class RecordTileService : TileService() {
         showDialog(
             TileServiceDialog(this, repository, onStartRecording = { startRecording(it) })
         )
+    }
+
+    override fun onBind(intent: Intent?): IBinder? {
+        // Make sure that `onStartListening` gets called when e.g. the system reboots
+        requestListeningState(this, ComponentName(this, RecordTileService::class.java))
+        return super.onBind(intent)
     }
 
     override fun onStartListening() {
