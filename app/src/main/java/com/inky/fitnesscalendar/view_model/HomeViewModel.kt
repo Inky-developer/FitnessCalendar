@@ -32,7 +32,7 @@ class HomeViewModel @Inject constructor(
 ) : BaseViewModel(context, repository) {
     val weekStats = loadWeekStats()
     val monthStats = loadMonthStats()
-    val activitiesToday = repository.getActivities(ActivityFilter(range = DateRangeOption.Today))
+    val activitiesToday = repository.getActivities(ActivityFilter(range = DateRangeOption.today()))
 
     private val _today = MutableStateFlow(Day(day = EpochDay.today()))
     val today: StateFlow<Day> = _today.asStateFlow()
@@ -67,14 +67,14 @@ class HomeViewModel @Inject constructor(
     }
 
     private fun loadWeekStats(): Flow<ActivityStatistics> {
-        val filter = ActivityFilter(range = DateRangeOption.SevenDays)
+        val filter = ActivityFilter(range = DateRangeOption.sevenDays())
         return repository.getActivities(filter).map { activities ->
             ActivityStatistics(activities)
         }
     }
 
     private fun loadMonthStats(): Flow<ActivityStatistics> {
-        val filter = ActivityFilter(range = DateRangeOption.FourWeeks)
+        val filter = ActivityFilter(range = DateRangeOption.fourWeeks())
         return repository.getActivities(filter).map { activities ->
             ActivityStatistics(activities)
         }

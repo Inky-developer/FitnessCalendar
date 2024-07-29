@@ -25,7 +25,9 @@ sealed class ActivityFilterChip {
         is TextFilterChip -> FilterHistoryItem(type = FilterHistoryItem.ItemType.Text, text = text)
         is DateFilterChip -> FilterHistoryItem(
             type = FilterHistoryItem.ItemType.Date,
-            dateRangeOption = option
+            dateRangeStart = option.range.start,
+            dateRangeEnd = option.range.end,
+            dateRangeName = option.name
         )
 
         is CategoryFilterChip -> FilterHistoryItem(
@@ -80,7 +82,7 @@ sealed class ActivityFilterChip {
     fun displayText(context: Context) = when (this) {
         is AttributeFilterChip -> attribute.getString(context, state)
         is CategoryFilterChip -> context.getString(category.nameId)
-        is DateFilterChip -> context.getString(option.nameId)
+        is DateFilterChip -> option.getText(context)
         is TextFilterChip -> text
         is TypeFilterChip -> type.name
         is PlaceFilterChip -> place.name
@@ -91,7 +93,13 @@ sealed class ActivityFilterChip {
             return when (item.type) {
                 FilterHistoryItem.ItemType.Text -> TextFilterChip(text = item.text ?: return null)
                 FilterHistoryItem.ItemType.Date -> DateFilterChip(
-                    option = item.dateRangeOption ?: return null
+                    option = DateRangeOption(
+                        range = DateRange(
+                            start = item.dateRangeStart ?: return null,
+                            end = item.dateRangeEnd
+                        ),
+                        name = item.dateRangeName
+                    )
                 )
 
                 FilterHistoryItem.ItemType.Category -> CategoryFilterChip(

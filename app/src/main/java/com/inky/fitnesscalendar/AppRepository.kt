@@ -67,8 +67,6 @@ class AppRepository @Inject constructor(
 
         val categories = filter.categories.map { it.toString() }
 
-        val rangeDate = filter.range?.getDateRange()
-
         val hasDescription = filter.attributes.description.toBooleanOrNull()
         val hasFeel = filter.attributes.feel.toBooleanOrNull()
         val hasImage = filter.attributes.image.toBooleanOrNull()
@@ -83,8 +81,8 @@ class AppRepository @Inject constructor(
             isPlacesEmpty = filter.places.isEmpty(),
             search = filter.text?.let { "%$it%" },
             searchVehicles = searchVehicles,
-            start = rangeDate?.start,
-            end = rangeDate?.end,
+            start = filter.range?.range?.start,
+            end = filter.range?.range?.end,
             hasDescription = hasDescription,
             hasFeel = hasFeel,
             hasImage = hasImage,

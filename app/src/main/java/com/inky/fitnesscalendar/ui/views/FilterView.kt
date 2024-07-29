@@ -187,24 +187,24 @@ fun FilterView(
 
             OptionGroup(
                 label = stringResource(R.string.filter_by_date),
-                selectionLabel = filter.range?.nameId?.let { stringResource(it) },
+                selectionLabel = filter.range?.getText(context),
                 modifier = Modifier.padding(all = 8.dp)
             ) {
                 LazyRow {
-                    items(dateRangeOptions) { range ->
+                    items(DateRangeKind.entries) { range ->
                         FilterChip(
-                            selected = filter.range == range,
+                            selected = filter.range?.name == range.rangeName,
                             onClick = {
-                                val newRange = if (filter.range == range) {
+                                val newRange = if (filter.range?.name == range.rangeName) {
                                     null
                                 } else {
-                                    range
+                                    range.toOption()
                                 }
                                 filter = filter.copy(range = newRange)
                             },
                             label = {
                                 Text(
-                                    stringResource(range.nameId),
+                                    range.toOption().getText(context),
                                     style = MaterialTheme.typography.titleMedium
                                 )
                             },
@@ -278,13 +278,20 @@ private fun PlacesSelector(isSelected: (Place) -> Boolean, onSelect: (Place) -> 
     }
 }
 
-private val dateRangeOptions by lazy {
-    listOf(
-        DateRangeOption.SevenDays,
-        DateRangeOption.LastWeek,
-        DateRangeOption.ThirtyDays,
-        DateRangeOption.LastMonth,
-        DateRangeOption.Year,
-        DateRangeOption.LastYear
-    )
+private enum class DateRangeKind(val rangeName: DateRangeOption.DateRangeName) {
+    SevenDays(DateRangeOption.DateRangeName.SevenDays),
+    LastWeek(DateRangeOption.DateRangeName.LastWeek),
+    ThirtyDays(DateRangeOption.DateRangeName.ThirtyDays),
+    LastMonth(DateRangeOption.DateRangeName.LastMonth),
+    Year(DateRangeOption.DateRangeName.Year),
+    LastYear(DateRangeOption.DateRangeName.LastYear);
+
+    fun toOption() = when (this) {
+        SevenDays -> DateRangeOption.sevenDays()
+        LastWeek -> DateRangeOption.lastWeek()
+        ThirtyDays -> DateRangeOption.thirtyDays()
+        LastMonth -> DateRangeOption.lastMonth()
+        Year -> DateRangeOption.year()
+        LastYear -> DateRangeOption.lastYear()
+    }
 }

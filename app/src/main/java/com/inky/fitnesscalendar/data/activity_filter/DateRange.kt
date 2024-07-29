@@ -1,7 +1,11 @@
 package com.inky.fitnesscalendar.data.activity_filter
 
+import android.os.Parcelable
+import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.util.DAY_START_OFFSET_HOURS
 import com.inky.fitnesscalendar.util.toDate
+import com.inky.fitnesscalendar.util.toLocalDate
+import kotlinx.parcelize.Parcelize
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -9,7 +13,15 @@ import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import java.util.Date
 
-data class DateRange(val start: Date, val end: Date?) {
+@Parcelize
+data class DateRange(val start: Date, val end: Date?) : Parcelable {
+    fun getText(): String {
+        val startDateString = start.toLocalDate().format(LocalizationRepository.localDateFormatter)
+        val endDateString =
+            end?.toLocalDate()?.format(LocalizationRepository.localDateFormatter) ?: ""
+        return "$startDateString - $endDateString"
+    }
+
     companion object {
         // Let days start at 2 am
         fun atDay(offsetDays: Long): DateRange {

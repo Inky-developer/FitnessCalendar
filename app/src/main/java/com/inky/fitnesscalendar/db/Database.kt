@@ -22,7 +22,7 @@ import com.inky.fitnesscalendar.db.entities.Recording
 import com.inky.fitnesscalendar.util.DATABASE_NAME
 
 @Database(
-    version = 17,
+    version = 18,
     entities = [Activity::class, Recording::class, ActivityType::class, FilterHistoryItem::class, Day::class, Place::class],
     autoMigrations = [
         AutoMigration(from = 2, to = 3),
@@ -70,7 +70,8 @@ abstract class AppDatabase : RoomDatabase() {
                     MIGRATION_7_8,
                     MIGRATION_8_9,
                     MIGRATION_9_10,
-                    MIGRATION_12_13
+                    MIGRATION_12_13,
+                    MIGRATION_17_18,
                 )
                 .addCallback(object : Callback() {
                     override fun onCreate(db: SupportSQLiteDatabase) {

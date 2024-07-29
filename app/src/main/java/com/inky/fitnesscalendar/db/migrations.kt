@@ -203,3 +203,13 @@ val MIGRATION_12_13 = object : Migration(12, 13) {
         db.execSQL("CREATE INDEX IF NOT EXISTS `index_Activity_place_id` ON `Activity` (`place_id`)")
     }
 }
+
+val MIGRATION_17_18 = object : Migration(17, 18) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("DROP TABLE FilterHistoryItem")
+        db.execSQL("CREATE TABLE IF NOT EXISTS FilterHistoryItem (`uid` INTEGER, `type` TEXT NOT NULL, `text` TEXT, `date_range_start` INTEGER, `date_range_end` INTEGER, `date_range_name` TEXT, `category` TEXT, `type_id` INTEGER, `place_id` INTEGER, `attribute` TEXT, `attribute_state` INTEGER, `last_updated` INTEGER NOT NULL, PRIMARY KEY(`uid`), FOREIGN KEY(`type_id`) REFERENCES `ActivityType`(`uid`) ON UPDATE NO ACTION ON DELETE CASCADE , FOREIGN KEY(`place_id`) REFERENCES `Place`(`uid`) ON UPDATE NO ACTION ON DELETE CASCADE )")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_FilterHistoryItem_last_updated` ON `FilterHistoryItem` (`last_updated`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_FilterHistoryItem_type_id` ON `FilterHistoryItem` (`type_id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_FilterHistoryItem_place_id` ON `FilterHistoryItem` (`place_id`)")
+    }
+}
