@@ -1,10 +1,6 @@
 package com.inky.fitnesscalendar.ui.views
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.FastOutLinearInEasing
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -58,7 +54,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -78,6 +73,7 @@ import com.inky.fitnesscalendar.ui.components.ActivityCard
 import com.inky.fitnesscalendar.ui.components.NewActivityFAB
 import com.inky.fitnesscalendar.ui.components.PlaceIcon
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
+import com.inky.fitnesscalendar.ui.util.getAppBarContainerColor
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.ui.util.sharedElement
 import com.inky.fitnesscalendar.view_model.ActivityLogViewModel
@@ -138,21 +134,8 @@ fun ActivityLog(
         scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,
         titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
     )
-
-    val fraction by remember {
-        derivedStateOf {
-            val colorTransitionFraction = scrollBehavior.state.overlappedFraction
-            if (colorTransitionFraction > 0.01f) 1f else 0f
-        }
-    }
-    val appBarContainerColor by animateColorAsState(
-        targetValue = lerp(
-            topAppBarColors.containerColor,
-            topAppBarColors.scrolledContainerColor,
-            FastOutLinearInEasing.transform(fraction)
-        ),
-        animationSpec = spring(stiffness = Spring.StiffnessMediumLow)
-    )
+    val appBarContainerColor =
+        getAppBarContainerColor(scrollBehavior = scrollBehavior, topAppBarColors = topAppBarColors)
 
     Scaffold(
         topBar = {

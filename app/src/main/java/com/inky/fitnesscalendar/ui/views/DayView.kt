@@ -1,12 +1,16 @@
 package com.inky.fitnesscalendar.ui.views
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.foundation.ScrollState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
@@ -52,6 +56,7 @@ import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivityCard
 import com.inky.fitnesscalendar.ui.components.ActivityImage
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
+import com.inky.fitnesscalendar.ui.util.getAppBarContainerColor
 import com.inky.fitnesscalendar.ui.util.horizontalOrderedTransitionSpec
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.util.toDate
@@ -76,6 +81,15 @@ fun DayView(
         initialSelectedDateMillis = epochDay.toLocalDate().atStartOfDay()
             .toDate(ZoneId.of("UTC")).time
     )
+    val scrollState = rememberScrollState()
+
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    val topAppBarColors = TopAppBarDefaults.topAppBarColors(
+        scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,
+        titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+    )
+    val appBarContainerColor =
+        getAppBarContainerColor(scrollBehavior = scrollBehavior, topAppBarColors = topAppBarColors)
 
     if (showDatePicker) {
         DatePickerDialog(
@@ -100,7 +114,6 @@ fun DayView(
         }
     }
 
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -110,10 +123,7 @@ fun DayView(
                     }
                     Text(todayString)
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                ),
+                colors = topAppBarColors,
                 navigationIcon = {
                     IconButton(onClick = onOpenDrawer) {
                         Icon(
@@ -141,7 +151,8 @@ fun DayView(
             PrevAndNextDaySelector(
                 day = epochDay,
                 onNext = { epochDay = EpochDay(epochDay.day + 1) },
-                onPrev = { epochDay = EpochDay(epochDay.day - 1) }
+                onPrev = { epochDay = EpochDay(epochDay.day - 1) },
+                modifier = Modifier.background(appBarContainerColor)
             )
             AnimatedContent(
                 targetState = epochDay,
@@ -158,6 +169,7 @@ fun DayView(
                     DayViewInner(
                         day = day!!,
                         activities = activities!!,
+                        scrollState = scrollState,
                         localizationRepository = viewModel.repository.localizationRepository,
                         onDeleteActivity = { viewModel.deleteActivity(it) },
                         onEditActivity = onEditActivity,
@@ -185,6 +197,7 @@ fun DayView(
 fun DayViewInner(
     day: Day,
     activities: List<RichActivity>,
+    scrollState: ScrollState,
     localizationRepository: LocalizationRepository,
     onDeleteActivity: (RichActivity) -> Unit,
     onEditActivity: (RichActivity) -> Unit,
@@ -192,7 +205,7 @@ fun DayViewInner(
 ) {
     var showImageViewer by rememberSaveable { mutableStateOf(false) }
 
-    Column(modifier = Modifier.padding(vertical = 8.dp)) {
+    Column(modifier = Modifier.verticalScroll(scrollState)) {
         AnimatedContent(
             targetState = day.imageUri,
             label = stringResource(R.string.image)
@@ -276,13 +289,18 @@ fun DayViewInner(
 }
 
 @Composable
-fun PrevAndNextDaySelector(day: EpochDay, onPrev: () -> Unit, onNext: () -> Unit) {
+fun PrevAndNextDaySelector(
+    day: EpochDay,
+    onPrev: () -> Unit,
+    onNext: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     val today = remember { EpochDay.today() }
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
+        modifier = modifier
             .padding(horizontal = 8.dp)
-            .fillMaxWidth(),
+            .fillMaxWidth()
     ) {
         Button(
             onClick = onPrev, enabled = day.day > 0, modifier = Modifier
