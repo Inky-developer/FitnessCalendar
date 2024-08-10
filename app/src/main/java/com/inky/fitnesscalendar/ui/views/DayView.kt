@@ -228,7 +228,7 @@ fun DayViewInner(
             onClick = onEditDay,
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
             modifier = Modifier
-                .padding(horizontal = 8.dp)
+                .padding(start = 8.dp, end = 8.dp, bottom = 4.dp)
                 .fillMaxWidth()
         ) {
             AnimatedContent(

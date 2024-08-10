@@ -83,7 +83,7 @@ fun ActivityCard(
         colors = CardDefaults.cardColors(containerColor = containerColor),
         modifier = modifier
             .fillMaxWidth()
-            .padding(all = 8.dp)
+            .padding(horizontal = 8.dp, vertical = 4.dp)
             .combinedClickable(
                 onClick = { onEdit(activity) },
                 onLongClick = {

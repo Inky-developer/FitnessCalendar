@@ -284,17 +284,19 @@ private fun ActivityList(
                 )
             }
         }
-        for (item in activityListItems) {
+        for ((index, item) in activityListItems.withIndex()) {
             when (item) {
                 is ActivityListItem.DateHeader -> stickyHeader(
                     key = item.date,
                     contentType = item.contentType
                 ) {
                     val feel = days[EpochDay(item.date.toEpochDay())]?.feel
+                    val paddingTop = if (index == 0) 0.dp else 4.dp
                     Row(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
+                            .padding(top = paddingTop, bottom = 4.dp)
                             .background(MaterialTheme.colorScheme.primary)
                             .padding(horizontal = 8.dp)
                             .fillMaxWidth()
