@@ -24,9 +24,9 @@ data class DateRangeOption(val range: DateRange, val name: DateRangeName? = null
     }
 
     companion object {
-        fun today() = DateRangeOption(range = DateRange.atDay(0), name = DateRangeName.Today)
+        fun today() = DateRangeOption(range = DateRange.atRelativeDay(0), name = DateRangeName.Today)
         fun yesterday() =
-            DateRangeOption(range = DateRange.atDay(-1), name = DateRangeName.Yesterday)
+            DateRangeOption(range = DateRange.atRelativeDay(-1), name = DateRangeName.Yesterday)
 
         fun sevenDays() =
             DateRangeOption(range = DateRange.lastDays(7), name = DateRangeName.SevenDays)

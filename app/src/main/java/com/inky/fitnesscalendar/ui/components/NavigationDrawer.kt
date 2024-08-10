@@ -32,6 +32,7 @@ import com.inky.fitnesscalendar.ui.views.Views
 
 val selectableViews = listOf(
     Views.Home,
+    Views.DayView(),
     Views.ActivityLog(),
     Views.Statistics(),
     Views.Settings

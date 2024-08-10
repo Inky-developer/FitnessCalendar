@@ -1,14 +1,15 @@
 package com.inky.fitnesscalendar.data.activity_filter
 
 import android.os.Parcelable
+import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.util.DAY_START_OFFSET_HOURS
 import com.inky.fitnesscalendar.util.toDate
 import com.inky.fitnesscalendar.util.toLocalDate
 import kotlinx.parcelize.Parcelize
 import java.time.Instant
+import java.time.LocalDate
 import java.time.LocalDateTime
-import java.time.LocalTime
 import java.time.ZoneId
 import java.time.temporal.ChronoUnit
 import java.util.Date
@@ -24,16 +25,22 @@ data class DateRange(val start: Date, val end: Date?) : Parcelable {
 
     companion object {
         // Let days start at 2 am
-        fun atDay(offsetDays: Long): DateRange {
+        fun atRelativeDay(offsetDays: Long): DateRange {
             val day =
                 LocalDateTime.ofInstant(Instant.now(), ZoneId.systemDefault()).plusDays(offsetDays)
-                    .minusHours(DAY_START_OFFSET_HOURS)
-            val startOfToday = day.with(LocalTime.MIN).plusHours(DAY_START_OFFSET_HOURS)
-            val endOfToday = day.with(LocalTime.MAX).plusHours(DAY_START_OFFSET_HOURS)
+                    .minusHours(DAY_START_OFFSET_HOURS).toLocalDate()
+            return atDay(day)
+        }
+
+        fun atDay(day: EpochDay) = atDay(day.toLocalDate())
+
+        private fun atDay(day: LocalDate): DateRange {
+            val startOfDay = day.atStartOfDay().plusHours(DAY_START_OFFSET_HOURS)
+            val endOfDay = day.plusDays(1).atStartOfDay().plusHours(DAY_START_OFFSET_HOURS)
 
             return DateRange(
-                start = startOfToday.toDate(),
-                end = if (offsetDays == 0L) null else endOfToday.toDate()
+                start = startOfDay.toDate(),
+                end = endOfDay.toDate()
             )
         }
 

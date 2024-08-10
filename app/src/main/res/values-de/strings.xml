@@ -196,4 +196,6 @@
     <string name="undo">Rückgängig machen</string>
     <string name="recent_activity">Kürzliche Aktivität</string>
     <string name="no_place">Kein Ort</string>
+    <string name="no_notes_for_day">Keine Notizen für diesen Tag</string>
+    <string name="no_activities_on_day">Keine Aktivitäten an diesem Tag</string>
 </resources>

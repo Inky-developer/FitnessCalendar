@@ -9,6 +9,8 @@ import com.inky.fitnesscalendar.data.Vehicle
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilterChip
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilterChip.Companion.toActivityFilterChip
+import com.inky.fitnesscalendar.data.activity_filter.DateRange
+import com.inky.fitnesscalendar.data.activity_filter.DateRangeOption
 import com.inky.fitnesscalendar.db.AppDatabase
 import com.inky.fitnesscalendar.db.dao.ActivityDao
 import com.inky.fitnesscalendar.db.dao.ActivityTypeDao
@@ -177,6 +179,9 @@ class AppRepository @Inject constructor(
     fun getDays() = dayDao.getDays()
 
     fun getDay(day: EpochDay): Flow<Day> = dayDao.get(day).map { it ?: Day(day = day) }
+
+    fun getDayActivities(day: EpochDay) =
+        getActivities(ActivityFilter(range = DateRangeOption(DateRange.atDay(day))))
 
     suspend fun saveDay(day: Day) {
         dayDao.upsert(day)

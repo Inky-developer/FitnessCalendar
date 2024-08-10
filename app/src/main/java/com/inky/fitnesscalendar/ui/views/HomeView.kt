@@ -95,7 +95,7 @@ fun Home(
     onEditActivity: (Activity) -> Unit,
     onEditDay: (EpochDay) -> Unit,
     onRecordActivity: () -> Unit,
-    onNavigateActivity: () -> Unit,
+    onNavigateToday: () -> Unit,
     onNavigateStats: (Period) -> Unit,
     onOpenDrawer: () -> Unit
 ) {
@@ -186,12 +186,12 @@ fun Home(
                 onEdit = onEditActivity,
             )
             Today(
-                typeActivities = activitiesToday ?: emptyList(),
+                richActivities = activitiesToday ?: emptyList(),
                 day = day,
                 localizationRepository = viewModel.repository.localizationRepository,
                 onDay = { viewModel.updateDay(it) },
                 onEditDay = onEditDay,
-                onNavigateActivity = onNavigateActivity,
+                onNavigateToday = onNavigateToday
             )
             StatisticsIfNotNull(
                 stringResource(R.string.last_seven_days),
@@ -356,17 +356,17 @@ fun Statistics(name: String, stats: ActivityStatistics, onClick: () -> Unit) {
 
 @Composable
 fun Today(
-    typeActivities: List<RichActivity>,
+    richActivities: List<RichActivity>,
     day: Day,
     localizationRepository: LocalizationRepository,
     onDay: (Day) -> Unit,
     onEditDay: (EpochDay) -> Unit,
-    onNavigateActivity: () -> Unit,
+    onNavigateToday: () -> Unit,
 ) {
     var showImageViewer by rememberSaveable { mutableStateOf(false) }
 
     Card(
-        onClick = onNavigateActivity,
+        onClick = onNavigateToday,
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.secondaryContainer,
         ),
@@ -430,7 +430,7 @@ fun Today(
         }
 
         AnimatedContent(
-            targetState = typeActivities.isEmpty(),
+            targetState = richActivities.isEmpty(),
             label = "ActivitiesToday"
         ) { noActivities ->
             when (noActivities) {
@@ -457,13 +457,13 @@ fun Today(
 
                 false -> {
                     Column {
-                        for (typeActivity in typeActivities) {
+                        for (richActivity in richActivities) {
                             CompactActivityCard(
-                                richActivity = typeActivity,
+                                richActivity = richActivity,
                                 localizationRepository = localizationRepository,
                                 modifier = Modifier.sharedElement(
                                     SharedContentKey.ActivityCard(
-                                        typeActivity.activity.uid
+                                        richActivity.activity.uid
                                     )
                                 )
                             )

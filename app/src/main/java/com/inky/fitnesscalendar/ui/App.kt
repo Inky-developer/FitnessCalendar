@@ -27,6 +27,7 @@ import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.ui.components.NavigationDrawer
 import com.inky.fitnesscalendar.ui.util.ProvideDatabaseValues
 import com.inky.fitnesscalendar.ui.views.ActivityLog
+import com.inky.fitnesscalendar.ui.views.DayView
 import com.inky.fitnesscalendar.ui.views.EditDayDialog
 import com.inky.fitnesscalendar.ui.views.FilterView
 import com.inky.fitnesscalendar.ui.views.Home
@@ -112,9 +113,7 @@ private fun AppNavigation(
                             navController.navigate(Views.EditDay(it.day))
                         },
                         onRecordActivity = { navController.navigate(Views.RecordActivity) },
-                        onNavigateActivity = {
-                            navController.navigate(Views.ActivityLog())
-                        },
+                        onNavigateToday = { navController.navigate(Views.DayView()) },
                         onNavigateStats = {
                             navController.navigate(Views.Statistics(it.toString()))
                         },
@@ -129,6 +128,28 @@ private fun AppNavigation(
                     epochDay = route.epochDay,
                     onNavigateBack = { navController.popBackStack() }
                 )
+            }
+            composable<Views.DayView> { backStackEntry ->
+                val route: Views.DayView = backStackEntry.toRoute()
+                onCurrentView(route)
+
+                ProvideSharedContent(sharedContentScope = this@SharedTransitionLayout) {
+                    DayView(
+                        initialEpochDay = route.epochDay,
+                        onEditActivity = {
+                            navController.navigate(
+                                Views.NewActivity(it.activity.uid ?: -1)
+                            )
+                        },
+                        onJumpToActivity = {
+                            navController.navigate(
+                                Views.ActivityLog(it.activity.uid ?: -1)
+                            )
+                        },
+                        onEditDay = { navController.navigate(Views.EditDay(it.day)) },
+                        onOpenDrawer = openDrawer
+                    )
+                }
             }
             composable<Views.ActivityLog> { backStackEntry ->
                 val route: Views.ActivityLog = backStackEntry.toRoute()

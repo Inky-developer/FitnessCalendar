@@ -15,8 +15,15 @@ sealed class Views(val nameId: Int) : Parcelable {
     data object Home : Views(R.string.today)
 
     @Serializable
-    data class EditDay(val primitiveEpochDay: Long) : Views(R.string.edit_object) {
+    data class EditDay(val primitiveEpochDay: Long) : Views(R.string.edit_day) {
         val epochDay get() = EpochDay(primitiveEpochDay)
+    }
+
+    @Serializable
+    data class DayView(val primitiveEpochDay: Long = -1) : Views(R.string.days) {
+        val epochDay
+            get() =
+                if (primitiveEpochDay == -1L) EpochDay.today() else EpochDay(primitiveEpochDay)
     }
 
     @Serializable
