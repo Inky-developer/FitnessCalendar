@@ -55,6 +55,7 @@ import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivityCard
 import com.inky.fitnesscalendar.ui.components.ActivityImage
+import com.inky.fitnesscalendar.ui.components.ImageViewer
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.getAppBarContainerColor
 import com.inky.fitnesscalendar.ui.util.horizontalOrderedTransitionSpec
@@ -288,6 +289,10 @@ fun DayViewInner(
                 }
             }
         }
+    }
+
+    if (showImageViewer && day.imageUri != null) {
+        ImageViewer(imageUri = day.imageUri, onDismiss = { showImageViewer = false })
     }
 }
 
