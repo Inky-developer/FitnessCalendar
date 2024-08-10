@@ -173,7 +173,8 @@ fun DayView(
                         localizationRepository = viewModel.repository.localizationRepository,
                         onDeleteActivity = { viewModel.deleteActivity(it) },
                         onEditActivity = onEditActivity,
-                        onJumpToActivity = onJumpToActivity
+                        onJumpToActivity = onJumpToActivity,
+                        onEditDay = { onEditDay(actualEpochDay!!) }
                     )
                 } else {
                     Row(
@@ -202,6 +203,7 @@ fun DayViewInner(
     onDeleteActivity: (RichActivity) -> Unit,
     onEditActivity: (RichActivity) -> Unit,
     onJumpToActivity: (RichActivity) -> Unit,
+    onEditDay: () -> Unit,
 ) {
     var showImageViewer by rememberSaveable { mutableStateOf(false) }
 
@@ -222,6 +224,7 @@ fun DayViewInner(
         }
 
         Card(
+            onClick = onEditDay,
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
             modifier = Modifier
                 .padding(horizontal = 8.dp)
