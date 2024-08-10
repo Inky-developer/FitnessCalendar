@@ -222,7 +222,7 @@ fun DayViewInner(
         }
 
         Card(
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.primaryContainer),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
             modifier = Modifier
                 .padding(horizontal = 8.dp)
                 .fillMaxWidth()
