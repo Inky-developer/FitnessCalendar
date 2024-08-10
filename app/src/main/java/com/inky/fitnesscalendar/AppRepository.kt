@@ -28,6 +28,7 @@ import com.inky.fitnesscalendar.db.entities.RichRecording
 import com.inky.fitnesscalendar.di.ActivityTypeOrder
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.preferences.Preference
+import com.inky.fitnesscalendar.util.Ordering
 import com.inky.fitnesscalendar.util.getCurrentBssid
 import com.inky.fitnesscalendar.util.hideRecordingNotification
 import com.inky.fitnesscalendar.util.showRecordingNotification
@@ -55,7 +56,10 @@ class AppRepository @Inject constructor(
 ) {
     suspend fun loadAllActivities() = activityDao.loadActivities()
 
-    fun getActivities(filter: ActivityFilter): Flow<List<RichActivity>> {
+    fun getActivities(
+        filter: ActivityFilter,
+        order: Ordering = Ordering.DESC
+    ): Flow<List<RichActivity>> {
         // Use simpler query if no filters are needed
         if (filter.isEmpty()) {
             return activityDao.getActivities()
@@ -75,6 +79,7 @@ class AppRepository @Inject constructor(
         val hasPlace = filter.attributes.place.toBooleanOrNull()
 
         return activityDao.getFiltered(
+            order = order.ordinal,
             typeIds = filter.types.mapNotNull { it.uid },
             isTypesEmpty = filter.types.isEmpty(),
             categories = categories,
@@ -181,7 +186,10 @@ class AppRepository @Inject constructor(
     fun getDay(day: EpochDay): Flow<Day> = dayDao.get(day).map { it ?: Day(day = day) }
 
     fun getDayActivities(day: EpochDay) =
-        getActivities(ActivityFilter(range = DateRangeOption(DateRange.atDay(day))))
+        getActivities(
+            ActivityFilter(range = DateRangeOption(DateRange.atDay(day))),
+            order = Ordering.ASC
+        )
 
     suspend fun saveDay(day: Day) {
         dayDao.upsert(day)

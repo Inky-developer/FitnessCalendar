@@ -32,7 +32,7 @@ class HomeViewModel @Inject constructor(
 ) : BaseViewModel(context, repository) {
     val weekStats = loadWeekStats()
     val monthStats = loadMonthStats()
-    val activitiesToday = repository.getActivities(ActivityFilter(range = DateRangeOption.today()))
+    val activitiesToday = repository.getDayActivities(EpochDay.today())
 
     private val _today = MutableStateFlow(Day(day = EpochDay.today()))
     val today: StateFlow<Day> = _today.asStateFlow()

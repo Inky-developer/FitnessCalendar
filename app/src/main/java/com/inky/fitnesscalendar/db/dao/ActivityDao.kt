@@ -37,19 +37,22 @@ abstract class ActivityDao {
                 "INNER JOIN ActivityType AS type ON Activity.type_id = type.uid " +
                 "LEFT JOIN Place AS place ON Activity.place_id = place.uid " +
                 "WHERE " +
-                "(type_id IN (:typeIds) OR :isTypesEmpty) AND" +
-                "(type.activity_category in (:categories) or :isCategoriesEmpty) AND" +
-                "(place_id in (:placeIds) OR :isPlacesEmpty) AND" +
-                "(description LIKE :search OR type.name LIKE :search OR place.name LIKE :search OR vehicle IN (:searchVehicles) OR :search IS NULL) AND" +
-                "(end_time >= :start OR :start IS NULL) AND" +
-                "(start_time <= :end OR :end IS NULL) AND" +
-                "((description != '') == :hasDescription OR :hasDescription IS NULL) AND" +
-                "((feel IS NOT NULL) == :hasFeel OR :hasFeel IS NULL) AND" +
-                "((image_uri IS NOT NULL) == :hasImage OR :hasImage IS NULL) AND" +
-                "((place_id IS NOT NULL) == :hasPlace OR :hasPlace IS NULL) " +
-                "ORDER BY start_time DESC"
+                "   (type_id IN (:typeIds) OR :isTypesEmpty) AND" +
+                "   (type.activity_category in (:categories) or :isCategoriesEmpty) AND" +
+                "   (place_id in (:placeIds) OR :isPlacesEmpty) AND" +
+                "   (description LIKE :search OR type.name LIKE :search OR place.name LIKE :search OR vehicle IN (:searchVehicles) OR :search IS NULL) AND" +
+                "   (end_time >= :start OR :start IS NULL) AND" +
+                "   (start_time <= :end OR :end IS NULL) AND" +
+                "   ((description != '') == :hasDescription OR :hasDescription IS NULL) AND" +
+                "   ((feel IS NOT NULL) == :hasFeel OR :hasFeel IS NULL) AND" +
+                "   ((image_uri IS NOT NULL) == :hasImage OR :hasImage IS NULL) AND" +
+                "   ((place_id IS NOT NULL) == :hasPlace OR :hasPlace IS NULL)" +
+                "ORDER BY " +
+                "   CASE WHEN :order = 0 THEN start_time END ASC," +
+                "   CASE WHEN :order = 1 THEN start_time END DESC"
     )
     abstract fun getFiltered(
+        order: Int,
         typeIds: List<Int>,
         isTypesEmpty: Boolean,
         categories: List<String>,
