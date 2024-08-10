@@ -14,7 +14,7 @@ const val ACTION_SAVE = "$APP_URL.action.save"
 
 const val EXTRA_RECORDING_ID = "recording_id"
 
-const val ACTIVITY_IMAGES_DIR = "activity_images"
+const val IMAGES_DIR = "activity_images"
 const val SHARED_MEDIA_DIR = "shared_media_cache"
 
 // Specifies by how many hours offset a day starts.

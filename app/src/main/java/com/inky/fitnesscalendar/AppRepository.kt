@@ -106,7 +106,7 @@ class AppRepository @Inject constructor(
 
     fun getActivity(id: Int) = activityDao.get(id)
 
-    suspend fun getActivityImages() = activityDao.getImages()
+    suspend fun getUsedImages() = activityDao.getImages().toSet() + dayDao.getImages()
 
     suspend fun startRecording(richRecording: RichRecording, context: Context) {
         val includeWifi = Preference.COLLECT_BSSID.get(context)

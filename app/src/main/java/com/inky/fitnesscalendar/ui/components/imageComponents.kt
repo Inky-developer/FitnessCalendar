@@ -26,7 +26,7 @@ import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.util.copyFileToStorage
-import com.inky.fitnesscalendar.util.getOrCreateActivityImagesDir
+import com.inky.fitnesscalendar.util.getOrCreateImagesDir
 
 @Composable
 fun ActivityImage(
@@ -84,7 +84,7 @@ fun rememberImagePickerLauncher(onUri: (Uri) -> Unit, context: Context = LocalCo
         if (uri != null) {
             val actualUri = context.copyFileToStorage(
                 uri,
-                context.getOrCreateActivityImagesDir()
+                context.getOrCreateImagesDir()
             )
             println(uri)
             if (actualUri != null) {

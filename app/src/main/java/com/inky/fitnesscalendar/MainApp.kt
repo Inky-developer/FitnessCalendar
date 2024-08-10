@@ -4,7 +4,7 @@ import android.app.Application
 import android.util.Log
 import com.inky.fitnesscalendar.di.ActivityTypeOrder
 import com.inky.fitnesscalendar.di.DecisionTrees
-import com.inky.fitnesscalendar.util.cleanActivityImageStorage
+import com.inky.fitnesscalendar.util.cleanImageStorage
 import com.inky.fitnesscalendar.util.getOrCreateSharedMediaCache
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.Dispatchers
@@ -27,8 +27,8 @@ class MainApp : Application() {
     }
 
     private suspend fun cleanupStorage() {
-        val usedActivityImages = appRepository.getActivityImages()
-        cleanActivityImageStorage(usedActivityImages.toSet())
+        val usedImages = appRepository.getUsedImages()
+        cleanImageStorage(usedImages.toSet())
 
         getOrCreateSharedMediaCache().listFiles()?.forEach {
             it.delete()
