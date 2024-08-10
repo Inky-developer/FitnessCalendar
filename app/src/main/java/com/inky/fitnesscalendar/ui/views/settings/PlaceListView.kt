@@ -125,7 +125,7 @@ private fun PlaceCard(
     Card(
         border = BorderStroke(2.dp, colorResource(place.color.colorId)),
         modifier = modifier
-            .padding(all = 8.dp)
+            .padding(horizontal = 8.dp, vertical = 4.dp)
             .fillMaxWidth()
             .combinedClickable(
                 onClick = onEdit,
@@ -135,7 +135,7 @@ private fun PlaceCard(
         Text(
             place.name,
             style = MaterialTheme.typography.displaySmall,
-            modifier = Modifier.padding(horizontal = 8.dp)
+            modifier = Modifier.padding(all = 8.dp)
         )
     }
 
