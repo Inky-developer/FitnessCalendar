@@ -130,28 +130,9 @@ fun FilterView(
             }
 
             OptionGroup(
-                label = stringResource(R.string.filter_by_activities),
-                selectionLabel = selectionLabel,
-                modifier = Modifier.padding(all = 8.dp)
-            ) {
-                ActivityTypeSelector(
-                    isSelected = { filter.types.contains(it) },
-                    onSelect = { activityType ->
-                        val oldSelection = filter.types
-                        val newSelection =
-                            oldSelection.filter { it != activityType }.toMutableList()
-                        if (newSelection.size == oldSelection.size) {
-                            newSelection.add(activityType)
-                        }
-                        filter = filter.copy(types = newSelection)
-                    },
-                )
-            }
-
-            OptionGroup(
                 label = stringResource(R.string.filter_by_categories),
                 selectionLabel = categorySelectionLabel,
-                modifier = Modifier.padding(all = 8.dp)
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp).padding(top = 4.dp)
             ) {
                 ActivityCategorySelector(
                     isSelected = { filter.categories.contains(it) },
@@ -168,27 +149,48 @@ fun FilterView(
             }
 
             OptionGroup(
-                label = stringResource(R.string.filter_by_places),
-                selectionLabel = placeSelectionLabel,
-                modifier = Modifier.padding(all = 8.dp)
+                label = stringResource(R.string.filter_by_activities),
+                selectionLabel = selectionLabel,
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
             ) {
-                PlacesSelector(
-                    isSelected = { filter.places.contains(it) },
-                    onSelect = { place ->
-                        val oldSelection = filter.places
-                        val newSelection = oldSelection.filter { it != place }.toMutableList()
+                ActivityTypeSelector(
+                    isSelected = { filter.types.contains(it) },
+                    onSelect = { activityType ->
+                        val oldSelection = filter.types
+                        val newSelection =
+                            oldSelection.filter { it != activityType }.toMutableList()
                         if (newSelection.size == oldSelection.size) {
-                            newSelection.add(place)
+                            newSelection.add(activityType)
                         }
-                        filter = filter.copy(places = newSelection)
-                    }
+                        filter = filter.copy(types = newSelection)
+                    },
                 )
+            }
+
+            if (localDatabaseValues.current.places.isNotEmpty()) {
+                OptionGroup(
+                    label = stringResource(R.string.filter_by_places),
+                    selectionLabel = placeSelectionLabel,
+                    modifier = Modifier.padding(all = 8.dp)
+                ) {
+                    PlacesSelector(
+                        isSelected = { filter.places.contains(it) },
+                        onSelect = { place ->
+                            val oldSelection = filter.places
+                            val newSelection = oldSelection.filter { it != place }.toMutableList()
+                            if (newSelection.size == oldSelection.size) {
+                                newSelection.add(place)
+                            }
+                            filter = filter.copy(places = newSelection)
+                        }
+                    )
+                }
             }
 
             OptionGroup(
                 label = stringResource(R.string.filter_by_date),
                 selectionLabel = filter.range?.getText(context),
-                modifier = Modifier.padding(all = 8.dp)
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
             ) {
                 LazyRow {
                     items(DateRangeKind.entries) { range ->
@@ -217,7 +219,7 @@ fun FilterView(
             OptionGroup(
                 label = stringResource(R.string.filter_by_attributes),
                 selectionLabel = attributeSelectionLabel,
-                modifier = Modifier.padding(all = 8.dp)
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
             ) {
                 LazyRow {
                     items(AttributeFilter.Attribute.entries) { attribute ->
