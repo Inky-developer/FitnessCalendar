@@ -198,4 +198,5 @@
     <string name="no_place">Kein Ort</string>
     <string name="no_notes_for_day">Keine Notizen für diesen Tag</string>
     <string name="no_activities_on_day">Keine Aktivitäten an diesem Tag</string>
+    <string name="number_of_activities_n">Anzahl Aktivitäten: %1s</string>
 </resources>

@@ -202,4 +202,6 @@ class AppRepository @Inject constructor(
     suspend fun deletePlace(place: Place) = placeDao.delete(place)
 
     fun getPlaces() = placeDao.getAll()
+
+    fun getActivityCountPerPlace() = placeDao.getWithActivityCount()
 }

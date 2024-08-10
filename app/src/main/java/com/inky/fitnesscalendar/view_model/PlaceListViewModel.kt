@@ -27,11 +27,18 @@ class PlaceListViewModel @Inject constructor(
     private val _places = MutableStateFlow<List<Place>>(emptyList())
     val places get() = _places.asStateFlow()
 
+    private val _placeActivityCounts = MutableStateFlow<Map<Int, Int>>(emptyMap())
+    val placeActivityCounts get() = _placeActivityCounts.asStateFlow()
+
     val snackbarHostState = SnackbarHostState()
 
     init {
         repository.getPlaces().onEach {
             _places.emit(it)
+        }.launchIn(viewModelScope)
+
+        repository.getActivityCountPerPlace().onEach {
+            _placeActivityCounts.emit(it)
         }.launchIn(viewModelScope)
     }
 

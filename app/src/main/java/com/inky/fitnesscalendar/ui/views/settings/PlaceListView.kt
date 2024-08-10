@@ -82,9 +82,11 @@ fun PlaceListView(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { innerPadding ->
         val places by viewModel.places.collectAsState()
+        val activityCounts by viewModel.placeActivityCounts.collectAsState()
 
         PlaceList(
             places,
+            activityCounts,
             onDeletePlace = { viewModel.delete(it) },
             onEditPlace = { onEditPlace(it) },
             modifier = Modifier.padding(innerPadding)
@@ -95,6 +97,7 @@ fun PlaceListView(
 @Composable
 private fun PlaceList(
     places: List<Place>,
+    activityCounts: Map<Int, Int>,
     onDeletePlace: (Place) -> Unit,
     onEditPlace: (Place) -> Unit,
     modifier: Modifier = Modifier
@@ -103,6 +106,7 @@ private fun PlaceList(
         items(places, key = { it.uid ?: -1 }) { place ->
             PlaceCard(
                 place,
+                activityCount = activityCounts[place.uid] ?: 0,
                 onDelete = { onDeletePlace(place) },
                 onEdit = { onEditPlace(place) },
                 modifier = Modifier.animateItem()
@@ -115,6 +119,7 @@ private fun PlaceList(
 @Composable
 private fun PlaceCard(
     place: Place,
+    activityCount: Int,
     onDelete: () -> Unit,
     onEdit: () -> Unit,
     modifier: Modifier = Modifier
@@ -136,6 +141,11 @@ private fun PlaceCard(
             place.name,
             style = MaterialTheme.typography.displaySmall,
             modifier = Modifier.padding(all = 8.dp)
+        )
+        Text(
+            stringResource(R.string.number_of_activities_n, activityCount),
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(all = 4.dp)
         )
     }
 
