@@ -217,7 +217,7 @@ fun Recordings(
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer),
         modifier = Modifier
-            .padding(all = 8.dp)
+            .padding(horizontal = 8.dp, vertical = 4.dp)
             .fillMaxWidth()
     ) {
         for (typeRecording in richRecordings) {
@@ -294,7 +294,7 @@ fun Statistics(name: String, stats: ActivityStatistics, onClick: () -> Unit) {
         onClick = onClick,
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
         modifier = Modifier
-            .padding(all = 8.dp)
+            .padding(horizontal = 8.dp, vertical = 4.dp)
             .fillMaxWidth()
     ) {
         Text(
@@ -371,7 +371,7 @@ fun Today(
             containerColor = MaterialTheme.colorScheme.secondaryContainer,
         ),
         modifier = Modifier
-            .padding(all = 8.dp)
+            .padding(horizontal = 8.dp, vertical = 4.dp)
             .fillMaxWidth()
     ) {
         Row(
@@ -422,6 +422,8 @@ fun Today(
                 Text(
                     description,
                     modifier = Modifier
+                        .padding(horizontal = 8.dp)
+                        .clip(MaterialTheme.shapes.small)
                         .background(backgroundColor)
                         .padding(horizontal = 8.dp)
                         .fillMaxWidth()
@@ -456,7 +458,7 @@ fun Today(
                 }
 
                 false -> {
-                    Column {
+                    Column(modifier = Modifier.padding(vertical = 4.dp)) {
                         for (richActivity in richActivities) {
                             CompactActivityCard(
                                 richActivity = richActivity,
