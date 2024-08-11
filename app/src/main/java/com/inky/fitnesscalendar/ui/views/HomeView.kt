@@ -409,7 +409,9 @@ fun Today(
                 ActivityImage(
                     uri = imageUri,
                     onClick = { showImageViewer = true },
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                    modifier = Modifier
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                        .sharedElement(SharedContentKey.DayImage)
                 )
             }
         }
@@ -431,6 +433,7 @@ fun Today(
                         .background(backgroundColor)
                         .padding(horizontal = 8.dp)
                         .fillMaxWidth()
+                        .sharedElement(SharedContentKey.DayDescription)
                 )
             }
         }

@@ -62,6 +62,7 @@ import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.getAppBarContainerColor
 import com.inky.fitnesscalendar.ui.util.horizontalOrderedTransitionSpec
 import com.inky.fitnesscalendar.ui.util.sharedBounds
+import com.inky.fitnesscalendar.ui.util.sharedElement
 import com.inky.fitnesscalendar.util.toDate
 import com.inky.fitnesscalendar.view_model.BaseViewModel
 import java.time.Instant
@@ -223,7 +224,9 @@ fun DayViewInner(
                 ActivityImage(
                     uri = imageUri,
                     onClick = { showImageViewer = true },
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                    modifier = Modifier
+                        .padding(horizontal = 8.dp, vertical = 4.dp)
+                        .sharedElement(SharedContentKey.DayImage)
                 )
             }
         }
@@ -251,7 +254,7 @@ fun DayViewInner(
                 label = stringResource(R.string.description)
             ) { description ->
                 if (description.isNotBlank()) {
-                    Text(day.description, modifier = Modifier.padding(all = 8.dp))
+                    Text(day.description, modifier = Modifier.padding(all = 8.dp).sharedElement(SharedContentKey.DayDescription))
                 } else {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,

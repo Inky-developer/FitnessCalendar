@@ -11,6 +11,10 @@ sealed class SharedContentKey {
     data object NewActivityFAB : SharedContentKey()
 
     data object AppBar : SharedContentKey()
+
+    data object DayImage : SharedContentKey()
+
+    data object DayDescription : SharedContentKey()
 }
 
 
