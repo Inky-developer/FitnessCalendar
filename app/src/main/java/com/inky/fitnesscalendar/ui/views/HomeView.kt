@@ -406,7 +406,11 @@ fun Today(
             label = stringResource(R.string.image)
         ) { imageUri ->
             if (imageUri != null) {
-                ActivityImage(uri = imageUri, onClick = { showImageViewer = true })
+                ActivityImage(
+                    uri = imageUri,
+                    onClick = { showImageViewer = true },
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                )
             }
         }
 

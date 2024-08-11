@@ -113,7 +113,8 @@ fun EditDayDialog(
                                 editState = editState.copy(imageUri = day.imageUri)
                             }
                         },
-                        onClick = { showImageViewer = true }
+                        onClick = { showImageViewer = true },
+                        modifier = Modifier.padding(vertical = 4.dp)
                     )
                 }
             }

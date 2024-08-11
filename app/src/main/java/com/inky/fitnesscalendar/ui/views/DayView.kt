@@ -217,12 +217,10 @@ fun DayViewInner(
             label = stringResource(R.string.image)
         ) { imageUri ->
             if (imageUri != null) {
-                ActivityImage(uri = imageUri, onClick = { showImageViewer = true })
-            } else {
-                Spacer(
-                    modifier = Modifier
-                        .padding(vertical = 4.dp)
-                        .fillMaxWidth()
+                ActivityImage(
+                    uri = imageUri,
+                    onClick = { showImageViewer = true },
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                 )
             }
         }
@@ -231,7 +229,7 @@ fun DayViewInner(
             onClick = onEditDay,
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
             modifier = Modifier
-                .padding(start = 8.dp, end = 8.dp, bottom = 4.dp)
+                .padding(horizontal = 8.dp, vertical = 4.dp)
                 .fillMaxWidth()
         ) {
             AnimatedContent(

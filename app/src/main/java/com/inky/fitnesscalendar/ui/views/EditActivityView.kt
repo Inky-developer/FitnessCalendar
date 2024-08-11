@@ -212,7 +212,8 @@ fun NewActivity(
                     },
                     onClick = {
                         showImageViewer = true
-                    }
+                    },
+                    modifier = Modifier.padding(vertical = 4.dp)
                 )
             }
 
@@ -220,11 +221,7 @@ fun NewActivity(
                 targetState = editState.activitySelectorState.activityType?.hasDuration == true,
                 label = stringResource(R.string.select_date)
             ) { hasDuration ->
-                Row(
-                    modifier = Modifier
-                        .padding(vertical = 4.dp)
-                        .fillMaxWidth()
-                ) {
+                Row(modifier = Modifier.fillMaxWidth()) {
                     val dateLabelId = if (hasDuration) {
                         R.string.datetime_start
                     } else {

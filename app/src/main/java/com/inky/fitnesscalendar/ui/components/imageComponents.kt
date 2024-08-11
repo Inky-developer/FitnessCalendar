@@ -9,7 +9,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -31,6 +30,7 @@ import com.inky.fitnesscalendar.util.getOrCreateImagesDir
 @Composable
 fun ActivityImage(
     uri: Uri,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit = {},
     onState: ((AsyncImagePainter.State) -> Unit)? = null,
 ) {
@@ -39,8 +39,7 @@ fun ActivityImage(
         contentDescription = stringResource(R.string.user_uploaded_image),
         onState = onState,
         contentScale = ContentScale.FillWidth,
-        modifier = Modifier
-            .padding(all = 8.dp)
+        modifier = modifier
             .fillMaxWidth()
             .heightIn(max = 256.dp)
             .clip(MaterialTheme.shapes.large)

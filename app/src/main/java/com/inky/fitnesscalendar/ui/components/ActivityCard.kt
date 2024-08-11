@@ -209,7 +209,8 @@ fun ActivityCard(
             HorizontalDivider()
             ActivityImage(
                 uri = activity.imageUri,
-                onClick = { showImageViewer = true }
+                onClick = { showImageViewer = true },
+                modifier = Modifier.padding(all = 8.dp)
             )
         }
     }
