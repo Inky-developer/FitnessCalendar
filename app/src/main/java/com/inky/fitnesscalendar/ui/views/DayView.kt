@@ -30,6 +30,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -66,6 +67,7 @@ import com.inky.fitnesscalendar.view_model.BaseViewModel
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
+import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -82,7 +84,8 @@ fun DayView(
     var showDatePicker by rememberSaveable { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = epochDay.toLocalDate().atStartOfDay()
-            .toDate(ZoneId.of("UTC")).time
+            .toDate(ZoneId.of("UTC")).time,
+        selectableDates = PastDates
     )
     val scrollState = rememberScrollState()
 
@@ -326,4 +329,10 @@ fun PrevAndNextDaySelector(
             Icon(Icons.AutoMirrored.Outlined.ArrowForward, stringResource(R.string.forward))
         }
     }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+object PastDates : SelectableDates {
+    override fun isSelectableDate(utcTimeMillis: Long) =
+        Date.from(Instant.now()).time >= utcTimeMillis
 }
