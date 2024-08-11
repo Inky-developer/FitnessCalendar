@@ -5,9 +5,11 @@ import android.text.format.DateFormat
 import androidx.compose.runtime.Immutable
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.measure.Duration.Companion.until
+import com.inky.fitnesscalendar.util.DAY_START_OFFSET_HOURS
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.time.Instant
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.time.format.TextStyle
@@ -52,7 +54,10 @@ class LocalizationRepository @Inject constructor(@ApplicationContext private val
     }
 
     fun formatRelativeLocalDate(localDate: LocalDate): String {
-        val daysDiff = localDate.until(LocalDate.now(), ChronoUnit.DAYS)
+        val daysDiff = localDate.until(
+            LocalDateTime.now().minusHours(DAY_START_OFFSET_HOURS).toLocalDate(),
+            ChronoUnit.DAYS
+        )
         if (daysDiff == 0L) {
             return context.getString(R.string.today)
         }

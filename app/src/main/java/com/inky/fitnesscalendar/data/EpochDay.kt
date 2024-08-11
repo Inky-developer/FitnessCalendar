@@ -9,7 +9,7 @@ import java.time.format.DateTimeFormatter
 
 @Parcelize
 data class EpochDay(val day: Long) : Parcelable, Comparable<EpochDay> {
-    fun toLocalDate() = LocalDate.ofEpochDay(day)
+    fun toLocalDate(): LocalDate = LocalDate.ofEpochDay(day)
 
     override fun toString(): String {
         return LocalDate.ofEpochDay(day).format(DateTimeFormatter.ISO_LOCAL_DATE)
