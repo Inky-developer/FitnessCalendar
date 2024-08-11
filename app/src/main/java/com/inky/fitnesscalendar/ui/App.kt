@@ -146,6 +146,7 @@ private fun AppNavigation(
                                 Views.ActivityLog(it.activity.uid ?: -1)
                             )
                         },
+                        onNewActivity = { navController.navigate(Views.NewActivity()) },
                         onEditDay = { navController.navigate(Views.EditDay(it.day)) },
                         onOpenDrawer = openDrawer
                     )
@@ -159,9 +160,7 @@ private fun AppNavigation(
                         initialSelectedActivityId = route.activityId,
                         filter = filterState,
                         onOpenDrawer = openDrawer,
-                        onNewActivity = {
-                            navController.navigate(Views.NewActivity())
-                        },
+                        onNewActivity = { navController.navigate(Views.NewActivity()) },
                         onEditActivity = {
                             navController.navigate(Views.NewActivity(it.uid ?: -1))
                         },

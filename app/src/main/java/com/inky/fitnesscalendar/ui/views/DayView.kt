@@ -56,6 +56,7 @@ import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivityCard
 import com.inky.fitnesscalendar.ui.components.ActivityImage
 import com.inky.fitnesscalendar.ui.components.ImageViewer
+import com.inky.fitnesscalendar.ui.components.NewActivityFAB
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.getAppBarContainerColor
 import com.inky.fitnesscalendar.ui.util.horizontalOrderedTransitionSpec
@@ -73,6 +74,7 @@ fun DayView(
     initialEpochDay: EpochDay,
     onEditActivity: (RichActivity) -> Unit,
     onJumpToActivity: (RichActivity) -> Unit,
+    onNewActivity: () -> Unit,
     onEditDay: (EpochDay) -> Unit,
     onOpenDrawer: () -> Unit
 ) {
@@ -145,6 +147,7 @@ fun DayView(
                 modifier = Modifier.sharedBounds(SharedContentKey.AppBar)
             )
         },
+        floatingActionButton = { NewActivityFAB(onClick = onNewActivity) },
         snackbarHost = { SnackbarHost(viewModel.snackbarHostState) },
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { paddingValues ->
