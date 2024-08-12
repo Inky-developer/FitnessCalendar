@@ -114,7 +114,7 @@ fun ActivityLog(
             if (nextScrollTarget != null) {
                 activityListState.scrollToActivity(nextScrollTarget)
                 nextScrollTarget = null
-            } else {
+            } else if (activityListState.listState.firstVisibleItemIndex == 0) {
                 activityListState.listState.scrollToItem(1)
             }
         }
