@@ -1,24 +1,22 @@
 package com.inky.fitnesscalendar.view_model
 
 import android.content.Context
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.viewModelScope
 import com.inky.fitnesscalendar.AppRepository
-import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilterChip.Companion.toActivityFilterChip
-import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.util.toLocalDate
 import com.inky.fitnesscalendar.view_model.activity_log.ActivityListItem
+import com.inky.fitnesscalendar.view_model.activity_log.ActivityListState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -34,43 +32,61 @@ class ActivityLogViewModel @Inject constructor(
     val filterHistory = repository.getFilterHistoryItems()
         .map { item -> item.mapNotNull { it.toActivityFilterChip() } }
 
-    private val _days = MutableStateFlow(emptyMap<EpochDay, Day>())
-    val days = _days.asStateFlow()
+    private val _activityListState = MutableStateFlow(
+        ActivityListState(
+            items = emptyList(),
+            activities = emptyList(),
+            days = emptyMap(),
+            filter = ActivityFilter(),
+            isInitialized = false
+        )
+    )
+    val activityListState: StateFlow<ActivityListState> = _activityListState.asStateFlow()
 
-    private val _activities = MutableStateFlow(emptyList<RichActivity>())
-    val activities = _activities.asStateFlow()
+    private val dayFlow = repository.getDays()
 
-    val activityListItems: Flow<List<ActivityListItem>> = activities.map { activityList ->
+    private var activityListStateUpdateJob: Job? = null
+
+    init {
+        updateJob(ActivityFilter())
+    }
+
+    fun setFilter(filter: ActivityFilter) {
+        updateJob(filter)
+    }
+
+    private fun updateJob(filter: ActivityFilter) = viewModelScope.launch {
+        activityListStateUpdateJob?.cancelAndJoin()
+        activityListStateUpdateJob = repository
+            .getActivities(filter)
+            .combine(dayFlow) { activities, days ->
+                _activityListState.value.copy(
+                    items = calculateActivityListItems(activities),
+                    activities = activities,
+                    days = days,
+                    filter = filter,
+                    isInitialized = true
+                )
+            }
+            .onEach { newState ->
+                _activityListState.emit(newState)
+            }
+            .launchIn(viewModelScope)
+    }
+
+    private fun calculateActivityListItems(
+        activities: List<RichActivity>,
+    ): List<ActivityListItem> {
         val result = mutableListOf<ActivityListItem>()
 
         val zoneId = ZoneId.systemDefault()
-        val days = activityList.groupBy { it.activity.startTime.toLocalDate(zoneId) }
+        val activitiesByDay = activities.groupBy { it.activity.startTime.toLocalDate(zoneId) }
 
-        for ((day, items) in days) {
+        for ((day, items) in activitiesByDay) {
             result.add(ActivityListItem.DateHeader(day))
             result.addAll(items.map { ActivityListItem.Activity(it) })
         }
 
-        result
-    }
-
-    var activityListState = mutableStateOf(LazyListState())
-
-    private var activityUpdateJob: Job? = null
-
-    init {
-        activityUpdateJob = repository.getActivities(ActivityFilter()).onEach { activityList ->
-            _activities.emit(activityList)
-        }.launchIn(viewModelScope)
-
-        // TODO: Only select the required days
-        repository.getDays().onEach { _days.emit(it) }.launchIn(viewModelScope)
-    }
-
-    fun setFilter(filter: ActivityFilter) = viewModelScope.launch {
-        activityUpdateJob?.cancelAndJoin()
-        activityUpdateJob = repository.getActivities(filter).onEach { activityList ->
-            _activities.emit(activityList)
-        }.launchIn(viewModelScope)
+        return result
     }
 }

@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -66,7 +65,6 @@ import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilterChip
 import com.inky.fitnesscalendar.db.entities.Activity
-import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivityCard
@@ -78,6 +76,7 @@ import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.ui.util.sharedElement
 import com.inky.fitnesscalendar.view_model.ActivityLogViewModel
 import com.inky.fitnesscalendar.view_model.activity_log.ActivityListItem
+import com.inky.fitnesscalendar.view_model.activity_log.ActivityListState
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -94,39 +93,29 @@ fun ActivityLog(
 ) {
     val scope = rememberCoroutineScope()
 
-    val activityListState by viewModel.activityListState
-    val isAtTopOfList by remember { derivedStateOf { activityListState.firstVisibleItemIndex <= 1 } }
+    val activityListState by viewModel.activityListState.collectAsState()
+    val filterHistoryItems by viewModel.filterHistory.collectAsState(initial = emptyList())
+
+    val isAtTopOfList by remember { derivedStateOf { activityListState.listState.firstVisibleItemIndex <= 1 } }
+    val activitiesEmpty by remember { derivedStateOf { activityListState.activities.isEmpty() } }
 
     LaunchedEffect(filter) {
         viewModel.setFilter(filter)
     }
 
-    val activities by viewModel.activities.collectAsState()
-    val activityListItems by viewModel.activityListItems.collectAsState(initial = emptyList())
-    val activitiesEmpty by remember { derivedStateOf { activities.isEmpty() } }
-
-    val days by viewModel.days.collectAsState()
-
-    val filterHistoryItems by viewModel.filterHistory.collectAsState(initial = emptyList())
-
     // Scroll to requested activity or to the newest activity
-    var scrollToId by remember(initialSelectedActivityId) { mutableStateOf(initialSelectedActivityId) }
-    var latestActivity by remember { mutableStateOf(activities.firstOrNull()?.activity) }
-    LaunchedEffect(activities) {
-        if (scrollToId != null) {
-            val index =
-                activityListItems
-                    .withIndex()
-                    .firstOrNull { (_, item) -> item is ActivityListItem.Activity && item.richActivity.activity.uid == scrollToId }
-                    ?.index
-            if (index != null) {
-                activityListState.animateScrollToItem(index + 1)
-                scrollToId = null
+    var nextScrollTarget by remember(initialSelectedActivityId) {
+        mutableStateOf(initialSelectedActivityId)
+    }
+    LaunchedEffect(activityListState.activities) {
+        if (activityListState.isInitialized) {
+            if (nextScrollTarget != null) {
+                activityListState.scrollToActivity(nextScrollTarget)
+                nextScrollTarget = null
+            } else {
+                activityListState.listState.scrollToItem(1)
             }
-        } else if (activities.firstOrNull()?.activity?.uid != latestActivity?.uid) {
-            activityListState.animateScrollToItem(1)
         }
-        latestActivity = activities.firstOrNull()?.activity
     }
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -168,7 +157,7 @@ fun ActivityLog(
                 ) {
                     SmallFloatingActionButton(onClick = {
                         scope.launch {
-                            activityListState.animateScrollToItem(1)
+                            activityListState.listState.animateScrollToItem(1)
                             scrollBehavior.state.contentOffset = 0f
                             scrollBehavior.state.heightOffset = 0f
                         }
@@ -228,15 +217,11 @@ fun ActivityLog(
                 }
             } else {
                 ActivityList(
-                    listState = activityListState,
-                    activityListItems = activityListItems,
-                    numActivities = activities.size,
-                    days = days,
-                    filter = filter,
+                    state = activityListState,
                     localizationRepository = viewModel.repository.localizationRepository,
-                    onJumpToActivity = {
+                    onJumpToActivity = { activity ->
+                        nextScrollTarget = activity.uid
                         onEditFilter(ActivityFilter())
-                        scrollToId = it.uid
                     },
                     onEditFilter = onEditFilter,
                     onEditActivity = onEditActivity,
@@ -250,18 +235,18 @@ fun ActivityLog(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ActivityList(
-    listState: LazyListState,
-    activityListItems: List<ActivityListItem>,
-    numActivities: Int,
-    days: Map<EpochDay, Day>,
-    filter: ActivityFilter,
+    state: ActivityListState,
     localizationRepository: LocalizationRepository,
     onJumpToActivity: (Activity) -> Unit,
     onEditFilter: (ActivityFilter) -> Unit,
     onEditActivity: (Activity) -> Unit,
     onDeleteActivity: (RichActivity) -> Unit
 ) {
-    val isFilterEmpty = remember(filter) { filter.isEmpty() }
+    val numActivities = remember(state) { state.activities.size }
+    val listItems = remember(state) { state.items }
+    val days = remember(state) { state.days }
+    val filter = remember(state) { state.filter }
+    val listState = remember(state) { state.listState }
 
     LazyColumn(
         state = listState,
@@ -280,7 +265,7 @@ private fun ActivityList(
                 )
             }
         }
-        for (item in activityListItems) {
+        for (item in listItems) {
             when (item) {
                 is ActivityListItem.DateHeader -> stickyHeader(
                     key = item.date,
@@ -317,10 +302,10 @@ private fun ActivityList(
                         onDelete = {
                             onDeleteActivity(item.richActivity)
                         },
-                        onFilter = if (isFilterEmpty) {
+                        onFilter = if (filter.isEmpty()) {
                             onEditFilter
                         } else null,
-                        onJumpTo = if (!isFilterEmpty) {
+                        onJumpTo = if (!filter.isEmpty()) {
                             { onJumpToActivity(item.richActivity.activity) }
                         } else null,
                         onEdit = onEditActivity,
