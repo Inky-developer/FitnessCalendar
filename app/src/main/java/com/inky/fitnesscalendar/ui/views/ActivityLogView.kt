@@ -263,10 +263,6 @@ private fun ActivityList(
 ) {
     val isFilterEmpty = remember(filter) { filter.isEmpty() }
 
-    LaunchedEffect(key1 = null) {
-        listState.scrollToItem(1)
-    }
-
     LazyColumn(
         state = listState,
         contentPadding = PaddingValues(bottom = 128.dp),
