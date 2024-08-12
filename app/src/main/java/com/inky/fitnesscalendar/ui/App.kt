@@ -164,6 +164,7 @@ private fun AppNavigation(
                         onEditActivity = {
                             navController.navigate(Views.NewActivity(it.uid ?: -1))
                         },
+                        onShowDay = { navController.navigate(Views.DayView(it.day)) },
                         onFilter = {
                             navController.navigate(Views.FilterActivity)
                         },

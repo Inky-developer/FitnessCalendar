@@ -5,6 +5,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -88,6 +89,7 @@ fun ActivityLog(
     onOpenDrawer: () -> Unit,
     onNewActivity: () -> Unit,
     onEditActivity: (Activity) -> Unit,
+    onShowDay: (EpochDay) -> Unit,
     onFilter: () -> Unit,
     initialSelectedActivityId: Int? = null,
 ) {
@@ -223,6 +225,7 @@ fun ActivityLog(
                         nextScrollTarget = activity.uid
                         onEditFilter(ActivityFilter())
                     },
+                    onShowDay = onShowDay,
                     onEditFilter = onEditFilter,
                     onEditActivity = onEditActivity,
                     onDeleteActivity = { viewModel.deleteActivity(it) }
@@ -238,6 +241,7 @@ private fun ActivityList(
     state: ActivityListState,
     localizationRepository: LocalizationRepository,
     onJumpToActivity: (Activity) -> Unit,
+    onShowDay: (EpochDay) -> Unit,
     onEditFilter: (ActivityFilter) -> Unit,
     onEditActivity: (Activity) -> Unit,
     onDeleteActivity: (RichActivity) -> Unit
@@ -280,6 +284,7 @@ private fun ActivityList(
                             .padding(horizontal = 8.dp)
                             .fillMaxWidth()
                             .animateItem()
+                            .clickable { onShowDay(EpochDay(item.date.toEpochDay())) }
                     ) {
                         Text(
                             LocalizationRepository.localDateFormatter.format(item.date),
@@ -308,6 +313,7 @@ private fun ActivityList(
                         onJumpTo = if (!filter.isEmpty()) {
                             { onJumpToActivity(item.richActivity.activity) }
                         } else null,
+                        onShowDay = { onShowDay(item.richActivity.activity.epochDay) },
                         onEdit = onEditActivity,
                         localizationRepository = localizationRepository,
                         modifier = Modifier

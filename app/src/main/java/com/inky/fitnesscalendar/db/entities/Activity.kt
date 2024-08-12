@@ -6,12 +6,14 @@ import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
+import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.data.Feel
 import com.inky.fitnesscalendar.data.Intensity
 import com.inky.fitnesscalendar.data.Vehicle
 import com.inky.fitnesscalendar.data.measure.Distance
 import com.inky.fitnesscalendar.data.measure.Duration.Companion.until
 import com.inky.fitnesscalendar.data.measure.Velocity
+import com.inky.fitnesscalendar.util.toLocalDate
 import java.util.Date
 
 @Entity(
@@ -53,6 +55,8 @@ data class Activity(
         distance = if (type.hasDistance) distance else null,
         intensity = if (type.hasIntensity) intensity else null,
     )
+
+    val epochDay get() = EpochDay(startTime.toLocalDate().toEpochDay())
 
     val duration
         get() = startTime until endTime

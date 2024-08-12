@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowForward
+import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material3.AlertDialog
@@ -58,6 +59,7 @@ fun ActivityCard(
     localizationRepository: LocalizationRepository,
     modifier: Modifier = Modifier,
     onJumpTo: (() -> Unit)? = null,
+    onShowDay: (() -> Unit)? = null,
     onFilter: ((ActivityFilter) -> Unit)? = null,
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainer,
     contentColor: Color = MaterialTheme.colorScheme.primary
@@ -228,6 +230,12 @@ fun ActivityCard(
                     it()
                 }
             },
+            onShowDay = onShowDay?.let {
+                {
+                    showContextMenu = false
+                    it()
+                }
+            },
             onFilterByType = onFilter?.let {
                 {
                     showContextMenu = false
@@ -248,6 +256,7 @@ fun ActivityCardContextMenu(
     onDismiss: () -> Unit,
     onDelete: () -> Unit,
     onJumpTo: (() -> Unit)?,
+    onShowDay: (() -> Unit)?,
     onFilterByType: (() -> Unit)?,
 ) {
     var showDialog by rememberSaveable { mutableStateOf(false) }
@@ -270,6 +279,18 @@ fun ActivityCardContextMenu(
                     )
                 },
                 modifier = Modifier.clickable { onJumpTo?.let { it() } }
+            )
+        }
+        AnimatedVisibility(visible = onShowDay != null) {
+            ListItem(
+                headlineContent = { Text(stringResource(R.string.show_day)) },
+                leadingContent = {
+                    Icon(
+                        Icons.Outlined.DateRange,
+                        stringResource(R.string.show_day)
+                    )
+                },
+                modifier = Modifier.clickable { onShowDay?.let { it() } }
             )
         }
         AnimatedVisibility(visible = onFilterByType != null) {

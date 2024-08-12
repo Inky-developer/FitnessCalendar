@@ -188,6 +188,7 @@
     <string name="no_notes_for_day">No notes on that day</string>
     <string name="no_activities_on_day">No activities on that day</string>
     <string name="number_of_activities_n">Number of activities: %1s</string>
+    <string name="show_day">Show day</string>
     <plurals name="num_activities">
         <item quantity="one">%1d activity</item>
         <item quantity="other">%1d activities</item>
