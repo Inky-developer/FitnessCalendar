@@ -215,7 +215,11 @@ fun DayViewInner(
 ) {
     var showImageViewer by rememberSaveable { mutableStateOf(false) }
 
-    Column(modifier = Modifier.verticalScroll(scrollState)) {
+    Column(
+        modifier = Modifier
+            .verticalScroll(scrollState)
+            .padding(bottom = 128.dp)
+    ) {
         AnimatedContent(
             targetState = day.imageUri,
             label = stringResource(R.string.image)
@@ -254,7 +258,12 @@ fun DayViewInner(
                 label = stringResource(R.string.description)
             ) { description ->
                 if (description.isNotBlank()) {
-                    Text(day.description, modifier = Modifier.padding(all = 8.dp).sharedElement(SharedContentKey.DayDescription))
+                    Text(
+                        day.description,
+                        modifier = Modifier
+                            .padding(all = 8.dp)
+                            .sharedElement(SharedContentKey.DayDescription)
+                    )
                 } else {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
