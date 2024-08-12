@@ -57,7 +57,7 @@ fun NavGraphBuilder.settingsDestination(
         composable<SettingsViews.PlaceList> {
             PlaceListView(
                 onOpenDrawer = onOpenDrawer,
-                onEditPlace = { onNavigate(SettingsViews.PlaceDialog(it?.uid ?: -1)) })
+                onEditPlace = { onNavigate(SettingsViews.PlaceDialog(it?.uid)) })
         }
 
         dialog<SettingsViews.PlaceDialog> { backStackEntry ->

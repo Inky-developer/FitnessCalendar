@@ -107,7 +107,7 @@ private fun AppNavigation(
                     Home(
                         onNewActivity = { navController.navigate(Views.NewActivity()) },
                         onEditActivity = {
-                            navController.navigate(Views.NewActivity(it.uid ?: -1))
+                            navController.navigate(Views.NewActivity(it.uid))
                         },
                         onEditDay = {
                             navController.navigate(Views.EditDay(it.day))
@@ -138,12 +138,12 @@ private fun AppNavigation(
                         initialEpochDay = route.epochDay,
                         onEditActivity = {
                             navController.navigate(
-                                Views.NewActivity(it.activity.uid ?: -1)
+                                Views.NewActivity(it.activity.uid)
                             )
                         },
                         onJumpToActivity = {
                             navController.navigate(
-                                Views.ActivityLog(it.activity.uid ?: -1)
+                                Views.ActivityLog(it.activity.uid)
                             )
                         },
                         onNewActivity = { navController.navigate(Views.NewActivity()) },
@@ -162,7 +162,7 @@ private fun AppNavigation(
                         onOpenDrawer = openDrawer,
                         onNewActivity = { navController.navigate(Views.NewActivity()) },
                         onEditActivity = {
-                            navController.navigate(Views.NewActivity(it.uid ?: -1))
+                            navController.navigate(Views.NewActivity(it.uid))
                         },
                         onShowDay = { navController.navigate(Views.DayView(it.day)) },
                         onFilter = {
@@ -234,7 +234,7 @@ private fun AppNavigation(
                         initialPeriod = route.initialPeriod,
                         onOpenDrawer = openDrawer,
                         onViewActivity = {
-                            navController.navigate(Views.ActivityLog(it.uid ?: -1))
+                            navController.navigate(Views.ActivityLog(it.uid))
                         }
                     )
                 }

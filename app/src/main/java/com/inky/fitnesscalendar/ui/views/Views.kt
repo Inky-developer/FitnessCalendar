@@ -20,24 +20,19 @@ sealed class Views(val nameId: Int) : Parcelable {
     }
 
     @Serializable
-    data class DayView(val primitiveEpochDay: Long = -1) : Views(R.string.days) {
+    data class DayView(val primitiveEpochDay: Long? = null) : Views(R.string.days) {
         val epochDay
-            get() =
-                if (primitiveEpochDay == -1L) EpochDay.today() else EpochDay(primitiveEpochDay)
+            get() = primitiveEpochDay?.let { EpochDay(primitiveEpochDay) } ?: EpochDay.today()
     }
 
     @Serializable
-    data class ActivityLog(val primitiveActivityId: Int = -1) : Views(R.string.activity_log) {
-        val activityId get() = if (primitiveActivityId == -1) null else primitiveActivityId
-    }
+    data class ActivityLog(val activityId: Int? = null) : Views(R.string.activity_log)
 
     @Serializable
     data object FilterActivity : Views(R.string.filter)
 
     @Serializable
-    data class NewActivity(val primitiveActivityId: Int = -1) : Views(R.string.new_activity) {
-        val activityId get() = if (primitiveActivityId == -1) null else primitiveActivityId
-    }
+    data class NewActivity(val activityId: Int? = null) : Views(R.string.new_activity)
 
     @Serializable
     data object RecordActivity : Views(R.string.record_activity)

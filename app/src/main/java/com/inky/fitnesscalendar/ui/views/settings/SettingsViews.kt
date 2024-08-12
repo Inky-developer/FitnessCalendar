@@ -17,9 +17,7 @@ sealed interface SettingsViews {
     object PlaceList
 
     @Serializable
-    data class PlaceDialog(val primitivePlaceId: Int = -1) {
-        val placeId get() = if (primitivePlaceId == -1) null else primitivePlaceId
-    }
+    data class PlaceDialog(val placeId: Int? = null)
 
     @Serializable
     object ImportExport
