@@ -39,8 +39,8 @@
     <string name="no_activities_with_filter">Keine zum Filter passenden Aktivitäten</string>
     <string name="reset_filters">Filter zurücksetzen</string>
     <string name="import_export"><![CDATA[Importieren & Exportieren]]></string>
-    <string name="export_activities">Exportieren</string>
-    <string name="import_activities">Importieren</string>
+    <string name="export_activities">Aktivitäten Exportieren</string>
+    <string name="import_activities">Aktivitäten Importieren</string>
     <string name="activity_log">Aktivitätslog</string>
     <string name="this_week">Diese Woche</string>
     <string name="last_seven_days">7 Tage</string>
@@ -200,4 +200,9 @@
     <string name="no_activities_on_day">Keine Aktivitäten an diesem Tag</string>
     <string name="number_of_activities_n">Anzahl Aktivitäten: %1s</string>
     <string name="show_day">Tag anzeigen</string>
+    <string name="click_to_set_type">Klicken, um die Aktivitätsart zu wählen…</string>
+    <string name="confirm_import">Importieren</string>
+    <string name="choose_activity_type">Aktivitätsart auswählen</string>
+    <string name="could_not_read_input_file">Konnte die Eingabedatei nicht lesen</string>
+    <string name="title_activity_import">Aktivititäten importieren</string>
 </resources>

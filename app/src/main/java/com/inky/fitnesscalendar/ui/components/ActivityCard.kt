@@ -45,7 +45,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
+import com.inky.fitnesscalendar.data.measure.Duration.Companion.until
 import com.inky.fitnesscalendar.db.entities.Activity
+import com.inky.fitnesscalendar.db.entities.Place
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.util.skipToLookaheadSize
@@ -66,7 +68,6 @@ fun ActivityCard(
 ) {
     val activity = richActivity.activity
     val activityType = richActivity.type
-    val place = richActivity.place
 
     var showContextMenu by rememberSaveable { mutableStateOf(false) }
     var showImageViewer by rememberSaveable { mutableStateOf(false) }
@@ -75,9 +76,6 @@ fun ActivityCard(
     val time = remember(activity) {
         localizationRepository.timeFormatter.format(activity.startTime)
     }
-    val description = remember(activity) { activity.description }
-    val timeElapsed = remember(activity) { activity.duration }
-    val velocity = remember(activity) { activity.velocity }
 
     val haptics = LocalHapticFeedback.current
 
@@ -110,102 +108,7 @@ fun ActivityCard(
             modifier = Modifier.padding(horizontal = 4.dp)
         )
 
-        if (activity.vehicle != null || timeElapsed.elapsedMs > 0) {
-            HorizontalDivider()
-        }
-
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(all = 8.dp), horizontalArrangement = Arrangement.SpaceAround
-        ) {
-            if (activity.vehicle != null) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(activity.vehicle.emoji, style = MaterialTheme.typography.bodyLarge)
-                    Text(
-                        stringResource(activity.vehicle.nameId),
-                        style = MaterialTheme.typography.bodyLarge
-                    )
-                }
-            }
-
-            if (activity.feel != null) {
-                Text(activity.feel.emoji, style = MaterialTheme.typography.bodyLarge)
-            }
-
-            if (timeElapsed.elapsedMs > 0) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        painterResource(R.drawable.outline_timer_24),
-                        stringResource(R.string.time)
-                    )
-                    Text(timeElapsed.format(), style = MaterialTheme.typography.bodyLarge)
-                }
-            }
-
-            if (activity.distance != null) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        Icons.AutoMirrored.Outlined.ArrowForward,
-                        stringResource(R.string.distance)
-                    )
-                    Text(
-                        stringResource(
-                            R.string.n_kilometers,
-                            "%.1f".format(activity.distance.kilometers)
-                        )
-                    )
-                }
-            }
-
-            if (velocity != null) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        painterResource(R.drawable.outline_speed_24),
-                        stringResource(R.string.speed)
-                    )
-                    Text(
-                        stringResource(R.string.x_kmh, "%.1f".format(velocity.kmh))
-                    )
-                }
-            }
-
-            if (activity.intensity != null) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Icon(
-                        painterResource(R.drawable.twotone_lightbulb_24),
-                        stringResource(R.string.intensity),
-                        tint = lerp(
-                            colorResource(R.color.intensity_low),
-                            colorResource(R.color.intensity_high),
-                            activity.intensity.value.toFloat() / 10f
-                        )
-                    )
-                    Text(activity.intensity.value.toString())
-                }
-            }
-        }
-
-        if (place != null) {
-            HorizontalDivider()
-            PlaceInfo(
-                place,
-                modifier = Modifier
-                    .padding(all = 8.dp)
-                    .fillMaxWidth()
-            )
-        }
-
-        if (description.isNotEmpty()) {
-            HorizontalDivider()
-            Text(
-                description,
-                overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(all = 8.dp)
-            )
-        }
+        ActivityCardContent(activity, richActivity.place)
 
         if (activity.imageUri != null) {
             HorizontalDivider()
@@ -250,9 +153,152 @@ fun ActivityCard(
     }
 }
 
+@Composable
+fun CompactActivityCard(
+    richActivity: RichActivity,
+    localizationRepository: LocalizationRepository,
+    modifier: Modifier = Modifier,
+    expand: Boolean = false,
+) {
+    val (activity, activityType) = richActivity
+
+    val title = remember(activityType) { "${activityType.emoji} ${activityType.name}" }
+    val time = remember(activity) {
+        localizationRepository.formatRelativeDate(activity.startTime)
+    }
+
+    Card(
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp, vertical = 4.dp)
+    ) {
+        Text(
+            time,
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.secondary,
+            modifier = Modifier
+                .align(Alignment.End)
+                .padding(horizontal = 4.dp)
+        )
+        Text(
+            title,
+            style = MaterialTheme.typography.displaySmall,
+            color = MaterialTheme.colorScheme.primary,
+            modifier = Modifier.padding(horizontal = 4.dp)
+        )
+
+        if (expand) {
+            ActivityCardContent(activity = activity, place = richActivity.place)
+        }
+    }
+}
+
+@Composable
+private fun ActivityCardContent(activity: Activity, place: Place?) {
+    val timeElapsed = remember(activity) { activity.startTime until activity.endTime }
+
+    if (activity.vehicle != null || timeElapsed.elapsedMs > 0) {
+        HorizontalDivider()
+    }
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(all = 8.dp), horizontalArrangement = Arrangement.SpaceAround
+    ) {
+        if (activity.vehicle != null) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(activity.vehicle.emoji, style = MaterialTheme.typography.bodyLarge)
+                Text(
+                    stringResource(activity.vehicle.nameId),
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+        }
+
+        if (activity.feel != null) {
+            Text(activity.feel.emoji, style = MaterialTheme.typography.bodyLarge)
+        }
+
+        if (timeElapsed.elapsedMs > 0) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    painterResource(R.drawable.outline_timer_24),
+                    stringResource(R.string.time)
+                )
+                Text(timeElapsed.format(), style = MaterialTheme.typography.bodyLarge)
+            }
+        }
+
+        if (activity.distance != null) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    Icons.AutoMirrored.Outlined.ArrowForward,
+                    stringResource(R.string.distance)
+                )
+                Text(
+                    stringResource(
+                        R.string.n_kilometers,
+                        "%.1f".format(activity.distance.kilometers)
+                    )
+                )
+            }
+        }
+
+        if (activity.velocity != null) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    painterResource(R.drawable.outline_speed_24),
+                    stringResource(R.string.speed)
+                )
+                Text(
+                    stringResource(R.string.x_kmh, "%.1f".format(activity.velocity!!.kmh))
+                )
+            }
+        }
+
+        if (activity.intensity != null) {
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Icon(
+                    painterResource(R.drawable.twotone_lightbulb_24),
+                    stringResource(R.string.intensity),
+                    tint = lerp(
+                        colorResource(R.color.intensity_low),
+                        colorResource(R.color.intensity_high),
+                        activity.intensity.value.toFloat() / 10f
+                    )
+                )
+                Text(activity.intensity.value.toString())
+            }
+        }
+    }
+
+    if (place != null) {
+        HorizontalDivider()
+        PlaceInfo(
+            place,
+            modifier = Modifier
+                .padding(all = 8.dp)
+                .fillMaxWidth()
+        )
+    }
+
+    if (activity.description.isNotEmpty()) {
+        HorizontalDivider()
+        Text(
+            activity.description,
+            overflow = TextOverflow.Ellipsis,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(all = 8.dp)
+        )
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ActivityCardContextMenu(
+private fun ActivityCardContextMenu(
     onDismiss: () -> Unit,
     onDelete: () -> Unit,
     onJumpTo: (() -> Unit)?,
