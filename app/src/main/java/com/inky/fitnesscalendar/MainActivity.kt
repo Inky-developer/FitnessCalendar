@@ -16,6 +16,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import com.inky.fitnesscalendar.ui.App
 import com.inky.fitnesscalendar.ui.theme.FitnessCalendarTheme
+import com.inky.fitnesscalendar.util.EXTRA_TOAST
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -30,6 +31,11 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         requestNotificationPermission()
+
+        val toastMsg = intent.getStringExtra(EXTRA_TOAST)
+        if (toastMsg != null) {
+            Toast.makeText(this, toastMsg, Toast.LENGTH_LONG).show()
+        }
 
         setContent {
             FitnessCalendarTheme {

@@ -38,8 +38,8 @@
     <string name="no_activities_with_filter">No activities that match the filter</string>
     <string name="reset_filters">Reset filters</string>
     <string name="import_export"><![CDATA[Import & Export]]></string>
-    <string name="export_activities">Export</string>
-    <string name="import_activities">Import</string>
+    <string name="export_activities">Export activities</string>
+    <string name="import_activities">Import activities</string>
     <string name="activity_log">Activity Log</string>
     <string name="this_week">This Week</string>
     <string name="last_seven_days">7 Days</string>
@@ -197,4 +197,9 @@
         <item quantity="one">Imported %1d activity</item>
         <item quantity="other">Imported %1d activities</item>
     </plurals>
+    <string name="title_activity_import">Import activities</string>
+    <string name="click_to_set_type">Click to set type…</string>
+    <string name="confirm_import">Import</string>
+    <string name="choose_activity_type">Choose activity type</string>
+    <string name="could_not_read_input_file">Could not read input file</string>
 </resources>
