@@ -11,6 +11,7 @@ import com.inky.fitnesscalendar.AppRepository
 import com.inky.fitnesscalendar.MainActivity
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.gpx.GpxTrack
+import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.util.EXTRA_TOAST
 import com.inky.fitnesscalendar.util.gpx.GpxReader
@@ -59,6 +60,11 @@ class ImportViewModel @Inject constructor(
         context.startActivity(intent)
         closeActivity()
     }
+
+    fun updateTypeMapping(key: String, value: ActivityType) =
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.setActivityTypeName(key, value)
+        }
 
     fun loadFiles(files: List<ParcelFileDescriptor>) = viewModelScope.launch(Dispatchers.IO) {
         _done.value = false

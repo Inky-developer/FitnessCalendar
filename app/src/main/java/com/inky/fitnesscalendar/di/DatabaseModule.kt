@@ -33,4 +33,7 @@ class DatabaseModule {
 
     @Provides
     fun placeDao(database: AppDatabase) = database.placeDao()
+
+    @Provides
+    fun activityTypeNameDao(database: AppDatabase) = database.activityTypeNameDao()
 }

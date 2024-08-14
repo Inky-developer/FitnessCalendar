@@ -14,12 +14,14 @@ import com.inky.fitnesscalendar.data.activity_filter.DateRangeOption
 import com.inky.fitnesscalendar.db.AppDatabase
 import com.inky.fitnesscalendar.db.dao.ActivityDao
 import com.inky.fitnesscalendar.db.dao.ActivityTypeDao
+import com.inky.fitnesscalendar.db.dao.ActivityTypeNameDao
 import com.inky.fitnesscalendar.db.dao.DayDao
 import com.inky.fitnesscalendar.db.dao.FilterHistoryDao
 import com.inky.fitnesscalendar.db.dao.PlaceDao
 import com.inky.fitnesscalendar.db.dao.RecordingDao
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.ActivityType
+import com.inky.fitnesscalendar.db.entities.ActivityTypeName
 import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.db.entities.Place
 import com.inky.fitnesscalendar.db.entities.Recording
@@ -50,6 +52,7 @@ class AppRepository @Inject constructor(
     private val recordingDao: RecordingDao,
     private val activityTypeDao: ActivityTypeDao,
     private val filterHistoryDao: FilterHistoryDao,
+    private val activityTypeNameDao: ActivityTypeNameDao,
     private val dayDao: DayDao,
     private val placeDao: PlaceDao,
     val localizationRepository: LocalizationRepository
@@ -204,4 +207,13 @@ class AppRepository @Inject constructor(
     fun getPlaces() = placeDao.getAll()
 
     fun getActivityCountPerPlace() = placeDao.getWithActivityCount()
+
+    fun getActivityTypeNames() =
+        activityTypeNameDao
+            .getAll()
+            .map { names -> names.associate { it.typeName.name to it.type } }
+
+    suspend fun setActivityTypeName(name: String, type: ActivityType) = activityTypeNameDao.set(
+        ActivityTypeName(name, type.uid!!)
+    )
 }
