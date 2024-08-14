@@ -12,6 +12,7 @@ import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -23,12 +24,12 @@ class ActivityTypeViewModel @Inject constructor(
     ViewModel() {
     val snackbarHostState = SnackbarHostState()
 
-    fun save(activityType: ActivityType) = viewModelScope.launch {
+    fun save(activityType: ActivityType) = viewModelScope.launch(Dispatchers.IO) {
         repository.saveActivityType(activityType)
     }
 
     fun delete(activityType: ActivityType) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             try {
                 repository.deleteActivityType(activityType)
                 val result = snackbarHostState.showSnackbar(

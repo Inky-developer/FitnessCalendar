@@ -12,6 +12,7 @@ import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.db.entities.Place
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.launchIn
@@ -44,11 +45,11 @@ class PlaceListViewModel @Inject constructor(
 
     fun get(placeId: Int) = repository.getPlace(placeId)
 
-    fun save(place: Place) = viewModelScope.launch {
+    fun save(place: Place) = viewModelScope.launch(Dispatchers.IO) {
         repository.savePlace(place)
     }
 
-    fun delete(place: Place) = viewModelScope.launch {
+    fun delete(place: Place) = viewModelScope.launch(Dispatchers.IO) {
         try {
             repository.deletePlace(place)
             val result = snackbarHostState.showSnackbar(
