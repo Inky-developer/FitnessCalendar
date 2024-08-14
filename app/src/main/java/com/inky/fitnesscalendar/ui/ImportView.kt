@@ -26,9 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -48,6 +46,7 @@ import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivityTypeSelector
 import com.inky.fitnesscalendar.ui.components.BaseEditDialog
 import com.inky.fitnesscalendar.ui.components.CompactActivityCard
+import com.inky.fitnesscalendar.ui.util.localDatabaseValues
 import com.inky.fitnesscalendar.view_model.ImportViewModel
 
 @Composable
@@ -69,7 +68,8 @@ fun ImportView(viewModel: ImportViewModel) {
         ImportView(
             tracks = tracks,
             localizationRepository = viewModel.repository.localizationRepository,
-            onImport = { viewModel.import(it) }
+            onImport = viewModel::import,
+            onTypeMapping = viewModel::updateTypeMapping
         )
     }
 }
@@ -79,16 +79,14 @@ fun ImportView(viewModel: ImportViewModel) {
 fun ImportView(
     tracks: List<GpxTrack>,
     localizationRepository: LocalizationRepository,
-    onImport: (List<RichActivity>) -> Unit
+    onImport: (List<RichActivity>) -> Unit,
+    onTypeMapping: (String, ActivityType) -> Unit,
 ) {
-    val typeMapping = remember { mutableStateMapOf<String, ActivityType>() }
-
-    val saveButtonEnabled by remember {
-        derivedStateOf {
-            tracks.all {
-                val type = typeMapping[it.type]
-                type != null && it.toRichActivity(type) != null
-            }
+    val typeMapping = localDatabaseValues.current.activityTypeNames
+    val saveButtonEnabled = remember(tracks, typeMapping) {
+        tracks.all {
+            val type = typeMapping[it.type]
+            type != null && it.toRichActivity(type) != null
         }
     }
 
@@ -141,7 +139,8 @@ fun ImportView(
                     track = track,
                     selectedType = type,
                     localizationRepository = localizationRepository,
-                    onChangeType = { key, value -> typeMapping[key] = value })
+                    onChangeType = { key, value -> onTypeMapping(key, value) }
+                )
             }
         }
     }

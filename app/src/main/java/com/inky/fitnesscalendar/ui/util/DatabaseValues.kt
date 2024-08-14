@@ -15,6 +15,7 @@ import com.inky.fitnesscalendar.db.entities.Place
  */
 data class DatabaseValues(
     val activityTypes: List<ActivityType> = emptyList(),
+    val activityTypeNames: Map<String, ActivityType> = emptyMap(),
     val activityTypeRows: List<List<ActivityType>> = emptyList(),
     val places: List<Place> = emptyList()
 )
@@ -26,15 +27,17 @@ fun ProvideDatabaseValues(repository: AppRepository, content: @Composable () -> 
     val activityTypes by repository
         .getActivityTypes()
         .collectAsState(initial = emptyList())
+    val typeNames by repository.getActivityTypeNames().collectAsState(initial = emptyMap())
     val activityTypeRows by repository
         .getActivityTypeRows()
         .collectAsState(initial = emptyList())
     val places by repository
         .getPlaces()
         .collectAsState(initial = emptyList())
-    val databaseValues = remember(activityTypes, activityTypeRows, places) {
+    val databaseValues = remember(activityTypes, activityTypeRows, places, typeNames) {
         DatabaseValues(
             activityTypes = activityTypes,
+            activityTypeNames = typeNames,
             activityTypeRows = activityTypeRows,
             places = places
         )

@@ -9,12 +9,14 @@ import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.inky.fitnesscalendar.db.dao.ActivityDao
 import com.inky.fitnesscalendar.db.dao.ActivityTypeDao
+import com.inky.fitnesscalendar.db.dao.ActivityTypeNameDao
 import com.inky.fitnesscalendar.db.dao.DayDao
 import com.inky.fitnesscalendar.db.dao.FilterHistoryDao
 import com.inky.fitnesscalendar.db.dao.PlaceDao
 import com.inky.fitnesscalendar.db.dao.RecordingDao
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.ActivityType
+import com.inky.fitnesscalendar.db.entities.ActivityTypeName
 import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.db.entities.FilterHistoryItem
 import com.inky.fitnesscalendar.db.entities.Place
@@ -22,8 +24,16 @@ import com.inky.fitnesscalendar.db.entities.Recording
 import com.inky.fitnesscalendar.util.DATABASE_NAME
 
 @Database(
-    version = 18,
-    entities = [Activity::class, Recording::class, ActivityType::class, FilterHistoryItem::class, Day::class, Place::class],
+    version = 19,
+    entities = [
+        Activity::class,
+        Recording::class,
+        ActivityType::class,
+        FilterHistoryItem::class,
+        Day::class,
+        Place::class,
+        ActivityTypeName::class
+    ],
     autoMigrations = [
         AutoMigration(from = 2, to = 3),
         AutoMigration(from = 3, to = 4),
@@ -34,6 +44,7 @@ import com.inky.fitnesscalendar.util.DATABASE_NAME
         AutoMigration(from = 14, to = 15),
         AutoMigration(from = 15, to = 16),
         AutoMigration(from = 16, to = 17),
+        AutoMigration(from = 18, to = 19),
     ]
 )
 @TypeConverters(Converters::class)
@@ -49,6 +60,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun dayDao(): DayDao
 
     abstract fun placeDao(): PlaceDao
+
+    abstract fun activityTypeNameDao(): ActivityTypeNameDao
 
     companion object {
         @Volatile
