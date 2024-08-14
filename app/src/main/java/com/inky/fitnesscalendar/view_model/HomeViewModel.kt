@@ -50,7 +50,7 @@ class HomeViewModel @Inject constructor(
         repository.getDay(EpochDay.today()).onEach { _today.emit(it) }.launchIn(viewModelScope)
     }
 
-    fun updateDay(day: Day) = viewModelScope.launch {
+    fun updateDay(day: Day) = viewModelScope.launch(Dispatchers.IO) {
         repository.saveDay(day)
     }
 

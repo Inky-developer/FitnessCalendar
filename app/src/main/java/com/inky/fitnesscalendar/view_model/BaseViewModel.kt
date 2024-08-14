@@ -13,6 +13,7 @@ import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -24,17 +25,17 @@ open class BaseViewModel @Inject constructor(
     val snackbarHostState = SnackbarHostState()
 
     fun addToFilterHistory(filter: ActivityFilter) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             repository.upsertFilterHistoryChips(filter.items())
         }
     }
 
-    fun saveDay(day: Day) = viewModelScope.launch {
+    fun saveDay(day: Day) = viewModelScope.launch(Dispatchers.IO) {
         repository.saveDay(day)
     }
 
     fun deleteActivity(richActivity: RichActivity) {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             repository.deleteActivity(richActivity.activity)
             val result = snackbarHostState.showSnackbar(
                 context.getString(R.string.deleted_activity),

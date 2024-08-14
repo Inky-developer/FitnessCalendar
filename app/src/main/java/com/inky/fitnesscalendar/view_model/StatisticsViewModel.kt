@@ -55,7 +55,7 @@ class StatisticsViewModel @Inject constructor(
     val modelProducer = CartesianChartModelProducer()
 
     init {
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             appRepository.getActivityTypes().collect {
                 activityTypes.value = it
             }
@@ -64,7 +64,7 @@ class StatisticsViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             snapshotFlow { period to grouping }.collect { refreshActivities() }
         }
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             snapshotFlow { projection to activityTypes }.collect { refreshModel() }
         }
 

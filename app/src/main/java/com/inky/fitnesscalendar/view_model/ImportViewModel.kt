@@ -41,7 +41,7 @@ class ImportViewModel @Inject constructor(
     private val _error = mutableStateOf(false)
     val error: State<Boolean> get() = _error
 
-    fun import(activities: List<RichActivity>) = viewModelScope.launch {
+    fun import(activities: List<RichActivity>) = viewModelScope.launch(Dispatchers.IO) {
         for (activity in activities) {
             repository.saveActivity(activity)
         }

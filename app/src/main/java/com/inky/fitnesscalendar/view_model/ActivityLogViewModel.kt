@@ -11,6 +11,7 @@ import com.inky.fitnesscalendar.view_model.activity_log.ActivityListItem
 import com.inky.fitnesscalendar.view_model.activity_log.ActivityListState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancelAndJoin
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -55,7 +56,7 @@ class ActivityLogViewModel @Inject constructor(
         updateJob(filter)
     }
 
-    private fun updateJob(filter: ActivityFilter) = viewModelScope.launch {
+    private fun updateJob(filter: ActivityFilter) = viewModelScope.launch(Dispatchers.IO) {
         activityListStateUpdateJob?.cancelAndJoin()
         activityListStateUpdateJob = repository
             .getActivities(filter)

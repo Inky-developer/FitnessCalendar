@@ -49,7 +49,7 @@ class ImportExportViewModel @Inject constructor(
         _importData.emit(emptyList())
     }
 
-    fun confirmImport(data: List<RichActivity>) = viewModelScope.launch {
+    fun confirmImport(data: List<RichActivity>) = viewModelScope.launch(Dispatchers.IO) {
         _showImportDialog.emit(false)
         for (typeActivity in data) {
             repository.saveActivity(typeActivity)
