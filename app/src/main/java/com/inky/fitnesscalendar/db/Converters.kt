@@ -4,7 +4,10 @@ import android.net.Uri
 import androidx.room.TypeConverter
 import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.data.Intensity
+import com.inky.fitnesscalendar.data.gpx.GpxTrackPoint
 import com.inky.fitnesscalendar.data.measure.Distance
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import java.util.Date
 
 class Converters {
@@ -56,5 +59,15 @@ class Converters {
     @TypeConverter
     fun byteToIntensity(value: Byte): Intensity {
         return Intensity(value)
+    }
+
+    @TypeConverter
+    fun trackPointsToByteArray(points: List<GpxTrackPoint>): ByteArray {
+        return Json.encodeToString(points).toByteArray()
+    }
+
+    @TypeConverter
+    fun byteArrayToTrackPoints(array: ByteArray): List<GpxTrackPoint> {
+        return Json.decodeFromString(array.toString())
     }
 }

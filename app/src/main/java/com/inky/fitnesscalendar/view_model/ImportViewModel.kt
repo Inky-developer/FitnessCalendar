@@ -13,6 +13,7 @@ import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.gpx.GpxTrack
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.RichActivity
+import com.inky.fitnesscalendar.db.entities.Track
 import com.inky.fitnesscalendar.util.EXTRA_TOAST
 import com.inky.fitnesscalendar.util.gpx.GpxReader
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -41,25 +42,29 @@ class ImportViewModel @Inject constructor(
     private val _error = mutableStateOf(false)
     val error: State<Boolean> get() = _error
 
-    fun import(activities: List<RichActivity>) = viewModelScope.launch(Dispatchers.IO) {
-        for (activity in activities) {
-            repository.saveActivity(activity)
-        }
+    fun import(activities: List<Pair<RichActivity, GpxTrack>>) =
+        viewModelScope.launch(Dispatchers.IO) {
+            for ((activity, gpxTrack) in activities) {
+                val activityId = repository.saveActivity(activity)
 
-        val intent = Intent(context, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_TASK_ON_HOME or Intent.FLAG_ACTIVITY_NEW_TASK
-            putExtra(
-                EXTRA_TOAST,
-                context.resources.getQuantityString(
-                    R.plurals.imported_activities,
-                    activities.size,
-                    activities.size
+                val track = Track(activityId = activityId, points = gpxTrack.points)
+                repository.saveTrack(track)
+            }
+
+            val intent = Intent(context, MainActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_TASK_ON_HOME or Intent.FLAG_ACTIVITY_NEW_TASK
+                putExtra(
+                    EXTRA_TOAST,
+                    context.resources.getQuantityString(
+                        R.plurals.imported_activities,
+                        activities.size,
+                        activities.size
+                    )
                 )
-            )
+            }
+            context.startActivity(intent)
+            closeActivity()
         }
-        context.startActivity(intent)
-        closeActivity()
-    }
 
     fun updateTypeMapping(key: String, value: ActivityType) =
         viewModelScope.launch(Dispatchers.IO) {

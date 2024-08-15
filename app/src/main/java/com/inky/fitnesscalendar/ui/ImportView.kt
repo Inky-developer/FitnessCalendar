@@ -79,7 +79,7 @@ fun ImportView(viewModel: ImportViewModel) {
 fun ImportView(
     tracks: List<GpxTrack>,
     localizationRepository: LocalizationRepository,
-    onImport: (List<RichActivity>) -> Unit,
+    onImport: (List<Pair<RichActivity, GpxTrack>>) -> Unit,
     onTypeMapping: (String, ActivityType) -> Unit,
 ) {
     val typeMapping = localDatabaseValues.current.activityTypeNames
@@ -107,10 +107,12 @@ fun ImportView(
             AnimatedVisibility(visible = saveButtonEnabled) {
                 ExtendedFloatingActionButton(
                     onClick = {
-                        val activities = tracks.mapNotNull { track ->
-                            typeMapping[track.type]?.let { track.toRichActivity(it) }
+                        val activitiesAndTracks = tracks.mapNotNull { track ->
+                            typeMapping[track.type]
+                                ?.let { track.toRichActivity(it) }
+                                ?.let { it to track }
                         }
-                        onImport(activities)
+                        onImport(activitiesAndTracks)
                     },
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {

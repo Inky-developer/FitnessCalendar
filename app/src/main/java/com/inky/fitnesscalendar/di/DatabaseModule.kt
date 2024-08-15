@@ -36,4 +36,7 @@ class DatabaseModule {
 
     @Provides
     fun activityTypeNameDao(database: AppDatabase) = database.activityTypeNameDao()
+
+    @Provides
+    fun tackDao(database: AppDatabase) = database.trackDao()
 }

@@ -19,6 +19,7 @@ import com.inky.fitnesscalendar.db.dao.DayDao
 import com.inky.fitnesscalendar.db.dao.FilterHistoryDao
 import com.inky.fitnesscalendar.db.dao.PlaceDao
 import com.inky.fitnesscalendar.db.dao.RecordingDao
+import com.inky.fitnesscalendar.db.dao.TrackDao
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.ActivityTypeName
@@ -27,6 +28,7 @@ import com.inky.fitnesscalendar.db.entities.Place
 import com.inky.fitnesscalendar.db.entities.Recording
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.db.entities.RichRecording
+import com.inky.fitnesscalendar.db.entities.Track
 import com.inky.fitnesscalendar.di.ActivityTypeOrder
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.preferences.Preference
@@ -53,6 +55,7 @@ class AppRepository @Inject constructor(
     private val activityTypeDao: ActivityTypeDao,
     private val filterHistoryDao: FilterHistoryDao,
     private val activityTypeNameDao: ActivityTypeNameDao,
+    private val trackDao: TrackDao,
     private val dayDao: DayDao,
     private val placeDao: PlaceDao,
     val localizationRepository: LocalizationRepository
@@ -102,8 +105,8 @@ class AppRepository @Inject constructor(
 
     fun getMostRecentActivity() = activityDao.getMostRecentActivity()
 
-    suspend fun saveActivity(activity: RichActivity) {
-        activityDao.save(activity.clean().activity)
+    suspend fun saveActivity(activity: RichActivity): Int {
+        return activityDao.save(activity.clean().activity).toInt()
     }
 
     suspend fun deleteActivity(activity: Activity) {
@@ -216,4 +219,6 @@ class AppRepository @Inject constructor(
     suspend fun setActivityTypeName(name: String, type: ActivityType) = activityTypeNameDao.set(
         ActivityTypeName(name, type.uid!!)
     )
+
+    suspend fun saveTrack(track: Track) = trackDao.upsert(track)
 }
