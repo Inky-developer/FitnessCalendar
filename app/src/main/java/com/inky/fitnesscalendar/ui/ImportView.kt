@@ -245,6 +245,7 @@ private fun GpxTrack.toRichActivity(type: ActivityType): RichActivity? {
             distance = computeLength(),
         ),
         type = type,
-        place = null
+        place = null,
+        track = null,
     )
 }

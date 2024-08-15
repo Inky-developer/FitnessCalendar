@@ -68,6 +68,6 @@ class Converters {
 
     @TypeConverter
     fun byteArrayToTrackPoints(array: ByteArray): List<GpxTrackPoint> {
-        return Json.decodeFromString(array.toString())
+        return Json.decodeFromString(array.decodeToString())
     }
 }

@@ -470,7 +470,8 @@ private data class ActivityEditState(
         return RichActivity(
             activity = newActivity,
             place = activitySelectorState.place,
-            type = activitySelectorState.activityType
+            type = activitySelectorState.activityType,
+            track = initialActivity?.track
         )
     }
 }
