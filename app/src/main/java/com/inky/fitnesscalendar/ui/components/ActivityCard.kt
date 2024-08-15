@@ -66,15 +66,12 @@ fun ActivityCard(
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainer,
     contentColor: Color = MaterialTheme.colorScheme.primary
 ) {
-    val activity = richActivity.activity
-    val activityType = richActivity.type
-
     var showContextMenu by rememberSaveable { mutableStateOf(false) }
     var showImageViewer by rememberSaveable { mutableStateOf(false) }
 
-    val title = remember(activityType) { "${activityType.emoji} ${activityType.name}" }
-    val time = remember(activity) {
-        localizationRepository.timeFormatter.format(activity.startTime)
+    val title = remember(richActivity) { "${richActivity.type.emoji} ${richActivity.type.name}" }
+    val time = remember(richActivity) {
+        localizationRepository.timeFormatter.format(richActivity.activity.startTime)
     }
 
     val haptics = LocalHapticFeedback.current
@@ -85,7 +82,7 @@ fun ActivityCard(
             .fillMaxWidth()
             .padding(horizontal = 8.dp, vertical = 4.dp)
             .combinedClickable(
-                onClick = { onEdit(activity) },
+                onClick = { onEdit(richActivity.activity) },
                 onLongClick = {
                     haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                     showContextMenu = true
@@ -108,12 +105,12 @@ fun ActivityCard(
             modifier = Modifier.padding(horizontal = 4.dp)
         )
 
-        ActivityCardContent(activity, richActivity.place)
+        ActivityCardContent(richActivity.activity, richActivity.place)
 
-        if (activity.imageUri != null) {
+        if (richActivity.activity.imageUri != null) {
             HorizontalDivider()
             ActivityImage(
-                uri = activity.imageUri,
+                uri = richActivity.activity.imageUri,
                 onClick = { showImageViewer = true },
                 modifier = Modifier.padding(all = 8.dp)
             )
@@ -142,14 +139,16 @@ fun ActivityCard(
             onFilterByType = onFilter?.let {
                 {
                     showContextMenu = false
-                    it(ActivityFilter(types = listOf(activityType)))
+                    it(ActivityFilter(types = listOf(richActivity.type)))
                 }
             }
         )
     }
 
-    if (showImageViewer && activity.imageUri != null) {
-        ImageViewer(imageUri = activity.imageUri, onDismiss = { showImageViewer = false })
+    if (showImageViewer && richActivity.activity.imageUri != null) {
+        ImageViewer(
+            imageUri = richActivity.activity.imageUri,
+            onDismiss = { showImageViewer = false })
     }
 }
 
