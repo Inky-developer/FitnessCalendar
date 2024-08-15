@@ -77,7 +77,7 @@ abstract class ActivityDao {
     abstract suspend fun getImages(): List<Uri>
 
     @Upsert
-    abstract suspend fun save(activity: Activity)
+    abstract suspend fun save(activity: Activity): Long
 
     @Delete
     abstract suspend fun delete(activity: Activity)

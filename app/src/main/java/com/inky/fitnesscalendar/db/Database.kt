@@ -14,6 +14,7 @@ import com.inky.fitnesscalendar.db.dao.DayDao
 import com.inky.fitnesscalendar.db.dao.FilterHistoryDao
 import com.inky.fitnesscalendar.db.dao.PlaceDao
 import com.inky.fitnesscalendar.db.dao.RecordingDao
+import com.inky.fitnesscalendar.db.dao.TrackDao
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.ActivityTypeName
@@ -21,10 +22,11 @@ import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.db.entities.FilterHistoryItem
 import com.inky.fitnesscalendar.db.entities.Place
 import com.inky.fitnesscalendar.db.entities.Recording
+import com.inky.fitnesscalendar.db.entities.Track
 import com.inky.fitnesscalendar.util.DATABASE_NAME
 
 @Database(
-    version = 19,
+    version = 20,
     entities = [
         Activity::class,
         Recording::class,
@@ -32,7 +34,8 @@ import com.inky.fitnesscalendar.util.DATABASE_NAME
         FilterHistoryItem::class,
         Day::class,
         Place::class,
-        ActivityTypeName::class
+        ActivityTypeName::class,
+        Track::class,
     ],
     autoMigrations = [
         AutoMigration(from = 2, to = 3),
@@ -45,6 +48,7 @@ import com.inky.fitnesscalendar.util.DATABASE_NAME
         AutoMigration(from = 15, to = 16),
         AutoMigration(from = 16, to = 17),
         AutoMigration(from = 18, to = 19),
+        AutoMigration(from = 19, to = 20),
     ]
 )
 @TypeConverters(Converters::class)
@@ -62,6 +66,8 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun placeDao(): PlaceDao
 
     abstract fun activityTypeNameDao(): ActivityTypeNameDao
+
+    abstract fun trackDao(): TrackDao
 
     companion object {
         @Volatile
