@@ -42,6 +42,7 @@ import com.inky.fitnesscalendar.data.gpx.GpxTrack
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.RichActivity
+import com.inky.fitnesscalendar.db.entities.Track
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivityTypeSelector
 import com.inky.fitnesscalendar.ui.components.BaseEditDialog
@@ -159,11 +160,13 @@ fun TrackView(
     var selectedActivityType by rememberSaveable { mutableStateOf<ActivityType?>(null) }
     val richActivity =
         remember(track, selectedType) { selectedType?.let { track.toRichActivity(selectedType) } }
+    val dbTrack = remember(track) { Track(activityId = -1, points = track.points) }
 
     Box(modifier = Modifier.clickable { dialogOpen = true }) {
         if (richActivity != null) {
             CompactActivityCard(
                 richActivity = richActivity,
+                track = dbTrack,
                 localizationRepository = localizationRepository,
                 expand = true
             )
