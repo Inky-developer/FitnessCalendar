@@ -448,7 +448,7 @@ private fun rememberTrackPath(track: Track?, canvasSize: Size?): Path? {
     var path by remember { mutableStateOf<Path?>(null) }
 
     LaunchedEffect(track, canvasSize) {
-        launch(Dispatchers.IO) {
+        launch(Dispatchers.Default) {
             path = generateTrackPath(track, canvasSize)
         }
     }
