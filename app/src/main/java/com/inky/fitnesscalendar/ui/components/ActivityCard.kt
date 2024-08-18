@@ -55,8 +55,10 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
+import com.inky.fitnesscalendar.data.gpx.Coordinate
 import com.inky.fitnesscalendar.data.measure.Duration.Companion.until
 import com.inky.fitnesscalendar.db.entities.Activity
+import com.inky.fitnesscalendar.db.entities.CoordinateRect
 import com.inky.fitnesscalendar.db.entities.Place
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.db.entities.Track
@@ -437,7 +439,6 @@ private fun CardWithCanvas(
     }
 }
 
-private const val strokeSize = 8f
 
 @Composable
 private fun rememberTrackPath(track: Track?, canvasSize: Size?): Path? {
@@ -457,47 +458,68 @@ private fun rememberTrackPath(track: Track?, canvasSize: Size?): Path? {
 }
 
 private fun DrawScope.drawTrackPath(trackPath: Path, color: Color) {
-    drawPath(trackPath, color.copy(alpha = 0.25f), style = Stroke(strokeSize))
+    drawPath(trackPath, color.copy(alpha = 0.25f), style = Stroke(PathGeneratorState.STROKE_SIZE))
+}
+
+private data class PathGeneratorState(
+    val bounds: CoordinateRect,
+    val scale: Float,
+    val xOff: Float,
+    val yOff: Float
+) {
+    inline fun coordinateToUiPos(coordinate: Coordinate, handler: (Float, Float) -> Unit) {
+        // y axis is inverted for canvas (0 at the top, but latitude is 0 at equator and increases north)
+        val lat = yOff - (coordinate.latitude - bounds.latitudeMin).toFloat() * scale
+        val lon = xOff + (coordinate.longitude - bounds.longitudeMin).toFloat() * scale
+        handler(lat, lon)
+    }
+
+    companion object {
+        const val PADDING = 16f
+        const val STROKE_SIZE = 8f
+
+        fun create(bounds: CoordinateRect, size: Size): PathGeneratorState {
+            val effectiveHeight = size.height - STROKE_SIZE - PADDING
+            val effectiveWidth = size.width - STROKE_SIZE - PADDING
+
+            val scale = minOf(
+                effectiveWidth / (bounds.longitudeMax - bounds.longitudeMin),
+                effectiveHeight / (bounds.latitudeMax - bounds.latitudeMin)
+            ).toFloat()
+
+            val maxX = (bounds.longitudeMax - bounds.longitudeMin) * scale
+            val maxY = (bounds.latitudeMax - bounds.latitudeMin) * scale
+
+            // Align right center
+            val yOff = size.height - (size.height - maxY).toFloat() / 2f
+            val xOff = size.width - (PADDING + STROKE_SIZE) / 2f - maxX.toFloat()
+
+            return PathGeneratorState(bounds = bounds, scale = scale, xOff = xOff, yOff = yOff)
+        }
+    }
 }
 
 private fun generateTrackPath(track: Track, canvasSize: Size): Path? {
-    val path = Path()
-    val padding = 16f
-    val bounds = track.calculateBounds() ?: return null
-    val effectiveHeight = canvasSize.height - strokeSize - padding
-    val effectiveWidth = canvasSize.width - strokeSize - padding
-    val scale = minOf(
-        effectiveWidth / (bounds.longitudeMax - bounds.longitudeMin),
-        effectiveHeight / (bounds.latitudeMax - bounds.latitudeMin)
-    )
-    val maxX = (bounds.longitudeMax - bounds.longitudeMin) * scale
-    val maxY = (bounds.latitudeMax - bounds.latitudeMin) * scale
+    if (track.points.isEmpty()) {
+        return null
+    }
 
-    // Align right center
-    val yOff = canvasSize.height - (canvasSize.height - maxY) / 2f
-    val xOff = canvasSize.width - (padding + strokeSize) / 2f - maxX
+    val path = Path()
+    val bounds = track.calculateBounds() ?: return null
+    val state = PathGeneratorState.create(bounds, canvasSize)
 
     val stepSize = 8
-    for (index in 0..<track.points.size step stepSize) {
+    state.coordinateToUiPos(track.points[0].coordinate) { lat, lon -> path.moveTo(lon, lat) }
+    for (index in stepSize..<track.points.size step stepSize) {
         val point = track.points[index]
 
-        // y axis is inverted for canvas (0 at the top, but latitude is 0 at equator and increases north)
-        val lat = yOff - (point.coordinate.latitude - bounds.latitudeMin) * scale
-        val lon = xOff + (point.coordinate.longitude - bounds.longitudeMin) * scale
-        if (index == 0) {
-            path.moveTo(lon.toFloat(), lat.toFloat())
-        } else {
-            path.lineTo(lon.toFloat(), lat.toFloat())
-        }
+        state.coordinateToUiPos(point.coordinate) { lat, lon -> path.lineTo(lon, lat) }
     }
 
     // Make sure that the end point is included
     if (track.points.isNotEmpty() && (track.points.size - 1) % stepSize != 0) {
         val point = track.points.last()
-        path.lineTo(
-            (xOff + (point.coordinate.longitude - bounds.longitudeMin) * scale).toFloat(),
-            (yOff - (point.coordinate.latitude - bounds.latitudeMin) * scale).toFloat()
-        )
+        state.coordinateToUiPos(point.coordinate) { lat, lon -> path.lineTo(lon, lat) }
     }
 
     return path
