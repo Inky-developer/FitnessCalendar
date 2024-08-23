@@ -16,6 +16,7 @@ import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.db.entities.Track
 import com.inky.fitnesscalendar.util.EXTRA_TOAST
 import com.inky.fitnesscalendar.util.gpx.GpxReader
+import com.inky.fitnesscalendar.view_model.import.ImportTrack
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -33,7 +34,7 @@ class ImportViewModel @Inject constructor(
 ) : ViewModel() {
     var closeActivity: () -> Unit = {}
 
-    private val _tracks = MutableStateFlow(emptyList<GpxTrack>())
+    private val _tracks = MutableStateFlow(emptyList<ImportTrack>())
     val tracks get() = _tracks.asStateFlow()
 
     private val _done = mutableStateOf(false)
@@ -43,9 +44,9 @@ class ImportViewModel @Inject constructor(
     val error: State<Boolean> get() = _error
 
     fun import(activities: List<Pair<RichActivity, GpxTrack>>) =
-        viewModelScope.launch(Dispatchers.IO) {
-            for ((activity, gpxTrack) in activities) {
-                val activityId = repository.saveActivity(activity)
+        viewModelScope.launch(Dispatchers.Default) {
+            for ((richActivity, gpxTrack) in activities) {
+                val activityId = repository.saveActivity(richActivity)
 
                 val track = Track(activityId = activityId, points = gpxTrack.points)
                 repository.saveTrack(track)
@@ -91,7 +92,9 @@ class ImportViewModel @Inject constructor(
     private suspend fun loadFile(stream: InputStream) {
         val gpx = GpxReader.read(stream)
         if (gpx != null) {
-            _tracks.emit(_tracks.value.toMutableList().apply { addAll(gpx.tracks) })
+            _tracks.emit(
+                _tracks.value.toMutableList().apply { addAll(gpx.tracks.map { ImportTrack(it) }) }
+            )
         }
     }
 }

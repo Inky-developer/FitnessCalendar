@@ -1,16 +1,18 @@
 package com.inky.fitnesscalendar.ui.components
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -31,7 +33,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,11 +41,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.drawscope.DrawScope
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
@@ -52,20 +49,19 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.data.gpx.Coordinate
+import com.inky.fitnesscalendar.data.gpx.TrackSvg
 import com.inky.fitnesscalendar.data.measure.Duration.Companion.until
 import com.inky.fitnesscalendar.db.entities.Activity
-import com.inky.fitnesscalendar.db.entities.CoordinateRect
 import com.inky.fitnesscalendar.db.entities.Place
 import com.inky.fitnesscalendar.db.entities.RichActivity
-import com.inky.fitnesscalendar.db.entities.Track
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.util.skipToLookaheadSize
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import com.inky.fitnesscalendar.util.gpx.simplify
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -89,13 +85,12 @@ fun ActivityCard(
         localizationRepository.timeFormatter.format(richActivity.activity.startTime)
     }
 
+    val trackColor = contentColorFor(containerColor)
+    val trackPreview = remember(richActivity) { richActivity.activity.trackPreview?.toTrackSvg() }
+
     val haptics = LocalHapticFeedback.current
 
-    val trackColor = contentColorFor(backgroundColor = containerColor)
-    var canvasSize by remember { mutableStateOf<Size?>(null) }
-    val trackPath = rememberTrackPath(richActivity.track, canvasSize)
-
-    CardWithCanvas(
+    CardWithBackground(
         containerColor = containerColor,
         modifier = modifier
             .fillMaxWidth()
@@ -108,10 +103,15 @@ fun ActivityCard(
                 },
             )
             .skipToLookaheadSize(),
-        onDraw = {
-            canvasSize = size
-            if (trackPath != null) {
-                drawTrackPath(trackPath, trackColor)
+        backgroundContent = {
+            if (trackPreview != null) {
+                TrackView(
+                    track = trackPreview,
+                    color = trackColor,
+                    modifier = Modifier
+                        .matchParentSize()
+                        .padding(all = 8.dp)
+                )
             }
         }
     ) {
@@ -182,7 +182,6 @@ fun CompactActivityCard(
     richActivity: RichActivity,
     localizationRepository: LocalizationRepository,
     modifier: Modifier = Modifier,
-    track: Track? = richActivity.track,
     expand: Boolean = false,
 ) {
     val (activity, activityType) = richActivity
@@ -193,19 +192,24 @@ fun CompactActivityCard(
     }
 
     val backgroundColor = MaterialTheme.colorScheme.surfaceContainer
-    val trackColor = contentColorFor(backgroundColor)
-    var canvasSize by remember { mutableStateOf<Size?>(null) }
-    val trackPath = rememberTrackPath(track, canvasSize)
 
-    CardWithCanvas(
+    val trackColor = contentColorFor(backgroundColor)
+    val track = remember(richActivity) { richActivity.activity.trackPreview?.toTrackSvg() }
+
+    CardWithBackground(
         containerColor = MaterialTheme.colorScheme.surfaceContainer,
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp, vertical = 4.dp),
-        onDraw = {
-            canvasSize = size
-            if (trackPath != null && expand) {
-                drawTrackPath(trackPath, trackColor)
+        backgroundContent = {
+            if (track != null) {
+                TrackView(
+                    track = track,
+                    color = trackColor,
+                    modifier = Modifier
+                        .matchParentSize()
+                        .padding(all = 8.dp)
+                )
             }
         }
     ) {
@@ -422,105 +426,63 @@ private fun ActivityCardContextMenu(
 }
 
 @Composable
-private fun CardWithCanvas(
+private fun CardWithBackground(
     modifier: Modifier = Modifier,
     containerColor: Color,
-    onDraw: DrawScope.() -> Unit,
+    backgroundContent: @Composable BoxScope.() -> Unit,
     content: @Composable ColumnScope.() -> Unit,
 ) {
-    Box(modifier = modifier.clip(CardDefaults.shape)) {
-        Canvas(modifier = Modifier.matchParentSize()) {
-            drawRect(containerColor, size = size)
-            onDraw()
-        }
+    Box(
+        modifier = modifier
+            .clip(CardDefaults.shape)
+            .background(containerColor)
+    ) {
+        backgroundContent()
         Column {
             content()
         }
     }
 }
 
-
+@Preview
 @Composable
-private fun rememberTrackPath(track: Track?, canvasSize: Size?): Path? {
-    if (track == null || canvasSize == null) {
-        return null
+private fun CardWithBackgroundPreview() {
+    val trackPoints = remember {
+        listOf(
+            Coordinate(0.0, 0.0),
+            Coordinate(1.0, 1.0),
+            Coordinate(-0.5, 2.0),
+            Coordinate(-1.0, 3.0),
+            Coordinate(-1.0, 4.0),
+            Coordinate(0.0, 5.0),
+            Coordinate(2.0, 4.5),
+            Coordinate(3.0, 2.0),
+            Coordinate(0.0, 0.0),
+        )
     }
+    val simplifiedTrack = remember(trackPoints) { simplify(trackPoints, maxNumPoints = 7) }
+    val path = remember(simplifiedTrack) { TrackSvg.fromPoints(simplifiedTrack) }
 
-    var path by remember { mutableStateOf<Path?>(null) }
-
-    LaunchedEffect(track, canvasSize) {
-        launch(Dispatchers.Default) {
-            path = generateTrackPath(track, canvasSize)
+    Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Center) {
+        CardWithBackground(
+            containerColor = Color.White,
+            backgroundContent = {
+                if (path != null) {
+                    TrackView(
+                        track = path,
+                        color = Color.Red,
+                        modifier = Modifier.matchParentSize()
+                    )
+                }
+            },
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp, horizontal = 8.dp)
+        ) {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Text("Hello", modifier = Modifier.padding(all = 8.dp))
+                Text("New Line", modifier = Modifier.padding(all = 8.dp))
+            }
         }
     }
-
-    return path
-}
-
-private fun DrawScope.drawTrackPath(trackPath: Path, color: Color) {
-    drawPath(trackPath, color.copy(alpha = 0.25f), style = Stroke(PathGeneratorState.STROKE_SIZE))
-}
-
-private data class PathGeneratorState(
-    val bounds: CoordinateRect,
-    val scale: Float,
-    val xOff: Float,
-    val yOff: Float
-) {
-    inline fun coordinateToUiPos(coordinate: Coordinate, handler: (Float, Float) -> Unit) {
-        // y axis is inverted for canvas (0 at the top, but latitude is 0 at equator and increases north)
-        val lat = yOff - (coordinate.latitude - bounds.latitudeMin).toFloat() * scale
-        val lon = xOff + (coordinate.longitude - bounds.longitudeMin).toFloat() * scale
-        handler(lat, lon)
-    }
-
-    companion object {
-        const val PADDING = 16f
-        const val STROKE_SIZE = 8f
-
-        fun create(bounds: CoordinateRect, size: Size): PathGeneratorState {
-            val effectiveHeight = size.height - STROKE_SIZE - PADDING
-            val effectiveWidth = size.width - STROKE_SIZE - PADDING
-
-            val scale = minOf(
-                effectiveWidth / (bounds.longitudeMax - bounds.longitudeMin),
-                effectiveHeight / (bounds.latitudeMax - bounds.latitudeMin)
-            ).toFloat()
-
-            val maxX = (bounds.longitudeMax - bounds.longitudeMin) * scale
-            val maxY = (bounds.latitudeMax - bounds.latitudeMin) * scale
-
-            // Align right center
-            val yOff = size.height - (size.height - maxY).toFloat() / 2f
-            val xOff = size.width - (PADDING + STROKE_SIZE) / 2f - maxX.toFloat()
-
-            return PathGeneratorState(bounds = bounds, scale = scale, xOff = xOff, yOff = yOff)
-        }
-    }
-}
-
-private fun generateTrackPath(track: Track, canvasSize: Size): Path? {
-    if (track.points.isEmpty()) {
-        return null
-    }
-
-    val path = Path()
-    val bounds = track.calculateBounds() ?: return null
-    val state = PathGeneratorState.create(bounds, canvasSize)
-
-    val stepSize = 8
-    state.coordinateToUiPos(track.points[0].coordinate) { lat, lon -> path.moveTo(lon, lat) }
-    for (index in stepSize..<track.points.size step stepSize) {
-        val point = track.points[index]
-
-        state.coordinateToUiPos(point.coordinate) { lat, lon -> path.lineTo(lon, lat) }
-    }
-
-    // Make sure that the end point is included
-    if (track.points.isNotEmpty() && (track.points.size - 1) % stepSize != 0) {
-        val point = track.points.last()
-        state.coordinateToUiPos(point.coordinate) { lat, lon -> path.lineTo(lon, lat) }
-    }
-
-    return path
 }

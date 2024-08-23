@@ -471,7 +471,6 @@ private data class ActivityEditState(
             activity = newActivity,
             place = activitySelectorState.place,
             type = activitySelectorState.activityType,
-            track = initialActivity?.track
         )
     }
 }

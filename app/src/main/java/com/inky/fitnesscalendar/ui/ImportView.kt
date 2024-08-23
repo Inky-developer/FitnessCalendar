@@ -39,16 +39,15 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.gpx.GpxTrack
-import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.RichActivity
-import com.inky.fitnesscalendar.db.entities.Track
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivityTypeSelector
 import com.inky.fitnesscalendar.ui.components.BaseEditDialog
 import com.inky.fitnesscalendar.ui.components.CompactActivityCard
 import com.inky.fitnesscalendar.ui.util.localDatabaseValues
 import com.inky.fitnesscalendar.view_model.ImportViewModel
+import com.inky.fitnesscalendar.view_model.import.ImportTrack
 
 @Composable
 fun ImportView(viewModel: ImportViewModel) {
@@ -78,7 +77,7 @@ fun ImportView(viewModel: ImportViewModel) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ImportView(
-    tracks: List<GpxTrack>,
+    tracks: List<ImportTrack>,
     localizationRepository: LocalizationRepository,
     onImport: (List<Pair<RichActivity, GpxTrack>>) -> Unit,
     onTypeMapping: (String, ActivityType) -> Unit,
@@ -86,7 +85,7 @@ fun ImportView(
     val typeMapping = localDatabaseValues.current.activityTypeNames
     val saveButtonEnabled = remember(tracks, typeMapping) {
         tracks.all {
-            val type = typeMapping[it.type]
+            val type = typeMapping[it.track.type]
             type != null && it.toRichActivity(type) != null
         }
     }
@@ -109,9 +108,9 @@ fun ImportView(
                 ExtendedFloatingActionButton(
                     onClick = {
                         val activitiesAndTracks = tracks.mapNotNull { track ->
-                            typeMapping[track.type]
+                            typeMapping[track.track.type]
                                 ?.let { track.toRichActivity(it) }
-                                ?.let { it to track }
+                                ?.let { it to track.track }
                         }
                         onImport(activitiesAndTracks)
                     },
@@ -137,7 +136,7 @@ fun ImportView(
                 .fillMaxSize()
         ) {
             items(tracks) { track ->
-                val type = typeMapping[track.type]
+                val type = typeMapping[track.track.type]
                 TrackView(
                     track = track,
                     selectedType = type,
@@ -151,7 +150,7 @@ fun ImportView(
 
 @Composable
 fun TrackView(
-    track: GpxTrack,
+    track: ImportTrack,
     selectedType: ActivityType?,
     localizationRepository: LocalizationRepository,
     onChangeType: (String, ActivityType) -> Unit,
@@ -160,18 +159,16 @@ fun TrackView(
     var selectedActivityType by rememberSaveable { mutableStateOf<ActivityType?>(null) }
     val richActivity =
         remember(track, selectedType) { selectedType?.let { track.toRichActivity(selectedType) } }
-    val dbTrack = remember(track) { Track(activityId = -1, points = track.points) }
 
     Box(modifier = Modifier.clickable { dialogOpen = true }) {
         if (richActivity != null) {
             CompactActivityCard(
                 richActivity = richActivity,
-                track = dbTrack,
                 localizationRepository = localizationRepository,
                 expand = true
             )
         } else {
-            ActivityCardWithoutType(track, localizationRepository)
+            ActivityCardWithoutType(track.track, localizationRepository)
         }
     }
 
@@ -180,7 +177,7 @@ fun TrackView(
             title = stringResource(R.string.choose_activity_type),
             onNavigateBack = { dialogOpen = false },
             onSave = {
-                selectedActivityType?.let { onChangeType(track.type, it) }
+                selectedActivityType?.let { onChangeType(track.track.type, it) }
                 dialogOpen = false
             },
             actions = {}
@@ -236,19 +233,4 @@ private fun ActivityCardWithoutType(
             modifier = Modifier.padding(all = 8.dp)
         )
     }
-}
-
-private fun GpxTrack.toRichActivity(type: ActivityType): RichActivity? {
-    return RichActivity(
-        activity = Activity(
-            typeId = type.uid ?: return null,
-            description = name,
-            startTime = startTime ?: return null,
-            endTime = endTime ?: return null,
-            distance = computeLength(),
-        ),
-        type = type,
-        place = null,
-        track = null,
-    )
 }

@@ -49,7 +49,6 @@ fun importCsv(rawData: String, types: List<ActivityType>): List<RichActivity> {
         RichActivity(
             type = types.first { it.uid == activity.typeId },
             place = null,
-            track = null,
             activity = activity
         ).clean()
     }.also {
