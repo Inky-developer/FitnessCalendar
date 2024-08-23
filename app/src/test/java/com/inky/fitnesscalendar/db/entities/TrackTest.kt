@@ -6,7 +6,6 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 class TrackTest {
-
     @Test
     fun testSimplify() {
         val trackPoints = listOf(

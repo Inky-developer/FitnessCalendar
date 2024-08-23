@@ -1,6 +1,5 @@
 package com.inky.fitnesscalendar.util.gpx
 
-import android.util.Log
 import com.inky.fitnesscalendar.data.gpx.Coordinate
 import java.util.PriorityQueue
 import kotlin.math.absoluteValue
@@ -16,7 +15,6 @@ private const val TAG = "util/gpx/simplification"
  */
 fun simplify(points: List<Coordinate>, maxNumPoints: Int = 100): List<Coordinate> {
     val numPointsToRemove = points.size - maxNumPoints
-    Log.d(TAG, "Starting track simplification, to remove: $numPointsToRemove (from ${points.size})")
     if (numPointsToRemove <= 0) {
         return points
     }
@@ -59,7 +57,6 @@ fun simplify(points: List<Coordinate>, maxNumPoints: Int = 100): List<Coordinate
         .asSequence()
         .filterIndexed { index, _ -> pointsToKeep.contains(index) }
         .toList()
-    Log.d(TAG, "Simplified track to ${coordinates.size}")
     return coordinates
 }
 
