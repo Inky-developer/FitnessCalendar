@@ -6,6 +6,7 @@ import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.data.Intensity
 import com.inky.fitnesscalendar.data.gpx.GpxTrackPoint
 import com.inky.fitnesscalendar.data.measure.Distance
+import com.inky.fitnesscalendar.db.entities.Activity
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.util.Date
@@ -69,5 +70,15 @@ class Converters {
     @TypeConverter
     fun byteArrayToTrackPoints(array: ByteArray): List<GpxTrackPoint> {
         return Json.decodeFromString(array.decodeToString())
+    }
+
+    @TypeConverter
+    fun serializedTrackPreviewToString(preview: Activity.SerializedTrackPreview): String {
+        return preview.value
+    }
+
+    @TypeConverter
+    fun stringToSerializedTrackPreview(value: String): Activity.SerializedTrackPreview {
+        return Activity.SerializedTrackPreview.assumeValid(value)
     }
 }

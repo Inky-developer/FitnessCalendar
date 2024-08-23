@@ -24,36 +24,37 @@ class ImportActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        val uris = when (intent.action) {
-            Intent.ACTION_SEND -> handleSendIntent()
-            Intent.ACTION_SEND_MULTIPLE -> handleSendMultipleIntent()
-            Intent.ACTION_VIEW -> handleViewIntent()
-            else -> throw RuntimeException("Unexpected action ${intent.action}")
-        }
-
-        Log.i(TAG, "Received: $uris")
-
-        val files = try {
-            uris.mapNotNull { contentResolver.openFileDescriptor(it, "r") }
-        } catch (e: FileNotFoundException) {
-            Log.e(TAG, "File not found: $e")
-            finish()
-            return
-        }
-
-        if (files.isEmpty()) {
-            Log.e(TAG, "No valid files in the intent")
-            finish()
-            return
-        }
-
-
         val viewModel: ImportViewModel by viewModels()
         viewModel.closeActivity = {
             finish()
         }
 
-        viewModel.loadFiles(files)
+        if (savedInstanceState == null) {
+            val uris = when (intent.action) {
+                Intent.ACTION_SEND -> handleSendIntent()
+                Intent.ACTION_SEND_MULTIPLE -> handleSendMultipleIntent()
+                Intent.ACTION_VIEW -> handleViewIntent()
+                else -> throw RuntimeException("Unexpected action ${intent.action}")
+            }
+
+            Log.i(TAG, "Received: $uris")
+
+            val files = try {
+                uris.mapNotNull { contentResolver.openFileDescriptor(it, "r") }
+            } catch (e: FileNotFoundException) {
+                Log.e(TAG, "File not found: $e")
+                finish()
+                return
+            }
+
+            if (files.isEmpty()) {
+                Log.e(TAG, "No valid files in the intent")
+                finish()
+                return
+            }
+
+            viewModel.loadFiles(files)
+        }
 
         setContent {
             FitnessCalendarTheme {

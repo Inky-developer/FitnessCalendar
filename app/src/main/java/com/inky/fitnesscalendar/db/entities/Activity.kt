@@ -10,10 +10,13 @@ import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.data.Feel
 import com.inky.fitnesscalendar.data.Intensity
 import com.inky.fitnesscalendar.data.Vehicle
+import com.inky.fitnesscalendar.data.gpx.TrackSvg
 import com.inky.fitnesscalendar.data.measure.Distance
 import com.inky.fitnesscalendar.data.measure.Duration.Companion.until
 import com.inky.fitnesscalendar.data.measure.Velocity
 import com.inky.fitnesscalendar.util.toLocalDate
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import java.util.Date
 
 @Entity(
@@ -47,6 +50,7 @@ data class Activity(
     @ColumnInfo(name = "intensity") val intensity: Intensity? = null,
     // The unique identifier of the wifi network the device was connected to when starting the activity
     @ColumnInfo(name = "wifi_bssid") val wifiBssid: String? = null,
+    @ColumnInfo(name = "track_preview") val trackPreview: SerializedTrackPreview? = null,
 ) {
     fun clean(type: ActivityType) = copy(
         placeId = if (type.hasPlace) placeId else null,
@@ -68,4 +72,17 @@ data class Activity(
             }
             return distance?.let { Velocity(metersPerSecond = it.meters / duration.elapsedSeconds) }
         }
+
+    @JvmInline
+    value class SerializedTrackPreview(private val inner: String) {
+        val value get() = inner
+
+        fun toTrackSvg(): TrackSvg = Json.decodeFromString(value)
+
+        companion object {
+            fun assumeValid(value: String) = SerializedTrackPreview(value)
+
+            fun TrackSvg.serialize() = SerializedTrackPreview(Json.encodeToString(this))
+        }
+    }
 }
