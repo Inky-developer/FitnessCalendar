@@ -16,7 +16,9 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.scale
 import androidx.compose.ui.graphics.drawscope.translate
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.tooling.preview.Preview
+import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.gpx.Coordinate
 import com.inky.fitnesscalendar.data.gpx.TrackSvg
 import com.inky.fitnesscalendar.util.gpx.simplify
@@ -31,6 +33,9 @@ fun TrackView(track: TrackSvg, color: Color, modifier: Modifier, alpha: Float = 
             trackPath = generateTrackPath(track)
         }
     }
+
+    val startColor = colorResource(R.color.start_point)
+    val endColor = colorResource(R.color.end_point)
 
     Canvas(modifier = modifier) {
         val path = trackPath
@@ -70,6 +75,27 @@ fun TrackView(track: TrackSvg, color: Color, modifier: Modifier, alpha: Float = 
                         style = Stroke(width = (strokeWidth / scale).toFloat()),
                         alpha = alpha
                     )
+
+                    val start = track.points.firstOrNull()
+                    if (start != null) {
+                        drawCircle(
+                            startColor,
+                            radius = (strokeWidth / scale).toFloat(),
+                            center = Offset(
+                                x = start.longitude.toFloat(),
+                                y = start.latitude.toFloat()
+                            ),
+                        )
+                    }
+
+                    val end = track.points.lastOrNull()
+                    if (end != null) {
+                        drawCircle(
+                            endColor,
+                            radius = (strokeWidth / scale).toFloat(),
+                            center = Offset(end.longitude.toFloat(), end.latitude.toFloat()),
+                        )
+                    }
                 }
             }
         }

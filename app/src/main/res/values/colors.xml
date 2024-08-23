@@ -5,8 +5,10 @@
     <color name="purple_700">#FF3700B3</color>
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
+
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
     <color name="stats_sport">#B54D4D</color>
     <color name="stats_travel">#5576A4</color>
     <color name="stats_work">#D8C365</color>
@@ -17,6 +19,10 @@
     <color name="stats_3">#3BA79D</color>
     <color name="stats_4">#5A3B3B</color>
     <color name="stats_5">#C7BD6B</color>
+
     <color name="intensity_low">#5E5E5E</color>
     <color name="intensity_high">#E2C400</color>
+
+    <color name="start_point">#2E7D32</color>
+    <color name="end_point">#D84315</color>
 </resources>
