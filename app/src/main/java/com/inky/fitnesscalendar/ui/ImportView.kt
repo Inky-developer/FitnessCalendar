@@ -45,6 +45,7 @@ import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivityTypeSelector
 import com.inky.fitnesscalendar.ui.components.BaseEditDialog
 import com.inky.fitnesscalendar.ui.components.CompactActivityCard
+import com.inky.fitnesscalendar.ui.components.OptionGroup
 import com.inky.fitnesscalendar.ui.util.localDatabaseValues
 import com.inky.fitnesscalendar.view_model.ImportViewModel
 import com.inky.fitnesscalendar.view_model.import.ImportTrack
@@ -182,10 +183,16 @@ fun TrackView(
             },
             actions = {}
         ) {
-            ActivityTypeSelector(
-                isSelected = { it == selectedActivityType },
-                onSelect = { selectedActivityType = it }
-            )
+            OptionGroup(
+                label = stringResource(R.string.select_activity),
+                selectionLabel = selectedActivityType?.name,
+                modifier = Modifier.padding(all = 8.dp)
+            ) {
+                ActivityTypeSelector(
+                    isSelected = { it == selectedActivityType },
+                    onSelect = { selectedActivityType = it }
+                )
+            }
         }
     }
 }
