@@ -8,10 +8,6 @@ import android.os.Bundle
 import android.os.IBinder
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
-import androidx.compose.foundation.background
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.lifecycle.Lifecycle
@@ -28,7 +24,7 @@ import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.inky.fitnesscalendar.AppRepository
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.db.entities.RichRecording
-import com.inky.fitnesscalendar.ui.theme.FitnessCalendarTheme
+import com.inky.fitnesscalendar.ui.components.AppFrame
 import com.inky.fitnesscalendar.ui.util.ProvideDatabaseValues
 import com.inky.fitnesscalendar.ui.views.QsTileRecordActivityDialog
 import dagger.hilt.android.AndroidEntryPoint
@@ -94,17 +90,15 @@ class RecordTileService : TileService() {
                 setViewTreeSavedStateRegistryOwner(lifecycleOwner)
 
                 setContent {
-                    FitnessCalendarTheme {
+                    AppFrame {
                         ProvideDatabaseValues(repository = repository) {
-                            Surface(modifier = Modifier.background(MaterialTheme.colorScheme.background)) {
-                                QsTileRecordActivityDialog(
-                                    onSave = {
-                                        onStartRecording(it)
-                                        dismiss()
-                                    },
-                                    onDismiss = { dismiss() }
-                                )
-                            }
+                            QsTileRecordActivityDialog(
+                                onSave = {
+                                    onStartRecording(it)
+                                    dismiss()
+                                },
+                                onDismiss = { dismiss() }
+                            )
                         }
                     }
                 }
