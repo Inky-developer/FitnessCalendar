@@ -204,4 +204,5 @@
     <string name="could_not_read_input_file">Could not read input file</string>
     <string name="track">Track</string>
     <string name="filter_by_vehicles">Filter by vehicles…</string>
+    <string name="filter_by_feels">Filter by feels…</string>
 </resources>

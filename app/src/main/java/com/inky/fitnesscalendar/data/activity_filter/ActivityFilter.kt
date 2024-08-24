@@ -2,6 +2,7 @@ package com.inky.fitnesscalendar.data.activity_filter
 
 import android.os.Parcelable
 import com.inky.fitnesscalendar.data.ActivityCategory
+import com.inky.fitnesscalendar.data.Feel
 import com.inky.fitnesscalendar.data.Vehicle
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.Place
@@ -15,6 +16,7 @@ data class ActivityFilter(
     val categories: List<ActivityCategory> = emptyList(),
     val places: List<Place> = emptyList(),
     val vehicles: List<Vehicle> = emptyList(),
+    val feels: List<Feel> = emptyList(),
     val text: String? = null,
     val range: DateRangeOption? = null,
     val attributes: AttributeFilter = AttributeFilter(),
@@ -29,6 +31,8 @@ data class ActivityFilter(
     fun withPlace(newPlace: Place) = copy(places = places.added(newPlace))
 
     fun withVehicle(newVehicle: Vehicle) = copy(vehicles = vehicles.added(newVehicle))
+
+    fun withFeel(newFeel: Feel) = copy(feels = feels.added(newFeel))
 
     fun items(): List<ActivityFilterChip> {
         val items = mutableListOf<ActivityFilterChip>()
@@ -55,6 +59,10 @@ data class ActivityFilter(
 
         for (vehicle in vehicles) {
             items.add(ActivityFilterChip.VehicleFilterChip(vehicle))
+        }
+
+        for (feel in feels) {
+            items.add(ActivityFilterChip.FeelFilterChip(feel))
         }
 
         for ((attribute, state) in attributes.entries()

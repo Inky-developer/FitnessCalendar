@@ -207,4 +207,5 @@
     <string name="title_activity_import">Aktivititäten importieren</string>
     <string name="track">Track</string>
     <string name="filter_by_vehicles">Nach Fahrzeugen filtern…</string>
+    <string name="filter_by_feels">Nach Stimmungen filtern…</string>
 </resources>

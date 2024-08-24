@@ -6,6 +6,7 @@ import androidx.room.ForeignKey
 import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.inky.fitnesscalendar.data.ActivityCategory
+import com.inky.fitnesscalendar.data.Feel
 import com.inky.fitnesscalendar.data.Vehicle
 import com.inky.fitnesscalendar.data.activity_filter.AttributeFilter
 import com.inky.fitnesscalendar.data.activity_filter.DateRangeOption
@@ -40,6 +41,7 @@ data class FilterHistoryItem(
     @ColumnInfo(name = "type_id") val typeId: Int? = null,
     @ColumnInfo(name = "place_id") val placeId: Int? = null,
     @ColumnInfo(name = "vehicle") val vehicle: Vehicle? = null,
+    @ColumnInfo(name = "feel") val feel: Feel? = null,
     @ColumnInfo(name = "attribute") val attribute: AttributeFilter.Attribute? = null,
     @ColumnInfo(name = "attribute_state") val attributeState: Boolean? = null,
     @ColumnInfo(name = "last_updated") val lastUpdated: Date = Date.from(Instant.now()),
@@ -51,6 +53,7 @@ data class FilterHistoryItem(
         Type,
         Place,
         Vehicle,
+        Feel,
         Attribute
     }
 }

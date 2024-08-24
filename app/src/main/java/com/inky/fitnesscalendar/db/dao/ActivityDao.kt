@@ -6,6 +6,7 @@ import androidx.room.Delete
 import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Upsert
+import com.inky.fitnesscalendar.data.Feel
 import com.inky.fitnesscalendar.data.Vehicle
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.Recording
@@ -41,6 +42,7 @@ abstract class ActivityDao {
                 "   (type.activity_category in (:categories) or :isCategoriesEmpty) AND" +
                 "   (place_id in (:placeIds) OR :isPlacesEmpty) AND" +
                 "   (vehicle in (:vehicles) OR :isVehiclesEmpty) AND" +
+                "   (feel in (:feels) OR :isFeelsEmpty) AND" +
                 "   (description LIKE :search OR type.name LIKE :search OR place.name LIKE :search OR vehicle IN (:searchVehicles) OR :search IS NULL) AND" +
                 "   (end_time >= :start OR :start IS NULL) AND" +
                 "   (start_time <= :end OR :end IS NULL) AND" +
@@ -63,6 +65,8 @@ abstract class ActivityDao {
         isPlacesEmpty: Boolean,
         vehicles: List<Vehicle>,
         isVehiclesEmpty: Boolean,
+        feels: List<Feel>,
+        isFeelsEmpty: Boolean,
         search: String?,
         searchVehicles: List<Vehicle>,
         start: Date?,

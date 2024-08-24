@@ -35,6 +35,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.R
+import com.inky.fitnesscalendar.data.Feel
 import com.inky.fitnesscalendar.data.Vehicle
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.data.activity_filter.AttributeFilter
@@ -125,6 +126,9 @@ fun FilterView(
             }
             val vehicleSelectionLabel = remember(filter) {
                 if (filter.vehicles.isEmpty()) null else filter.vehicles.joinToString(", ") { it.name }
+            }
+            val feelSelectionLabel = remember(filter) {
+                if (filter.feels.isEmpty()) null else filter.feels.joinToString(", ") { it.name }
             }
             val attributeSelectionLabel = remember(filter) {
                 val entries = filter.attributes.entries()
@@ -221,6 +225,30 @@ fun FilterView(
                             label = {
                                 Text(
                                     vehicle.emoji,
+                                    style = MaterialTheme.typography.headlineMedium
+                                )
+                            },
+                            modifier = Modifier.padding(all = 4.dp)
+                        )
+                    }
+                }
+            }
+
+            OptionGroup(
+                label = stringResource(R.string.filter_by_feels),
+                selectionLabel = feelSelectionLabel,
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+            ) {
+                LazyRow {
+                    items(Feel.entries) { feel ->
+                        FilterChip(
+                            selected = filter.feels.contains(feel),
+                            onClick = {
+                                filter = filter.copy(feels = filter.feels.toggled(feel))
+                            },
+                            label = {
+                                Text(
+                                    feel.emoji,
                                     style = MaterialTheme.typography.headlineMedium
                                 )
                             },

@@ -395,6 +395,11 @@ private fun FilterChipIcon(chip: ActivityFilterChip) {
             chip.vehicle.emoji,
             style = MaterialTheme.typography.titleLarge
         )
+
+        is ActivityFilterChip.FeelFilterChip -> Text(
+            chip.feel.emoji,
+            style = MaterialTheme.typography.titleLarge
+        )
     }
 }
 
