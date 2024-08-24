@@ -1,9 +1,13 @@
 package com.inky.fitnesscalendar.ui.views.settings
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -19,12 +23,14 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -45,7 +51,9 @@ import com.inky.fitnesscalendar.ui.components.ActivityCategorySelector
 import com.inky.fitnesscalendar.ui.components.ActivityTypeSelector
 import com.inky.fitnesscalendar.ui.components.BaseEditDialog
 import com.inky.fitnesscalendar.ui.components.ColorSelector
+import com.inky.fitnesscalendar.ui.components.EmojiPickerDialog
 import com.inky.fitnesscalendar.ui.components.OptionGroup
+import com.inky.fitnesscalendar.ui.components.optionGroupDefaultBackground
 import com.inky.fitnesscalendar.view_model.settings.ActivityTypeEditState
 import com.inky.fitnesscalendar.view_model.settings.ActivityTypeViewModel
 
@@ -127,6 +135,8 @@ fun EditTypeDialog(
     val context = LocalContext.current
 
     var state by rememberSaveable { mutableStateOf(initialState) }
+    var showEmojiPicker by rememberSaveable { mutableStateOf(false) }
+
     val type = remember(state) { state.toActivityType() }
     val title = remember(state) {
         if (state.isNewType) {
@@ -148,34 +158,47 @@ fun EditTypeDialog(
         }
     ) {
         Column(modifier = Modifier.padding(all = 8.dp)) {
-            TextField(
-                value = state.name,
-                onValueChange = { state = state.copy(name = it) },
-                leadingIcon = { Icon(Icons.Outlined.Edit, stringResource(R.string.type_name)) },
-                placeholder = { Text(stringResource(R.string.name_of_type)) },
-                singleLine = true,
-                keyboardOptions = remember { KeyboardOptions(capitalization = KeyboardCapitalization.Words) },
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
-                    .fillMaxWidth()
                     .padding(vertical = 4.dp)
-            )
+                    .fillMaxWidth()
+                    .height(IntrinsicSize.Min)
+            ) {
+                IconButton(
+                    onClick = { showEmojiPicker = true },
+                    colors = IconButtonDefaults.iconButtonColors(containerColor = optionGroupDefaultBackground()),
+                    modifier = Modifier
+                        .weight(0.25f)
+                        .padding(end = 4.dp)
+                        .fillMaxHeight()
+                ) {
+                    AnimatedContent(targetState = state.emoji, label = "emoji") { emoji ->
+                        if (emoji.isBlank()) {
+                            Icon(Icons.Outlined.Face, stringResource(R.string.emoji))
+                        } else {
+                            Text(state.emoji, style = MaterialTheme.typography.displaySmall)
+                        }
+                    }
+                }
 
-            // TODO: Use proper emoji picker
-            TextField(
-                value = state.emoji,
-                onValueChange = { state = state.copy(emoji = it) },
-                leadingIcon = { Icon(Icons.Outlined.Face, stringResource(R.string.emoji)) },
-                placeholder = { Text(stringResource(R.string.emoji)) },
-                singleLine = true,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp)
-            )
+                TextField(
+                    value = state.name,
+                    onValueChange = { state = state.copy(name = it) },
+                    leadingIcon = { Icon(Icons.Outlined.Edit, stringResource(R.string.type_name)) },
+                    placeholder = { Text(stringResource(R.string.name_of_type)) },
+                    singleLine = true,
+                    keyboardOptions = remember { KeyboardOptions(capitalization = KeyboardCapitalization.Words) },
+                    colors = TextFieldDefaults.colors(unfocusedContainerColor = optionGroupDefaultBackground()),
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 4.dp)
+                )
+            }
 
             OptionGroup(
                 label = stringResource(R.string.select_category),
                 selectionLabel = if (state.category != null) stringResource(state.category!!.nameId) else null,
-                modifier = Modifier.padding(vertical = 4.dp)
             ) {
                 ActivityCategorySelector(
                     isSelected = { state.category == it },
@@ -186,7 +209,6 @@ fun EditTypeDialog(
             OptionGroup(
                 label = stringResource(R.string.select_color),
                 selectionLabel = if (state.color != null) stringResource(state.color!!.nameId) else null,
-                modifier = Modifier.padding(vertical = 4.dp)
             ) {
                 ColorSelector(
                     isSelected = { state.color == it },
@@ -221,6 +243,16 @@ fun EditTypeDialog(
             )
         }
     }
+
+    if (showEmojiPicker) {
+        EmojiPickerDialog(
+            onDismiss = { showEmojiPicker = false },
+            onEmoji = {
+                showEmojiPicker = false
+                state = state.copy(emoji = it)
+            }
+        )
+    }
 }
 
 @Composable
@@ -251,7 +283,7 @@ fun Toggle(
         modifier = Modifier
             .padding(vertical = 4.dp)
             .clip(MaterialTheme.shapes.small)
-            .background(MaterialTheme.colorScheme.surfaceContainerHigh)
+            .background(optionGroupDefaultBackground())
     ) {
         Text(
             name,
@@ -260,6 +292,10 @@ fun Toggle(
                 .weight(1f)
                 .padding(horizontal = 8.dp)
         )
-        Switch(checked = value, onCheckedChange = onValue)
+        Switch(
+            checked = value,
+            onCheckedChange = onValue,
+            modifier = Modifier.padding(horizontal = 8.dp)
+        )
     }
 }

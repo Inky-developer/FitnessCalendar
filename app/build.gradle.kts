@@ -115,6 +115,7 @@ dependencies {
     implementation(libs.coil.compose)
     implementation(libs.google.accompanist.permissions)
     implementation(libs.kotlinx.serialization.json)
+    implementation(libs.androidx.emoji2.emojipicker)
 
     ksp(libs.hilt.android.compiler)
     ksp(libs.androidx.room.compiler)

@@ -10,6 +10,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -28,6 +29,7 @@ import com.inky.fitnesscalendar.db.entities.Place
 import com.inky.fitnesscalendar.ui.components.BaseEditDialog
 import com.inky.fitnesscalendar.ui.components.ColorSelector
 import com.inky.fitnesscalendar.ui.components.OptionGroup
+import com.inky.fitnesscalendar.ui.components.optionGroupDefaultBackground
 import com.inky.fitnesscalendar.view_model.PlaceListViewModel
 import kotlinx.coroutines.flow.flowOf
 
@@ -83,6 +85,7 @@ private fun EditPlaceDialog(initialPlace: Place?, onDismiss: () -> Unit, onSave:
                 placeholder = { Text(stringResource(R.string.name_of_place)) },
                 singleLine = true,
                 keyboardOptions = remember { KeyboardOptions(capitalization = KeyboardCapitalization.Words) },
+                colors = TextFieldDefaults.colors(unfocusedContainerColor = optionGroupDefaultBackground()),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 4.dp)

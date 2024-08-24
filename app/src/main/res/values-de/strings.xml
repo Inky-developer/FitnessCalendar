@@ -208,4 +208,5 @@
     <string name="track">Track</string>
     <string name="filter_by_vehicles">Nach Fahrzeugen filtern…</string>
     <string name="filter_by_feels">Nach Stimmungen filtern…</string>
+    <string name="select_emoji">Emoji auswählen…</string>
 </resources>

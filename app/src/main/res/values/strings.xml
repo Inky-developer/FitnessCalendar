@@ -205,4 +205,5 @@
     <string name="track">Track</string>
     <string name="filter_by_vehicles">Filter by vehicles…</string>
     <string name="filter_by_feels">Filter by feels…</string>
+    <string name="select_emoji">Select emoji…</string>
 </resources>

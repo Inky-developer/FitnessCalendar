@@ -34,9 +34,7 @@ fun BaseEditDialog(
 ) {
     Dialog(onDismissRequest = onNavigateBack) {
         Card(
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceContainer
-            ),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
         ) {
             Column(modifier = Modifier.background(MaterialTheme.colorScheme.primaryContainer)) {
                 Row(

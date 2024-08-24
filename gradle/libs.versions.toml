@@ -19,6 +19,7 @@ navigationCompose = "2.8.0-rc01"
 room = "2.7.0-alpha07"
 ksp = "2.0.0-1.0.22"
 vico = "2.0.0-alpha.28"
+emoji2EmojipickerVersion = "1.4.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -49,6 +50,7 @@ kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializa
 vico-compose = { group = "com.patrykandpatrick.vico", name = "compose", version.ref = "vico" }
 vico-compose-m3 = { group = "com.patrykandpatrick.vico", name = "compose-m3", version.ref = "vico" }
 vico-core = { group = "com.patrykandpatrick.vico", name = "core", version.ref = "vico" }
+androidx-emoji2-emojipicker = { group = "androidx.emoji2", name = "emoji2-emojipicker", version.ref = "emoji2EmojipickerVersion" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
