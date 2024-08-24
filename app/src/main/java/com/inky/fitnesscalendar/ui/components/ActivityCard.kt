@@ -438,7 +438,7 @@ private fun CardWithBackground(
             .background(containerColor)
     ) {
         backgroundContent()
-        Column {
+        Column(modifier = Modifier.fillMaxWidth()) {
             content()
         }
     }
