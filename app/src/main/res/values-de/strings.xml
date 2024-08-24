@@ -206,4 +206,5 @@
     <string name="could_not_read_input_file">Konnte die Eingabedatei nicht lesen</string>
     <string name="title_activity_import">Aktivititäten importieren</string>
     <string name="track">Track</string>
+    <string name="filter_by_vehicles">Nach Fahrzeugen filtern…</string>
 </resources>

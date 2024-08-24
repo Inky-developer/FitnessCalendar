@@ -40,6 +40,7 @@ abstract class ActivityDao {
                 "   (type_id IN (:typeIds) OR :isTypesEmpty) AND" +
                 "   (type.activity_category in (:categories) or :isCategoriesEmpty) AND" +
                 "   (place_id in (:placeIds) OR :isPlacesEmpty) AND" +
+                "   (vehicle in (:vehicles) OR :isVehiclesEmpty) AND" +
                 "   (description LIKE :search OR type.name LIKE :search OR place.name LIKE :search OR vehicle IN (:searchVehicles) OR :search IS NULL) AND" +
                 "   (end_time >= :start OR :start IS NULL) AND" +
                 "   (start_time <= :end OR :end IS NULL) AND" +
@@ -60,6 +61,8 @@ abstract class ActivityDao {
         isCategoriesEmpty: Boolean,
         placeIds: List<Int>,
         isPlacesEmpty: Boolean,
+        vehicles: List<Vehicle>,
+        isVehiclesEmpty: Boolean,
         search: String?,
         searchVehicles: List<Vehicle>,
         start: Date?,

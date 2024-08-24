@@ -35,6 +35,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.R
+import com.inky.fitnesscalendar.data.Vehicle
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.data.activity_filter.AttributeFilter
 import com.inky.fitnesscalendar.data.activity_filter.DateRangeOption
@@ -119,7 +120,10 @@ fun FilterView(
                 }
             }
             val placeSelectionLabel = remember(filter) {
-                if (filter.places.isEmpty()) null else filter.places.joinToString(",") { it.name }
+                if (filter.places.isEmpty()) null else filter.places.joinToString(", ") { it.name }
+            }
+            val vehicleSelectionLabel = remember(filter) {
+                if (filter.vehicles.isEmpty()) null else filter.vehicles.joinToString(", ") { it.name }
             }
             val attributeSelectionLabel = remember(filter) {
                 val entries = filter.attributes.entries()
@@ -132,7 +136,9 @@ fun FilterView(
             OptionGroup(
                 label = stringResource(R.string.filter_by_categories),
                 selectionLabel = categorySelectionLabel,
-                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp).padding(top = 4.dp)
+                modifier = Modifier
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                    .padding(top = 4.dp)
             ) {
                 ActivityCategorySelector(
                     isSelected = { filter.categories.contains(it) },
@@ -208,6 +214,36 @@ fun FilterView(
                                 Text(
                                     range.toOption().getText(context),
                                     style = MaterialTheme.typography.titleMedium
+                                )
+                            },
+                            modifier = Modifier.padding(all = 4.dp)
+                        )
+                    }
+                }
+            }
+
+            OptionGroup(
+                label = stringResource(R.string.filter_by_vehicles),
+                selectionLabel = vehicleSelectionLabel,
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+            ) {
+                LazyRow {
+                    items(Vehicle.entries) { vehicle ->
+                        FilterChip(
+                            selected = filter.vehicles.contains(vehicle),
+                            onClick = {
+                                val oldSelection = filter.vehicles
+                                val newSelection =
+                                    oldSelection.filter { it != vehicle }.toMutableList()
+                                if (newSelection.size == oldSelection.size) {
+                                    newSelection.add(vehicle)
+                                }
+                                filter = filter.copy(vehicles = newSelection)
+                            },
+                            label = {
+                                Text(
+                                    vehicle.emoji,
+                                    style = MaterialTheme.typography.headlineMedium
                                 )
                             },
                             modifier = Modifier.padding(all = 4.dp)

@@ -2,6 +2,7 @@ package com.inky.fitnesscalendar.data.activity_filter
 
 import android.content.Context
 import com.inky.fitnesscalendar.data.ActivityCategory
+import com.inky.fitnesscalendar.data.Vehicle
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.FilterHistoryItem
 import com.inky.fitnesscalendar.db.entities.Place
@@ -17,6 +18,8 @@ sealed class ActivityFilterChip {
     data class TypeFilterChip(val type: ActivityType) : ActivityFilterChip()
 
     data class PlaceFilterChip(val place: Place) : ActivityFilterChip()
+
+    data class VehicleFilterChip(val vehicle: Vehicle) : ActivityFilterChip()
 
     data class AttributeFilterChip(val attribute: AttributeFilter.Attribute, val state: Boolean) :
         ActivityFilterChip()
@@ -45,6 +48,11 @@ sealed class ActivityFilterChip {
             placeId = place.uid
         )
 
+        is VehicleFilterChip -> FilterHistoryItem(
+            type = FilterHistoryItem.ItemType.Vehicle,
+            vehicle = vehicle
+        )
+
         is AttributeFilterChip -> FilterHistoryItem(
             type = FilterHistoryItem.ItemType.Attribute,
             attribute = attribute,
@@ -62,6 +70,7 @@ sealed class ActivityFilterChip {
         is TextFilterChip -> filter.copy(text = null)
         is TypeFilterChip -> filter.copy(types = filter.types.filter { it != type })
         is PlaceFilterChip -> filter.copy(places = filter.places.filter { it != place })
+        is VehicleFilterChip -> filter.copy(vehicles = filter.vehicles.filter { it != vehicle })
     }
 
     fun addTo(filter: ActivityFilter) = when (this) {
@@ -77,6 +86,7 @@ sealed class ActivityFilterChip {
         is TextFilterChip -> filter.copy(text = text)
         is TypeFilterChip -> filter.withType(type)
         is PlaceFilterChip -> filter.withPlace(place)
+        is VehicleFilterChip -> filter.withVehicle(vehicle)
     }
 
     fun displayText(context: Context) = when (this) {
@@ -86,6 +96,7 @@ sealed class ActivityFilterChip {
         is TextFilterChip -> text
         is TypeFilterChip -> type.name
         is PlaceFilterChip -> place.name
+        is VehicleFilterChip -> context.getString(vehicle.nameId)
     }
 
     companion object {
@@ -108,6 +119,10 @@ sealed class ActivityFilterChip {
 
                 FilterHistoryItem.ItemType.Type -> TypeFilterChip(type = type ?: return null)
                 FilterHistoryItem.ItemType.Place -> PlaceFilterChip(place = place ?: return null)
+                FilterHistoryItem.ItemType.Vehicle -> VehicleFilterChip(
+                    vehicle = item.vehicle ?: return null
+                )
+
                 FilterHistoryItem.ItemType.Attribute -> AttributeFilterChip(
                     attribute = item.attribute ?: return null,
                     state = item.attributeState ?: return null

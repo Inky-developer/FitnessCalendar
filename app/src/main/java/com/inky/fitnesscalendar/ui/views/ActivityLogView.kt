@@ -390,6 +390,11 @@ private fun FilterChipIcon(chip: ActivityFilterChip) {
         )
 
         is ActivityFilterChip.PlaceFilterChip -> PlaceIcon(chip.place)
+
+        is ActivityFilterChip.VehicleFilterChip -> Text(
+            chip.vehicle.emoji,
+            style = MaterialTheme.typography.titleLarge
+        )
     }
 }
 
