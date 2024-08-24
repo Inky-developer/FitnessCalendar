@@ -4,7 +4,7 @@ import android.text.Spannable
 import android.text.SpannableStringBuilder
 import android.text.style.ForegroundColorSpan
 import com.inky.fitnesscalendar.data.measure.format
-import com.patrykandpatrick.vico.core.cartesian.CartesianDrawContext
+import com.patrykandpatrick.vico.core.cartesian.CartesianDrawingContext
 import com.patrykandpatrick.vico.core.cartesian.marker.CartesianMarker
 import com.patrykandpatrick.vico.core.cartesian.marker.CartesianMarkerValueFormatter
 import com.patrykandpatrick.vico.core.cartesian.marker.ColumnCartesianLayerMarkerTarget
@@ -12,7 +12,7 @@ import kotlin.time.Duration.Companion.hours
 
 class TimeMarkerFormatter : CartesianMarkerValueFormatter {
     override fun format(
-        context: CartesianDrawContext,
+        context: CartesianDrawingContext,
         targets: List<CartesianMarker.Target>
     ): CharSequence {
         val builder = SpannableStringBuilder()
@@ -25,12 +25,12 @@ class TimeMarkerFormatter : CartesianMarkerValueFormatter {
                         continue
                     }
                     val lastIndex = columns.lastIndex
-                    val total = columns.sumOf { it.entry.y.toDouble() }
+                    val total = columns.sumOf { it.entry.y }
                     val totalTime = total.hours.format()
                     builder.append("$totalTime (")
                     columns.forEachIndexed { index, column ->
                         builder.append(
-                            column.entry.y.toDouble().hours.format(),
+                            column.entry.y.hours.format(),
                             ForegroundColorSpan(column.color),
                             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
                         )

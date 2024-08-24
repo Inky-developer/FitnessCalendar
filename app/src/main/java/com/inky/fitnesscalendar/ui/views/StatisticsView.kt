@@ -38,12 +38,12 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityCategory
@@ -73,10 +73,9 @@ import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
 import com.patrykandpatrick.vico.compose.common.data.rememberExtraLambda
 import com.patrykandpatrick.vico.compose.common.of
 import com.patrykandpatrick.vico.compose.common.rememberHorizontalLegend
-import com.patrykandpatrick.vico.compose.common.rememberLegendItem
 import com.patrykandpatrick.vico.compose.common.shape.rounded
-import com.patrykandpatrick.vico.core.cartesian.CartesianDrawContext
-import com.patrykandpatrick.vico.core.cartesian.CartesianMeasureContext
+import com.patrykandpatrick.vico.core.cartesian.CartesianDrawingContext
+import com.patrykandpatrick.vico.core.cartesian.CartesianMeasuringContext
 import com.patrykandpatrick.vico.core.cartesian.HorizontalLayout
 import com.patrykandpatrick.vico.core.cartesian.Scroll
 import com.patrykandpatrick.vico.core.cartesian.Zoom
@@ -86,7 +85,9 @@ import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.layer.ColumnCartesianLayer
 import com.patrykandpatrick.vico.core.cartesian.marker.DefaultCartesianMarker
 import com.patrykandpatrick.vico.core.common.Dimensions
+import com.patrykandpatrick.vico.core.common.LegendItem
 import com.patrykandpatrick.vico.core.common.component.LineComponent
+import com.patrykandpatrick.vico.core.common.component.ShapeComponent
 import com.patrykandpatrick.vico.core.common.component.TextComponent
 import com.patrykandpatrick.vico.core.common.shape.Shape
 import kotlinx.coroutines.launch
@@ -395,22 +396,27 @@ private fun Graph(
 @Composable
 private fun rememberLegend(
     groupingOptions: List<Displayable>,
-    context: Context = LocalContext.current
+    context: Context = LocalContext.current,
+    textColor: Color = MaterialTheme.colorScheme.onPrimaryContainer
 ) =
-    rememberHorizontalLegend<CartesianMeasureContext, CartesianDrawContext>(
-        items = groupingOptions.map { group ->
-            rememberLegendItem(
-                icon = rememberShapeComponent(
-                    shape = Shape.Pill,
-                    color = Color(group.getColor(context))
-                ),
-                labelComponent = rememberTextComponent(
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    textSize = 12.sp,
-                    typeface = Typeface.MONOSPACE,
-                ),
-                label = group.getText(context),
-            )
+    rememberHorizontalLegend<CartesianMeasuringContext, CartesianDrawingContext>(
+        items = rememberExtraLambda(groupingOptions) {
+            groupingOptions.map { group ->
+                add(
+                    LegendItem(
+                        icon = ShapeComponent(
+                            shape = Shape.Pill,
+                            color = group.getColor(context)
+                        ),
+                        labelComponent = TextComponent(
+                            color = textColor.toArgb(),
+                            textSizeSp = 12f,
+                            typeface = Typeface.MONOSPACE,
+                        ),
+                        label = group.getText(context),
+                    )
+                )
+            }
         },
         iconSize = 8.dp,
         iconPadding = 4.dp,
