@@ -5,6 +5,7 @@ import com.inky.fitnesscalendar.data.ActivityCategory
 import com.inky.fitnesscalendar.data.Vehicle
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.Place
+import com.inky.fitnesscalendar.util.added
 import kotlinx.parcelize.Parcelize
 
 
@@ -20,30 +21,14 @@ data class ActivityFilter(
 ) : Parcelable {
     fun isEmpty() = this == ActivityFilter()
 
-    fun withCategory(newCategory: ActivityCategory): ActivityFilter {
-        val newSelection =
-            categories.filter { it != newCategory }.toMutableList()
-        newSelection.add(newCategory)
-        return copy(categories = newSelection)
-    }
+    fun withCategory(newCategory: ActivityCategory) =
+        copy(categories = categories.added(newCategory))
 
-    fun withType(newType: ActivityType): ActivityFilter {
-        val newSelection = types.filter { it != newType }.toMutableList()
-        newSelection.add(newType)
-        return copy(types = newSelection)
-    }
+    fun withType(newType: ActivityType) = copy(types = types.added(newType))
 
-    fun withPlace(newPlace: Place): ActivityFilter {
-        val newSelection = places.filter { it != newPlace }.toMutableList()
-        newSelection.add(newPlace)
-        return copy(places = newSelection)
-    }
+    fun withPlace(newPlace: Place) = copy(places = places.added(newPlace))
 
-    fun withVehicle(newVehicle: Vehicle): ActivityFilter {
-        val newSelection = vehicles.filter { it != newVehicle }.toMutableList()
-        newSelection.add(newVehicle)
-        return copy(vehicles = newSelection)
-    }
+    fun withVehicle(newVehicle: Vehicle) = copy(vehicles = vehicles.added(newVehicle))
 
     fun items(): List<ActivityFilterChip> {
         val items = mutableListOf<ActivityFilterChip>()
