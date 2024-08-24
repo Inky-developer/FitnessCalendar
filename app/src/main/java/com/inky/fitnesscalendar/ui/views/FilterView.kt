@@ -47,6 +47,7 @@ import com.inky.fitnesscalendar.ui.components.PlaceIcon
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.localDatabaseValues
 import com.inky.fitnesscalendar.ui.util.sharedBounds
+import com.inky.fitnesscalendar.util.toggled
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -143,13 +144,7 @@ fun FilterView(
                 ActivityCategorySelector(
                     isSelected = { filter.categories.contains(it) },
                     onSelect = { category ->
-                        val oldSelection = filter.categories
-                        val newSelection =
-                            oldSelection.filter { it != category }.toMutableList()
-                        if (newSelection.size == oldSelection.size) {
-                            newSelection.add(category)
-                        }
-                        filter = filter.copy(categories = newSelection)
+                        filter = filter.copy(categories = filter.categories.toggled(category))
                     }
                 )
             }
@@ -162,13 +157,7 @@ fun FilterView(
                 ActivityTypeSelector(
                     isSelected = { filter.types.contains(it) },
                     onSelect = { activityType ->
-                        val oldSelection = filter.types
-                        val newSelection =
-                            oldSelection.filter { it != activityType }.toMutableList()
-                        if (newSelection.size == oldSelection.size) {
-                            newSelection.add(activityType)
-                        }
-                        filter = filter.copy(types = newSelection)
+                        filter = filter.copy(types = filter.types.toggled(activityType))
                     },
                 )
             }
@@ -182,12 +171,7 @@ fun FilterView(
                     PlacesSelector(
                         isSelected = { filter.places.contains(it) },
                         onSelect = { place ->
-                            val oldSelection = filter.places
-                            val newSelection = oldSelection.filter { it != place }.toMutableList()
-                            if (newSelection.size == oldSelection.size) {
-                                newSelection.add(place)
-                            }
-                            filter = filter.copy(places = newSelection)
+                            filter = filter.copy(places = filter.places.toggled(place))
                         }
                     )
                 }
@@ -232,13 +216,7 @@ fun FilterView(
                         FilterChip(
                             selected = filter.vehicles.contains(vehicle),
                             onClick = {
-                                val oldSelection = filter.vehicles
-                                val newSelection =
-                                    oldSelection.filter { it != vehicle }.toMutableList()
-                                if (newSelection.size == oldSelection.size) {
-                                    newSelection.add(vehicle)
-                                }
-                                filter = filter.copy(vehicles = newSelection)
+                                filter = filter.copy(vehicles = filter.vehicles.toggled(vehicle))
                             },
                             label = {
                                 Text(
