@@ -12,6 +12,7 @@ import kotlinx.parcelize.Parcelize
 @Parcelize
 data class AttributeFilter(
     val description: TriState = TriState.Undefined,
+    val vehicle: TriState = TriState.Undefined,
     val feel: TriState = TriState.Undefined,
     val image: TriState = TriState.Undefined,
     val place: TriState = TriState.Undefined,
@@ -19,6 +20,7 @@ data class AttributeFilter(
 ) : Parcelable {
     fun with(attribute: Attribute, value: TriState) = when (attribute) {
         Attribute.Description -> copy(description = value)
+        Attribute.Vehicle -> copy(vehicle = value)
         Attribute.Feel -> copy(feel = value)
         Attribute.Image -> copy(image = value)
         Attribute.Place -> copy(place = value)
@@ -27,6 +29,7 @@ data class AttributeFilter(
 
     fun get(attribute: Attribute): TriState = when (attribute) {
         Attribute.Description -> description
+        Attribute.Vehicle -> vehicle
         Attribute.Feel -> feel
         Attribute.Image -> image
         Attribute.Place -> place
@@ -37,6 +40,7 @@ data class AttributeFilter(
 
     enum class Attribute(@StringRes val nameId: Int) {
         Description(R.string.description),
+        Vehicle(R.string.vehicle),
         Feel(R.string.feel),
         Image(R.string.image),
         Place(R.string.place),

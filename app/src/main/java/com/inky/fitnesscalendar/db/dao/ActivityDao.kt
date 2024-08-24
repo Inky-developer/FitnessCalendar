@@ -47,6 +47,7 @@ abstract class ActivityDao {
                 "   (end_time >= :start OR :start IS NULL) AND" +
                 "   (start_time <= :end OR :end IS NULL) AND" +
                 "   ((description != '') == :hasDescription OR :hasDescription IS NULL) AND" +
+                "   ((vehicle IS NOT NULL) == :hasVehicle OR :hasVehicle IS NULL) AND" +
                 "   ((feel IS NOT NULL) == :hasFeel OR :hasFeel IS NULL) AND" +
                 "   ((image_uri IS NOT NULL) == :hasImage OR :hasImage IS NULL) AND" +
                 "   ((place_id IS NOT NULL) == :hasPlace OR :hasPlace IS NULL) AND" +
@@ -72,6 +73,7 @@ abstract class ActivityDao {
         start: Date?,
         end: Date?,
         hasDescription: Boolean?,
+        hasVehicle: Boolean?,
         hasFeel: Boolean?,
         hasImage: Boolean?,
         hasPlace: Boolean?,
