@@ -5,8 +5,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Clear
@@ -68,6 +70,8 @@ fun FilterView(
         onBack()
     }
 
+    val scrollState = rememberScrollState()
+
     val appBar = @Composable {
         TopAppBar(
             colors = TopAppBarDefaults.topAppBarColors(
@@ -111,7 +115,11 @@ fun FilterView(
     Scaffold(
         topBar = appBar, containerColor = MaterialTheme.colorScheme.surface
     ) { paddingValues ->
-        Column(modifier = Modifier.padding(paddingValues)) {
+        Column(
+            modifier = Modifier
+                .padding(paddingValues)
+                .verticalScroll(scrollState)
+        ) {
             val context = LocalContext.current
             val selectionLabel = remember(filter) {
                 if (filter.types.isEmpty()) null else filter.types.joinToString(", ") { it.name }
