@@ -6,6 +6,8 @@ import androidx.compose.runtime.Immutable
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.measure.Duration.Companion.until
 import com.inky.fitnesscalendar.util.DAY_START_OFFSET_HOURS
+import com.inky.fitnesscalendar.util.toLocalDate
+import com.inky.fitnesscalendar.util.toLocalDateTime
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.time.Instant
 import java.time.LocalDate
@@ -14,7 +16,6 @@ import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
 import java.time.format.TextStyle
 import java.time.temporal.ChronoUnit
-import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import javax.inject.Inject
@@ -33,20 +34,22 @@ class LocalizationRepository @Inject constructor(@ApplicationContext private val
             return duration.format()
         }
 
-        return formatRelativeDate(date, now)
+        return formatRelativeDate(date, now.toLocalDateTime())
     }
 
-    fun formatRelativeDate(date: Date, now: Date = Date.from(Instant.now())): String {
-        val duration = date until now
+    fun formatRelativeDate(date: Date, now: LocalDateTime = LocalDateTime.now()): String {
+        val localDate = date.toLocalDate()
+        val daysDiff = localDate.until(
+            now.minusHours(DAY_START_OFFSET_HOURS).toLocalDate(),
+            ChronoUnit.DAYS
+        )
 
-        if (duration.elapsedMs < ChronoUnit.DAYS.duration.toMillis()) {
+        if (daysDiff == 0L) {
             return timeFormatter.format(date)
         }
 
-        if (duration.elapsedMs < ChronoUnit.WEEKS.duration.toMillis()) {
-            return Calendar.getInstance().apply {
-                time = date
-            }.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault()) ?: "-"
+        if (daysDiff < 7) {
+            return localDate.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault())
         }
 
         // For farther in the past, just format the date itself
@@ -75,9 +78,7 @@ class LocalizationRepository @Inject constructor(@ApplicationContext private val
 
     companion object {
         val localDateFormatter: DateTimeFormatter by lazy {
-            DateTimeFormatter.ofLocalizedDate(
-                FormatStyle.FULL
-            )
+            DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL)
         }
     }
 }

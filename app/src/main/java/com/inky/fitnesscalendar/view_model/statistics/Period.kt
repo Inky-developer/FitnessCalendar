@@ -60,7 +60,7 @@ enum class Period(
     }
 
     private fun formatRelativeDay(day: LocalDate, today: LocalDate): String {
-        return if (!day.isBefore(today.minusWeeks(1))) {
+        return if (today.minusWeeks(1).isBefore(day)) {
             day.dayOfWeek.getDisplayName(
                 TextStyle.SHORT,
                 Locale.getDefault()
