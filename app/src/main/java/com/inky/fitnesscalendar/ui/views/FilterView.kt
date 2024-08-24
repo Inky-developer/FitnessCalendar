@@ -2,6 +2,7 @@ package com.inky.fitnesscalendar.ui.views
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
@@ -91,7 +92,8 @@ fun FilterView(
                     ),
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                    keyboardActions = KeyboardActions(onSearch = { onBack() })
+                    keyboardActions = KeyboardActions(onSearch = { onBack() }),
+                    modifier = Modifier.fillMaxWidth()
                 )
             },
             navigationIcon = {
