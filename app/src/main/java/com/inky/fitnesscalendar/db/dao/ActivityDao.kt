@@ -46,7 +46,8 @@ abstract class ActivityDao {
                 "   ((description != '') == :hasDescription OR :hasDescription IS NULL) AND" +
                 "   ((feel IS NOT NULL) == :hasFeel OR :hasFeel IS NULL) AND" +
                 "   ((image_uri IS NOT NULL) == :hasImage OR :hasImage IS NULL) AND" +
-                "   ((place_id IS NOT NULL) == :hasPlace OR :hasPlace IS NULL)" +
+                "   ((place_id IS NOT NULL) == :hasPlace OR :hasPlace IS NULL) AND" +
+                "   ((track_preview IS NOT NULL) == :hasTrack OR :hasTrack IS NULL)" +
                 "ORDER BY " +
                 "   CASE WHEN :order = 0 THEN start_time END ASC," +
                 "   CASE WHEN :order = 1 THEN start_time END DESC"
@@ -66,7 +67,8 @@ abstract class ActivityDao {
         hasDescription: Boolean?,
         hasFeel: Boolean?,
         hasImage: Boolean?,
-        hasPlace: Boolean?
+        hasPlace: Boolean?,
+        hasTrack: Boolean?,
     ): Flow<List<RichActivity>>
 
     @Transaction

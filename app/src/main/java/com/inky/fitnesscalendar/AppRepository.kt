@@ -83,6 +83,7 @@ class AppRepository @Inject constructor(
         val hasFeel = filter.attributes.feel.toBooleanOrNull()
         val hasImage = filter.attributes.image.toBooleanOrNull()
         val hasPlace = filter.attributes.place.toBooleanOrNull()
+        val hasTrack = filter.attributes.track.toBooleanOrNull()
 
         return activityDao.getFiltered(
             order = order.ordinal,
@@ -100,6 +101,7 @@ class AppRepository @Inject constructor(
             hasFeel = hasFeel,
             hasImage = hasImage,
             hasPlace = hasPlace,
+            hasTrack = hasTrack,
         )
     }
 

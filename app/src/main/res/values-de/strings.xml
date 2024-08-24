@@ -205,4 +205,5 @@
     <string name="choose_activity_type">Aktivitätsart auswählen</string>
     <string name="could_not_read_input_file">Konnte die Eingabedatei nicht lesen</string>
     <string name="title_activity_import">Aktivititäten importieren</string>
+    <string name="track">Track</string>
 </resources>

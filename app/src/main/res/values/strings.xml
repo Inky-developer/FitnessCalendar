@@ -202,4 +202,5 @@
     <string name="confirm_import">Import</string>
     <string name="choose_activity_type">Choose activity type</string>
     <string name="could_not_read_input_file">Could not read input file</string>
+    <string name="track">Track</string>
 </resources>
