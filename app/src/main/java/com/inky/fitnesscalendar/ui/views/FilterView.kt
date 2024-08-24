@@ -124,12 +124,6 @@ fun FilterView(
             val placeSelectionLabel = remember(filter) {
                 if (filter.places.isEmpty()) null else filter.places.joinToString(", ") { it.name }
             }
-            val vehicleSelectionLabel = remember(filter) {
-                if (filter.vehicles.isEmpty()) null else filter.vehicles.joinToString(", ") { it.name }
-            }
-            val feelSelectionLabel = remember(filter) {
-                if (filter.feels.isEmpty()) null else filter.feels.joinToString(", ") { it.name }
-            }
             val attributeSelectionLabel = remember(filter) {
                 val entries = filter.attributes.entries()
                     .filter { (_, state) -> state != AttributeFilter.TriState.Undefined }
@@ -210,52 +204,24 @@ fun FilterView(
                 }
             }
 
-            OptionGroup(
+            FilterSelectionGroup(
                 label = stringResource(R.string.filter_by_vehicles),
-                selectionLabel = vehicleSelectionLabel,
-                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                text = { context.getString(it.nameId) },
+                selection = filter.vehicles,
+                options = Vehicle.entries,
+                onSelection = { filter = filter.copy(vehicles = it) }
             ) {
-                LazyRow {
-                    items(Vehicle.entries) { vehicle ->
-                        FilterChip(
-                            selected = filter.vehicles.contains(vehicle),
-                            onClick = {
-                                filter = filter.copy(vehicles = filter.vehicles.toggled(vehicle))
-                            },
-                            label = {
-                                Text(
-                                    vehicle.emoji,
-                                    style = MaterialTheme.typography.headlineMedium
-                                )
-                            },
-                            modifier = Modifier.padding(all = 4.dp)
-                        )
-                    }
-                }
+                Text(it.emoji, style = MaterialTheme.typography.headlineMedium)
             }
 
-            OptionGroup(
+            FilterSelectionGroup(
                 label = stringResource(R.string.filter_by_feels),
-                selectionLabel = feelSelectionLabel,
-                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                text = { context.getString(it.nameId) },
+                selection = filter.feels,
+                options = Feel.entries,
+                onSelection = { filter = filter.copy(feels = it) }
             ) {
-                LazyRow {
-                    items(Feel.entries) { feel ->
-                        FilterChip(
-                            selected = filter.feels.contains(feel),
-                            onClick = {
-                                filter = filter.copy(feels = filter.feels.toggled(feel))
-                            },
-                            label = {
-                                Text(
-                                    feel.emoji,
-                                    style = MaterialTheme.typography.headlineMedium
-                                )
-                            },
-                            modifier = Modifier.padding(all = 4.dp)
-                        )
-                    }
-                }
+                Text(it.emoji, style = MaterialTheme.typography.headlineMedium)
             }
 
             OptionGroup(
@@ -318,6 +284,38 @@ private fun PlacesSelector(isSelected: (Place) -> Boolean, onSelect: (Place) -> 
                 ),
                 modifier = Modifier.padding(all = 4.dp)
             )
+        }
+    }
+}
+
+@Composable
+private fun <T> FilterSelectionGroup(
+    label: String,
+    text: (T) -> String,
+    selection: List<T>,
+    options: List<T>,
+    onSelection: (List<T>) -> Unit,
+    icon: @Composable (T) -> Unit,
+) {
+    val selectionLabel = remember(selection) {
+        if (selection.isEmpty()) null else selection.joinToString(", ") { text(it) }
+    }
+    OptionGroup(
+        label = label,
+        selectionLabel = selectionLabel,
+        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+    ) {
+        LazyRow {
+            items(options) { option ->
+                FilterChip(
+                    selected = selection.contains(option),
+                    onClick = {
+                        onSelection(selection.toggled(option))
+                    },
+                    label = { icon(option) },
+                    modifier = Modifier.padding(all = 4.dp)
+                )
+            }
         }
     }
 }
