@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.DrawerState
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -48,6 +50,8 @@ fun NavigationDrawer(
 
     ModalNavigationDrawer(drawerState = drawerState, drawerContent = {
         ModalDrawerSheet(drawerContainerColor = MaterialTheme.colorScheme.primaryContainer) {
+            val scrollState = rememberScrollState()
+
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     painterResource(R.drawable.ic_launcher_foreground),
@@ -70,6 +74,7 @@ fun NavigationDrawer(
                 modifier = Modifier
                     .fillMaxSize()
                     .background(MaterialTheme.colorScheme.surface)
+                    .verticalScroll(scrollState)
             ) {
                 Spacer(modifier = Modifier.height(8.dp))
 
@@ -80,8 +85,9 @@ fun NavigationDrawer(
                         onClick = { if (currentView != view) onNavigate(view) },
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                     )
-
                 }
+
+                Spacer(modifier = Modifier.height(8.dp))
             }
         }
     }) {
