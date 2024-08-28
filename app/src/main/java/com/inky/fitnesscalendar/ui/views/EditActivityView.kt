@@ -8,10 +8,13 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.isImeVisible
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -112,7 +115,7 @@ fun NewActivity(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun NewActivity(
     richActivity: RichActivity?,
@@ -135,7 +138,8 @@ fun NewActivity(
     var contextMenuOpen by rememberSaveable { mutableStateOf(false) }
     var showImageViewer by rememberSaveable { mutableStateOf(false) }
 
-    val showSaveButton by remember { derivedStateOf { (richActivity == null || editState != initialState) && editState.isValid } }
+    val isKeyboardVisible = WindowInsets.isImeVisible
+    val showSaveButton by remember(isKeyboardVisible) { derivedStateOf { !isKeyboardVisible && (richActivity == null || editState != initialState) && editState.isValid } }
     val imagePickerLauncher = rememberImagePickerLauncher(onUri = {
         editState = editState.copy(imageUri = it)
     })
@@ -318,7 +322,7 @@ fun NewActivity(
                 shape = MaterialTheme.shapes.small,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 4.dp),
+                    .padding(vertical = 4.dp)
             )
 
             Spacer(modifier = Modifier.height(128.dp))
