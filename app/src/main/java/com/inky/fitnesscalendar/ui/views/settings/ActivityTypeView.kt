@@ -5,10 +5,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
@@ -169,9 +169,8 @@ fun EditTypeDialog(
                     onClick = { showEmojiPicker = true },
                     colors = IconButtonDefaults.iconButtonColors(containerColor = optionGroupDefaultBackground()),
                     modifier = Modifier
-                        .weight(0.25f)
+                        .size(56.dp)
                         .padding(end = 4.dp)
-                        .fillMaxHeight()
                 ) {
                     AnimatedContent(targetState = state.emoji, label = "emoji") { emoji ->
                         if (emoji.isBlank()) {
