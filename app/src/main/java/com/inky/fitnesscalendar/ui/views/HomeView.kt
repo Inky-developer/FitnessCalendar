@@ -503,7 +503,7 @@ fun CompactFeelSelector(feel: Feel?, onFeel: (Feel?) -> Unit, modifier: Modifier
             OutlinedButton(
                 onClick = { expanded.targetState = true },
                 contentPadding = PaddingValues(all = 4.dp),
-                modifier = Modifier.size(56.dp)
+                modifier = Modifier.size(48.dp)
             ) {
                 if (actualFeel != null) {
                     Text(
