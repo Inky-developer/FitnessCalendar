@@ -2,9 +2,9 @@ package com.inky.fitnesscalendar.ui.views
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -21,6 +21,7 @@ import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Menu
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -64,7 +65,6 @@ import com.inky.fitnesscalendar.ui.components.ActivityImage
 import com.inky.fitnesscalendar.ui.components.ImageViewer
 import com.inky.fitnesscalendar.ui.components.NewActivityFAB
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
-import com.inky.fitnesscalendar.ui.util.getAppBarContainerColor
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.ui.util.sharedElement
 import com.inky.fitnesscalendar.util.toDate
@@ -86,16 +86,12 @@ fun DayView(
     onEditDay: (EpochDay) -> Unit,
     onOpenDrawer: () -> Unit
 ) {
+    val animationScope = rememberCoroutineScope()
     val pagerState =
         rememberPagerState(initialPage = initialEpochDay.day.toInt()) { EpochDay.today().day.toInt() + 1 }
     val epochDay by remember { derivedStateOf { EpochDay(pagerState.currentPage.toLong()) } }
 
     var showDatePicker by rememberSaveable { mutableStateOf(false) }
-    val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = epochDay.toLocalDate().atStartOfDay()
-            .toDate(ZoneId.of("UTC")).time,
-        selectableDates = PastDates
-    )
 
     val scrollState = rememberScrollState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -103,36 +99,19 @@ fun DayView(
         scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,
         titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
     )
-    val appBarContainerColor =
-        getAppBarContainerColor(scrollBehavior = scrollBehavior, topAppBarColors = topAppBarColors)
 
     if (showDatePicker) {
-        val scope = rememberCoroutineScope()
-
-        DatePickerDialog(
-            onDismissRequest = { showDatePicker = false },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        showDatePicker = false
-                        val dateMillis = datePickerState.selectedDateMillis
-                        if (dateMillis != null) {
-                            val date = LocalDateTime.ofInstant(
-                                Instant.ofEpochMilli(dateMillis),
-                                ZoneId.systemDefault()
-                            ).toLocalDate()
-                            scope.launch {
-                                // TODO: use `animateScrollToPage`
-                                // At the time of me writing this, the function is bugged and does not complete the scroll
-                                pagerState.scrollToPage(date.toEpochDay().toInt())
-                            }
-                        }
-                    }
-                ) { Text(stringResource(R.string.confirm)) }
-            }
-        ) {
-            DatePicker(state = datePickerState)
-        }
+        DayPickerDialog(
+            onDismiss = { showDatePicker = false },
+            onScrollTo = { day ->
+                animationScope.launch {
+                    // TODO: use `animateScrollToPage`
+                    // At the time of me writing this, the function is bugged and does not complete the scroll
+                    pagerState.scrollToPage(day.day.toInt())
+                }
+            },
+            epochDay = epochDay
+        )
     }
 
     Scaffold(
@@ -165,18 +144,22 @@ fun DayView(
                 modifier = Modifier.sharedBounds(SharedContentKey.AppBar)
             )
         },
+        bottomBar = {
+            BottomAppBar(
+                actions = {
+                    PrevAndNextDaySelector(
+                        day = epochDay,
+                        onNext = { animationScope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) } },
+                        onPrev = { animationScope.launch { pagerState.animateScrollToPage(pagerState.currentPage - 1) } },
+                    )
+                }
+            )
+        },
         floatingActionButton = { NewActivityFAB(onClick = onNewActivity) },
         snackbarHost = { SnackbarHost(viewModel.snackbarHostState) },
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
-            val scope = rememberCoroutineScope()
-            PrevAndNextDaySelector(
-                day = epochDay,
-                onNext = { scope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) } },
-                onPrev = { scope.launch { pagerState.animateScrollToPage(pagerState.currentPage - 1) } },
-                modifier = Modifier.background(appBarContainerColor)
-            )
             HorizontalPager(
                 state = pagerState,
                 verticalAlignment = Alignment.Top,
@@ -329,33 +312,61 @@ fun DayViewInner(
 }
 
 @Composable
-fun PrevAndNextDaySelector(
+private fun RowScope.PrevAndNextDaySelector(
     day: EpochDay,
     onPrev: () -> Unit,
     onNext: () -> Unit,
-    modifier: Modifier = Modifier
 ) {
     val today = remember { EpochDay.today() }
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = modifier
-            .padding(horizontal = 8.dp)
-            .fillMaxWidth()
+    Button(
+        onClick = onPrev, enabled = day.day > 0, modifier = Modifier
+            .weight(1f)
+            .padding(end = 4.dp)
     ) {
-        Button(
-            onClick = onPrev, enabled = day.day > 0, modifier = Modifier
-                .weight(1f)
-                .padding(end = 4.dp)
-        ) {
-            Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.back))
+        Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.back))
+    }
+    Button(
+        onClick = onNext, enabled = day < today, modifier = Modifier
+            .weight(1f)
+            .padding(start = 4.dp)
+    ) {
+        Icon(Icons.AutoMirrored.Outlined.ArrowForward, stringResource(R.string.forward))
+    }
+}
+
+@Composable
+@OptIn(ExperimentalMaterial3Api::class)
+private fun DayPickerDialog(
+    onDismiss: () -> Unit,
+    onScrollTo: (day: EpochDay) -> Unit,
+    epochDay: EpochDay
+) {
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = epochDay.toLocalDate().atStartOfDay()
+            .toDate(ZoneId.of("UTC")).time,
+        selectableDates = PastDates
+    )
+
+    DatePickerDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    val dateMillis = datePickerState.selectedDateMillis
+                    if (dateMillis != null) {
+                        val date = LocalDateTime.ofInstant(
+                            Instant.ofEpochMilli(dateMillis),
+                            ZoneId.systemDefault()
+                        ).toLocalDate()
+                        onScrollTo(EpochDay(date.toEpochDay()))
+                    }
+
+                    onDismiss()
+                }
+            ) { Text(stringResource(R.string.confirm)) }
         }
-        Button(
-            onClick = onNext, enabled = day < today, modifier = Modifier
-                .weight(1f)
-                .padding(start = 4.dp)
-        ) {
-            Icon(Icons.AutoMirrored.Outlined.ArrowForward, stringResource(R.string.forward))
-        }
+    ) {
+        DatePicker(state = datePickerState)
     }
 }
 
