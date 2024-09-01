@@ -181,7 +181,16 @@ fun DayView(
                         onDeleteActivity = { viewModel.deleteActivity(it) },
                         onEditActivity = onEditActivity,
                         onJumpToActivity = onJumpToActivity,
-                        onEditDay = { onEditDay(actualEpochDay) }
+                        onEditDay = { onEditDay(actualEpochDay) },
+                        // Kind of hacky. The problem is that Horizontal Pager instantiates
+                        // multiple [DayViewInner]s, but only one of them should have the shared
+                        // content keys for the animation from [HomeView] to [DayView].
+                        // Otherwise artifacts occur.
+                        sharedElement = if (page == pagerState.currentPage) {
+                            { this.sharedElement(it) }
+                        } else {
+                            { this }
+                        }
                     )
                 } else {
                     Row(
@@ -211,6 +220,7 @@ fun DayViewInner(
     onEditActivity: (RichActivity) -> Unit,
     onJumpToActivity: (RichActivity) -> Unit,
     onEditDay: () -> Unit,
+    sharedElement: @Composable Modifier.(SharedContentKey) -> Modifier,
 ) {
     var showImageViewer by rememberSaveable { mutableStateOf(false) }
 
