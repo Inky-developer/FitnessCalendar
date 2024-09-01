@@ -15,6 +15,10 @@ sealed class SharedContentKey {
     data object DayImage : SharedContentKey()
 
     data object DayDescription : SharedContentKey()
+
+    data object DayFeel : SharedContentKey()
+
+    data object DayTitle : SharedContentKey()
 }
 
 

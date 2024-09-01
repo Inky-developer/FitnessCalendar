@@ -385,6 +385,7 @@ fun Today(
                 stringResource(R.string.today),
                 color = MaterialTheme.colorScheme.onSecondaryContainer,
                 style = MaterialTheme.typography.displayLarge,
+                modifier = Modifier.sharedBounds(SharedContentKey.DayTitle)
             )
 
             Spacer(modifier = Modifier.weight(1f))
@@ -505,7 +506,11 @@ fun CompactFeelSelector(feel: Feel?, onFeel: (Feel?) -> Unit, modifier: Modifier
                 modifier = Modifier.size(56.dp)
             ) {
                 if (actualFeel != null) {
-                    Text(actualFeel.emoji, style = MaterialTheme.typography.titleLarge)
+                    Text(
+                        actualFeel.emoji,
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.sharedElement(SharedContentKey.DayFeel)
+                    )
                 } else {
                     Icon(Icons.Outlined.Face, stringResource(R.string.select_feel))
                 }

@@ -121,7 +121,15 @@ fun DayView(
                     val todayString = remember(epochDay) {
                         viewModel.repository.localizationRepository.formatRelativeLocalDate(epochDay.toLocalDate())
                     }
-                    Text(todayString)
+
+                    // This is done to avoid animating the title back when the day has changed
+                    // Since it would look weird due to a text mismatch
+                    val modifier = if (epochDay == EpochDay.today()) {
+                        Modifier.sharedBounds(SharedContentKey.DayTitle)
+                    } else {
+                        Modifier
+                    }
+                    Text(todayString, modifier = modifier)
                 },
                 colors = topAppBarColors,
                 navigationIcon = {
@@ -258,7 +266,11 @@ fun DayViewInner(
                 if (feel != null) {
                     Row {
                         Spacer(modifier = Modifier.weight(1f))
-                        Text(feel.emoji, modifier = Modifier.padding(end = 8.dp, top = 8.dp))
+                        Text(
+                            feel.emoji, modifier = Modifier
+                                .padding(end = 8.dp, top = 8.dp)
+                                .sharedElement(SharedContentKey.DayFeel)
+                        )
                     }
                 }
             }
