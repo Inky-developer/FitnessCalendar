@@ -332,8 +332,8 @@ private fun FilterInformation(
     historyItems: List<ActivityFilterChip>,
     onChange: (ActivityFilter) -> Unit
 ) {
-    val listState = rememberLazyListState()
     val context = LocalContext.current
+    val listState = rememberLazyListState()
     val filterItems = remember(filter) { filter.items() }
     val filteredHistoryItems = remember(filter, historyItems) {
         historyItems.filter {
@@ -341,6 +341,10 @@ private fun FilterInformation(
                 it
             )
         }
+    }
+
+    LaunchedEffect(filterItems) {
+        listState.animateScrollToItem(0)
     }
 
     LazyRow(state = listState, modifier = Modifier.fillMaxWidth()) {
