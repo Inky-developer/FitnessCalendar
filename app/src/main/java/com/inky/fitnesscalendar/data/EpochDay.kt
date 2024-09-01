@@ -8,7 +8,8 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @Parcelize
-data class EpochDay(val day: Long) : Parcelable, Comparable<EpochDay> {
+@JvmInline
+value class EpochDay(val day: Long) : Parcelable, Comparable<EpochDay> {
     fun toLocalDate(): LocalDate = LocalDate.ofEpochDay(day)
 
     override fun toString(): String {

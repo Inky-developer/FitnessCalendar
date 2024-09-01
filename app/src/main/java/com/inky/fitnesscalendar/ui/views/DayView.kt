@@ -7,8 +7,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -38,9 +41,11 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -60,11 +65,11 @@ import com.inky.fitnesscalendar.ui.components.ImageViewer
 import com.inky.fitnesscalendar.ui.components.NewActivityFAB
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.getAppBarContainerColor
-import com.inky.fitnesscalendar.ui.util.horizontalOrderedTransitionSpec
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.ui.util.sharedElement
 import com.inky.fitnesscalendar.util.toDate
 import com.inky.fitnesscalendar.view_model.BaseViewModel
+import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -81,15 +86,18 @@ fun DayView(
     onEditDay: (EpochDay) -> Unit,
     onOpenDrawer: () -> Unit
 ) {
-    var epochDay by rememberSaveable(initialEpochDay) { mutableStateOf(initialEpochDay) }
+    val pagerState =
+        rememberPagerState(initialPage = initialEpochDay.day.toInt()) { EpochDay.today().day.toInt() + 1 }
+    val epochDay by remember { derivedStateOf { EpochDay(pagerState.currentPage.toLong()) } }
+
     var showDatePicker by rememberSaveable { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = epochDay.toLocalDate().atStartOfDay()
             .toDate(ZoneId.of("UTC")).time,
         selectableDates = PastDates
     )
-    val scrollState = rememberScrollState()
 
+    val scrollState = rememberScrollState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val topAppBarColors = TopAppBarDefaults.topAppBarColors(
         scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -99,19 +107,25 @@ fun DayView(
         getAppBarContainerColor(scrollBehavior = scrollBehavior, topAppBarColors = topAppBarColors)
 
     if (showDatePicker) {
+        val scope = rememberCoroutineScope()
+
         DatePickerDialog(
             onDismissRequest = { showDatePicker = false },
             confirmButton = {
                 TextButton(
                     onClick = {
+                        showDatePicker = false
                         val dateMillis = datePickerState.selectedDateMillis
                         if (dateMillis != null) {
                             val date = LocalDateTime.ofInstant(
                                 Instant.ofEpochMilli(dateMillis),
                                 ZoneId.systemDefault()
                             ).toLocalDate()
-                            epochDay = EpochDay(day = date.toEpochDay())
-                            showDatePicker = false
+                            scope.launch {
+                                // TODO: use `animateScrollToPage`
+                                // At the time of me writing this, the function is bugged and does not complete the scroll
+                                pagerState.scrollToPage(date.toEpochDay().toInt())
+                            }
                         }
                     }
                 ) { Text(stringResource(R.string.confirm)) }
@@ -156,21 +170,23 @@ fun DayView(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
+            val scope = rememberCoroutineScope()
             PrevAndNextDaySelector(
                 day = epochDay,
-                onNext = { epochDay = EpochDay(epochDay.day + 1) },
-                onPrev = { epochDay = EpochDay(epochDay.day - 1) },
+                onNext = { scope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) } },
+                onPrev = { scope.launch { pagerState.animateScrollToPage(pagerState.currentPage - 1) } },
                 modifier = Modifier.background(appBarContainerColor)
             )
-            AnimatedContent(
-                targetState = epochDay,
-                transitionSpec = horizontalOrderedTransitionSpec(),
-                label = stringResource(R.string.day),
-            ) { actualEpochDay ->
-                val day by remember(actualEpochDay) { viewModel.repository.getDay(actualEpochDay!!) }
+            HorizontalPager(
+                state = pagerState,
+                verticalAlignment = Alignment.Top,
+                modifier = Modifier.fillMaxSize()
+            ) { page ->
+                val actualEpochDay = EpochDay(page.toLong())
+                val day by remember(actualEpochDay) { viewModel.repository.getDay(actualEpochDay) }
                     .collectAsState(initial = null)
                 val activities by remember(actualEpochDay) {
-                    viewModel.repository.getDayActivities(actualEpochDay!!)
+                    viewModel.repository.getDayActivities(actualEpochDay)
                 }.collectAsState(initial = null)
 
                 if (day != null && activities != null) {
@@ -182,7 +198,7 @@ fun DayView(
                         onDeleteActivity = { viewModel.deleteActivity(it) },
                         onEditActivity = onEditActivity,
                         onJumpToActivity = onJumpToActivity,
-                        onEditDay = { onEditDay(actualEpochDay!!) }
+                        onEditDay = { onEditDay(actualEpochDay) }
                     )
                 } else {
                     Row(
