@@ -1,6 +1,7 @@
 package com.inky.fitnesscalendar.data.activity_filter
 
 import android.content.Context
+import android.os.Parcelable
 import com.inky.fitnesscalendar.data.ActivityCategory
 import com.inky.fitnesscalendar.data.Feel
 import com.inky.fitnesscalendar.data.Vehicle
@@ -8,22 +9,32 @@ import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.FilterHistoryItem
 import com.inky.fitnesscalendar.db.entities.Place
 import com.inky.fitnesscalendar.db.entities.RichFilterHistoryItem
+import kotlinx.parcelize.Parcelize
 
-sealed class ActivityFilterChip {
+@Parcelize
+sealed class ActivityFilterChip : Parcelable {
+    @Parcelize
     data class TextFilterChip(val text: String) : ActivityFilterChip()
 
+    @Parcelize
     data class DateFilterChip(val option: DateRangeOption) : ActivityFilterChip()
 
+    @Parcelize
     data class CategoryFilterChip(val category: ActivityCategory) : ActivityFilterChip()
 
+    @Parcelize
     data class TypeFilterChip(val type: ActivityType) : ActivityFilterChip()
 
+    @Parcelize
     data class PlaceFilterChip(val place: Place) : ActivityFilterChip()
 
+    @Parcelize
     data class VehicleFilterChip(val vehicle: Vehicle) : ActivityFilterChip()
 
+    @Parcelize
     data class FeelFilterChip(val feel: Feel) : ActivityFilterChip()
 
+    @Parcelize
     data class AttributeFilterChip(val attribute: AttributeFilter.Attribute, val state: Boolean) :
         ActivityFilterChip()
 

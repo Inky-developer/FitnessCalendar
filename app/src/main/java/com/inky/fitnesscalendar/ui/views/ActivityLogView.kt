@@ -343,8 +343,8 @@ private fun FilterInformation(
         }
     }
 
-    LazyRow(state = listState) {
-        items(filterItems) { chip ->
+    LazyRow(state = listState, modifier = Modifier.fillMaxWidth()) {
+        items(filterItems, key = { it }) { chip ->
             FilterChip(
                 onClick = { onChange(chip.removeFrom(filter)) },
                 label = { Text(chip.displayText(context)) },
@@ -352,7 +352,7 @@ private fun FilterInformation(
             )
         }
 
-        items(filteredHistoryItems) { chip ->
+        items(filteredHistoryItems, key = { it }) { chip ->
             SuggestionFilterChip(
                 onClick = { onChange(chip.addTo(filter)) },
                 label = { Text(chip.displayText(context)) },
