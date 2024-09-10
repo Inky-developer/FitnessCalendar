@@ -3,7 +3,6 @@ package com.inky.fitnesscalendar.ui.components
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -25,9 +24,9 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
@@ -358,46 +357,45 @@ private fun ActivityCardContextMenu(
         HorizontalDivider(modifier = Modifier.padding(all = 8.dp))
 
         AnimatedVisibility(visible = onJumpTo != null) {
-            ListItem(
-                headlineContent = { Text(stringResource(R.string.jump_to)) },
-                leadingContent = {
-                    Icon(
-                        Icons.Outlined.PlayArrow,
-                        stringResource(R.string.jump_to)
-                    )
+            SheetButton(
+                onClick = { onJumpTo?.let { it() } },
+                leadingIcon = {
+                    Icon(Icons.Outlined.PlayArrow, stringResource(R.string.jump_to))
                 },
-                modifier = Modifier.clickable { onJumpTo?.let { it() } }
-            )
+            ) {
+                Text(stringResource(R.string.jump_to))
+            }
         }
         AnimatedVisibility(visible = onShowDay != null) {
-            ListItem(
-                headlineContent = { Text(stringResource(R.string.show_day)) },
-                leadingContent = {
-                    Icon(
-                        Icons.Outlined.DateRange,
-                        stringResource(R.string.show_day)
-                    )
+            SheetButton(
+                onClick = { onShowDay?.let { it() } },
+                leadingIcon = {
+                    Icon(Icons.Outlined.DateRange, stringResource(R.string.show_day))
                 },
-                modifier = Modifier.clickable { onShowDay?.let { it() } }
-            )
+            ) {
+                Text(stringResource(R.string.show_day))
+            }
         }
         AnimatedVisibility(visible = onFilterByType != null) {
-            ListItem(
-                headlineContent = { Text(stringResource(R.string.only_show_this_activity_type)) },
-                leadingContent = {
+            SheetButton(
+                onClick = { onFilterByType?.let { it() } },
+                leadingIcon = {
                     Icon(
                         painterResource(R.drawable.outline_filter_24),
                         stringResource(R.string.filter)
                     )
                 },
-                modifier = Modifier.clickable { onFilterByType?.let { it() } }
-            )
+            ) {
+                Text(stringResource(R.string.only_show_this_activity_type))
+            }
         }
-        ListItem(
-            headlineContent = { Text(stringResource(R.string.delete_activity)) },
-            leadingContent = { Icon(Icons.Outlined.Delete, stringResource(R.string.delete)) },
-            modifier = Modifier.clickable { showDialog = true }
-        )
+
+        SheetButton(
+            onClick = { showDialog = true },
+            leadingIcon = { Icon(Icons.Outlined.Delete, stringResource(R.string.delete)) },
+        ) {
+            Text(stringResource(R.string.delete_activity))
+        }
 
         Spacer(Modifier.height(32.dp))
     }
@@ -424,6 +422,26 @@ private fun ActivityCardContextMenu(
                 }
             }
         )
+    }
+}
+
+@Composable
+private fun SheetButton(
+    leadingIcon: @Composable () -> Unit,
+    onClick: () -> Unit,
+    content: @Composable () -> Unit
+) {
+    FilledTonalButton(
+        onClick = onClick,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp)
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+            leadingIcon()
+            Spacer(modifier = Modifier.padding(horizontal = 4.dp))
+            content()
+        }
     }
 }
 
