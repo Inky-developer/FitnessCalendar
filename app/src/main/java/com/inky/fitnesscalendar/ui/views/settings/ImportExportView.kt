@@ -10,7 +10,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Menu
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
@@ -52,7 +52,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun ImportExport(
     viewModel: ImportExportViewModel = hiltViewModel(),
-    onOpenDrawer: () -> Unit
+    onBack: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
     var exporting by remember { mutableStateOf(false) }
@@ -81,8 +81,8 @@ fun ImportExport(
                     titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
                 ),
                 navigationIcon = {
-                    IconButton(onClick = onOpenDrawer) {
-                        Icon(Icons.Outlined.Menu, stringResource(R.string.Menu))
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.back))
                     }
                 },
                 scrollBehavior = scrollBehavior,

@@ -1,8 +1,11 @@
 package com.inky.fitnesscalendar.ui.views
 
+import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.runtime.Composable
+import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
@@ -40,23 +43,17 @@ fun NavGraphBuilder.settingsDestination(
             }
         }
 
-        composable<SettingsViews.Debug>(
-            enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Start) },
-            exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.End) }
-        ) {
+        settingsComposable<SettingsViews.Debug> {
             SettingsDebug()
         }
 
-        composable<SettingsViews.ActivityType>(
-            enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Start) },
-            exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.End) }
-        ) {
+        settingsComposable<SettingsViews.ActivityType> {
             ActivityTypeView(onBack = onBack)
         }
 
-        composable<SettingsViews.PlaceList> {
+        settingsComposable<SettingsViews.PlaceList> {
             PlaceListView(
-                onOpenDrawer = onOpenDrawer,
+                onBack = onBack,
                 onEditPlace = { onNavigate(SettingsViews.PlaceDialog(it?.uid)) })
         }
 
@@ -68,11 +65,15 @@ fun NavGraphBuilder.settingsDestination(
             )
         }
 
-        composable<SettingsViews.ImportExport> {
-            ImportExport(
-                onOpenDrawer = onOpenDrawer
-            )
+        settingsComposable<SettingsViews.ImportExport> {
+            ImportExport(onBack = onBack)
         }
     }
 }
 
+private inline fun <reified T : Any> NavGraphBuilder.settingsComposable(noinline content: @Composable AnimatedContentScope.(NavBackStackEntry) -> Unit) =
+    composable<T>(
+        enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Start) },
+        exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.End) },
+        content = content
+    )
