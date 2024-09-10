@@ -24,7 +24,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -357,7 +356,7 @@ private fun ActivityCardContextMenu(
         HorizontalDivider(modifier = Modifier.padding(all = 8.dp))
 
         AnimatedVisibility(visible = onJumpTo != null) {
-            SheetButton(
+            BottomSheetButton(
                 onClick = { onJumpTo?.let { it() } },
                 leadingIcon = {
                     Icon(Icons.Outlined.PlayArrow, stringResource(R.string.jump_to))
@@ -367,7 +366,7 @@ private fun ActivityCardContextMenu(
             }
         }
         AnimatedVisibility(visible = onShowDay != null) {
-            SheetButton(
+            BottomSheetButton(
                 onClick = { onShowDay?.let { it() } },
                 leadingIcon = {
                     Icon(Icons.Outlined.DateRange, stringResource(R.string.show_day))
@@ -377,7 +376,7 @@ private fun ActivityCardContextMenu(
             }
         }
         AnimatedVisibility(visible = onFilterByType != null) {
-            SheetButton(
+            BottomSheetButton(
                 onClick = { onFilterByType?.let { it() } },
                 leadingIcon = {
                     Icon(
@@ -390,7 +389,7 @@ private fun ActivityCardContextMenu(
             }
         }
 
-        SheetButton(
+        BottomSheetButton(
             onClick = { showDialog = true },
             leadingIcon = { Icon(Icons.Outlined.Delete, stringResource(R.string.delete)) },
         ) {
@@ -422,26 +421,6 @@ private fun ActivityCardContextMenu(
                 }
             }
         )
-    }
-}
-
-@Composable
-private fun SheetButton(
-    leadingIcon: @Composable () -> Unit,
-    onClick: () -> Unit,
-    content: @Composable () -> Unit
-) {
-    FilledTonalButton(
-        onClick = onClick,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 8.dp)
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-            leadingIcon()
-            Spacer(modifier = Modifier.padding(horizontal = 4.dp))
-            content()
-        }
     }
 }
 

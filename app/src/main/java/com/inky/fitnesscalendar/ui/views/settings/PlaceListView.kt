@@ -2,7 +2,6 @@ package com.inky.fitnesscalendar.ui.views.settings
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,7 +20,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.ListItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Scaffold
@@ -43,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.db.entities.Place
+import com.inky.fitnesscalendar.ui.components.BottomSheetButton
 import com.inky.fitnesscalendar.view_model.PlaceListViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -155,14 +154,15 @@ private fun PlaceCard(
             )
             HorizontalDivider(modifier = Modifier.padding(all = 8.dp))
 
-            ListItem(
-                headlineContent = { Text(stringResource(R.string.delete_place)) },
-                leadingContent = { Icon(Icons.Outlined.Delete, stringResource(R.string.delete)) },
-                modifier = Modifier.clickable {
+            BottomSheetButton(
+                onClick = {
                     showContextMenu = false
                     showDeleteDialog = true
-                }
-            )
+                },
+                leadingIcon = { Icon(Icons.Outlined.Delete, stringResource(R.string.delete)) },
+            ) {
+                Text(stringResource(R.string.delete_place))
+            }
 
             Spacer(Modifier.height(32.dp))
         }
