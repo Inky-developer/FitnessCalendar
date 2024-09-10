@@ -1,7 +1,6 @@
 package com.inky.fitnesscalendar.ui.views
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -93,7 +92,6 @@ fun DayView(
 
     var showDatePicker by rememberSaveable { mutableStateOf(false) }
 
-    val scrollState = rememberScrollState()
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val topAppBarColors = TopAppBarDefaults.topAppBarColors(
         scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,
@@ -184,7 +182,6 @@ fun DayView(
                     DayViewInner(
                         day = day!!,
                         activities = activities!!,
-                        scrollState = scrollState,
                         localizationRepository = viewModel.repository.localizationRepository,
                         onDeleteActivity = { viewModel.deleteActivity(it) },
                         onEditActivity = onEditActivity,
@@ -222,7 +219,6 @@ fun DayView(
 fun DayViewInner(
     day: Day,
     activities: List<RichActivity>,
-    scrollState: ScrollState,
     localizationRepository: LocalizationRepository,
     onDeleteActivity: (RichActivity) -> Unit,
     onEditActivity: (RichActivity) -> Unit,
@@ -231,6 +227,7 @@ fun DayViewInner(
     sharedElement: @Composable Modifier.(SharedContentKey) -> Modifier,
 ) {
     var showImageViewer by rememberSaveable { mutableStateOf(false) }
+    val scrollState = rememberScrollState()
 
     Column(
         modifier = Modifier
