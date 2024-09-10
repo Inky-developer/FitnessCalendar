@@ -1,6 +1,6 @@
 [versions]
 accompanistPermissionsVersion = "0.35.1-alpha"
-agp = "8.5.2"
+agp = "8.6.0"
 coilCompose = "2.7.0"
 datastorePreferences = "1.1.1"
 hiltAndroid = "2.51.1"
@@ -11,15 +11,14 @@ junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
 kotlinxSerializationJsonVersion = "1.7.1"
-lifecycleRuntimeKtx = "2.8.4"
-activityCompose = "1.9.1"
-composeBom = "2024.08.00"
-animationCompose = "1.7.0-rc01"
-navigationCompose = "2.8.0-rc01"
+lifecycleRuntimeKtx = "2.8.5"
+activityCompose = "1.9.2"
+composeBom = "2024.09.00"
+navigationCompose = "2.8.0"
 room = "2.7.0-alpha07"
 ksp = "2.0.0-1.0.22"
 vico = "2.0.0-alpha.28"
-emoji2EmojipickerVersion = "1.4.0"
+emoji2EmojipickerVersion = "1.5.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -45,7 +44,6 @@ androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-man
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
-androidx-animation = { group = "androidx.compose.animation", name = "animation", version.ref = "animationCompose" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJsonVersion" }
 vico-compose = { group = "com.patrykandpatrick.vico", name = "compose", version.ref = "vico" }
 vico-compose-m3 = { group = "com.patrykandpatrick.vico", name = "compose-m3", version.ref = "vico" }

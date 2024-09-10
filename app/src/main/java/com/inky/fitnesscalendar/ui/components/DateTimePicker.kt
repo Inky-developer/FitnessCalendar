@@ -9,6 +9,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -134,7 +135,10 @@ fun DaySelector(date: LocalDate, onDate: (LocalDate) -> Unit) {
                 }
             }
         ) {
-            DatePicker(state = datePickerState)
+            DatePicker(
+                state = datePickerState,
+                colors = DatePickerDefaults.colors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+            )
         }
     }
 }
@@ -147,7 +151,7 @@ fun DaySelector(date: LocalDate, onDate: (LocalDate) -> Unit) {
 @OptIn(ExperimentalMaterial3Api::class)
 private fun rememberDatePickerStateKeyed(initialSelectedDateMillis: Long): DatePickerState {
     val locale = LocalConfiguration.current.locales[0]
-    return remember(key1 = initialSelectedDateMillis) {
+    return remember(initialSelectedDateMillis) {
         DatePickerState(
             initialSelectedDateMillis = initialSelectedDateMillis,
             locale = locale
@@ -155,11 +159,13 @@ private fun rememberDatePickerStateKeyed(initialSelectedDateMillis: Long): DateP
     }
 }
 
+// TODO: This does not remember with saveable which it should
+// See [rememberDatePickerStateKeyed]
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun rememberTimePickerStateKeyed(initialTime: LocalTime): TimePickerState {
     val context = LocalContext.current
-    return rememberSaveable(context, initialTime, saver = TimePickerState.Saver()) {
+    return remember(initialTime) {
         val is24Hour = DateFormat.is24HourFormat(context)
         TimePickerState(
             initialHour = initialTime.hour,
