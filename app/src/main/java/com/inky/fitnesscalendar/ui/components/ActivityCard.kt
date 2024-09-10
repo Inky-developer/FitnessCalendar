@@ -22,6 +22,7 @@ import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.PlayArrow
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -90,8 +91,8 @@ fun ActivityCard(
 
     val haptics = LocalHapticFeedback.current
 
-    CardWithBackground(
-        containerColor = containerColor,
+    Card(
+        colors = CardDefaults.cardColors(containerColor = containerColor),
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp, vertical = 4.dp)
@@ -103,7 +104,8 @@ fun ActivityCard(
                 },
             )
             .skipToLookaheadSize(),
-        backgroundContent = {
+    ) {
+        Box {
             if (trackPreview != null) {
                 TrackView(
                     track = trackPreview,
@@ -113,24 +115,24 @@ fun ActivityCard(
                         .padding(all = 8.dp)
                 )
             }
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Text(
+                    time,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = MaterialTheme.colorScheme.secondary,
+                    modifier = Modifier
+                        .align(Alignment.End)
+                        .padding(horizontal = 4.dp)
+                )
+                Text(
+                    title,
+                    style = MaterialTheme.typography.displaySmall,
+                    color = contentColor,
+                    modifier = Modifier.padding(horizontal = 4.dp)
+                )
+                ActivityCardContent(richActivity.activity, richActivity.place)
+            }
         }
-    ) {
-        Text(
-            time,
-            style = MaterialTheme.typography.titleSmall,
-            color = MaterialTheme.colorScheme.secondary,
-            modifier = Modifier
-                .align(Alignment.End)
-                .padding(horizontal = 4.dp)
-        )
-        Text(
-            title,
-            style = MaterialTheme.typography.displaySmall,
-            color = contentColor,
-            modifier = Modifier.padding(horizontal = 4.dp)
-        )
-
-        ActivityCardContent(richActivity.activity, richActivity.place)
 
         if (richActivity.activity.imageUri != null) {
             HorizontalDivider()
