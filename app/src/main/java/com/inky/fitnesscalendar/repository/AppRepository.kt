@@ -49,6 +49,7 @@ private const val TAG = "AppRepository"
 @Singleton
 class AppRepository @Inject constructor(
     @ApplicationContext val context: Context,
+    val backupRepository: BackupRepository,
     private val database: AppDatabase,
     private val activityDao: ActivityDao,
     private val recordingDao: RecordingDao,

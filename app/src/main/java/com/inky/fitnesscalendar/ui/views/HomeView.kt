@@ -1,6 +1,8 @@
 package com.inky.fitnesscalendar.ui.views
 
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.MutableTransitionState
@@ -44,6 +46,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -59,6 +62,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
+import androidx.documentfile.provider.DocumentFile
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityStatistics
@@ -86,6 +90,8 @@ import com.inky.fitnesscalendar.ui.util.sharedElement
 import com.inky.fitnesscalendar.util.showRecordingNotification
 import com.inky.fitnesscalendar.view_model.HomeViewModel
 import com.inky.fitnesscalendar.view_model.statistics.Period
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 private const val TAG = "HOME"
 
@@ -170,6 +176,22 @@ fun Home(
                 .verticalScroll(scrollState)
                 .padding(bottom = 64.dp) // Account for fab, maybe this should be set dynamically?
         ) {
+            val scope = rememberCoroutineScope()
+            val launcher =
+                rememberLauncherForActivityResult(contract = ActivityResultContracts.OpenDocumentTree()) { uri ->
+                    val file = uri?.let { DocumentFile.fromTreeUri(context, it) }
+                        ?.createFile("application/vnd.sqlite3", "backup.sqlite")?.uri
+                    if (file != null) {
+                        scope.launch(Dispatchers.IO) {
+                            viewModel.repository.backupRepository.backup(file)
+                        }
+                    }
+                }
+            Button(
+                onClick = { launcher.launch(null) }
+            ) {
+                Text("VACUUM INTO")
+            }
 
             AnimatedVisibility(visible = typeRecordings?.isNotEmpty() ?: false) {
                 Recordings(

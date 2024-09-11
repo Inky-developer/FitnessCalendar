@@ -1,5 +1,6 @@
 package com.inky.fitnesscalendar.util
 
+import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
 import android.util.Log
@@ -12,19 +13,30 @@ import java.util.UUID
 private const val TAG = "file_storage"
 
 fun Context.copyFileToStorage(input: Uri, targetDir: File): Uri? {
+    val filename = UUID.randomUUID().toString()
+    val file = File(targetDir, filename)
+    return copyFile(contentResolver, input, file.toUri())
+}
+
+fun Context.copyFile(input: Uri, output: Uri): Uri? = copyFile(contentResolver, input, output)
+
+private fun copyFile(contentResolver: ContentResolver, input: Uri, output: Uri): Uri? {
     try {
         return contentResolver.openInputStream(input).use { inputStream ->
             if (inputStream == null) {
-                return@use null
+                return null
             }
-            val filename = UUID.randomUUID().toString()
-            val file = File(targetDir, filename)
-            file.outputStream().use { outputStream ->
+
+            contentResolver.openOutputStream(output).use { outputStream ->
+                if (outputStream == null) {
+                    return null
+                }
+
                 val bytesCopied = inputStream.copyTo(outputStream)
 
-                Log.i(TAG, "Copied $bytesCopied bytes from $input to ${file.toUri()}")
+                Log.i(TAG, "Copied $bytesCopied bytes from $input to $output")
 
-                file.toUri()
+                output
             }
         }
     } catch (_: FileNotFoundException) {
@@ -42,6 +54,15 @@ fun Context.getOrCreateSharedMediaCache(): File {
     val dir = File(cacheDir, SHARED_MEDIA_DIR)
     dir.mkdir()
     return dir
+}
+
+/**
+ * Returns the path for temporary backups and deletes any files currently existing at this path
+ */
+fun Context.getTemporaryBackupUri(): Uri {
+    val file = File(cacheDir, "backup.sqlite")
+    file.delete()
+    return file.toUri()
 }
 
 fun Context.cleanImageStorage(liveUris: Set<Uri>) {
