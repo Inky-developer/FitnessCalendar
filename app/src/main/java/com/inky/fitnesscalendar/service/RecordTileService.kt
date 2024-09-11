@@ -21,7 +21,7 @@ import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
-import com.inky.fitnesscalendar.AppRepository
+import com.inky.fitnesscalendar.repository.AppRepository
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.db.entities.RichRecording
 import com.inky.fitnesscalendar.ui.components.AppFrame

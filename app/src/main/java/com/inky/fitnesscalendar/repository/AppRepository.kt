@@ -1,4 +1,4 @@
-package com.inky.fitnesscalendar
+package com.inky.fitnesscalendar.repository
 
 import android.content.Context
 import android.util.Log

@@ -4,6 +4,7 @@ import android.app.Application
 import android.util.Log
 import com.inky.fitnesscalendar.di.ActivityTypeOrder
 import com.inky.fitnesscalendar.di.DecisionTrees
+import com.inky.fitnesscalendar.repository.AppRepository
 import com.inky.fitnesscalendar.util.cleanImageStorage
 import com.inky.fitnesscalendar.util.getOrCreateSharedMediaCache
 import dagger.hilt.android.HiltAndroidApp

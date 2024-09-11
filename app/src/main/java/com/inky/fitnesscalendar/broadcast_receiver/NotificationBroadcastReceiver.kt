@@ -4,7 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.inky.fitnesscalendar.AppRepository
+import com.inky.fitnesscalendar.repository.AppRepository
 import com.inky.fitnesscalendar.util.ACTION_CANCEL
 import com.inky.fitnesscalendar.util.ACTION_SAVE
 import com.inky.fitnesscalendar.util.EXTRA_RECORDING_ID

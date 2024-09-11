@@ -2,7 +2,7 @@ package com.inky.fitnesscalendar.view_model
 
 import android.content.Context
 import androidx.lifecycle.viewModelScope
-import com.inky.fitnesscalendar.AppRepository
+import com.inky.fitnesscalendar.repository.AppRepository
 import com.inky.fitnesscalendar.data.ActivityStatistics
 import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter

@@ -9,7 +9,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.inky.fitnesscalendar.AppRepository
+import com.inky.fitnesscalendar.repository.AppRepository
 import com.inky.fitnesscalendar.data.ActivityStatistics
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.preferences.Preference

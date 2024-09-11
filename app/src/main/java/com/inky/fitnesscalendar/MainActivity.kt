@@ -9,6 +9,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
+import com.inky.fitnesscalendar.repository.AppRepository
 import com.inky.fitnesscalendar.ui.App
 import com.inky.fitnesscalendar.ui.components.AppFrame
 import com.inky.fitnesscalendar.util.EXTRA_TOAST
