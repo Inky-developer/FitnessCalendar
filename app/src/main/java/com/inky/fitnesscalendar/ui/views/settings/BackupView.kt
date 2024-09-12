@@ -104,7 +104,14 @@ private fun BackupButton(backupRepository: BackupRepository, snackbarHostState: 
                     backupRepository.backup(file)
                     backupInProgress = false
                     snackbarHostState.showSnackbar(
-                        "Backup successful",
+                        context.getString(R.string.backup_successful),
+                        duration = SnackbarDuration.Long
+                    )
+                }
+            } else if (uri != null) {
+                scope.launch {
+                    snackbarHostState.showSnackbar(
+                        context.getString(R.string.could_not_read_path),
                         duration = SnackbarDuration.Long
                     )
                 }

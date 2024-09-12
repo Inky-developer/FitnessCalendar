@@ -212,4 +212,6 @@
     <string name="backup">Sicherung</string>
     <string name="backup_directory">Sicherungspfad:</string>
     <string name="create_backup">Sicherung erstellen</string>
+    <string name="backup_successful">Sicherung war erfolgreich</string>
+    <string name="could_not_read_path">Pfad kann nicht gelesen werden</string>
 </resources>

@@ -209,4 +209,6 @@
     <string name="backup">Backup</string>
     <string name="backup_directory">Backup directory:</string>
     <string name="create_backup">Create backup</string>
+    <string name="backup_successful">Backup successful</string>
+    <string name="could_not_read_path">Could not read path</string>
 </resources>
