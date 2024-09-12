@@ -18,7 +18,4 @@ sealed interface SettingsViews {
 
     @Serializable
     data class PlaceDialog(val placeId: Int? = null)
-
-    @Serializable
-    object ImportExport
 }
