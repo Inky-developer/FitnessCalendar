@@ -13,6 +13,7 @@ import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import com.inky.fitnesscalendar.ui.ProvideSharedContent
 import com.inky.fitnesscalendar.ui.views.settings.ActivityTypeView
+import com.inky.fitnesscalendar.ui.views.settings.BackupView
 import com.inky.fitnesscalendar.ui.views.settings.EditPlaceDialog
 import com.inky.fitnesscalendar.ui.views.settings.PlaceListView
 import com.inky.fitnesscalendar.ui.views.settings.SettingsDebug
@@ -37,6 +38,7 @@ fun NavGraphBuilder.settingsDestination(
                     onNavigateTypes = { onNavigate(SettingsViews.ActivityType) },
                     onNavigateDebug = { onNavigate(SettingsViews.Debug) },
                     onNavigatePlaces = { onNavigate(SettingsViews.PlaceList) },
+                    onNavigateBackup = { onNavigate(SettingsViews.Backup) }
                 )
             }
         }
@@ -61,6 +63,10 @@ fun NavGraphBuilder.settingsDestination(
                 initialPlaceId = route.placeId,
                 onDismiss = onBack,
             )
+        }
+
+        settingsComposable<SettingsViews.Backup> {
+            BackupView(onBack = onBack)
         }
     }
 }

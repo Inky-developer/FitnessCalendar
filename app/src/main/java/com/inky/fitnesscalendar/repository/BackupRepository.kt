@@ -33,7 +33,7 @@ class BackupRepository @Inject constructor(
 
     private fun backupDatabase(zip: Zip) {
         val dbFile = File(context.cacheDir, BACKUP_DB_NAME).apply {
-            createNewFile()
+            delete()
         }
         val query = SimpleSQLiteQuery("VACUUM INTO ?", arrayOf(dbFile.toPath().toString()))
         val result = database.query(query)

@@ -209,4 +209,7 @@
     <string name="filter_by_vehicles">Nach Fahrzeugen filtern…</string>
     <string name="filter_by_feels">Nach Stimmungen filtern…</string>
     <string name="select_emoji">Emoji auswählen…</string>
+    <string name="backup">Sicherung</string>
+    <string name="backup_directory">Sicherungspfad:</string>
+    <string name="create_backup">Sicherung erstellen</string>
 </resources>

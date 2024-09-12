@@ -49,6 +49,7 @@ fun SettingsView(
     onNavigateDebug: () -> Unit,
     onNavigateTypes: () -> Unit,
     onNavigatePlaces: () -> Unit,
+    onNavigateBackup: () -> Unit,
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
@@ -84,6 +85,10 @@ fun SettingsView(
                 Setting(
                     title = stringResource(R.string.places),
                     onClick = onNavigatePlaces,
+                )
+                Setting(
+                    title = stringResource(R.string.backup),
+                    onClick = onNavigateBackup
                 )
                 Setting(
                     title = stringResource(R.string.debug),
