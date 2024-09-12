@@ -180,7 +180,7 @@ fun Home(
             val launcher =
                 rememberLauncherForActivityResult(contract = ActivityResultContracts.OpenDocumentTree()) { uri ->
                     val file = uri?.let { DocumentFile.fromTreeUri(context, it) }
-                        ?.createFile("application/vnd.sqlite3", "backup.sqlite")?.uri
+                        ?.createFile("application/zip", "backup.zip")?.uri
                     if (file != null) {
                         scope.launch(Dispatchers.IO) {
                             viewModel.repository.backupRepository.backup(file)

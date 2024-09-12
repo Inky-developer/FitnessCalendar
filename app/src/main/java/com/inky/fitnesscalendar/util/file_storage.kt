@@ -63,15 +63,6 @@ fun Context.getOrCreateSharedMediaCache(): File {
     return dir
 }
 
-/**
- * Returns the path for temporary backups and deletes any files currently existing at this path
- */
-fun Context.getTemporaryBackupUri(): Uri {
-    val file = File(cacheDir, "backup.sqlite")
-    file.delete()
-    return file.toUri()
-}
-
 fun Context.cleanImageStorage(liveUris: Set<Uri>) {
     val deadFiles = getOrCreateImagesDir().listFiles { file ->
         !liveUris.contains(file.toUri()) && System.currentTimeMillis() - file.lastModified() > ChronoUnit.DAYS.duration.toMillis()

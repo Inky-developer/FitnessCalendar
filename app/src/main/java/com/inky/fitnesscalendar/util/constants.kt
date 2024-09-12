@@ -17,6 +17,9 @@ const val EXTRA_RECORDING_ID = "recording_id"
 const val IMAGES_DIR = "activity_images"
 const val SHARED_MEDIA_DIR = "shared_media_cache"
 
+const val BACKUP_CACHE_FILE = "backup-temp.zip"
+const val BACKUP_DB_NAME = "database.sqlite"
+
 const val EXTRA_TOAST = "toast_message"
 
 // Specifies by how many hours offset a day starts.
