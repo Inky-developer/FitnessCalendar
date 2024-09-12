@@ -1,5 +1,6 @@
 package com.inky.fitnesscalendar.util
 
+import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
 import android.util.Log
@@ -11,20 +12,38 @@ import java.util.UUID
 
 private const val TAG = "file_storage"
 
-fun Context.copyFileToStorage(input: Uri, targetDir: File): Uri? {
+data class InternalFile(val name: String, val uri: Uri)
+
+fun Context.copyFileToStorage(input: Uri, targetDir: File): InternalFile? {
+    val filename = UUID.randomUUID().toString()
+    val file = File(targetDir, filename)
+    val result = copyFile(contentResolver, input, file.toUri())
+    return if (result != null) {
+        InternalFile(name = filename, uri = result)
+    } else {
+        null
+    }
+}
+
+fun Context.copyFile(input: Uri, output: Uri): Uri? = copyFile(contentResolver, input, output)
+
+private fun copyFile(contentResolver: ContentResolver, input: Uri, output: Uri): Uri? {
     try {
         return contentResolver.openInputStream(input).use { inputStream ->
             if (inputStream == null) {
-                return@use null
+                return null
             }
-            val filename = UUID.randomUUID().toString()
-            val file = File(targetDir, filename)
-            file.outputStream().use { outputStream ->
+
+            contentResolver.openOutputStream(output).use { outputStream ->
+                if (outputStream == null) {
+                    return null
+                }
+
                 val bytesCopied = inputStream.copyTo(outputStream)
 
-                Log.i(TAG, "Copied $bytesCopied bytes from $input to ${file.toUri()}")
+                Log.i(TAG, "Copied $bytesCopied bytes from $input to $output")
 
-                file.toUri()
+                output
             }
         }
     } catch (_: FileNotFoundException) {

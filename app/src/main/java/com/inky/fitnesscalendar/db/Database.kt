@@ -26,7 +26,7 @@ import com.inky.fitnesscalendar.db.entities.Track
 import com.inky.fitnesscalendar.util.DATABASE_NAME
 
 @Database(
-    version = 23,
+    version = 25,
     entities = [
         Activity::class,
         Recording::class,
@@ -52,6 +52,7 @@ import com.inky.fitnesscalendar.util.DATABASE_NAME
         AutoMigration(from = 20, to = 21),
         AutoMigration(from = 21, to = 22),
         AutoMigration(from = 22, to = 23),
+        AutoMigration(from = 23, to = 24, spec = Migration23To24Spec::class),
     ]
 )
 @TypeConverters(Converters::class)
@@ -94,6 +95,7 @@ abstract class AppDatabase : RoomDatabase() {
                     MIGRATION_9_10,
                     MIGRATION_12_13,
                     MIGRATION_17_18,
+                    MIGRATION_24_25,
                 )
                 .addCallback(object : Callback() {
                     override fun onCreate(db: SupportSQLiteDatabase) {

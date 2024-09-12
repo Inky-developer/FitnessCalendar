@@ -1,0 +1,101 @@
+package com.inky.fitnesscalendar.ui.views.settings
+
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material3.Button
+import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.documentfile.provider.DocumentFile
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.inky.fitnesscalendar.R
+import com.inky.fitnesscalendar.repository.BackupRepository
+import com.inky.fitnesscalendar.view_model.BaseViewModel
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun BackupView(viewModel: BaseViewModel = hiltViewModel(), onBack: () -> Unit) {
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
+    val topAppBarColors = TopAppBarDefaults.topAppBarColors(
+        scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,
+        titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+    )
+    Scaffold(
+        topBar = {
+            CenterAlignedTopAppBar(
+                title = { Text(stringResource(R.string.backup)) },
+                colors = topAppBarColors,
+                navigationIcon = {
+                    IconButton(onClick = onBack) {
+                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.back))
+                    }
+                },
+                scrollBehavior = scrollBehavior,
+            )
+        },
+        snackbarHost = { SnackbarHost(hostState = viewModel.snackbarHostState) },
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .padding(innerPadding)
+                .padding(horizontal = 8.dp)
+        ) {
+            Column(
+                modifier = Modifier
+                    .clickable { /* TODO */ }
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp)
+            ) {
+                Text(stringResource(R.string.backup_directory))
+                Text("TODO", style = MaterialTheme.typography.bodyMedium)
+            }
+
+            BackupButton(viewModel.repository.backupRepository)
+        }
+    }
+}
+
+@Composable
+private fun BackupButton(backupRepository: BackupRepository) {
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val launcher =
+        rememberLauncherForActivityResult(contract = ActivityResultContracts.OpenDocumentTree()) { uri ->
+            val file = uri?.let { DocumentFile.fromTreeUri(context, it) }
+                ?.createFile("application/zip", "backup.zip")?.uri
+            if (file != null) {
+                scope.launch(Dispatchers.IO) {
+                    backupRepository.backup(file)
+                }
+            }
+        }
+
+    Button(onClick = { launcher.launch(null) }, modifier = Modifier.padding(vertical = 4.dp)) {
+        Text(stringResource(R.string.create_backup))
+    }
+}

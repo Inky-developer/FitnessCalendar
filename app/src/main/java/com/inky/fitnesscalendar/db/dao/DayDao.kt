@@ -1,6 +1,5 @@
 package com.inky.fitnesscalendar.db.dao
 
-import android.net.Uri
 import androidx.room.Dao
 import androidx.room.MapColumn
 import androidx.room.Query
@@ -11,8 +10,8 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface DayDao {
-    @Query("SELECT image_uri FROM Day WHERE image_uri IS NOT NULL")
-    suspend fun getImages(): List<Uri>
+    @Query("SELECT image_name FROM Day WHERE image_name IS NOT NULL")
+    suspend fun getImages(): List<String>
 
     @Query("SELECT * FROM Day")
     fun getDays(): Flow<Map<@MapColumn(columnName = "day") EpochDay, Day>>

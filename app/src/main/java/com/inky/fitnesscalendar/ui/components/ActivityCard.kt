@@ -83,6 +83,7 @@ fun ActivityCard(
     val time = remember(richActivity) {
         localizationRepository.timeFormatter.format(richActivity.activity.startTime)
     }
+    val imageUri = richActivity.activity.getImageUri()
 
     val trackColor = contentColorFor(containerColor)
     val trackPreview = remember(richActivity) { richActivity.activity.trackPreview?.toTrackSvg() }
@@ -132,10 +133,10 @@ fun ActivityCard(
             }
         }
 
-        if (richActivity.activity.imageUri != null) {
+        if (imageUri != null) {
             HorizontalDivider()
             ActivityImage(
-                uri = richActivity.activity.imageUri,
+                uri = imageUri,
                 onClick = { showImageViewer = true },
                 modifier = Modifier.padding(all = 8.dp)
             )
@@ -170,9 +171,9 @@ fun ActivityCard(
         )
     }
 
-    if (showImageViewer && richActivity.activity.imageUri != null) {
+    if (showImageViewer && imageUri != null) {
         ImageViewer(
-            imageUri = richActivity.activity.imageUri,
+            imageUri = imageUri,
             onDismiss = { showImageViewer = false })
     }
 }

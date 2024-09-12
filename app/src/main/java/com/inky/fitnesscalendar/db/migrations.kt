@@ -213,3 +213,14 @@ val MIGRATION_17_18 = object : Migration(17, 18) {
         db.execSQL("CREATE INDEX IF NOT EXISTS `index_FilterHistoryItem_place_id` ON `FilterHistoryItem` (`place_id`)")
     }
 }
+
+@RenameColumn(tableName = "Activity", fromColumnName = "image_uri", toColumnName = "image_name")
+@RenameColumn(tableName = "Day", fromColumnName = "image_uri", toColumnName = "image_name")
+class Migration23To24Spec : AutoMigrationSpec
+
+val MIGRATION_24_25 = object : Migration(24, 25) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("UPDATE Activity SET image_name = replace(image_name, rtrim(image_name, replace(image_name, '/', '')), '')")
+        db.execSQL("UPDATE Day SET image_name = replace(image_name, rtrim(image_name, replace(image_name, '/', '')), '')")
+    }
+}

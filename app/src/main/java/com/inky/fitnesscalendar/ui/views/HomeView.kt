@@ -22,7 +22,6 @@ import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Face
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Menu
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -170,7 +169,6 @@ fun Home(
                 .verticalScroll(scrollState)
                 .padding(bottom = 64.dp) // Account for fab, maybe this should be set dynamically?
         ) {
-
             AnimatedVisibility(visible = typeRecordings?.isNotEmpty() ?: false) {
                 Recordings(
                     richRecordings = typeRecordings ?: emptyList(),
@@ -405,7 +403,7 @@ fun Today(
         }
 
         AnimatedContent(
-            targetState = day.imageUri,
+            targetState = day.getImageUri(),
             label = stringResource(R.string.image)
         ) { imageUri ->
             if (imageUri != null) {
@@ -486,8 +484,9 @@ fun Today(
         }
     }
 
-    if (showImageViewer && day.imageUri != null) {
-        ImageViewer(imageUri = day.imageUri, onDismiss = { showImageViewer = false })
+    val imageUri = day.getImageUri()
+    if (showImageViewer && imageUri != null) {
+        ImageViewer(imageUri = imageUri, onDismiss = { showImageViewer = false })
     }
 }
 
