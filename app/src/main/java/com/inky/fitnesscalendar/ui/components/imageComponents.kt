@@ -75,19 +75,14 @@ fun SelectImageDropdownMenuItem(
 }
 
 @Composable
-fun rememberImagePickerLauncher(onUri: (Uri) -> Unit, context: Context = LocalContext.current) =
+fun rememberImagePickerLauncher(onName: (String) -> Unit, context: Context = LocalContext.current) =
     rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri ->
-        println(uri)
         if (uri != null) {
-            val actualUri = context.copyFileToStorage(
-                uri,
-                context.getOrCreateImagesDir()
-            )
-            println(uri)
-            if (actualUri != null) {
-                onUri(actualUri)
+            val name = context.copyFileToStorage(uri, context.getOrCreateImagesDir())?.name
+            if (name != null) {
+                onName(name)
             }
         }
     }

@@ -1,6 +1,5 @@
 package com.inky.fitnesscalendar.db.dao
 
-import android.net.Uri
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Query
@@ -49,7 +48,7 @@ abstract class ActivityDao {
                 "   ((description != '') == :hasDescription OR :hasDescription IS NULL) AND" +
                 "   ((vehicle IS NOT NULL) == :hasVehicle OR :hasVehicle IS NULL) AND" +
                 "   ((feel IS NOT NULL) == :hasFeel OR :hasFeel IS NULL) AND" +
-                "   ((image_uri IS NOT NULL) == :hasImage OR :hasImage IS NULL) AND" +
+                "   ((image_name IS NOT NULL) == :hasImage OR :hasImage IS NULL) AND" +
                 "   ((place_id IS NOT NULL) == :hasPlace OR :hasPlace IS NULL) AND" +
                 "   ((track_preview IS NOT NULL) == :hasTrack OR :hasTrack IS NULL)" +
                 "ORDER BY " +
@@ -84,8 +83,8 @@ abstract class ActivityDao {
     @Query("SELECT * FROM ACTIVITY WHERE uid=(:id)")
     abstract fun get(id: Int): Flow<RichActivity>
 
-    @Query("SELECT image_uri FROM ACTIVITY WHERE image_uri IS NOT NULL")
-    abstract suspend fun getImages(): List<Uri>
+    @Query("SELECT image_name FROM ACTIVITY WHERE image_name IS NOT NULL")
+    abstract suspend fun getImages(): List<String>
 
     @Upsert
     abstract suspend fun save(activity: Activity): Long

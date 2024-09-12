@@ -12,10 +12,17 @@ import java.util.UUID
 
 private const val TAG = "file_storage"
 
-fun Context.copyFileToStorage(input: Uri, targetDir: File): Uri? {
+data class InternalFile(val name: String, val uri: Uri)
+
+fun Context.copyFileToStorage(input: Uri, targetDir: File): InternalFile? {
     val filename = UUID.randomUUID().toString()
     val file = File(targetDir, filename)
-    return copyFile(contentResolver, input, file.toUri())
+    val result = copyFile(contentResolver, input, file.toUri())
+    return if (result != null) {
+        InternalFile(name = filename, uri = result)
+    } else {
+        null
+    }
 }
 
 fun Context.copyFile(input: Uri, output: Uri): Uri? = copyFile(contentResolver, input, output)

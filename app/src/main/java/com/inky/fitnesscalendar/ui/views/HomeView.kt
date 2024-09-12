@@ -427,7 +427,7 @@ fun Today(
         }
 
         AnimatedContent(
-            targetState = day.imageUri,
+            targetState = day.getImageUri(),
             label = stringResource(R.string.image)
         ) { imageUri ->
             if (imageUri != null) {
@@ -508,8 +508,9 @@ fun Today(
         }
     }
 
-    if (showImageViewer && day.imageUri != null) {
-        ImageViewer(imageUri = day.imageUri, onDismiss = { showImageViewer = false })
+    val imageUri = day.getImageUri()
+    if (showImageViewer && imageUri != null) {
+        ImageViewer(imageUri = imageUri, onDismiss = { showImageViewer = false })
     }
 }
 

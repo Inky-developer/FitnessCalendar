@@ -235,7 +235,7 @@ fun DayViewInner(
             .padding(bottom = 128.dp)
     ) {
         AnimatedContent(
-            targetState = day.imageUri,
+            targetState = day.getImageUri(),
             label = stringResource(R.string.image)
         ) { imageUri ->
             if (imageUri != null) {
@@ -325,8 +325,9 @@ fun DayViewInner(
         }
     }
 
-    if (showImageViewer && day.imageUri != null) {
-        ImageViewer(imageUri = day.imageUri, onDismiss = { showImageViewer = false })
+    val imageUri = day.getImageUri()
+    if (showImageViewer && imageUri != null) {
+        ImageViewer(imageUri = imageUri, onDismiss = { showImageViewer = false })
     }
 }
 

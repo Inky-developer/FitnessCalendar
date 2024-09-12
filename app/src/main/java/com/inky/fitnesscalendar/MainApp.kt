@@ -2,10 +2,12 @@ package com.inky.fitnesscalendar
 
 import android.app.Application
 import android.util.Log
+import androidx.core.net.toUri
 import com.inky.fitnesscalendar.di.ActivityTypeOrder
 import com.inky.fitnesscalendar.di.DecisionTrees
 import com.inky.fitnesscalendar.repository.AppRepository
 import com.inky.fitnesscalendar.util.cleanImageStorage
+import com.inky.fitnesscalendar.util.getOrCreateImagesDir
 import com.inky.fitnesscalendar.util.getOrCreateSharedMediaCache
 import dagger.hilt.android.HiltAndroidApp
 import kotlinx.coroutines.Dispatchers
@@ -28,7 +30,8 @@ class MainApp : Application() {
     }
 
     private suspend fun cleanupStorage() {
-        val usedImages = appRepository.getUsedImages()
+        val imageDir = getOrCreateImagesDir().toPath()
+        val usedImages = appRepository.getUsedImages().map { imageDir.resolve(it).toFile().toUri() }
         cleanImageStorage(usedImages.toSet())
 
         getOrCreateSharedMediaCache().listFiles()?.forEach {

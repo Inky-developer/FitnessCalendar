@@ -119,7 +119,7 @@ fun ImageViewer(
 }
 
 private fun Context.shareImage(uri: Uri) {
-    val cacheFile = copyFileToStorage(uri, getOrCreateSharedMediaCache())?.toFile() ?: return
+    val cacheFile = copyFileToStorage(uri, getOrCreateSharedMediaCache())?.uri?.toFile() ?: return
     cacheFile.deleteOnExit()
     val sharableUri =
         FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".fileprovider", cacheFile)

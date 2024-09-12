@@ -1,6 +1,9 @@
 package com.inky.fitnesscalendar.db.entities
 
-import android.net.Uri
+import android.content.Context
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
+import androidx.core.net.toUri
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
@@ -14,6 +17,7 @@ import com.inky.fitnesscalendar.data.gpx.TrackSvg
 import com.inky.fitnesscalendar.data.measure.Distance
 import com.inky.fitnesscalendar.data.measure.Duration.Companion.until
 import com.inky.fitnesscalendar.data.measure.Velocity
+import com.inky.fitnesscalendar.util.getOrCreateImagesDir
 import com.inky.fitnesscalendar.util.toLocalDate
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -45,7 +49,7 @@ data class Activity(
     @ColumnInfo(name = "start_time", index = true) val startTime: Date,
     @ColumnInfo(name = "end_time") val endTime: Date = startTime,
     @ColumnInfo(name = "feel") val feel: Feel? = null,
-    @ColumnInfo(name = "image_uri") val imageUri: Uri? = null,
+    @ColumnInfo(name = "image_name") val imageName: String? = null,
     @ColumnInfo(name = "distance") val distance: Distance? = null,
     @ColumnInfo(name = "intensity") val intensity: Intensity? = null,
     // The unique identifier of the wifi network the device was connected to when starting the activity
@@ -59,6 +63,10 @@ data class Activity(
         distance = if (type.hasDistance) distance else null,
         intensity = if (type.hasIntensity) intensity else null,
     )
+
+    @Composable
+    fun getImageUri(context: Context = LocalContext.current) =
+        imageName?.let { context.getOrCreateImagesDir().toPath().resolve(it).toFile().toUri() }
 
     val epochDay get() = EpochDay(startTime.toLocalDate().toEpochDay())
 
