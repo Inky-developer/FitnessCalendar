@@ -36,8 +36,9 @@ class BackupRepository @Inject constructor(
             delete()
         }
         val query = SimpleSQLiteQuery("VACUUM INTO ?", arrayOf(dbFile.toPath().toString()))
-        val result = database.query(query)
-        result.moveToFirst()
+        database.query(query).use {
+            it.moveToFirst()
+        }
 
         zip.addFile(dbFile)
     }

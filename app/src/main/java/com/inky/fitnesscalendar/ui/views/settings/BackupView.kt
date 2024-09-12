@@ -12,16 +12,23 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
@@ -75,27 +82,44 @@ fun BackupView(viewModel: BaseViewModel = hiltViewModel(), onBack: () -> Unit) {
                 Text("TODO", style = MaterialTheme.typography.bodyMedium)
             }
 
-            BackupButton(viewModel.repository.backupRepository)
+            BackupButton(viewModel.repository.backupRepository, viewModel.snackbarHostState)
         }
     }
 }
 
 @Composable
-private fun BackupButton(backupRepository: BackupRepository) {
+private fun BackupButton(backupRepository: BackupRepository, snackbarHostState: SnackbarHostState) {
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
+
+    var backupInProgress by remember { mutableStateOf(false) }
+
     val launcher =
         rememberLauncherForActivityResult(contract = ActivityResultContracts.OpenDocumentTree()) { uri ->
             val file = uri?.let { DocumentFile.fromTreeUri(context, it) }
                 ?.createFile("application/zip", "backup.zip")?.uri
             if (file != null) {
                 scope.launch(Dispatchers.IO) {
+                    backupInProgress = true
                     backupRepository.backup(file)
+                    backupInProgress = false
+                    snackbarHostState.showSnackbar(
+                        "Backup successful",
+                        duration = SnackbarDuration.Long
+                    )
                 }
             }
         }
 
-    Button(onClick = { launcher.launch(null) }, modifier = Modifier.padding(vertical = 4.dp)) {
-        Text(stringResource(R.string.create_backup))
+    Button(
+        onClick = { launcher.launch(null) },
+        enabled = !backupInProgress,
+        modifier = Modifier.padding(vertical = 4.dp)
+    ) {
+        if (backupInProgress) {
+            CircularProgressIndicator()
+        } else {
+            Text(stringResource(R.string.create_backup))
+        }
     }
 }
