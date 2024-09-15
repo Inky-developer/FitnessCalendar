@@ -215,4 +215,5 @@
     <string name="backup_successful">Sicherung war erfolgreich</string>
     <string name="could_not_read_path">Pfad kann nicht gelesen werden</string>
     <string name="your_android_version_is_too_old_for_backup">Sicherungen werden nur auf Android Versionen 11 und höher unterstützt</string>
+    <string name="tap_to_set_backup_dir">Tippen, um das Sicherungsverzeichnis einzustellen…</string>
 </resources>

@@ -7,9 +7,9 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.inky.fitnesscalendar.repository.AppRepository
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.db.entities.ActivityType
+import com.inky.fitnesscalendar.repository.AppRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -20,8 +20,7 @@ import javax.inject.Inject
 class ActivityTypeViewModel @Inject constructor(
     @ApplicationContext private val context: Context,
     private val repository: AppRepository
-) :
-    ViewModel() {
+) : ViewModel() {
     val snackbarHostState = SnackbarHostState()
 
     fun save(activityType: ActivityType) = viewModelScope.launch(Dispatchers.IO) {

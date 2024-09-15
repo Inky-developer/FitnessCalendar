@@ -96,6 +96,8 @@ sealed class Preference<T, P>(
 
     companion object {
         val PREF_STATS_PROJECTION = EnumPreference("PREF_STATS_PROJECTION", Projection::class)
+        val PREF_BACKUP_URI = PrimitivePreference.create("PREF_BACKUP_URI", "")
+
         val COLLECT_BSSID = PrimitivePreference.create("PREF_COLLECT_BSSID", false).apply {
             titleId = R.string.setting_title_store_location_information
             descriptionId = R.string.setting_description_store_location_information
