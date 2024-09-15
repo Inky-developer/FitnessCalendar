@@ -38,6 +38,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.preferences.Preference
+import com.inky.fitnesscalendar.repository.BackupRepository
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 import kotlinx.coroutines.launch
@@ -86,10 +87,12 @@ fun SettingsView(
                     title = stringResource(R.string.places),
                     onClick = onNavigatePlaces,
                 )
-                Setting(
-                    title = stringResource(R.string.backup),
-                    onClick = onNavigateBackup
-                )
+                if (BackupRepository.isBackupSupported()) {
+                    Setting(
+                        title = stringResource(R.string.backup),
+                        onClick = onNavigateBackup
+                    )
+                }
                 Setting(
                     title = stringResource(R.string.debug),
                     onClick = onNavigateDebug,

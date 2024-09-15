@@ -101,12 +101,20 @@ private fun BackupButton(backupRepository: BackupRepository, snackbarHostState: 
             if (file != null) {
                 scope.launch(Dispatchers.IO) {
                     backupInProgress = true
-                    backupRepository.backup(file)
+                    val error = backupRepository.backup(file)
                     backupInProgress = false
+
+                    val message = when (error) {
+                        null -> context.getString(R.string.backup_successful)
+
+                        BackupRepository.BackupError.OLD_ANDROID_VERSION ->
+                            context.getString(R.string.your_android_version_is_too_old_for_backup)
+                    }
                     snackbarHostState.showSnackbar(
-                        context.getString(R.string.backup_successful),
+                        message,
                         duration = SnackbarDuration.Long
                     )
+
                 }
             } else if (uri != null) {
                 scope.launch {
@@ -120,7 +128,7 @@ private fun BackupButton(backupRepository: BackupRepository, snackbarHostState: 
 
     Button(
         onClick = { launcher.launch(null) },
-        enabled = !backupInProgress,
+        enabled = !backupInProgress && BackupRepository.isBackupSupported(),
         modifier = Modifier.padding(vertical = 4.dp)
     ) {
         if (backupInProgress) {

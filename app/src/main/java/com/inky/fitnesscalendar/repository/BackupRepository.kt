@@ -2,11 +2,15 @@ package com.inky.fitnesscalendar.repository
 
 import android.content.Context
 import android.net.Uri
+import android.os.Build
+import androidx.annotation.StringRes
 import androidx.core.net.toUri
 import androidx.sqlite.db.SimpleSQLiteQuery
+import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.db.AppDatabase
 import com.inky.fitnesscalendar.util.BACKUP_CACHE_FILE
 import com.inky.fitnesscalendar.util.BACKUP_DB_NAME
+import com.inky.fitnesscalendar.util.SDK_MIN_VERSION_FOR_SQLITE_VACUUM
 import com.inky.fitnesscalendar.util.Zip
 import com.inky.fitnesscalendar.util.copyFile
 import com.inky.fitnesscalendar.util.getOrCreateImagesDir
@@ -20,7 +24,15 @@ class BackupRepository @Inject constructor(
     private val database: AppDatabase,
     @ApplicationContext private val context: Context
 ) {
-    fun backup(target: Uri) {
+    enum class BackupError(@StringRes val msgID: Int) {
+        OLD_ANDROID_VERSION(R.string.your_android_version_is_too_old_for_backup)
+    }
+
+    fun backup(target: Uri): BackupError? {
+        if (!isBackupSupported()) {
+            return BackupError.OLD_ANDROID_VERSION
+        }
+
         val zipFile = File(context.cacheDir, BACKUP_CACHE_FILE)
 
         Zip(zipFile).use { zip ->
@@ -29,6 +41,8 @@ class BackupRepository @Inject constructor(
         }
 
         context.copyFile(zipFile.toUri(), target)
+
+        return null
     }
 
     private fun backupDatabase(zip: Zip) {
@@ -48,5 +62,9 @@ class BackupRepository @Inject constructor(
         for (file in dir.listFiles() ?: return) {
             zip.addFile(file, BACKUP_IMAGES_PATH)
         }
+    }
+
+    companion object {
+        fun isBackupSupported() = Build.VERSION.SDK_INT >= SDK_MIN_VERSION_FOR_SQLITE_VACUUM
     }
 }

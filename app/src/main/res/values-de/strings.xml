@@ -214,4 +214,5 @@
     <string name="create_backup">Sicherung erstellen</string>
     <string name="backup_successful">Sicherung war erfolgreich</string>
     <string name="could_not_read_path">Pfad kann nicht gelesen werden</string>
+    <string name="your_android_version_is_too_old_for_backup">Sicherungen werden nur auf Android Versionen 11 und höher unterstützt</string>
 </resources>

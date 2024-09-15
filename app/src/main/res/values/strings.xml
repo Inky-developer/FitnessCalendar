@@ -211,4 +211,5 @@
     <string name="create_backup">Create backup</string>
     <string name="backup_successful">Backup successful</string>
     <string name="could_not_read_path">Could not read path</string>
+    <string name="your_android_version_is_too_old_for_backup">Backup functionality is only supported on android 11+</string>
 </resources>
