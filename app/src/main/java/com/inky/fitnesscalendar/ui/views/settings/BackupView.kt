@@ -94,7 +94,9 @@ private fun BackupButton(
     Button(
         onClick = onBackup,
         enabled = !backupInProgress && BackupRepository.isBackupSupported() && backupDirectory.isNotBlank(),
-        modifier = Modifier.padding(vertical = 4.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
     ) {
         if (backupInProgress) {
             CircularProgressIndicator()
