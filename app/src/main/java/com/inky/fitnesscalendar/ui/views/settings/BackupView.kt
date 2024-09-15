@@ -26,15 +26,19 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
+import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.preferences.Preference.Companion.PREF_BACKUP_URI
 import com.inky.fitnesscalendar.repository.BackupRepository
 import com.inky.fitnesscalendar.view_model.settings.BackupViewModel
+import java.time.LocalDateTime
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -66,6 +70,9 @@ fun BackupView(viewModel: BackupViewModel = hiltViewModel(), onBack: () -> Unit)
                 .padding(innerPadding)
                 .padding(horizontal = 8.dp)
         ) {
+            val lastBackup by viewModel.lastBackup.collectAsState()
+            LastBackupInfo(lastBackup)
+
             BackupDirectoryButton(onUri = viewModel::updateBackupUri)
 
             val backupInProgress by viewModel.backupInProgress.collectAsState()
@@ -119,5 +126,20 @@ private fun BackupDirectoryButton(onUri: (Uri?) -> Unit) {
             }
             Text(text, style = MaterialTheme.typography.bodySmall)
         }
+    }
+}
+
+@Composable
+private fun LastBackupInfo(lastBackupDate: LocalDateTime? = null) {
+    val context = LocalContext.current
+    val lastBackupText = remember(lastBackupDate) {
+        lastBackupDate
+            ?.let { LocalizationRepository.localDateFormatter.format(lastBackupDate) }
+            ?: context.getString(R.string.never)
+    }
+
+    Column(modifier = Modifier.padding(vertical = 4.dp)) {
+        Text(stringResource(R.string.last_backup))
+        Text(lastBackupText, style = MaterialTheme.typography.bodySmall)
     }
 }

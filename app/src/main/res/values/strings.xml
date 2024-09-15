@@ -213,4 +213,7 @@
     <string name="could_not_read_path">Could not read path</string>
     <string name="your_android_version_is_too_old_for_backup">Backup functionality is only supported on android 11+</string>
     <string name="tap_to_set_backup_dir">Tap to setup the backup directory…</string>
+    <string name="last_backup">Last backup:</string>
+    <string name="never">Never</string>
+    <string name="cannot_access_file">Cannot access the file</string>
 </resources>
