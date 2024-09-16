@@ -1,6 +1,7 @@
 package com.inky.fitnesscalendar.preferences
 
 import android.content.Context
+import android.net.Uri
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -94,9 +95,23 @@ sealed class Preference<T, P>(
             enumClass.java.enumConstants?.getOrNull(primitive) ?: super.default
     }
 
+    class UriPreference(name: String) : Preference<Uri?, String>(stringPreferencesKey(name), null) {
+        override fun serialize(value: Uri?): String {
+            return value?.toString() ?: ""
+        }
+
+        override fun deserialize(primitive: String): Uri? {
+            return if (primitive.isBlank()) {
+                null
+            } else {
+                Uri.parse(primitive)
+            }
+        }
+    }
+
     companion object {
         val PREF_STATS_PROJECTION = EnumPreference("PREF_STATS_PROJECTION", Projection::class)
-        val PREF_BACKUP_URI = PrimitivePreference.create("PREF_BACKUP_URI", "")
+        val PREF_BACKUP_URI = UriPreference("PREF_BACKUP_URI")
 
         val COLLECT_BSSID = PrimitivePreference.create("PREF_COLLECT_BSSID", false).apply {
             titleId = R.string.setting_title_store_location_information

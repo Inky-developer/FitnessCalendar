@@ -93,7 +93,7 @@ private fun BackupButton(
 
     Button(
         onClick = onBackup,
-        enabled = !backupInProgress && BackupRepository.isBackupSupported() && backupDirectory.isNotBlank(),
+        enabled = !backupInProgress && BackupRepository.isBackupSupported() && backupDirectory != null,
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)
@@ -117,15 +117,13 @@ private fun BackupDirectoryButton(onUri: (Uri?) -> Unit) {
 
     Column(
         modifier = Modifier
-            .clickable { launcher.launch(Uri.parse(backupUri)) }
+            .clickable { launcher.launch(backupUri) }
             .fillMaxWidth()
             .padding(vertical = 4.dp)
     ) {
         Text(stringResource(R.string.backup_directory))
         AnimatedContent(backupUri, label = "backupUri") { uri ->
-            val text = uri.ifBlank {
-                stringResource(R.string.tap_to_set_backup_dir)
-            }
+            val text = uri?.toString() ?: stringResource(R.string.tap_to_set_backup_dir)
             Text(text, style = MaterialTheme.typography.bodySmall)
         }
     }

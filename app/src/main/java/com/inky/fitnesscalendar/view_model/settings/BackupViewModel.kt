@@ -46,20 +46,20 @@ class BackupViewModel @Inject constructor(
             val takeFlags: Int =
                 Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
             contentResolver.takePersistableUriPermission(uri, takeFlags)
-
-            PREF_BACKUP_URI.set(context, uri.toString())
-        } else {
-            PREF_BACKUP_URI.set(context, "")
         }
-        updateLastBackup(uri.toString())
+        PREF_BACKUP_URI.set(context, uri)
     }
 
     fun doBackup() = viewModelScope.launch(Dispatchers.IO) {
-        val uri = Uri.parse(PREF_BACKUP_URI.get(context))
+        val uri = PREF_BACKUP_URI.get(context)
         _backupInProgress.value = true
-        val error = backupRepository.backup(uri)
+        val error = if (uri != null) {
+            backupRepository.backup(uri)
+        } else {
+            BackupRepository.BackupError.CannotAccessFile
+        }
         _backupInProgress.value = false
-        updateLastBackup(uri.toString())
+        updateLastBackup(uri)
 
         val message = when (error) {
             null -> context.getString(R.string.backup_successful)
@@ -71,11 +71,7 @@ class BackupViewModel @Inject constructor(
         )
     }
 
-    private fun updateLastBackup(dir: String) {
-        _lastBackup.value = if (dir.isNotBlank()) {
-            backupRepository.getLastBackup(Uri.parse(dir))
-        } else {
-            null
-        }
+    private fun updateLastBackup(dir: Uri?) {
+        _lastBackup.value = dir?.let { backupRepository.getLastBackup(it) }
     }
 }
