@@ -50,7 +50,6 @@ private const val TAG = "AppRepository"
 @Singleton
 class AppRepository @Inject constructor(
     @ApplicationContext val context: Context,
-    val backupRepository: BackupRepository,
     private val database: AppDatabase,
     private val activityDao: ActivityDao,
     private val recordingDao: RecordingDao,
@@ -62,8 +61,6 @@ class AppRepository @Inject constructor(
     private val placeDao: PlaceDao,
     val localizationRepository: LocalizationRepository
 ) {
-    suspend fun loadAllActivities() = activityDao.loadActivities()
-
     fun getActivities(
         filter: ActivityFilter,
         order: Ordering = Ordering.DESC
@@ -171,8 +168,6 @@ class AppRepository @Inject constructor(
 
     suspend fun deleteActivityType(activityType: ActivityType) =
         activityTypeDao.delete(activityType)
-
-    suspend fun loadActivityTypes() = activityTypeDao.loadTypes()
 
     fun getActivityTypes() = activityTypeDao.getTypes()
 
