@@ -48,7 +48,7 @@ class BackupRepository @Inject constructor(
             return BackupError.OldAndroidVersion
         }
 
-        val targetUri = getBackupUri(directory) ?: return BackupError.CannotAccessFile
+        val targetUri = prepareBackupFile(directory) ?: return BackupError.CannotAccessFile
 
         val zipFile = File(context.cacheDir, BACKUP_CACHE_FILE)
 
@@ -62,10 +62,14 @@ class BackupRepository @Inject constructor(
         return null
     }
 
-    private fun getBackupUri(directory: Uri) =
-        DocumentFile.fromTreeUri(context, directory)
-            ?.createFile("application/zip", BACKUP_NAME)
-            ?.uri
+    /**
+     * Creates the backup file and clears any previous backup files
+     */
+    private fun prepareBackupFile(directory: Uri): Uri? {
+        val dirFile = DocumentFile.fromTreeUri(context, directory) ?: return null
+        dirFile.findFile(BACKUP_NAME)?.delete()
+        return dirFile.createFile("application/zip", BACKUP_NAME)?.uri
+    }
 
     private fun backupDatabase(zip: Zip) {
         val dbFile = File(context.cacheDir, BACKUP_DB_NAME).apply {
