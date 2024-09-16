@@ -16,19 +16,12 @@ import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.data.Feel
 
 @Composable
-fun FeelSelector(feel: Feel?, onChange: (Feel?) -> Unit, modifier: Modifier = Modifier) {
+fun FeelSelector(feel: Feel, onChange: (Feel) -> Unit, modifier: Modifier = Modifier) {
     Row(modifier = modifier.padding(horizontal = 4.dp)) {
         for (feelEntry in Feel.entries) {
             InputChip(
                 selected = feel == feelEntry,
-                onClick = {
-                    val newFeel = if (feel == feelEntry) {
-                        null
-                    } else {
-                        feelEntry
-                    }
-                    onChange(newFeel)
-                },
+                onClick = { onChange(feelEntry) },
                 label = { Text(feelEntry.emoji, style = MaterialTheme.typography.headlineMedium) },
                 modifier = Modifier.padding(all = 4.dp)
             )
@@ -40,7 +33,7 @@ fun FeelSelector(feel: Feel?, onChange: (Feel?) -> Unit, modifier: Modifier = Mo
 @Composable
 fun FeelPreview() {
     var feel by remember {
-        mutableStateOf<Feel?>(Feel.Ok)
+        mutableStateOf(Feel.Ok)
     }
     FeelSelector(feel = feel, onChange = { feel = it })
 }

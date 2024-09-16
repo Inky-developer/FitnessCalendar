@@ -122,7 +122,8 @@ fun EditDayDialog(
 
             OptionGroup(
                 label = stringResource(R.string.select_feel),
-                selectionLabel = editState.feel?.let { stringResource(it.nameId) }) {
+                selectionLabel = stringResource(editState.feel.nameId)
+            ) {
                 FeelSelector(
                     feel = editState.feel,
                     onChange = { editState = editState.copy(feel = it) },
@@ -158,9 +159,9 @@ fun EditDayDialog(
 
 @Parcelize
 data class EditDayState(
-    val feel: Feel? = null,
-    val description: String = "",
-    val imageName: ImageName? = null,
+    val feel: Feel,
+    val description: String,
+    val imageName: ImageName?,
 ) : Parcelable {
     constructor(day: Day) : this(
         feel = day.feel,

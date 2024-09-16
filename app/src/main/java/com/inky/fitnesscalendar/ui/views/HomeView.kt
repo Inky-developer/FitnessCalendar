@@ -19,7 +19,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.Face
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.Card
@@ -491,7 +490,7 @@ fun Today(
 }
 
 @Composable
-fun CompactFeelSelector(feel: Feel?, onFeel: (Feel?) -> Unit, modifier: Modifier = Modifier) {
+fun CompactFeelSelector(feel: Feel, onFeel: (Feel) -> Unit, modifier: Modifier = Modifier) {
     val expanded = remember { MutableTransitionState(false) }
 
     Column(modifier = modifier) {
@@ -505,15 +504,11 @@ fun CompactFeelSelector(feel: Feel?, onFeel: (Feel?) -> Unit, modifier: Modifier
                 contentPadding = PaddingValues(all = 4.dp),
                 modifier = Modifier.size(48.dp)
             ) {
-                if (actualFeel != null) {
-                    Text(
-                        actualFeel.emoji,
-                        style = MaterialTheme.typography.titleLarge,
-                        modifier = Modifier.sharedElement(SharedContentKey.DayFeel)
-                    )
-                } else {
-                    Icon(Icons.Outlined.Face, stringResource(R.string.select_feel))
-                }
+                Text(
+                    actualFeel!!.emoji,
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.sharedElement(SharedContentKey.DayFeel)
+                )
             }
         }
 

@@ -45,7 +45,7 @@ data class Activity(
     @ColumnInfo(name = "favorite", defaultValue = "false") val favorite: Boolean = false,
 
     @ColumnInfo(name = "image_name") val imageName: ImageName? = null,
-    @ColumnInfo(name = "feel") val feel: Feel? = null,
+    @ColumnInfo(name = "feel") val feel: Feel = Feel.Ok,
     @ColumnInfo(name = "intensity") val intensity: Intensity? = null,
 
     @ColumnInfo(name = "start_time", index = true) val startTime: Date,

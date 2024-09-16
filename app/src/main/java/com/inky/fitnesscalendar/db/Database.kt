@@ -1,6 +1,7 @@
 package com.inky.fitnesscalendar.db
 
 import android.content.Context
+import android.util.Log
 import androidx.room.AutoMigration
 import androidx.room.Database
 import androidx.room.Room
@@ -25,8 +26,10 @@ import com.inky.fitnesscalendar.db.entities.Recording
 import com.inky.fitnesscalendar.db.entities.Track
 import com.inky.fitnesscalendar.util.DATABASE_NAME
 
+private const val TAG = "Database"
+
 @Database(
-    version = 26,
+    version = 27,
     entities = [
         Activity::class,
         Recording::class,
@@ -97,10 +100,15 @@ abstract class AppDatabase : RoomDatabase() {
                     MIGRATION_12_13,
                     MIGRATION_17_18,
                     MIGRATION_24_25,
+                    MIGRATION_26_27,
                 )
                 .addCallback(object : Callback() {
                     override fun onCreate(db: SupportSQLiteDatabase) {
                         loadDefaultData(db, context)
+                    }
+
+                    override fun onOpen(db: SupportSQLiteDatabase) {
+                        Log.i(TAG, "DB version: ${db.version}")
                     }
                 })
                 .build()

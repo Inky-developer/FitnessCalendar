@@ -274,7 +274,8 @@ fun NewActivity(
             AnimatedVisibility(visible = editState.activitySelectorState.activityType?.hasFeel() == true) {
                 OptionGroup(
                     label = stringResource(R.string.select_feel),
-                    selectionLabel = editState.feel?.let { stringResource(it.nameId) }) {
+                    selectionLabel = stringResource(editState.feel.nameId)
+                ) {
                     FeelSelector(
                         feel = editState.feel,
                         onChange = { editState = editState.copy(feel = it) },
@@ -427,7 +428,7 @@ private data class ActivityEditState(
     val description: String,
     val distanceString: String,
     val intensity: Intensity?,
-    val feel: Feel?,
+    val feel: Feel,
     val imageName: ImageName?,
     val favorite: Boolean,
 ) : Parcelable {
@@ -446,7 +447,7 @@ private data class ActivityEditState(
         description = activity?.activity?.description ?: "",
         distanceString = activity?.activity?.distance?.kilometers?.toString() ?: "",
         intensity = activity?.activity?.intensity,
-        feel = activity?.activity?.feel,
+        feel = activity?.activity?.feel ?: Feel.Ok,
         imageName = activity?.activity?.imageName,
         favorite = activity?.activity?.favorite ?: false
     )

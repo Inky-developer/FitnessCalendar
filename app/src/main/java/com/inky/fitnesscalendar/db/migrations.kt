@@ -224,3 +224,28 @@ val MIGRATION_24_25 = object : Migration(24, 25) {
         db.execSQL("UPDATE Day SET image_name = replace(image_name, rtrim(image_name, replace(image_name, '/', '')), '')")
     }
 }
+
+val MIGRATION_26_27 = object : Migration(26, 27) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("CREATE TABLE IF NOT EXISTS `tempActivity` (`uid` INTEGER, `type_id` INTEGER NOT NULL, `place_id` INTEGER, `vehicle` TEXT, `description` TEXT NOT NULL, `favorite` INTEGER NOT NULL DEFAULT false, `image_name` TEXT, `feel` TEXT, `intensity` INTEGER, `start_time` INTEGER NOT NULL, `end_time` INTEGER NOT NULL, `distance` INTEGER, `wifi_bssid` TEXT, `track_preview` TEXT, PRIMARY KEY(`uid`), FOREIGN KEY(`type_id`) REFERENCES `ActivityType`(`uid`) ON UPDATE NO ACTION ON DELETE RESTRICT , FOREIGN KEY(`place_id`) REFERENCES `Place`(`uid`) ON UPDATE NO ACTION ON DELETE RESTRICT )")
+        db.execSQL("CREATE TABLE IF NOT EXISTS `tempDay` (`day` INTEGER NOT NULL, `description` TEXT NOT NULL, `feel` TEXT, `image_name` TEXT, PRIMARY KEY(`day`))")
+
+        db.execSQL("INSERT INTO tempActivity SELECT * FROM Activity")
+        db.execSQL("INSERT INTO tempDay SELECT * FROM Day")
+
+        db.execSQL("DROP TABLE Activity")
+        db.execSQL("DROP TABLE Day")
+
+        db.execSQL("UPDATE tempActivity SET feel = 'Ok' WHERE feel IS NULL")
+        db.execSQL("UPDATE tempDay SET feel = 'Ok' WHERE feel IS NULL")
+
+        db.execSQL("CREATE TABLE IF NOT EXISTS `Activity` (`uid` INTEGER, `type_id` INTEGER NOT NULL, `place_id` INTEGER, `vehicle` TEXT, `description` TEXT NOT NULL, `favorite` INTEGER NOT NULL DEFAULT false, `image_name` TEXT, `feel` TEXT NOT NULL, `intensity` INTEGER, `start_time` INTEGER NOT NULL, `end_time` INTEGER NOT NULL, `distance` INTEGER, `wifi_bssid` TEXT, `track_preview` TEXT, PRIMARY KEY(`uid`), FOREIGN KEY(`type_id`) REFERENCES `ActivityType`(`uid`) ON UPDATE NO ACTION ON DELETE RESTRICT , FOREIGN KEY(`place_id`) REFERENCES `Place`(`uid`) ON UPDATE NO ACTION ON DELETE RESTRICT )")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_Activity_type_id` ON `Activity` (`type_id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_Activity_place_id` ON `Activity` (`place_id`)")
+        db.execSQL("CREATE INDEX IF NOT EXISTS `index_Activity_start_time` ON `Activity` (`start_time`)")
+        db.execSQL("CREATE TABLE IF NOT EXISTS `Day` (`day` INTEGER NOT NULL, `description` TEXT NOT NULL, `feel` TEXT NOT NULL, `image_name` TEXT, PRIMARY KEY(`day`))")
+
+        db.execSQL("INSERT INTO Activity SELECT * FROM tempActivity")
+        db.execSQL("INSERT INTO Day SELECT * FROM tempDay")
+    }
+}

@@ -51,6 +51,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.R
+import com.inky.fitnesscalendar.data.Feel
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.data.gpx.Coordinate
 import com.inky.fitnesscalendar.data.gpx.TrackSvg
@@ -271,7 +272,7 @@ private fun ActivityCardContent(activity: Activity, place: Place?) {
             }
         }
 
-        if (activity.feel != null) {
+        if (activity.feel != Feel.Ok) {
             Text(activity.feel.emoji, style = MaterialTheme.typography.bodyLarge)
         }
 
