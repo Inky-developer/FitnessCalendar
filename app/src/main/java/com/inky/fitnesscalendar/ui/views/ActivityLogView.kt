@@ -64,6 +64,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.EpochDay
+import com.inky.fitnesscalendar.data.Feel
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilterChip
 import com.inky.fitnesscalendar.db.entities.Activity
@@ -294,7 +295,7 @@ private fun ActivityList(
                             color = contentColorFor(MaterialTheme.colorScheme.primary)
                         )
 
-                        if (feel != null) {
+                        if (feel != null && feel != Feel.Ok) {
                             Text(feel.emoji, style = MaterialTheme.typography.titleMedium)
                         }
                     }
