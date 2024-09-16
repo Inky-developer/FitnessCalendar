@@ -42,6 +42,7 @@ data class FilterHistoryItem(
     @ColumnInfo(name = "place_id") val placeId: Int? = null,
     @ColumnInfo(name = "vehicle") val vehicle: Vehicle? = null,
     @ColumnInfo(name = "feel") val feel: Feel? = null,
+    @ColumnInfo(name = "favorite") val favorite: Boolean? = null,
     @ColumnInfo(name = "attribute") val attribute: AttributeFilter.Attribute? = null,
     @ColumnInfo(name = "attribute_state") val attributeState: Boolean? = null,
     @ColumnInfo(name = "last_updated") val lastUpdated: Date = Date.from(Instant.now()),
@@ -54,6 +55,7 @@ data class FilterHistoryItem(
         Place,
         Vehicle,
         Feel,
+        Favorite,
         Attribute
     }
 }

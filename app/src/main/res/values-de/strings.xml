@@ -219,4 +219,7 @@
     <string name="last_backup">Letzte Sicherung:</string>
     <string name="never">Niemals</string>
     <string name="cannot_access_file">Kann nicht auf Datei zugreifen</string>
+    <string name="favorite">Favorit</string>
+    <string name="no_favorite">Kein Favorit</string>
+    <string name="filter_by_favorites">Nach Favoriten filtern…</string>
 </resources>

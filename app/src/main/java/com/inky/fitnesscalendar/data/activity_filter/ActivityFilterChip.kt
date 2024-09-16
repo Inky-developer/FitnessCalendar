@@ -2,6 +2,7 @@ package com.inky.fitnesscalendar.data.activity_filter
 
 import android.content.Context
 import android.os.Parcelable
+import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityCategory
 import com.inky.fitnesscalendar.data.Feel
 import com.inky.fitnesscalendar.data.Vehicle
@@ -33,6 +34,9 @@ sealed class ActivityFilterChip : Parcelable {
 
     @Parcelize
     data class FeelFilterChip(val feel: Feel) : ActivityFilterChip()
+
+    @Parcelize
+    data class FavoriteFilterChip(val favorite: Boolean) : ActivityFilterChip()
 
     @Parcelize
     data class AttributeFilterChip(val attribute: AttributeFilter.Attribute, val state: Boolean) :
@@ -72,6 +76,11 @@ sealed class ActivityFilterChip : Parcelable {
             feel = feel
         )
 
+        is FavoriteFilterChip -> FilterHistoryItem(
+            type = FilterHistoryItem.ItemType.Favorite,
+            favorite = favorite
+        )
+
         is AttributeFilterChip -> FilterHistoryItem(
             type = FilterHistoryItem.ItemType.Attribute,
             attribute = attribute,
@@ -91,6 +100,7 @@ sealed class ActivityFilterChip : Parcelable {
         is PlaceFilterChip -> filter.copy(places = filter.places.filter { it != place })
         is VehicleFilterChip -> filter.copy(vehicles = filter.vehicles.filter { it != vehicle })
         is FeelFilterChip -> filter.copy(feels = filter.feels.filter { it != feel })
+        is FavoriteFilterChip -> filter.copy(favorite = null)
     }
 
     fun addTo(filter: ActivityFilter) = when (this) {
@@ -108,6 +118,7 @@ sealed class ActivityFilterChip : Parcelable {
         is PlaceFilterChip -> filter.withPlace(place)
         is VehicleFilterChip -> filter.withVehicle(vehicle)
         is FeelFilterChip -> filter.withFeel(feel)
+        is FavoriteFilterChip -> filter.copy(favorite = favorite)
     }
 
     fun displayText(context: Context) = when (this) {
@@ -119,6 +130,11 @@ sealed class ActivityFilterChip : Parcelable {
         is PlaceFilterChip -> place.name
         is VehicleFilterChip -> context.getString(vehicle.nameId)
         is FeelFilterChip -> context.getString(feel.nameId)
+        is FavoriteFilterChip -> if (favorite) {
+            context.getString(R.string.favorite)
+        } else {
+            context.getString(R.string.no_favorite)
+        }
     }
 
     companion object {
@@ -146,6 +162,10 @@ sealed class ActivityFilterChip : Parcelable {
                 )
 
                 FilterHistoryItem.ItemType.Feel -> FeelFilterChip(feel = item.feel ?: return null)
+
+                FilterHistoryItem.ItemType.Favorite -> FavoriteFilterChip(
+                    favorite = item.favorite ?: return null
+                )
 
                 FilterHistoryItem.ItemType.Attribute -> AttributeFilterChip(
                     attribute = item.attribute ?: return null,

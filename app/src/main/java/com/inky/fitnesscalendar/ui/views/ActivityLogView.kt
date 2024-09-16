@@ -70,6 +70,7 @@ import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivityCard
+import com.inky.fitnesscalendar.ui.components.FavoriteIcon
 import com.inky.fitnesscalendar.ui.components.NewActivityFAB
 import com.inky.fitnesscalendar.ui.components.PlaceIcon
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
@@ -405,6 +406,8 @@ private fun FilterChipIcon(chip: ActivityFilterChip) {
             chip.feel.emoji,
             style = MaterialTheme.typography.titleLarge
         )
+
+        is ActivityFilterChip.FavoriteFilterChip -> FavoriteIcon(chip.favorite)
     }
 }
 

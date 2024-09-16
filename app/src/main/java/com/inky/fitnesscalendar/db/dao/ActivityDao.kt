@@ -39,10 +39,11 @@ abstract class ActivityDao {
                 "LEFT JOIN Place AS place ON Activity.place_id = place.uid " +
                 "WHERE " +
                 "   (type_id IN (:typeIds) OR :isTypesEmpty) AND" +
-                "   (type.activity_category in (:categories) or :isCategoriesEmpty) AND" +
-                "   (place_id in (:placeIds) OR :isPlacesEmpty) AND" +
-                "   (vehicle in (:vehicles) OR :isVehiclesEmpty) AND" +
-                "   (feel in (:feels) OR :isFeelsEmpty) AND" +
+                "   (type.activity_category IN (:categories) OR :isCategoriesEmpty) AND" +
+                "   (place_id IN (:placeIds) OR :isPlacesEmpty) AND" +
+                "   (vehicle IN (:vehicles) OR :isVehiclesEmpty) AND" +
+                "   (feel IN (:feels) OR :isFeelsEmpty) AND" +
+                "   (favorite == :favorite OR :favorite IS NULL) AND" +
                 "   (description LIKE :search OR type.name LIKE :search OR place.name LIKE :search OR vehicle IN (:searchVehicles) OR :search IS NULL) AND" +
                 "   (end_time >= :start OR :start IS NULL) AND" +
                 "   (start_time <= :end OR :end IS NULL) AND" +
@@ -68,6 +69,7 @@ abstract class ActivityDao {
         isVehiclesEmpty: Boolean,
         feels: List<Feel>,
         isFeelsEmpty: Boolean,
+        favorite: Boolean?,
         search: String?,
         searchVehicles: List<Vehicle>,
         start: Date?,

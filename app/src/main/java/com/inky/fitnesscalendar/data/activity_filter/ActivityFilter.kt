@@ -17,6 +17,7 @@ data class ActivityFilter(
     val places: List<Place> = emptyList(),
     val vehicles: List<Vehicle> = emptyList(),
     val feels: List<Feel> = emptyList(),
+    val favorite: Boolean? = null,
     val text: String? = null,
     val range: DateRangeOption? = null,
     val attributes: AttributeFilter = AttributeFilter(),
@@ -63,6 +64,10 @@ data class ActivityFilter(
 
         for (feel in feels) {
             items.add(ActivityFilterChip.FeelFilterChip(feel))
+        }
+
+        if (favorite != null) {
+            items.add(ActivityFilterChip.FavoriteFilterChip(favorite))
         }
 
         for ((attribute, state) in attributes.entries()

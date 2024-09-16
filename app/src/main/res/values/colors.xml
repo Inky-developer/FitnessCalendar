@@ -25,4 +25,6 @@
 
     <color name="start_point">#2E7D32</color>
     <color name="end_point">#D84315</color>
+
+    <color name="favorite">#AD1457</color>
 </resources>

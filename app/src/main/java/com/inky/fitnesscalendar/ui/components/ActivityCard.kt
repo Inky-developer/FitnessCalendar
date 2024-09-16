@@ -222,12 +222,20 @@ fun CompactActivityCard(
                 .align(Alignment.End)
                 .padding(horizontal = 4.dp)
         )
-        Text(
-            title,
-            style = MaterialTheme.typography.displaySmall,
-            color = MaterialTheme.colorScheme.primary,
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(horizontal = 4.dp)
-        )
+        ) {
+            Text(
+                title,
+                style = MaterialTheme.typography.displaySmall,
+                color = MaterialTheme.colorScheme.primary,
+            )
+            Spacer(modifier = Modifier.weight(1f))
+            if (activity.favorite) {
+                FavoriteIcon(true)
+            }
+        }
 
         if (expand) {
             ActivityCardContent(activity = activity, place = richActivity.place)
@@ -249,6 +257,10 @@ private fun ActivityCardContent(activity: Activity, place: Place?) {
             .fillMaxWidth()
             .padding(all = 8.dp), horizontalArrangement = Arrangement.SpaceAround
     ) {
+        if (activity.favorite) {
+            FavoriteIcon(true)
+        }
+
         if (activity.vehicle != null) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Text(activity.vehicle.emoji, style = MaterialTheme.typography.bodyLarge)

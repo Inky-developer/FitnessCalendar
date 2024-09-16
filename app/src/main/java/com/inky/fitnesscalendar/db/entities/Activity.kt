@@ -42,12 +42,16 @@ data class Activity(
     @ColumnInfo(name = "place_id") val placeId: Int? = null,
     @ColumnInfo(name = "vehicle") val vehicle: Vehicle? = null,
     @ColumnInfo(name = "description") val description: String = "",
+    @ColumnInfo(name = "favorite", defaultValue = "false") val favorite: Boolean = false,
+
+    @ColumnInfo(name = "image_name") val imageName: ImageName? = null,
+    @ColumnInfo(name = "feel") val feel: Feel? = null,
+    @ColumnInfo(name = "intensity") val intensity: Intensity? = null,
+
     @ColumnInfo(name = "start_time", index = true) val startTime: Date,
     @ColumnInfo(name = "end_time") val endTime: Date = startTime,
-    @ColumnInfo(name = "feel") val feel: Feel? = null,
-    @ColumnInfo(name = "image_name") val imageName: ImageName? = null,
     @ColumnInfo(name = "distance") val distance: Distance? = null,
-    @ColumnInfo(name = "intensity") val intensity: Intensity? = null,
+
     // The unique identifier of the wifi network the device was connected to when starting the activity
     @ColumnInfo(name = "wifi_bssid") val wifiBssid: String? = null,
     @ColumnInfo(name = "track_preview") val trackPreview: SerializedTrackPreview? = null,

@@ -97,6 +97,7 @@ class AppRepository @Inject constructor(
             isVehiclesEmpty = filter.vehicles.isEmpty(),
             feels = filter.feels,
             isFeelsEmpty = filter.feels.isEmpty(),
+            favorite = filter.favorite,
             search = filter.text?.let { "%$it%" },
             searchVehicles = searchVehicles,
             start = filter.range?.range?.start,

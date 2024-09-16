@@ -1,6 +1,7 @@
 package com.inky.fitnesscalendar.ui.views
 
 import androidx.activity.compose.BackHandler
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -46,6 +47,7 @@ import com.inky.fitnesscalendar.data.activity_filter.DateRangeOption
 import com.inky.fitnesscalendar.db.entities.Place
 import com.inky.fitnesscalendar.ui.components.ActivityCategorySelector
 import com.inky.fitnesscalendar.ui.components.ActivityTypeSelector
+import com.inky.fitnesscalendar.ui.components.FavoriteIcon
 import com.inky.fitnesscalendar.ui.components.OptionGroup
 import com.inky.fitnesscalendar.ui.components.PlaceIcon
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
@@ -234,6 +236,30 @@ fun FilterView(
                 Text(it.emoji, style = MaterialTheme.typography.headlineMedium)
             }
 
+            val currentFavoriteOption = filter.favorite?.let { FavoriteOption.fromBoolean(it) }
+            OptionGroup(
+                label = stringResource(R.string.filter_by_favorites),
+                selectionLabel = currentFavoriteOption?.let { context.getString(it.nameId) },
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+            ) {
+                LazyRow {
+                    items(FavoriteOption.entries) { option ->
+                        FilterChip(
+                            selected = currentFavoriteOption == option,
+                            onClick = {
+                                filter = if (filter.favorite == option.isFavorite()) {
+                                    filter.copy(favorite = null)
+                                } else {
+                                    filter.copy(favorite = option.isFavorite())
+                                }
+                            },
+                            label = { option.Icon() },
+                            modifier = Modifier.padding(all = 4.dp)
+                        )
+                    }
+                }
+            }
+
             OptionGroup(
                 label = stringResource(R.string.filter_by_attributes),
                 selectionLabel = attributeSelectionLabel,
@@ -345,5 +371,25 @@ private enum class DateRangeKind(val rangeName: DateRangeOption.DateRangeName) {
         LastMonth -> DateRangeOption.lastMonth()
         Year -> DateRangeOption.year()
         LastYear -> DateRangeOption.lastYear()
+    }
+}
+
+private enum class FavoriteOption(@StringRes val nameId: Int) {
+    Favorite(R.string.favorite),
+    NoFavorite(R.string.no_favorite);
+
+    fun isFavorite() = when (this) {
+        Favorite -> true
+        NoFavorite -> false
+    }
+
+    @Composable
+    fun Icon() = FavoriteIcon(isFavorite())
+
+    companion object {
+        fun fromBoolean(value: Boolean) = when (value) {
+            true -> Favorite
+            false -> NoFavorite
+        }
     }
 }

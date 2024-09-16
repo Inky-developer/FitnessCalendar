@@ -31,6 +31,7 @@ import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
@@ -73,6 +74,7 @@ import com.inky.fitnesscalendar.ui.components.ActivityImage
 import com.inky.fitnesscalendar.ui.components.ActivitySelector
 import com.inky.fitnesscalendar.ui.components.ActivitySelectorState
 import com.inky.fitnesscalendar.ui.components.DateTimePicker
+import com.inky.fitnesscalendar.ui.components.FavoriteIcon
 import com.inky.fitnesscalendar.ui.components.FeelSelector
 import com.inky.fitnesscalendar.ui.components.ImageViewer
 import com.inky.fitnesscalendar.ui.components.OptionGroup
@@ -162,6 +164,14 @@ fun NewActivity(
                     }
                 },
                 actions = {
+                    IconToggleButton(
+                        checked = editState.favorite,
+                        onCheckedChange = { editState = editState.copy(favorite = it) }
+                    ) {
+                        AnimatedContent(editState.favorite, label = "Favorite") { isFavorite ->
+                            FavoriteIcon(isFavorite)
+                        }
+                    }
                     IconButton(onClick = { contextMenuOpen = true }) {
                         Icon(Icons.Outlined.Menu, stringResource(R.string.open_context_menu))
                     }
@@ -419,6 +429,7 @@ private data class ActivityEditState(
     val intensity: Intensity?,
     val feel: Feel?,
     val imageName: ImageName?,
+    val favorite: Boolean,
 ) : Parcelable {
     constructor(
         activity: RichActivity?,
@@ -436,7 +447,8 @@ private data class ActivityEditState(
         distanceString = activity?.activity?.distance?.kilometers?.toString() ?: "",
         intensity = activity?.activity?.intensity,
         feel = activity?.activity?.feel,
-        imageName = activity?.activity?.imageName
+        imageName = activity?.activity?.imageName,
+        favorite = activity?.activity?.favorite ?: false
     )
 
     @IgnoredOnParcel
@@ -470,7 +482,8 @@ private data class ActivityEditState(
             imageName = imageName,
             feel = feel,
             distance = kilometerStringToDistance(distanceString),
-            intensity = intensity
+            intensity = intensity,
+            favorite = favorite
         )
 
         return RichActivity(

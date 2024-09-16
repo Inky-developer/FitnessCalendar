@@ -26,7 +26,7 @@ import com.inky.fitnesscalendar.db.entities.Track
 import com.inky.fitnesscalendar.util.DATABASE_NAME
 
 @Database(
-    version = 25,
+    version = 26,
     entities = [
         Activity::class,
         Recording::class,
@@ -53,6 +53,7 @@ import com.inky.fitnesscalendar.util.DATABASE_NAME
         AutoMigration(from = 21, to = 22),
         AutoMigration(from = 22, to = 23),
         AutoMigration(from = 23, to = 24, spec = Migration23To24Spec::class),
+        AutoMigration(from = 25, to = 26),
     ]
 )
 @TypeConverters(Converters::class)
