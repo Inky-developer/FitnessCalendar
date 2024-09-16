@@ -230,7 +230,7 @@ val MIGRATION_26_27 = object : Migration(26, 27) {
         db.execSQL("CREATE TABLE IF NOT EXISTS `tempActivity` (`uid` INTEGER, `type_id` INTEGER NOT NULL, `place_id` INTEGER, `vehicle` TEXT, `description` TEXT NOT NULL, `favorite` INTEGER NOT NULL DEFAULT false, `image_name` TEXT, `feel` TEXT, `intensity` INTEGER, `start_time` INTEGER NOT NULL, `end_time` INTEGER NOT NULL, `distance` INTEGER, `wifi_bssid` TEXT, `track_preview` TEXT, PRIMARY KEY(`uid`), FOREIGN KEY(`type_id`) REFERENCES `ActivityType`(`uid`) ON UPDATE NO ACTION ON DELETE RESTRICT , FOREIGN KEY(`place_id`) REFERENCES `Place`(`uid`) ON UPDATE NO ACTION ON DELETE RESTRICT )")
         db.execSQL("CREATE TABLE IF NOT EXISTS `tempDay` (`day` INTEGER NOT NULL, `description` TEXT NOT NULL, `feel` TEXT, `image_name` TEXT, PRIMARY KEY(`day`))")
 
-        db.execSQL("INSERT INTO tempActivity SELECT * FROM Activity")
+        db.execSQL("INSERT INTO tempActivity(uid, type_id, place_id, vehicle, description, favorite, image_name, feel, intensity, start_time, end_time, distance, wifi_bssid, track_preview) SELECT uid, type_id, place_id, vehicle, description, favorite, image_name, feel, intensity, start_time, end_time, distance, wifi_bssid, track_preview FROM Activity")
         db.execSQL("INSERT INTO tempDay SELECT * FROM Day")
 
         db.execSQL("DROP TABLE Activity")
@@ -247,5 +247,8 @@ val MIGRATION_26_27 = object : Migration(26, 27) {
 
         db.execSQL("INSERT INTO Activity SELECT * FROM tempActivity")
         db.execSQL("INSERT INTO Day SELECT * FROM tempDay")
+
+        db.execSQL("DROP TABLE tempActivity")
+        db.execSQL("DROP TABLE tempDay")
     }
 }
