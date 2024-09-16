@@ -1,6 +1,5 @@
 package com.inky.fitnesscalendar.ui.views
 
-import android.content.Context
 import android.os.Parcelable
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
@@ -59,11 +58,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImagePainter
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.Feel
+import com.inky.fitnesscalendar.data.ImageName
 import com.inky.fitnesscalendar.data.Intensity
 import com.inky.fitnesscalendar.data.measure.Distance
 import com.inky.fitnesscalendar.db.entities.Activity
@@ -80,7 +79,6 @@ import com.inky.fitnesscalendar.ui.components.OptionGroup
 import com.inky.fitnesscalendar.ui.components.SelectImageDropdownMenuItem
 import com.inky.fitnesscalendar.ui.components.optionGroupDefaultBackground
 import com.inky.fitnesscalendar.ui.components.rememberImagePickerLauncher
-import com.inky.fitnesscalendar.util.getOrCreateImagesDir
 import com.inky.fitnesscalendar.util.toDate
 import com.inky.fitnesscalendar.util.toLocalDateTime
 import com.inky.fitnesscalendar.view_model.NewActivityViewModel
@@ -207,7 +205,7 @@ fun NewActivity(
                 .padding(horizontal = 8.dp)
                 .verticalScroll(scrollState)
         ) {
-            val imageUri = editState.getImageUri()
+            val imageUri = editState.imageName?.getImageUri()
             if (imageUri != null) {
                 ActivityImage(
                     uri = imageUri,
@@ -331,7 +329,7 @@ fun NewActivity(
             Spacer(modifier = Modifier.height(128.dp))
         }
 
-        val imageUri = editState.getImageUri()
+        val imageUri = editState.imageName?.getImageUri()
         if (showImageViewer && imageUri != null) {
             ImageViewer(
                 imageUri = imageUri,
@@ -420,7 +418,7 @@ private data class ActivityEditState(
     val distanceString: String,
     val intensity: Intensity?,
     val feel: Feel?,
-    val imageName: String?,
+    val imageName: ImageName?,
 ) : Parcelable {
     constructor(
         activity: RichActivity?,
@@ -452,11 +450,6 @@ private data class ActivityEditState(
     val isValid = activitySelectorState.isValid()
             && !isDistanceStringError
             && !isEndDateTimeError
-
-    @Composable
-    fun getImageUri(context: Context = LocalContext.current) = imageName?.let {
-        context.getOrCreateImagesDir().toPath().resolve(it).toFile().toUri()
-    }
 
     /**
      * Converts this state into an activity. Panics if the state does not represent a valid activity

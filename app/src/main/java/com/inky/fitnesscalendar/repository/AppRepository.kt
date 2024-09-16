@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.compose.runtime.Immutable
 import androidx.room.withTransaction
 import com.inky.fitnesscalendar.data.EpochDay
+import com.inky.fitnesscalendar.data.ImageName
 import com.inky.fitnesscalendar.data.Vehicle
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilterChip
@@ -126,7 +127,8 @@ class AppRepository @Inject constructor(
 
     fun getActivity(id: Int) = activityDao.get(id)
 
-    suspend fun getUsedImages() = activityDao.getImages().toSet() + dayDao.getImages()
+    suspend fun getUsedImages(): Set<ImageName> =
+        activityDao.getImages().toSet() + dayDao.getImages()
 
     suspend fun startRecording(richRecording: RichRecording, context: Context) {
         val includeWifi = Preference.COLLECT_BSSID.get(context)

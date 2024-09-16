@@ -1,6 +1,5 @@
 package com.inky.fitnesscalendar.ui.views
 
-import android.content.Context
 import android.os.Parcelable
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Column
@@ -26,16 +25,15 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImagePainter
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.data.Feel
+import com.inky.fitnesscalendar.data.ImageName
 import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.ui.components.ActivityImage
 import com.inky.fitnesscalendar.ui.components.BaseEditDialog
@@ -45,7 +43,6 @@ import com.inky.fitnesscalendar.ui.components.OptionGroup
 import com.inky.fitnesscalendar.ui.components.SelectImageDropdownMenuItem
 import com.inky.fitnesscalendar.ui.components.optionGroupDefaultBackground
 import com.inky.fitnesscalendar.ui.components.rememberImagePickerLauncher
-import com.inky.fitnesscalendar.util.getOrCreateImagesDir
 import com.inky.fitnesscalendar.view_model.BaseViewModel
 import kotlinx.parcelize.Parcelize
 
@@ -106,7 +103,7 @@ fun EditDayDialog(
                 .weight(1f, fill = false)
         ) {
             AnimatedContent(
-                targetState = editState.getImageUri(),
+                targetState = editState.imageName?.getImageUri(),
                 label = stringResource(R.string.user_uploaded_image)
             ) { imageUri ->
                 if (imageUri != null) {
@@ -150,7 +147,7 @@ fun EditDayDialog(
         }
     }
 
-    val imageUri = editState.getImageUri()
+    val imageUri = editState.imageName?.getImageUri()
     if (showImageViewer && imageUri != null) {
         ImageViewer(
             imageUri = imageUri,
@@ -163,18 +160,13 @@ fun EditDayDialog(
 data class EditDayState(
     val feel: Feel? = null,
     val description: String = "",
-    val imageName: String? = null,
+    val imageName: ImageName? = null,
 ) : Parcelable {
     constructor(day: Day) : this(
         feel = day.feel,
         description = day.description,
         imageName = day.imageName
     )
-
-    @Composable
-    fun getImageUri(context: Context = LocalContext.current) = imageName?.let {
-        context.getOrCreateImagesDir().toPath().resolve(it).toFile().toUri()
-    }
 
     fun toDay(epochDay: EpochDay) =
         Day(day = epochDay, description = description, feel = feel, imageName = imageName)

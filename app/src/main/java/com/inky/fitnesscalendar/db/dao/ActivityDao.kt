@@ -6,6 +6,7 @@ import androidx.room.Query
 import androidx.room.Transaction
 import androidx.room.Upsert
 import com.inky.fitnesscalendar.data.Feel
+import com.inky.fitnesscalendar.data.ImageName
 import com.inky.fitnesscalendar.data.Vehicle
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.Recording
@@ -84,7 +85,7 @@ abstract class ActivityDao {
     abstract fun get(id: Int): Flow<RichActivity>
 
     @Query("SELECT image_name FROM ACTIVITY WHERE image_name IS NOT NULL")
-    abstract suspend fun getImages(): List<String>
+    abstract suspend fun getImages(): List<ImageName>
 
     @Upsert
     abstract suspend fun save(activity: Activity): Long

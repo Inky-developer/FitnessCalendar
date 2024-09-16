@@ -1,8 +1,8 @@
 package com.inky.fitnesscalendar.db
 
-import android.net.Uri
 import androidx.room.TypeConverter
 import com.inky.fitnesscalendar.data.EpochDay
+import com.inky.fitnesscalendar.data.ImageName
 import com.inky.fitnesscalendar.data.Intensity
 import com.inky.fitnesscalendar.data.gpx.GpxTrackPoint
 import com.inky.fitnesscalendar.data.measure.Distance
@@ -20,16 +20,6 @@ class Converters {
     @TypeConverter
     fun dateFromTimestamp(value: Long?): Date? {
         return value?.let { Date(it) }
-    }
-
-    @TypeConverter
-    fun uriToString(uri: Uri?): String? {
-        return uri?.toString()
-    }
-
-    @TypeConverter
-    fun uriFromString(value: String?): Uri? {
-        return value?.let { Uri.parse(it) }
     }
 
     @TypeConverter
@@ -81,4 +71,10 @@ class Converters {
     fun stringToSerializedTrackPreview(value: String): Activity.SerializedTrackPreview {
         return Activity.SerializedTrackPreview.assumeValid(value)
     }
+
+    @TypeConverter
+    fun imageNameToString(value: ImageName) = value.name
+
+    @TypeConverter
+    fun stringToImageName(value: String) = ImageName(value)
 }

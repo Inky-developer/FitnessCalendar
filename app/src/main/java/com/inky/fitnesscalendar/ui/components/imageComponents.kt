@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import com.inky.fitnesscalendar.R
+import com.inky.fitnesscalendar.data.ImageName
 import com.inky.fitnesscalendar.util.copyFileToStorage
 import com.inky.fitnesscalendar.util.getOrCreateImagesDir
 
@@ -75,14 +76,17 @@ fun SelectImageDropdownMenuItem(
 }
 
 @Composable
-fun rememberImagePickerLauncher(onName: (String) -> Unit, context: Context = LocalContext.current) =
+fun rememberImagePickerLauncher(
+    onName: (ImageName) -> Unit,
+    context: Context = LocalContext.current
+) =
     rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickVisualMedia()
     ) { uri ->
         if (uri != null) {
             val name = context.copyFileToStorage(uri, context.getOrCreateImagesDir())?.name
             if (name != null) {
-                onName(name)
+                onName(ImageName(name))
             }
         }
     }

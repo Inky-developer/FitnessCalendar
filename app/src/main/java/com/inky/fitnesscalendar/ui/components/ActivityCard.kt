@@ -83,7 +83,7 @@ fun ActivityCard(
     val time = remember(richActivity) {
         localizationRepository.timeFormatter.format(richActivity.activity.startTime)
     }
-    val imageUri = richActivity.activity.getImageUri()
+    val imageUri = richActivity.activity.imageName?.getImageUri()
 
     val trackColor = contentColorFor(containerColor)
     val trackPreview = remember(richActivity) { richActivity.activity.trackPreview?.toTrackSvg() }
