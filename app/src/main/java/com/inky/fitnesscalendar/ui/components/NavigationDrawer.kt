@@ -81,7 +81,7 @@ fun NavigationDrawer(
                 for (view in selectableViews) {
                     NavigationDrawerItem(
                         label = { Text(stringResource(view.nameId)) },
-                        selected = currentView == view,
+                        selected = currentView != null && currentView::class == view::class,
                         onClick = { if (currentView != view) onNavigate(view) },
                         modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                     )
