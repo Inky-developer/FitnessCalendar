@@ -252,3 +252,9 @@ val MIGRATION_26_27 = object : Migration(26, 27) {
         db.execSQL("DROP TABLE tempDay")
     }
 }
+
+val MIGRATION_27_28 = object : Migration(27, 28) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("DELETE FROM FilterHistoryItem")
+    }
+}

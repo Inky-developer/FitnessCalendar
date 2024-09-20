@@ -29,7 +29,7 @@ import com.inky.fitnesscalendar.util.DATABASE_NAME
 private const val TAG = "Database"
 
 @Database(
-    version = 27,
+    version = 28,
     entities = [
         Activity::class,
         Recording::class,
@@ -101,6 +101,7 @@ abstract class AppDatabase : RoomDatabase() {
                     MIGRATION_17_18,
                     MIGRATION_24_25,
                     MIGRATION_26_27,
+                    MIGRATION_27_28,
                 )
                 .addCallback(object : Callback() {
                     override fun onCreate(db: SupportSQLiteDatabase) {

@@ -80,7 +80,6 @@ class AppRepository @Inject constructor(
 
         val hasDescription = filter.attributes.description.toBooleanOrNull()
         val hasVehicle = filter.attributes.vehicle.toBooleanOrNull()
-        val hasFeel = filter.attributes.feel.toBooleanOrNull()
         val hasImage = filter.attributes.image.toBooleanOrNull()
         val hasPlace = filter.attributes.place.toBooleanOrNull()
         val hasTrack = filter.attributes.track.toBooleanOrNull()
@@ -104,7 +103,6 @@ class AppRepository @Inject constructor(
             end = filter.range?.range?.end,
             hasDescription = hasDescription,
             hasVehicle = hasVehicle,
-            hasFeel = hasFeel,
             hasImage = hasImage,
             hasPlace = hasPlace,
             hasTrack = hasTrack,
