@@ -53,6 +53,7 @@ import com.inky.fitnesscalendar.ui.components.BaseEditDialog
 import com.inky.fitnesscalendar.ui.components.ColorSelector
 import com.inky.fitnesscalendar.ui.components.EmojiPickerDialog
 import com.inky.fitnesscalendar.ui.components.OptionGroup
+import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.components.optionGroupDefaultBackground
 import com.inky.fitnesscalendar.view_model.settings.ActivityTypeEditState
 import com.inky.fitnesscalendar.view_model.settings.ActivityTypeViewModel
@@ -71,6 +72,7 @@ fun ActivityTypeView(viewModel: ActivityTypeViewModel = hiltViewModel(), onBack:
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text(stringResource(R.string.activity_types)) },
+                colors = defaultTopAppBarColors(),
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.back))

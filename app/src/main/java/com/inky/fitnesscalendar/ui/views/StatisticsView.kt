@@ -51,6 +51,7 @@ import com.inky.fitnesscalendar.data.Displayable
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.preferences.Preference
 import com.inky.fitnesscalendar.ui.components.CompactActivityCard
+import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.localDatabaseValues
 import com.inky.fitnesscalendar.ui.util.sharedBounds
@@ -123,15 +124,8 @@ fun StatisticsView(
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
-                title = {
-                    Text(
-                        stringResource(R.string.statistics),
-                    )
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                ),
+                title = { Text(stringResource(R.string.statistics)) },
+                colors = defaultTopAppBarColors(),
                 navigationIcon = {
                     IconButton(onClick = onOpenDrawer) {
                         Icon(

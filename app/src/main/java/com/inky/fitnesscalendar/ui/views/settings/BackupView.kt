@@ -37,6 +37,7 @@ import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.preferences.Preference.Companion.PREF_BACKUP_URI
 import com.inky.fitnesscalendar.repository.BackupRepository
+import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.view_model.settings.BackupViewModel
 import java.time.LocalDateTime
 
@@ -44,15 +45,11 @@ import java.time.LocalDateTime
 @Composable
 fun BackupView(viewModel: BackupViewModel = hiltViewModel(), onBack: () -> Unit) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-    val topAppBarColors = TopAppBarDefaults.topAppBarColors(
-        scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,
-        titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-    )
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text(stringResource(R.string.backup)) },
-                colors = topAppBarColors,
+                colors = defaultTopAppBarColors(),
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.back))

@@ -73,8 +73,9 @@ import com.inky.fitnesscalendar.ui.components.ActivityCard
 import com.inky.fitnesscalendar.ui.components.FavoriteIcon
 import com.inky.fitnesscalendar.ui.components.NewActivityFAB
 import com.inky.fitnesscalendar.ui.components.PlaceIcon
+import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
+import com.inky.fitnesscalendar.ui.components.getAppBarContainerColor
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
-import com.inky.fitnesscalendar.ui.util.getAppBarContainerColor
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.ui.util.sharedElement
 import com.inky.fitnesscalendar.view_model.ActivityLogViewModel
@@ -123,18 +124,13 @@ fun ActivityLog(
     }
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-    val topAppBarColors = TopAppBarDefaults.topAppBarColors(
-        scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,
-        titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-    )
-    val appBarContainerColor =
-        getAppBarContainerColor(scrollBehavior = scrollBehavior, topAppBarColors = topAppBarColors)
+    val appBarContainerColor = getAppBarContainerColor(scrollBehavior = scrollBehavior)
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text(stringResource(R.string.activity_log)) },
-                colors = topAppBarColors,
+                colors = defaultTopAppBarColors(),
                 navigationIcon = {
                     IconButton(onClick = onOpenDrawer) {
                         Icon(

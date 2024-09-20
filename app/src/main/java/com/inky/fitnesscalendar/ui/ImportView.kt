@@ -46,6 +46,7 @@ import com.inky.fitnesscalendar.ui.components.ActivityTypeSelector
 import com.inky.fitnesscalendar.ui.components.BaseEditDialog
 import com.inky.fitnesscalendar.ui.components.CompactActivityCard
 import com.inky.fitnesscalendar.ui.components.OptionGroup
+import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.util.localDatabaseValues
 import com.inky.fitnesscalendar.view_model.ImportViewModel
 import com.inky.fitnesscalendar.view_model.import.ImportTrack
@@ -92,15 +93,11 @@ fun ImportView(
     }
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-    val topAppBarColors = TopAppBarDefaults.topAppBarColors(
-        scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,
-        titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-    )
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text(stringResource(R.string.import_activities)) },
-                colors = topAppBarColors,
+                colors = defaultTopAppBarColors(),
                 scrollBehavior = scrollBehavior,
             )
         },

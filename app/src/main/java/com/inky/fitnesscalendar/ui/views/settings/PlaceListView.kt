@@ -42,6 +42,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.db.entities.Place
 import com.inky.fitnesscalendar.ui.components.BottomSheetButton
+import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.view_model.PlaceListViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -52,15 +53,11 @@ fun PlaceListView(
     onEditPlace: (Place?) -> Unit
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
-    val topAppBarColors = TopAppBarDefaults.topAppBarColors(
-        scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,
-        titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-    )
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text(stringResource(R.string.places)) },
-                colors = topAppBarColors,
+                colors = defaultTopAppBarColors(),
                 navigationIcon = {
                     IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.back))

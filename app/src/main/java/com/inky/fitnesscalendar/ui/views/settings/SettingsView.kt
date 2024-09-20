@@ -39,6 +39,7 @@ import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.preferences.Preference
 import com.inky.fitnesscalendar.repository.BackupRepository
+import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 import kotlinx.coroutines.launch
@@ -58,10 +59,7 @@ fun SettingsView(
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text(stringResource(R.string.settings)) },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-                ),
+                colors = defaultTopAppBarColors(),
                 navigationIcon = {
                     IconButton(onClick = onOpenDrawer) {
                         Icon(Icons.Outlined.Menu, stringResource(R.string.Menu))

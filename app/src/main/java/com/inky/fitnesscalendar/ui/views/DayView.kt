@@ -63,6 +63,7 @@ import com.inky.fitnesscalendar.ui.components.ActivityCard
 import com.inky.fitnesscalendar.ui.components.ActivityImage
 import com.inky.fitnesscalendar.ui.components.ImageViewer
 import com.inky.fitnesscalendar.ui.components.NewActivityFAB
+import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.ui.util.sharedElement
@@ -93,11 +94,6 @@ fun DayView(
     var showDatePicker by rememberSaveable { mutableStateOf(false) }
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-    val topAppBarColors = TopAppBarDefaults.topAppBarColors(
-        scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,
-        titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-    )
-
     if (showDatePicker) {
         DayPickerDialog(
             onDismiss = { showDatePicker = false },
@@ -129,7 +125,7 @@ fun DayView(
                     }
                     Text(todayString, modifier = modifier)
                 },
-                colors = topAppBarColors,
+                colors = defaultTopAppBarColors(),
                 navigationIcon = {
                     IconButton(onClick = onOpenDrawer) {
                         Icon(

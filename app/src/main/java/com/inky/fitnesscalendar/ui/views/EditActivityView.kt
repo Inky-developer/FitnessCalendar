@@ -79,6 +79,7 @@ import com.inky.fitnesscalendar.ui.components.FeelSelector
 import com.inky.fitnesscalendar.ui.components.ImageViewer
 import com.inky.fitnesscalendar.ui.components.OptionGroup
 import com.inky.fitnesscalendar.ui.components.SelectImageDropdownMenuItem
+import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.components.optionGroupDefaultBackground
 import com.inky.fitnesscalendar.ui.components.rememberImagePickerLauncher
 import com.inky.fitnesscalendar.util.toDate
@@ -147,16 +148,12 @@ fun NewActivity(
     })
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-    val topAppBarColors = TopAppBarDefaults.topAppBarColors(
-        scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,
-        titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-    )
 
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
                 title = { Text(title) },
-                colors = topAppBarColors,
+                colors = defaultTopAppBarColors(),
                 scrollBehavior = scrollBehavior,
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
