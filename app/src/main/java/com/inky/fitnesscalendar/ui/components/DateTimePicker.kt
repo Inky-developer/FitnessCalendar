@@ -32,6 +32,7 @@ import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.Wallpapers
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.util.horizontalOrderedTransitionSpec
@@ -137,7 +138,7 @@ fun DaySelector(date: LocalDate, onDate: (LocalDate) -> Unit) {
         ) {
             DatePicker(
                 state = datePickerState,
-                colors = DatePickerDefaults.colors(containerColor = MaterialTheme.colorScheme.primaryContainer)
+                colors = DatePickerDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)
             )
         }
     }
@@ -175,7 +176,7 @@ private fun rememberTimePickerStateKeyed(initialTime: LocalTime): TimePickerStat
     }
 }
 
-@Preview
+@Preview(wallpaper = Wallpapers.RED_DOMINATED_EXAMPLE)
 @Composable
 private fun DateTimePickerPreview() {
     DateTimePicker(onDismiss = {}, onOkay = { println(it) })
