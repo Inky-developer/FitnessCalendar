@@ -7,8 +7,8 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -20,13 +20,14 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ImageName
 import com.inky.fitnesscalendar.util.copyFileToStorage
 import com.inky.fitnesscalendar.util.getOrCreateImagesDir
+
+const val IMAGE_ASPECT_RATIO: Float = 4 / 3f
 
 @Composable
 fun ActivityImage(
@@ -39,10 +40,10 @@ fun ActivityImage(
         model = uri,
         contentDescription = stringResource(R.string.user_uploaded_image),
         onState = onState,
-        contentScale = ContentScale.FillWidth,
+        contentScale = ContentScale.Crop,
         modifier = modifier
             .fillMaxWidth()
-            .heightIn(max = 256.dp)
+            .aspectRatio(IMAGE_ASPECT_RATIO)
             .clip(MaterialTheme.shapes.large)
             .clickable { onClick() }
     )
