@@ -75,7 +75,7 @@ fun ActivityCard(
     onShowDay: (() -> Unit)? = null,
     onFilter: ((ActivityFilter) -> Unit)? = null,
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainer,
-    contentColor: Color = MaterialTheme.colorScheme.primary
+    contentColor: Color = contentColorFor(MaterialTheme.colorScheme.surfaceContainer)
 ) {
     var showContextMenu by rememberSaveable { mutableStateOf(false) }
     var showImageViewer by rememberSaveable { mutableStateOf(false) }
@@ -227,11 +227,7 @@ fun CompactActivityCard(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier.padding(horizontal = 4.dp)
         ) {
-            Text(
-                title,
-                style = MaterialTheme.typography.displaySmall,
-                color = MaterialTheme.colorScheme.primary,
-            )
+            Text(title, style = MaterialTheme.typography.displaySmall)
             Spacer(modifier = Modifier.weight(1f))
             if (activity.favorite) {
                 FavoriteIcon(true)

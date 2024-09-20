@@ -291,7 +291,7 @@ fun StatisticsIfNotNull(name: String, stats: ActivityStatistics?, onClick: () ->
 fun Statistics(name: String, stats: ActivityStatistics, onClick: () -> Unit) {
     Card(
         onClick = onClick,
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
         modifier = Modifier
             .padding(horizontal = 8.dp, vertical = 4.dp)
             .fillMaxWidth()

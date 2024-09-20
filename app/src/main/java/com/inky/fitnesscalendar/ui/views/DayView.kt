@@ -251,7 +251,7 @@ fun DayViewInner(
 
         Card(
             onClick = onEditDay,
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.secondaryContainer),
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
             modifier = Modifier
                 .padding(horizontal = 8.dp, vertical = 4.dp)
                 .fillMaxWidth()
@@ -260,15 +260,13 @@ fun DayViewInner(
                 targetState = day.feel,
                 label = stringResource(R.string.feel)
             ) { feel ->
-                if (feel != null) {
-                    Row {
-                        Spacer(modifier = Modifier.weight(1f))
-                        Text(
-                            feel.emoji, modifier = Modifier
-                                .padding(end = 8.dp, top = 8.dp)
-                                .sharedElement(SharedContentKey.DayFeel)
-                        )
-                    }
+                Row {
+                    Spacer(modifier = Modifier.weight(1f))
+                    Text(
+                        feel.emoji, modifier = Modifier
+                            .padding(end = 8.dp, top = 8.dp)
+                            .sharedElement(SharedContentKey.DayFeel)
+                    )
                 }
             }
             AnimatedContent(
