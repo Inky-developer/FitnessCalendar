@@ -15,13 +15,15 @@ data class ImportTrack(
     val trackSvg: TrackSvg? = track.toTrackSvg()
 ) {
     fun toRichActivity(type: ActivityType): RichActivity? {
+        val stats = track.computeStatistics()
         return RichActivity(
             activity = Activity(
                 typeId = type.uid ?: return null,
                 description = track.name,
                 startTime = track.startTime ?: return null,
                 endTime = track.endTime ?: return null,
-                distance = track.computeLength(),
+                distance = stats?.totalDistance,
+                movingDuration = stats?.movingDuration,
                 trackPreview = trackSvg?.serialize()
             ),
             type = type,

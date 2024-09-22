@@ -169,7 +169,7 @@
     <string name="speed">Geschwindigkeit</string>
     <string name="x_kmh">%1$s km/h</string>
     <string name="average_kmh">Durchschnittliche km/h</string>
-    <string name="average_velocity">Durchschnittsgeschwindigkeit</string>
+    <string name="average_speed">Durchschnittsgeschwindigkeit</string>
     <string name="has_intensity">Hat Intensität?</string>
     <string name="select_intensity">Intensität auswählen…</string>
     <string name="intensity">Intensität</string>

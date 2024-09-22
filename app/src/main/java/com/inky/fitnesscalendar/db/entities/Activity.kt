@@ -12,8 +12,9 @@ import com.inky.fitnesscalendar.data.Intensity
 import com.inky.fitnesscalendar.data.Vehicle
 import com.inky.fitnesscalendar.data.gpx.TrackSvg
 import com.inky.fitnesscalendar.data.measure.Distance
+import com.inky.fitnesscalendar.data.measure.Duration
 import com.inky.fitnesscalendar.data.measure.Duration.Companion.until
-import com.inky.fitnesscalendar.data.measure.Velocity
+import com.inky.fitnesscalendar.data.measure.Speed
 import com.inky.fitnesscalendar.util.toLocalDate
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -51,6 +52,7 @@ data class Activity(
     @ColumnInfo(name = "start_time", index = true) val startTime: Date,
     @ColumnInfo(name = "end_time") val endTime: Date = startTime,
     @ColumnInfo(name = "distance") val distance: Distance? = null,
+    @ColumnInfo(name = "moving_duration") val movingDuration: Duration? = null,
 
     // The unique identifier of the wifi network the device was connected to when starting the activity
     @ColumnInfo(name = "wifi_bssid") val wifiBssid: String? = null,
@@ -69,12 +71,17 @@ data class Activity(
     val duration
         get() = startTime until endTime
 
-    val velocity: Velocity?
+    val averageSpeed: Speed?
         get() {
-            if (duration.elapsedMs == 0L) {
+            if (duration.elapsedMs == 0L || distance == null) {
                 return null
             }
-            return distance?.let { Velocity(metersPerSecond = it.meters / duration.elapsedSeconds) }
+
+            if (movingDuration != null) {
+                return Speed(metersPerSecond = distance.meters / movingDuration.elapsedSeconds)
+            }
+
+            return Speed(metersPerSecond = distance.meters / duration.elapsedSeconds)
         }
 
     @JvmInline

@@ -297,14 +297,14 @@ private fun ActivityCardContent(activity: Activity, place: Place?) {
             }
         }
 
-        if (activity.velocity != null) {
+        if (activity.averageSpeed != null) {
             Row(verticalAlignment = Alignment.CenterVertically) {
                 Icon(
                     painterResource(R.drawable.outline_speed_24),
                     stringResource(R.string.speed)
                 )
                 Text(
-                    stringResource(R.string.x_kmh, "%.1f".format(activity.velocity!!.kmh))
+                    stringResource(R.string.x_kmh, "%.1f".format(activity.averageSpeed!!.kmh))
                 )
             }
         }

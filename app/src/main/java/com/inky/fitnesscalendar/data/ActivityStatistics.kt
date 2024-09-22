@@ -3,7 +3,7 @@ package com.inky.fitnesscalendar.data
 import com.inky.fitnesscalendar.data.measure.Distance
 import com.inky.fitnesscalendar.data.measure.Duration
 import com.inky.fitnesscalendar.data.measure.Duration.Companion.until
-import com.inky.fitnesscalendar.data.measure.Velocity
+import com.inky.fitnesscalendar.data.measure.Speed
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.util.toDate
@@ -36,12 +36,12 @@ data class ActivityStatistics(
         return Distance(meters = (distances.sum().toDouble() / distances.size).roundToLong())
     }
 
-    fun averageVelocity(): Velocity {
-        val elapsedSeconds = averageTime().elapsedSeconds
-        if (elapsedSeconds == 0.0) {
-            return Velocity(metersPerSecond = 0.0)
+    fun averageSpeed(): Speed {
+        val speeds = activities.mapNotNull { it.activity.averageSpeed?.metersPerSecond }
+        if (speeds.isEmpty()) {
+            return Speed(metersPerSecond = 0.0)
         }
-        return Velocity(metersPerSecond = averageDistance().meters / elapsedSeconds)
+        return Speed(metersPerSecond = speeds.sum() / speeds.size)
     }
 
     fun averageIntensity(): Double {

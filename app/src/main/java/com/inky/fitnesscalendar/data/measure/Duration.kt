@@ -4,7 +4,8 @@ import java.time.temporal.ChronoUnit
 import java.util.Date
 import java.util.concurrent.TimeUnit
 
-data class Duration(val elapsedMs: Long) {
+@JvmInline
+value class Duration(val elapsedMs: Long) {
     val elapsedSeconds
         get() = elapsedMs.toDouble() / ChronoUnit.SECONDS.duration.toMillis().toDouble()
 

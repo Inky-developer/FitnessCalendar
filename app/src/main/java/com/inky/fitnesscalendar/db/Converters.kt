@@ -6,6 +6,7 @@ import com.inky.fitnesscalendar.data.ImageName
 import com.inky.fitnesscalendar.data.Intensity
 import com.inky.fitnesscalendar.data.gpx.GpxTrackPoint
 import com.inky.fitnesscalendar.data.measure.Distance
+import com.inky.fitnesscalendar.data.measure.Duration
 import com.inky.fitnesscalendar.db.entities.Activity
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -77,4 +78,10 @@ class Converters {
 
     @TypeConverter
     fun stringToImageName(value: String) = ImageName(value)
+
+    @TypeConverter
+    fun durationToLong(duration: Duration) = duration.elapsedMs
+
+    @TypeConverter
+    fun longToDuration(value: Long) = Duration(elapsedMs = value)
 }
