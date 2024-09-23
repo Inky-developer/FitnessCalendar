@@ -96,24 +96,27 @@ fun SettingsView(
                         onClick = onNavigateBackup
                     )
                 }
-                Setting(
-                    title = stringResource(R.string.debug),
-                    onClick = onNavigateDebug,
-                )
 
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
                 CollectBssidPreference()
 
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
                 Text(
                     stringResource(R.string.advanced_settings),
-                    modifier = Modifier.padding(vertical = 8.dp)
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.padding(bottom = 8.dp)
                 )
 
                 Setting(
                     title = stringResource(R.string.recalculate_track_data),
                     onClick = viewModel::recalculateTrackData
+                )
+
+                Setting(
+                    title = stringResource(R.string.debug),
+                    onClick = onNavigateDebug,
                 )
             }
         }
