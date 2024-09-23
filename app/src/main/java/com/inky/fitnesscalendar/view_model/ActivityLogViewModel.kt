@@ -2,7 +2,7 @@ package com.inky.fitnesscalendar.view_model
 
 import android.content.Context
 import androidx.lifecycle.viewModelScope
-import com.inky.fitnesscalendar.repository.AppRepository
+import com.inky.fitnesscalendar.repository.DatabaseRepository
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilterChip.Companion.toActivityFilterChip
 import com.inky.fitnesscalendar.db.entities.RichActivity
@@ -28,7 +28,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ActivityLogViewModel @Inject constructor(
     @ApplicationContext context: Context,
-    repository: AppRepository
+    repository: DatabaseRepository
 ) : BaseViewModel(context, repository) {
     val filterHistory = repository.getFilterHistoryItems()
         .map { item -> item.mapNotNull { it.toActivityFilterChip() } }

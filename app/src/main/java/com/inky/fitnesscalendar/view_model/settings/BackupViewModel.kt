@@ -7,7 +7,7 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.lifecycle.viewModelScope
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.preferences.Preference.Companion.PREF_BACKUP_URI
-import com.inky.fitnesscalendar.repository.AppRepository
+import com.inky.fitnesscalendar.repository.DatabaseRepository
 import com.inky.fitnesscalendar.repository.BackupRepository
 import com.inky.fitnesscalendar.view_model.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,7 +24,7 @@ import javax.inject.Inject
 @HiltViewModel
 class BackupViewModel @Inject constructor(
     @ApplicationContext context: Context,
-    repository: AppRepository,
+    repository: DatabaseRepository,
     private val backupRepository: BackupRepository
 ) : BaseViewModel(context, repository) {
 

@@ -21,7 +21,7 @@ import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
-import com.inky.fitnesscalendar.repository.AppRepository
+import com.inky.fitnesscalendar.repository.DatabaseRepository
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.db.entities.RichRecording
 import com.inky.fitnesscalendar.ui.components.AppFrame
@@ -37,7 +37,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class RecordTileService : TileService() {
     @Inject
-    lateinit var repository: AppRepository
+    lateinit var repository: DatabaseRepository
 
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.IO + job)
@@ -74,7 +74,7 @@ class RecordTileService : TileService() {
 
     class TileServiceDialog(
         context: Context,
-        val repository: AppRepository,
+        val repository: DatabaseRepository,
         val onStartRecording: (RichRecording) -> Unit
     ) : Dialog(context, R.style.FullHeightDialog) {
         private val lifecycleOwner = MyHackyLifecycleOwner()

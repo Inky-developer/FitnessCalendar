@@ -6,7 +6,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import com.inky.fitnesscalendar.repository.AppRepository
+import com.inky.fitnesscalendar.repository.DatabaseRepository
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.Place
 
@@ -23,7 +23,7 @@ data class DatabaseValues(
 val localDatabaseValues = compositionLocalOf { DatabaseValues() }
 
 @Composable
-fun ProvideDatabaseValues(repository: AppRepository, content: @Composable () -> Unit) {
+fun ProvideDatabaseValues(repository: DatabaseRepository, content: @Composable () -> Unit) {
     val activityTypes by repository
         .getActivityTypes()
         .collectAsState(initial = emptyList())

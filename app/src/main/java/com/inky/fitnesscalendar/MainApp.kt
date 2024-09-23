@@ -4,7 +4,7 @@ import android.app.Application
 import android.util.Log
 import com.inky.fitnesscalendar.di.ActivityTypeOrder
 import com.inky.fitnesscalendar.di.DecisionTrees
-import com.inky.fitnesscalendar.repository.AppRepository
+import com.inky.fitnesscalendar.repository.DatabaseRepository
 import com.inky.fitnesscalendar.util.cleanImageStorage
 import com.inky.fitnesscalendar.util.getOrCreateImagesDir
 import com.inky.fitnesscalendar.util.getOrCreateSharedMediaCache
@@ -17,7 +17,7 @@ import javax.inject.Inject
 @HiltAndroidApp
 class MainApp : Application() {
     @Inject
-    lateinit var appRepository: AppRepository
+    lateinit var databaseRepository: DatabaseRepository
 
     override fun onCreate() {
         super.onCreate()
@@ -30,7 +30,7 @@ class MainApp : Application() {
 
     private suspend fun cleanupStorage() {
         val imagesDir = getOrCreateImagesDir().toPath()
-        val usedImages = appRepository.getUsedImages().map { it.resolve(imagesDir) }
+        val usedImages = databaseRepository.getUsedImages().map { it.resolve(imagesDir) }
         cleanImageStorage(usedImages.toSet())
 
         getOrCreateSharedMediaCache().listFiles()?.forEach {
@@ -41,7 +41,7 @@ class MainApp : Application() {
     private suspend fun initializeData() {
         Log.i("MainApp", "Initializing app data")
 
-        val activities = appRepository.loadMostRecentActivities(200)
+        val activities = databaseRepository.loadMostRecentActivities(200)
 
         ActivityTypeOrder.init(activities)
         DecisionTrees.init(activities)

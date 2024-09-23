@@ -7,7 +7,7 @@ import androidx.compose.runtime.State
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.inky.fitnesscalendar.repository.AppRepository
+import com.inky.fitnesscalendar.repository.DatabaseRepository
 import com.inky.fitnesscalendar.MainActivity
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.gpx.GpxTrack
@@ -30,7 +30,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ImportViewModel @Inject constructor(
     @ApplicationContext val context: Context,
-    val repository: AppRepository
+    val repository: DatabaseRepository
 ) : ViewModel() {
     var closeActivity: () -> Unit = {}
 
