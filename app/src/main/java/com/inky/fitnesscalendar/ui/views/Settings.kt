@@ -34,7 +34,7 @@ fun NavGraphBuilder.settingsDestination(
             onOpen()
             ProvideSharedContent(sharedContentScope = sharedContentScope) {
                 SettingsView(
-                    onOpenDrawer,
+                    onOpenDrawer = onOpenDrawer,
                     onNavigateTypes = { onNavigate(SettingsViews.ActivityType) },
                     onNavigateDebug = { onNavigate(SettingsViews.Debug) },
                     onNavigatePlaces = { onNavigate(SettingsViews.PlaceList) },

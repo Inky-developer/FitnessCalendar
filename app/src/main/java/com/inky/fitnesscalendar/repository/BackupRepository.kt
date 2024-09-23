@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.os.Build
 import androidx.annotation.StringRes
+import androidx.compose.runtime.Immutable
 import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
 import androidx.sqlite.db.SimpleSQLiteQuery
@@ -22,10 +23,13 @@ import java.time.Instant
 import java.time.LocalDateTime
 import java.util.Date
 import javax.inject.Inject
+import javax.inject.Singleton
 
 const val BACKUP_IMAGES_PATH = "images"
 const val BACKUP_NAME = "backup.zip"
 
+@Immutable
+@Singleton
 class BackupRepository @Inject constructor(
     private val database: AppDatabase,
     @ApplicationContext private val context: Context

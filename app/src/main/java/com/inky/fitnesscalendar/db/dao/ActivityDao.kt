@@ -84,6 +84,10 @@ abstract class ActivityDao {
     @Query("SELECT * FROM ACTIVITY WHERE uid=(:id)")
     abstract fun get(id: Int): Flow<RichActivity>
 
+    @Transaction
+    @Query("SELECT * FROM ACTIVITY WHERE uid=(:id)")
+    abstract suspend fun load(id: Int): RichActivity
+
     @Query("SELECT image_name FROM ACTIVITY WHERE image_name IS NOT NULL")
     abstract suspend fun getImages(): List<ImageName>
 

@@ -58,7 +58,7 @@ class ImportActivity : ComponentActivity() {
 
         setContent {
             AppFrame {
-                ProvideDatabaseValues(repository = viewModel.repository) {
+                ProvideDatabaseValues(repository = viewModel.dbRepository) {
                     ImportView(viewModel)
                 }
             }

@@ -100,6 +100,10 @@
         <item quantity="one">%1d Aktivität importiert</item>
         <item quantity="other">%1d Aktivitäten importiert</item>
     </plurals>
+    <plurals name="updated_activities">
+        <item quantity="one">%1d Aktivität aktualisiert</item>
+        <item quantity="other">%1d Aktivitäten aktualisiert</item>
+    </plurals>
 
     <string name="days">Tage</string>
     <string name="weeks">Wochen</string>
@@ -127,8 +131,8 @@
     <string name="options">Optionen</string>
     <string name="confirm">Bestätigen</string>
     <string name="ask_delete_activity">Aktivität löschen?</string>
-    <string name="configure_activity_types">Aktivitätsarten</string>
-    <string name="debug">Debug</string>
+    <string name="configure_activity_types">Aktivitätsarten…</string>
+    <string name="debug">Debug…</string>
     <string name="activity_types">Aktivitätsarten</string>
     <string name="edit_type">%1s bearbeiten</string>
     <string name="type_name">Name</string>
@@ -178,7 +182,7 @@
     <string name="animation_displayed_date">Animation für das Datum</string>
     <string name="now">Jetzt</string>
     <string name="cannot_delete_place_because_there_are_still_activities">Löschen fehlgeschlagen. Es müssen zuerst alle Aktivitäten dieser Art gelöscht werden.</string>
-    <string name="places">Orte</string>
+    <string name="configure_places">Orte…</string>
     <string name="new_place">Neuen Ort erstellen</string>
     <string name="name_of_place">Name des Ortes</string>
     <string name="delete_place">Ort löschen</string>
@@ -209,7 +213,7 @@
     <string name="filter_by_vehicles">Nach Fahrzeugen filtern…</string>
     <string name="filter_by_feels">Nach Stimmungen filtern…</string>
     <string name="select_emoji">Emoji auswählen…</string>
-    <string name="backup">Sicherung</string>
+    <string name="configure_backup">Sicherung…</string>
     <string name="backup_directory">Sicherungspfad:</string>
     <string name="create_backup">Sicherung erstellen</string>
     <string name="backup_successful">Sicherung war erfolgreich</string>
@@ -222,4 +226,8 @@
     <string name="favorite">Favorit</string>
     <string name="no_favorite">Kein Favorit</string>
     <string name="filter_by_favorites">Nach Favoriten filtern…</string>
+    <string name="backup">Sicherung</string>
+    <string name="places">Orte</string>
+    <string name="advanced_settings">Erweitert</string>
+    <string name="recalculate_track_data">Trackdaten aktualisieren</string>
 </resources>

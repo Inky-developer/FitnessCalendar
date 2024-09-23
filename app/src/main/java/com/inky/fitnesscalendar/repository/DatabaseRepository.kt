@@ -123,6 +123,8 @@ class DatabaseRepository @Inject constructor(
 
     fun getActivity(id: Int) = activityDao.get(id)
 
+    suspend fun loadActivity(id: Int) = activityDao.load(id)
+
     suspend fun getUsedImages(): Set<ImageName> =
         activityDao.getImages().toSet() + dayDao.getImages()
 
@@ -226,4 +228,6 @@ class DatabaseRepository @Inject constructor(
     )
 
     suspend fun saveTrack(track: Track) = trackDao.upsert(track)
+
+    suspend fun loadTracks() = trackDao.loadAll()
 }

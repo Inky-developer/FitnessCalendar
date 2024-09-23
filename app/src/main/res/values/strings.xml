@@ -116,8 +116,8 @@
     <string name="options">Options</string>
     <string name="confirm">Confirm</string>
     <string name="ask_delete_activity">Delete activity?</string>
-    <string name="configure_activity_types">Activity types</string>
-    <string name="debug">Debug</string>
+    <string name="configure_activity_types">Activity types…</string>
+    <string name="debug">Debug…</string>
     <string name="activity_types">Activity Types</string>
     <string name="edit_type">Edit %1s</string>
     <string name="type_name">Name</string>
@@ -167,7 +167,7 @@
     <string name="forward">Forward</string>
     <string name="animation_displayed_date">Animation for displayed date</string>
     <string name="now">Now</string>
-    <string name="places">Places</string>
+    <string name="configure_places">Places…</string>
     <string name="new_place">Create new place</string>
     <string name="name_of_place">Name of place</string>
     <string name="delete_place">Delete place</string>
@@ -197,6 +197,10 @@
         <item quantity="one">Imported %1d activity</item>
         <item quantity="other">Imported %1d activities</item>
     </plurals>
+    <plurals name="updated_activities">
+        <item quantity="one">Updated %1d activity</item>
+        <item quantity="other">Updated %1d activities</item>
+    </plurals>
     <string name="title_activity_import">Import activities</string>
     <string name="click_to_set_type">Click to set type…</string>
     <string name="confirm_import">Import</string>
@@ -206,7 +210,7 @@
     <string name="filter_by_vehicles">Filter by vehicles…</string>
     <string name="filter_by_feels">Filter by feels…</string>
     <string name="select_emoji">Select emoji…</string>
-    <string name="backup">Backup</string>
+    <string name="configure_backup">Backup…</string>
     <string name="backup_directory">Backup directory:</string>
     <string name="create_backup">Create backup</string>
     <string name="backup_successful">Backup successful</string>
@@ -219,4 +223,8 @@
     <string name="favorite">Favorite</string>
     <string name="no_favorite">No favorite</string>
     <string name="filter_by_favorites">Filter by favorites…</string>
+    <string name="backup">Backup</string>
+    <string name="places">Places</string>
+    <string name="advanced_settings">Advanced</string>
+    <string name="recalculate_track_data">Recalculate track data</string>
 </resources>

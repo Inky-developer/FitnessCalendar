@@ -40,8 +40,8 @@ import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.gpx.GpxTrack
 import com.inky.fitnesscalendar.db.entities.ActivityType
-import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.localization.LocalizationRepository
+import com.inky.fitnesscalendar.repository.ImportRepository
 import com.inky.fitnesscalendar.ui.components.ActivityTypeSelector
 import com.inky.fitnesscalendar.ui.components.BaseEditDialog
 import com.inky.fitnesscalendar.ui.components.CompactActivityCard
@@ -49,7 +49,6 @@ import com.inky.fitnesscalendar.ui.components.OptionGroup
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.util.localDatabaseValues
 import com.inky.fitnesscalendar.view_model.ImportViewModel
-import com.inky.fitnesscalendar.view_model.import.ImportTrack
 
 @Composable
 fun ImportView(viewModel: ImportViewModel) {
@@ -69,7 +68,7 @@ fun ImportView(viewModel: ImportViewModel) {
     } else {
         ImportView(
             tracks = tracks,
-            localizationRepository = viewModel.repository.localizationRepository,
+            localizationRepository = viewModel.dbRepository.localizationRepository,
             onImport = viewModel::import,
             onTypeMapping = viewModel::updateTypeMapping
         )
@@ -79,9 +78,9 @@ fun ImportView(viewModel: ImportViewModel) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ImportView(
-    tracks: List<ImportTrack>,
+    tracks: List<ImportRepository.ImportTrack>,
     localizationRepository: LocalizationRepository,
-    onImport: (List<Pair<RichActivity, GpxTrack>>) -> Unit,
+    onImport: (List<Pair<ImportRepository.ImportTrack, ActivityType>>) -> Unit,
     onTypeMapping: (String, ActivityType) -> Unit,
 ) {
     val typeMapping = localDatabaseValues.current.activityTypeNames
@@ -105,12 +104,10 @@ fun ImportView(
             AnimatedVisibility(visible = saveButtonEnabled) {
                 ExtendedFloatingActionButton(
                     onClick = {
-                        val activitiesAndTracks = tracks.mapNotNull { track ->
-                            typeMapping[track.track.type]
-                                ?.let { track.toRichActivity(it) }
-                                ?.let { it to track.track }
+                        val tracksAndActivityTypes = tracks.mapNotNull { track ->
+                            typeMapping[track.track.type]?.let { track to it }
                         }
-                        onImport(activitiesAndTracks)
+                        onImport(tracksAndActivityTypes)
                     },
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
@@ -148,7 +145,7 @@ fun ImportView(
 
 @Composable
 fun TrackView(
-    track: ImportTrack,
+    track: ImportRepository.ImportTrack,
     selectedType: ActivityType?,
     localizationRepository: LocalizationRepository,
     onChangeType: (String, ActivityType) -> Unit,

@@ -17,6 +17,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -34,6 +35,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
 import com.inky.fitnesscalendar.R
@@ -42,11 +44,13 @@ import com.inky.fitnesscalendar.repository.BackupRepository
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.sharedBounds
+import com.inky.fitnesscalendar.view_model.SettingsViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsView(
+    viewModel: SettingsViewModel = hiltViewModel(),
     onOpenDrawer: () -> Unit,
     onNavigateDebug: () -> Unit,
     onNavigateTypes: () -> Unit,
@@ -69,6 +73,7 @@ fun SettingsView(
                 modifier = Modifier.sharedBounds(SharedContentKey.AppBar)
             )
         },
+        snackbarHost = { SnackbarHost(viewModel.snackbarHostState) },
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { paddingValues ->
         LazyColumn(
@@ -82,12 +87,12 @@ fun SettingsView(
                     onClick = onNavigateTypes
                 )
                 Setting(
-                    title = stringResource(R.string.places),
+                    title = stringResource(R.string.configure_places),
                     onClick = onNavigatePlaces,
                 )
                 if (BackupRepository.isBackupSupported()) {
                     Setting(
-                        title = stringResource(R.string.backup),
+                        title = stringResource(R.string.configure_backup),
                         onClick = onNavigateBackup
                     )
                 }
@@ -99,6 +104,17 @@ fun SettingsView(
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
                 CollectBssidPreference()
+
+                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+                Text(
+                    stringResource(R.string.advanced_settings),
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+
+                Setting(
+                    title = stringResource(R.string.recalculate_track_data),
+                    onClick = viewModel::recalculateTrackData
+                )
             }
         }
     }
