@@ -1,6 +1,7 @@
 package com.inky.fitnesscalendar.repository
 
 import android.os.ParcelFileDescriptor
+import android.util.Log
 import androidx.compose.runtime.Immutable
 import com.inky.fitnesscalendar.data.gpx.GpxTrack
 import com.inky.fitnesscalendar.data.gpx.TrackSvg
@@ -15,6 +16,8 @@ import java.io.FileInputStream
 import java.io.InputStream
 import javax.inject.Inject
 import javax.inject.Singleton
+
+private const val TAG = "ImportRepository"
 
 @Immutable
 @Singleton
@@ -43,11 +46,14 @@ class ImportRepository @Inject constructor(private val dbRepository: DatabaseRep
             val richActivity = dbRepository.loadActivity(track.activityId)
 
             val updatedActivity = track.addStatsToActivity(richActivity.activity) ?: continue
-            if (updatedActivity == richActivity.activity) {
+            val cleanedActivity = updatedActivity.clean(richActivity.type)
+            if (cleanedActivity == richActivity.activity) {
                 continue
             }
+            Log.d(TAG, "updateTrackActivities: From ${richActivity.activity}")
+            Log.d(TAG, "updateTrackActivities:   To $cleanedActivity")
             numChangedActivities += 1
-            dbRepository.saveActivity(richActivity.copy(activity = updatedActivity))
+            dbRepository.saveActivity(richActivity.copy(activity = cleanedActivity))
         }
 
         return numChangedActivities
