@@ -61,9 +61,8 @@ import com.inky.fitnesscalendar.view_model.statistics.Period
 import com.inky.fitnesscalendar.view_model.statistics.Projection
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberAxisGuidelineComponent
-import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottomAxis
-import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStartAxis
-import com.patrykandpatrick.vico.compose.cartesian.fullWidth
+import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottom
+import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStart
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
 import com.patrykandpatrick.vico.compose.cartesian.marker.rememberDefaultCartesianMarker
 import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
@@ -72,11 +71,10 @@ import com.patrykandpatrick.vico.compose.cartesian.rememberVicoZoomState
 import com.patrykandpatrick.vico.compose.common.component.rememberShapeComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
 import com.patrykandpatrick.vico.compose.common.data.rememberExtraLambda
-import com.patrykandpatrick.vico.compose.common.of
+import com.patrykandpatrick.vico.compose.common.dimensions
 import com.patrykandpatrick.vico.compose.common.rememberHorizontalLegend
 import com.patrykandpatrick.vico.core.cartesian.CartesianDrawingContext
 import com.patrykandpatrick.vico.core.cartesian.CartesianMeasuringContext
-import com.patrykandpatrick.vico.core.cartesian.HorizontalLayout
 import com.patrykandpatrick.vico.core.cartesian.Scroll
 import com.patrykandpatrick.vico.core.cartesian.Zoom
 import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
@@ -85,13 +83,12 @@ import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.layer.LineCartesianLayer
 import com.patrykandpatrick.vico.core.cartesian.marker.CartesianMarker
 import com.patrykandpatrick.vico.core.cartesian.marker.DefaultCartesianMarker
-import com.patrykandpatrick.vico.core.common.Dimensions
 import com.patrykandpatrick.vico.core.common.Fill
 import com.patrykandpatrick.vico.core.common.LegendItem
 import com.patrykandpatrick.vico.core.common.component.Shadow
 import com.patrykandpatrick.vico.core.common.component.ShapeComponent
 import com.patrykandpatrick.vico.core.common.component.TextComponent
-import com.patrykandpatrick.vico.core.common.shape.Shape
+import com.patrykandpatrick.vico.core.common.shape.CorneredShape
 import kotlinx.coroutines.launch
 
 @Composable
@@ -344,30 +341,29 @@ private fun Graph(
             rememberLineCartesianLayer(
                 LineCartesianLayer.LineProvider.series(lines),
             ),
-            startAxis = rememberStartAxis(
+            startAxis = VerticalAxis.rememberStart(
                 itemPlacer = VerticalAxis.ItemPlacer.step({ projection.verticalStepSize }),
                 horizontalLabelPosition = VerticalAxis.HorizontalLabelPosition.Inside,
             ),
-            bottomAxis = rememberBottomAxis(
+            bottomAxis = HorizontalAxis.rememberBottom(
                 guideline = null,
                 titleComponent = rememberTextComponent(
                     background = rememberShapeComponent(
                         color = MaterialTheme.colorScheme.secondaryContainer,
-                        shape = Shape.Pill,
+                        shape = CorneredShape.Pill,
                     ),
                     color = MaterialTheme.colorScheme.onSecondaryContainer,
-                    padding = Dimensions.of(horizontal = 8.dp, vertical = 2.dp),
-                    margins = Dimensions.of(top = 4.dp),
+                    padding = dimensions(horizontal = 8.dp, vertical = 2.dp),
+                    margins = dimensions(top = 4.dp),
                     typeface = Typeface.MONOSPACE
                 ),
                 title = stringResource(period.xLabelId),
-                valueFormatter = { x, chartValues, _ ->
-                    chartValues.model.extraStore[StatisticsViewModel.xToDateKey][x.toLong()] ?: ""
+                valueFormatter = { ctx, value, _ ->
+                    ctx.model.extraStore[StatisticsViewModel.xToDateKey][value.toLong()] ?: ""
                 },
-                itemPlacer = HorizontalAxis.ItemPlacer.default(addExtremeLabelPadding = true),
+                itemPlacer = HorizontalAxis.ItemPlacer.aligned(addExtremeLabelPadding = true),
             ),
             legend = rememberLegend(groupingOptions),
-            horizontalLayout = HorizontalLayout.fullWidth(),
             marker = rememberMarker(projection),
         ),
         modelProducer = modelProducer,
@@ -389,7 +385,7 @@ private fun rememberLegend(
                 add(
                     LegendItem(
                         icon = ShapeComponent(
-                            shape = Shape.Pill,
+                            shape = CorneredShape.Pill,
                             color = group.getColor(context)
                         ),
                         labelComponent = TextComponent(
@@ -420,7 +416,7 @@ private fun rememberMarker(projection: Projection): CartesianMarker =
         indicator = { color ->
             ShapeComponent(
                 color = color.toArgb(),
-                shape = Shape.Pill,
+                shape = CorneredShape.Pill,
                 shadow = Shadow(radiusDp = 12f, color = color.toArgb()),
             )
         }
