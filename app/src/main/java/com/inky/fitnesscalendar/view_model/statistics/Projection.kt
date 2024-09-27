@@ -58,18 +58,27 @@ enum class Projection(
         1.0
     );
 
-    fun apply(statistics: ActivityStatistics): Double = when (this) {
+    fun apply(statistics: ActivityStatistics): Double? = when (this) {
         ByTotalTime -> statistics.totalTime().elapsedHours
-        ByAverageTime -> statistics.averageTime().elapsedHours
+        ByAverageTime -> statistics.averageTime()?.elapsedHours
         ByTotalActivities -> statistics.size.toDouble()
         ByTotalDistance -> statistics.totalDistance().kilometers
-        ByAverageDistance -> statistics.averageDistance().kilometers
-        ByAverageSpeed -> statistics.averageSpeed().kmh
+        ByAverageDistance -> statistics.averageDistance()?.kilometers
+        ByAverageSpeed -> statistics.averageSpeed()?.kmh
         ByAverageIntensity -> statistics.averageIntensity()
     }
 
     fun markerFormatter() = when (this) {
         ByTotalTime, ByAverageTime -> TimeMarkerFormatter()
         ByTotalActivities, ByTotalDistance, ByAverageDistance, ByAverageSpeed, ByAverageIntensity -> DefaultCartesianMarkerValueFormatter()
+    }
+
+    /**
+     * For non-cumulative projections, it makes more sense to interpolate missing values (return null)
+     * This is not wanted for total projections though, since here it is important to know when it is zero (explicitly return 0).
+     */
+    fun getDefault(): Double? = when (this) {
+        ByTotalTime, ByTotalActivities, ByTotalDistance, ByAverageTime, ByAverageDistance -> 0.0
+        ByAverageSpeed, ByAverageIntensity -> null
     }
 }

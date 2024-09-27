@@ -57,14 +57,14 @@ import com.inky.fitnesscalendar.ui.util.localDatabaseValues
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.view_model.StatisticsViewModel
 import com.inky.fitnesscalendar.view_model.statistics.Grouping
-import com.inky.fitnesscalendar.view_model.statistics.IconMarker
 import com.inky.fitnesscalendar.view_model.statistics.Period
 import com.inky.fitnesscalendar.view_model.statistics.Projection
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
+import com.patrykandpatrick.vico.compose.cartesian.axis.rememberAxisGuidelineComponent
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottomAxis
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStartAxis
 import com.patrykandpatrick.vico.compose.cartesian.fullWidth
-import com.patrykandpatrick.vico.compose.cartesian.layer.rememberColumnCartesianLayer
+import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
 import com.patrykandpatrick.vico.compose.cartesian.marker.rememberDefaultCartesianMarker
 import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
@@ -74,7 +74,6 @@ import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
 import com.patrykandpatrick.vico.compose.common.data.rememberExtraLambda
 import com.patrykandpatrick.vico.compose.common.of
 import com.patrykandpatrick.vico.compose.common.rememberHorizontalLegend
-import com.patrykandpatrick.vico.compose.common.shape.rounded
 import com.patrykandpatrick.vico.core.cartesian.CartesianDrawingContext
 import com.patrykandpatrick.vico.core.cartesian.CartesianMeasuringContext
 import com.patrykandpatrick.vico.core.cartesian.HorizontalLayout
@@ -83,11 +82,13 @@ import com.patrykandpatrick.vico.core.cartesian.Zoom
 import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
 import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
-import com.patrykandpatrick.vico.core.cartesian.layer.ColumnCartesianLayer
+import com.patrykandpatrick.vico.core.cartesian.layer.LineCartesianLayer
+import com.patrykandpatrick.vico.core.cartesian.marker.CartesianMarker
 import com.patrykandpatrick.vico.core.cartesian.marker.DefaultCartesianMarker
 import com.patrykandpatrick.vico.core.common.Dimensions
+import com.patrykandpatrick.vico.core.common.Fill
 import com.patrykandpatrick.vico.core.common.LegendItem
-import com.patrykandpatrick.vico.core.common.component.LineComponent
+import com.patrykandpatrick.vico.core.common.component.Shadow
 import com.patrykandpatrick.vico.core.common.component.ShapeComponent
 import com.patrykandpatrick.vico.core.common.component.TextComponent
 import com.patrykandpatrick.vico.core.common.shape.Shape
@@ -118,7 +119,7 @@ fun StatisticsView(
     onOpenDrawer: () -> Unit,
     onViewActivity: (Activity) -> Unit,
 ) {
-    val selectedActivities by viewModel.activityStatistics.collectAsState(initial = emptyList())
+    val selectedActivities by viewModel.activityStatistics.collectAsState(initial = emptyMap())
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
@@ -176,7 +177,6 @@ fun StatisticsView(
                         viewModel.projection,
                         viewModel.period,
                         viewModel.groupingOptions.value,
-                        viewModel.numDataPoints,
                         modifier = Modifier
                             .fillParentMaxHeight(0.9f)
                             .fillMaxWidth()
@@ -184,7 +184,7 @@ fun StatisticsView(
                 }
             }
 
-            for ((activities, header) in selectedActivities.asReversed()) {
+            for ((activities, header) in selectedActivities.values.reversed()) {
                 stickyHeader(contentType = ContentType.Date) {
                     Text(
                         header,
@@ -321,16 +321,13 @@ private fun Graph(
     projection: Projection,
     period: Period,
     groupingOptions: List<Displayable>,
-    numDataPoints: Int,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    val columns = remember(groupingOptions) {
+    val lines = remember(groupingOptions) {
         groupingOptions.map { group ->
-            LineComponent(
-                color = group.getColor(context),
-                thicknessDp = 64f,
-                shape = Shape.rounded(all = 8.dp)
+            LineCartesianLayer.Line(
+                fill = LineCartesianLayer.LineFill.single(Fill(group.getColor(context)))
             )
         }
     }
@@ -341,15 +338,11 @@ private fun Graph(
         autoScrollCondition = StatisticsViewModel.autoScrollCondition
     )
 
-    val persistentMarker =
-        rememberPersistentCartesianMarker(groupingOptions.map { it.getShortText() })
-
     CartesianChartHost(
         modifier = modifier,
         chart = rememberCartesianChart(
-            rememberColumnCartesianLayer(
-                ColumnCartesianLayer.ColumnProvider.series(columns),
-                mergeMode = { ColumnCartesianLayer.MergeMode.Stacked }
+            rememberLineCartesianLayer(
+                LineCartesianLayer.LineProvider.series(lines),
             ),
             startAxis = rememberStartAxis(
                 itemPlacer = VerticalAxis.ItemPlacer.step({ projection.verticalStepSize }),
@@ -369,21 +362,18 @@ private fun Graph(
                 ),
                 title = stringResource(period.xLabelId),
                 valueFormatter = { x, chartValues, _ ->
-                    chartValues.model.extraStore[StatisticsViewModel.labelListKey][x.toInt()]
+                    chartValues.model.extraStore[StatisticsViewModel.xToDateKey][x.toLong()] ?: ""
                 },
                 itemPlacer = HorizontalAxis.ItemPlacer.default(addExtremeLabelPadding = true),
             ),
             legend = rememberLegend(groupingOptions),
-            persistentMarkers = rememberExtraLambda(numDataPoints, persistentMarker) {
-                (0..<numDataPoints).forEach { persistentMarker at it.toFloat() }
-            },
             horizontalLayout = HorizontalLayout.fullWidth(),
             marker = rememberMarker(projection),
         ),
         modelProducer = modelProducer,
         runInitialAnimation = true,
         scrollState = scrollState,
-        zoomState = rememberVicoZoomState(initialZoom = remember(period) { Zoom.x(period.numVisibleEntries) }),
+        zoomState = rememberVicoZoomState(initialZoom = remember(period) { Zoom.x(period.numVisibleDays) }),
     )
 }
 
@@ -419,30 +409,19 @@ private fun rememberLegend(
 
 
 @Composable
-private fun rememberMarker(projection: Projection) =
+private fun rememberMarker(projection: Projection): CartesianMarker =
     rememberDefaultCartesianMarker(
         label = rememberTextComponent(
             color = MaterialTheme.colorScheme.onPrimaryContainer
         ),
         labelPosition = DefaultCartesianMarker.LabelPosition.Top,
-        valueFormatter = remember(projection) { projection.markerFormatter() }
+        valueFormatter = remember(projection) { projection.markerFormatter() },
+        guideline = rememberAxisGuidelineComponent(),
+        indicator = { color ->
+            ShapeComponent(
+                color = color.toArgb(),
+                shape = Shape.Pill,
+                shadow = Shadow(radiusDp = 12f, color = color.toArgb()),
+            )
+        }
     )
-
-
-@Composable
-private fun rememberPersistentCartesianMarker(emojis: List<String>) =
-    rememberIconMarker(
-        indicator = rememberTextComponent(
-            textSize = MaterialTheme.typography.titleLarge.fontSize
-        ),
-        emojis
-    )
-
-@Composable
-private fun rememberIconMarker(indicator: TextComponent, emojis: List<String>) = remember(
-    indicator,
-    emojis
-) {
-    IconMarker(indicator, emojis)
-}
-

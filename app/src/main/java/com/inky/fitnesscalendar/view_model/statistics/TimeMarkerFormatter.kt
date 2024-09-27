@@ -7,7 +7,7 @@ import com.inky.fitnesscalendar.data.measure.format
 import com.patrykandpatrick.vico.core.cartesian.CartesianDrawingContext
 import com.patrykandpatrick.vico.core.cartesian.marker.CartesianMarker
 import com.patrykandpatrick.vico.core.cartesian.marker.CartesianMarkerValueFormatter
-import com.patrykandpatrick.vico.core.cartesian.marker.ColumnCartesianLayerMarkerTarget
+import com.patrykandpatrick.vico.core.cartesian.marker.LineCartesianLayerMarkerTarget
 import kotlin.time.Duration.Companion.hours
 
 class TimeMarkerFormatter : CartesianMarkerValueFormatter {
@@ -19,8 +19,8 @@ class TimeMarkerFormatter : CartesianMarkerValueFormatter {
 
         for (target in targets) {
             when (target) {
-                is ColumnCartesianLayerMarkerTarget -> {
-                    val columns = target.columns.filter { it.entry.y > 0 }
+                is LineCartesianLayerMarkerTarget -> {
+                    val columns = target.points.filter { it.entry.y > 0 }
                     if (columns.isEmpty()) {
                         continue
                     }
@@ -41,7 +41,7 @@ class TimeMarkerFormatter : CartesianMarkerValueFormatter {
                     builder.append(")")
                 }
 
-                else -> throw NotImplementedError("TimeMarkerFormatter only supports columns")
+                else -> throw NotImplementedError("TimeMarkerFormatter only supports lines")
             }
         }
 

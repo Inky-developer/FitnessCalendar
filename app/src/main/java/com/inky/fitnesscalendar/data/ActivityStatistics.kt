@@ -24,30 +24,34 @@ data class ActivityStatistics(
     fun totalTime() =
         Duration(activities.sumOf { it.activity.startTime.until(it.activity.endTime).elapsedMs })
 
-    fun averageTime() = Duration(totalTime().elapsedMs / size)
+    fun averageTime(): Duration? {
+        val totalMs = totalTime().elapsedMs
+        if (totalMs == 0L) return null
+        return Duration(totalTime().elapsedMs / size)
+    }
 
     fun totalDistance() = Distance(meters = activities.sumOf { it.activity.distance?.meters ?: 0 })
 
-    fun averageDistance(): Distance {
+    fun averageDistance(): Distance? {
         val distances = activities.mapNotNull { it.activity.distance?.meters }
         if (distances.isEmpty()) {
-            return Distance(meters = 0)
+            return null
         }
         return Distance(meters = (distances.sum().toDouble() / distances.size).roundToLong())
     }
 
-    fun averageSpeed(): Speed {
+    fun averageSpeed(): Speed? {
         val speeds = activities.mapNotNull { it.activity.averageSpeed?.metersPerSecond }
         if (speeds.isEmpty()) {
-            return Speed(metersPerSecond = 0.0)
+            return null
         }
         return Speed(metersPerSecond = speeds.sum() / speeds.size)
     }
 
-    fun averageIntensity(): Double {
+    fun averageIntensity(): Double? {
         val intensities = activities.mapNotNull { it.activity.intensity?.value }
         if (intensities.isEmpty()) {
-            return 0.0
+            return null
         }
         return intensities.sumOf { it.toDouble() } / intensities.size
     }

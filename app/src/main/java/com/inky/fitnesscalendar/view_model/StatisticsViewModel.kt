@@ -3,22 +3,21 @@ package com.inky.fitnesscalendar.view_model
 import android.content.Context
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.inky.fitnesscalendar.repository.DatabaseRepository
 import com.inky.fitnesscalendar.data.ActivityStatistics
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.preferences.Preference
+import com.inky.fitnesscalendar.repository.DatabaseRepository
 import com.inky.fitnesscalendar.view_model.statistics.Grouping
 import com.inky.fitnesscalendar.view_model.statistics.Period
 import com.inky.fitnesscalendar.view_model.statistics.Projection
 import com.patrykandpatrick.vico.core.cartesian.AutoScrollCondition
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
-import com.patrykandpatrick.vico.core.cartesian.data.columnSeries
+import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
 import com.patrykandpatrick.vico.core.common.data.ExtraStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -44,13 +43,10 @@ class StatisticsViewModel @Inject constructor(
     var period by mutableStateOf(Period.Week)
     var projection by mutableStateOf(Projection.ByTotalActivities)
 
-    private var _activityStatistics =
-        MutableStateFlow<List<Pair<ActivityStatistics, String>>?>(null)
+    private var _activityStatistics = MutableStateFlow<Map<Long, Period.StatisticsEntry>?>(null)
     val activityStatistics get() = _activityStatistics.filterNotNull()
 
     private var activityTypes = mutableStateOf<List<ActivityType>?>(null)
-
-    var numDataPoints by mutableIntStateOf(0)
 
     val modelProducer = CartesianChartModelProducer()
 
@@ -85,35 +81,45 @@ class StatisticsViewModel @Inject constructor(
                 .getActivities(filter)
                 .shareIn(viewModelScope, SharingStarted.Eagerly)
                 .first()
-                .let { ActivityStatistics(it) }
-                .let { period.filter(it) }
+                .let { period.filter(ActivityStatistics(it)) }
     }
 
     private suspend fun refreshModel() {
         val types = activityTypes.value ?: return
 
-        val dataPoints =
-            _activityStatistics.value?.map { grouping.apply(it.first) to it.second } ?: return
-        numDataPoints = dataPoints.size
+        val dataPoints = _activityStatistics.value?.mapValues { entry ->
+            ModelData(
+                entryName = entry.value.entryName,
+                groups = grouping.apply(entry.value.statistics)
+            )
+        } ?: return
         if (dataPoints.isEmpty()) return
 
         modelProducer.runTransaction {
-            columnSeries {
+            lineSeries {
                 for (group in grouping.options(types)) {
-                    series(dataPoints.map { (stats, _) ->
-                        stats[group]?.let { projection.apply(it) } ?: 0
-                    })
+                    val groupData = dataPoints.mapNotNull { (key, modelData) ->
+                        val value = modelData.groups[group]?.let { projection.apply(it) }
+                            ?: projection.getDefault()
+                        value?.let { key to it }
+                    }.toMap()
+
+                    if (groupData.isNotEmpty()) {
+                        series(x = groupData.keys, y = groupData.values)
+                    }
                 }
             }
             extras {
-                it[labelListKey] = dataPoints.map { (_, label) -> label }
+                it[xToDateKey] = dataPoints.mapValues { entry -> entry.value.entryName }
                 it[periodKey] = period.ordinal
             }
         }
     }
 
+    data class ModelData(val entryName: String, val groups: Map<out Any, ActivityStatistics>)
+
     companion object {
-        val labelListKey = ExtraStore.Key<List<String>>()
+        val xToDateKey = ExtraStore.Key<Map<Long, String>>()
         val periodKey = ExtraStore.Key<Int>()
 
         val autoScrollCondition = AutoScrollCondition { newModel, oldModel ->

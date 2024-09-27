@@ -18,7 +18,7 @@ import java.util.Locale
 enum class Period(
     val nameId: Int,
     val xLabelId: Int,
-    val numVisibleEntries: Double,
+    val numVisibleDays: Double,
     private val temporalUnit: TemporalUnit
 ) {
     Day(R.string.days, R.string.day, 7.0, ChronoUnit.DAYS),
@@ -29,18 +29,23 @@ enum class Period(
     /**
      * Groups the given statistics to a list of value and x-axis label for that group
      */
-    fun filter(statistics: ActivityStatistics): List<Pair<ActivityStatistics, String>> {
+    fun filter(statistics: ActivityStatistics): Map<Long, StatisticsEntry> {
         // TODO: Filter out older statistics already in the db query
         val today = LocalDate.now()
 
-        val result: MutableList<Pair<ActivityStatistics, String>> = mutableListOf()
+        val result = mutableMapOf<Long, StatisticsEntry>()
         val activityMap = groupStats(statistics)
-        var day = activityMap.keys.minOrNull() ?: today
+        // Subtract 1 unit to make sure there are at least two data points
+        // Otherwise, the graph might not render correctly
+        var day = (activityMap.keys.minOrNull() ?: today).minus(1, temporalUnit)
+        var index = 0L
         while (!day.isAfter(today)) {
-            result.add(
-                (activityMap[day] ?: ActivityStatistics(emptyList())) to format(day, today)
+            result[index] = StatisticsEntry(
+                statistics = activityMap[day] ?: ActivityStatistics(emptyList()),
+                entryName = format(day, today)
             )
             day = day.plus(1, temporalUnit)
+            index += 1
         }
 
         return result
@@ -69,6 +74,8 @@ enum class Period(
             day.format(dateFormatter)
         }
     }
+
+    data class StatisticsEntry(val statistics: ActivityStatistics, val entryName: String)
 
     companion object {
         private val dateFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)
