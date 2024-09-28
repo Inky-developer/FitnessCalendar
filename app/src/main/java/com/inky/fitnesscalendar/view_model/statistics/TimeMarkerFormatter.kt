@@ -25,9 +25,7 @@ class TimeMarkerFormatter : CartesianMarkerValueFormatter {
                         continue
                     }
                     val lastIndex = columns.lastIndex
-                    val total = columns.sumOf { it.entry.y }
-                    val totalTime = total.hours.format()
-                    builder.append("$totalTime (")
+                    builder.append("(")
                     columns.forEachIndexed { index, column ->
                         builder.append(
                             column.entry.y.hours.format(),
