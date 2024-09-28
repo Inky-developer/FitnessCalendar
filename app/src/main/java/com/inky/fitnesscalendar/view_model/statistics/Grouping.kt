@@ -19,7 +19,7 @@ import com.inky.fitnesscalendar.db.entities.ActivityType
 sealed interface Grouping {
     fun filter(): ActivityFilter
 
-    fun apply(statistics: ActivityStatistics): Map<out Any, ActivityStatistics>
+    fun apply(statistics: ActivityStatistics): Map<out Displayable, ActivityStatistics>
 
     fun options(activityTypes: List<ActivityType>): List<Displayable>
 
@@ -34,10 +34,11 @@ sealed interface Grouping {
     data class Category(val category: ActivityCategory) : Grouping {
         override fun filter() = ActivityFilter(categories = listOf(category))
 
-        override fun apply(statistics: ActivityStatistics) = statistics.activitiesByType
+        override fun apply(statistics: ActivityStatistics) =
+            statistics.activitiesByCategory.filter { it.key == category } + statistics.activitiesByType
 
         override fun options(activityTypes: List<ActivityType>) =
-            activityTypes.filter { it.activityCategory == category }
+            listOf(category) + activityTypes.filter { it.activityCategory == category }
     }
 
     data class Type(val type: ActivityType) : Grouping {

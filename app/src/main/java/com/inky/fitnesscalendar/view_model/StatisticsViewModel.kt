@@ -9,6 +9,7 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.inky.fitnesscalendar.data.ActivityStatistics
+import com.inky.fitnesscalendar.data.Displayable
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.preferences.Preference
 import com.inky.fitnesscalendar.repository.DatabaseRepository
@@ -95,19 +96,26 @@ class StatisticsViewModel @Inject constructor(
         } ?: return
         if (dataPoints.isEmpty()) return
 
+        val groups = grouping.options(types)
+        val groupedDataPoints = groups.map { group ->
+            dataPoints.mapNotNull { (key, modelData) ->
+                val value = modelData.groups[group]?.let { projection.apply(it) }
+                    ?: projection.getDefault()
+                value?.let { key to it }
+            }.toMap()
+        }
         modelProducer.runTransaction {
-            lineSeries {
-                for (group in grouping.options(types)) {
-                    val groupData = dataPoints.mapNotNull { (key, modelData) ->
-                        val value = modelData.groups[group]?.let { projection.apply(it) }
-                            ?: projection.getDefault()
-                        value?.let { key to it }
-                    }.toMap()
-
-                    if (groupData.isNotEmpty()) {
-                        series(x = groupData.keys, y = groupData.values)
-                    } else {
-                        series(0)
+            // If no data are available, use this hack to clear the graph
+            if (groupedDataPoints.all { it.isEmpty() }) {
+                lineSeries { series(0) }
+            } else {
+                lineSeries {
+                    for (line in groupedDataPoints) {
+                        if (line.isNotEmpty()) {
+                            series(x = line.keys, y = line.values)
+                        } else {
+                            series(0)
+                        }
                     }
                 }
             }
@@ -119,7 +127,10 @@ class StatisticsViewModel @Inject constructor(
         }
     }
 
-    data class ModelData(val entryName: String, val groups: Map<out Any, ActivityStatistics>)
+    data class ModelData(
+        val entryName: String,
+        val groups: Map<out Displayable, ActivityStatistics>
+    )
 
     companion object {
         val xToDateKey = ExtraStore.Key<Map<Long, String>>()
