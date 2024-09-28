@@ -1,42 +1,42 @@
-name: Android CI
+name: Create a new release
 
 on:
   push:
-    branches:
-      - master
+    tags:
+      - "v*"
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Retrieve the keystore secret and decode it to a file
-      env:
-        KEYSTORE_B64: ${{ secrets.KEYSTOREB64 }}
-      run: |
-        echo $KEYSTORE_B64 | base64 --decode > app/keystore.jks
-    - name: set up java
-      uses: actions/setup-java@v4
-      with:
-        java-version: '21'
-        distribution: 'temurin'
-        cache: gradle
+      - uses: actions/checkout@v4
+      - name: Retrieve the keystore secret and decode it to a file
+        env:
+          KEYSTORE_B64: ${{ secrets.KEYSTOREB64 }}
+        run: |
+          echo $KEYSTORE_B64 | base64 --decode > app/keystore.jks
+      - name: set up java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: gradle
 
-    - name: Setup gradle
-      uses: gradle/actions/setup-gradle@v3
-    - name: Create release app with gradle
-      env:
-        STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-        KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
-      run: ./gradlew assembleRelease
-    - name: Rename release apk
-      run: mv app/build/outputs/apk/release/app-release.apk FitnessCalendar-Nightly.apk
-    - name: Upload release apk
-      uses: actions/upload-artifact@v4
-      with:
-        name: FitnessCalendar-Nightly
-        path: FitnessCalendar-Nightly.apk
+      - name: Setup gradle
+        uses: gradle/actions/setup-gradle@v3
+      - name: Create release app with gradle
+        env:
+          STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
+        run: ./gradlew assembleRelease
+      - name: Rename release apk
+        run: mv app/build/outputs/apk/release/app-release.apk FitnessCalendar-${{ github.ref_name }}.apk
+      - name: Upload release apk
+        uses: actions/upload-artifact@v4
+        with:
+          name: FitnessCalendar-${{ github.ref_name }}
+          path: FitnessCalendar-${{ github.ref_name }}.apk
 
   create_release:
     runs-on: ubuntu-latest
@@ -50,19 +50,10 @@ jobs:
       - name: Download release binaries
         uses: actions/download-artifact@master
         with:
-          name: FitnessCalendar-Nightly
+          name: FitnessCalendar-${{ github.ref_name }}
           path: release_binaries
-      - name: Delete previous release
-        env: 
-          GH_TOKEN: ${{ github.token }}
-        run: gh release delete "Nightly" --cleanup-tag --yes
       - name: Create release
         uses: ncipollo/release-action@v1
         with:
-          commit: "master"
-          tag: "Nightly"
           artifacts: "release_binaries/*"
-          allowUpdates: true
-          makeLatest: true
           omitBody: true
-          prerelease: true
