@@ -112,6 +112,7 @@ class StatisticsViewModel @Inject constructor(
             extras {
                 it[xToDateKey] = dataPoints.mapValues { entry -> entry.value.entryName }
                 it[periodKey] = period.ordinal
+                it[groupingKey] = grouping
             }
         }
     }
@@ -121,6 +122,7 @@ class StatisticsViewModel @Inject constructor(
     companion object {
         val xToDateKey = ExtraStore.Key<Map<Long, String>>()
         val periodKey = ExtraStore.Key<Int>()
+        val groupingKey = ExtraStore.Key<Grouping>()
 
         val autoScrollCondition = AutoScrollCondition { newModel, oldModel ->
             if (oldModel == null) {
@@ -132,6 +134,13 @@ class StatisticsViewModel @Inject constructor(
             }
 
             if (newModel.extraStore.getOrNull(periodKey) != oldModel.extraStore.getOrNull(periodKey)) {
+                return@AutoScrollCondition true
+            }
+
+            if (
+                newModel.extraStore.getOrNull(groupingKey)
+                != oldModel.extraStore.getOrNull(groupingKey)
+            ) {
                 return@AutoScrollCondition true
             }
 
