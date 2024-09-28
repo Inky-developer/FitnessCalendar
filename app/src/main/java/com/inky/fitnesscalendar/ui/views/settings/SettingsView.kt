@@ -52,6 +52,7 @@ import kotlinx.coroutines.launch
 fun SettingsView(
     viewModel: SettingsViewModel = hiltViewModel(),
     onOpenDrawer: () -> Unit,
+    onNavigateAbout: () -> Unit,
     onNavigateDebug: () -> Unit,
     onNavigateTypes: () -> Unit,
     onNavigatePlaces: () -> Unit,
@@ -96,6 +97,8 @@ fun SettingsView(
                         onClick = onNavigateBackup
                     )
                 }
+
+                Setting("About…", onClick = onNavigateAbout)
 
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 

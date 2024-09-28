@@ -12,9 +12,11 @@ import androidx.navigation.compose.dialog
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
 import com.inky.fitnesscalendar.ui.ProvideSharedContent
+import com.inky.fitnesscalendar.ui.views.settings.AboutView
 import com.inky.fitnesscalendar.ui.views.settings.ActivityTypeView
 import com.inky.fitnesscalendar.ui.views.settings.BackupView
 import com.inky.fitnesscalendar.ui.views.settings.EditPlaceDialog
+import com.inky.fitnesscalendar.ui.views.settings.OpenSourceLicensesView
 import com.inky.fitnesscalendar.ui.views.settings.PlaceListView
 import com.inky.fitnesscalendar.ui.views.settings.SettingsDebug
 import com.inky.fitnesscalendar.ui.views.settings.SettingsView
@@ -35,6 +37,7 @@ fun NavGraphBuilder.settingsDestination(
             ProvideSharedContent(sharedContentScope = sharedContentScope) {
                 SettingsView(
                     onOpenDrawer = onOpenDrawer,
+                    onNavigateAbout = { onNavigate(SettingsViews.About) },
                     onNavigateTypes = { onNavigate(SettingsViews.ActivityType) },
                     onNavigateDebug = { onNavigate(SettingsViews.Debug) },
                     onNavigatePlaces = { onNavigate(SettingsViews.PlaceList) },
@@ -45,6 +48,17 @@ fun NavGraphBuilder.settingsDestination(
 
         settingsComposable<SettingsViews.Debug> {
             SettingsDebug()
+        }
+
+        settingsComposable<SettingsViews.About> {
+            AboutView(
+                onBack = onBack,
+                onNavigateOpenSourceLicenses = { onNavigate(SettingsViews.OpenSourceLicences) }
+            )
+        }
+
+        settingsComposable<SettingsViews.OpenSourceLicences> {
+            OpenSourceLicensesView(onBack = onBack)
         }
 
         settingsComposable<SettingsViews.ActivityType> {

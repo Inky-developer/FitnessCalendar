@@ -1,5 +1,7 @@
 <resources>
     <string name="app_name">Fitness Calendar</string>
+    <string name="github_url" translatable="false">https://github.com/Inky-developer/FitnessCalendar</string>
+
     <string name="Menu">Menu</string>
     <string name="settings">Settings</string>
     <string name="today">Today</string>
@@ -227,4 +229,8 @@
     <string name="places">Places</string>
     <string name="advanced_settings">Advanced</string>
     <string name="recalculate_track_data">Recalculate track data</string>
+    <string name="about">About</string>
+    <string name="open_source_licenses">Open source licenses</string>
+    <string name="star_on_github">Star on Github</string>
+    <string name="show_open_source_licenses">Show open source licenses</string>
 </resources>

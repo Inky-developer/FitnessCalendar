@@ -48,49 +48,55 @@ fun NavigationDrawer(
     content: @Composable () -> Unit
 ) {
 
-    ModalNavigationDrawer(drawerState = drawerState, drawerContent = {
-        ModalDrawerSheet(drawerContainerColor = MaterialTheme.colorScheme.primaryContainer) {
-            val scrollState = rememberScrollState()
+    ModalNavigationDrawer(
+        drawerState = drawerState,
+        drawerContent = {
+            ModalDrawerSheet(drawerContainerColor = MaterialTheme.colorScheme.primaryContainer) {
+                val scrollState = rememberScrollState()
 
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Icon(
-                    painterResource(R.drawable.ic_launcher_foreground),
-                    stringResource(R.string.app_icon)
-                )
-                Text(
-                    stringResource(id = R.string.app_name),
-                    modifier = Modifier.padding(all = 16.dp),
-                    color = MaterialTheme.colorScheme.onPrimaryContainer,
-                    style = TextStyle(
-                        fontSize = 26.sp,
-                        shadow = Shadow(color = MaterialTheme.colorScheme.primary, blurRadius = 4f),
-                        fontFamily = FontFamily.Serif,
-                        fontWeight = FontWeight.Bold,
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Icon(
+                        painterResource(R.drawable.ic_launcher_foreground),
+                        stringResource(R.string.app_icon)
                     )
-                )
-            }
-            HorizontalDivider()
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(MaterialTheme.colorScheme.surface)
-                    .verticalScroll(scrollState)
-            ) {
-                Spacer(modifier = Modifier.height(8.dp))
-
-                for (view in selectableViews) {
-                    NavigationDrawerItem(
-                        label = { Text(stringResource(view.nameId)) },
-                        selected = currentView != null && currentView::class == view::class,
-                        onClick = { if (currentView != view) onNavigate(view) },
-                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                    Text(
+                        stringResource(id = R.string.app_name),
+                        modifier = Modifier.padding(all = 16.dp),
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        style = TextStyle(
+                            fontSize = 26.sp,
+                            shadow = Shadow(
+                                color = MaterialTheme.colorScheme.primary,
+                                blurRadius = 4f
+                            ),
+                            fontFamily = FontFamily.Serif,
+                            fontWeight = FontWeight.Bold,
+                        )
                     )
                 }
+                HorizontalDivider()
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.surface)
+                        .verticalScroll(scrollState)
+                ) {
+                    Spacer(modifier = Modifier.height(8.dp))
 
-                Spacer(modifier = Modifier.height(8.dp))
+                    for (view in selectableViews) {
+                        NavigationDrawerItem(
+                            label = { Text(stringResource(view.nameId)) },
+                            selected = currentView != null && currentView::class == view::class,
+                            onClick = { if (currentView != view) onNavigate(view) },
+                            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
             }
         }
-    }) {
+    ) {
         content()
     }
 }
