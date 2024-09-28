@@ -5,18 +5,21 @@ coilCompose = "2.7.0"
 datastorePreferences = "1.1.1"
 hiltAndroid = "2.52"
 hiltNavigationCompose = "1.2.0"
-kotlin = "2.0.0"
+kotlin = "2.0.20"
 coreKtx = "1.13.1"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 espressoCore = "3.6.1"
-kotlinxSerializationJsonVersion = "1.7.1"
+kotlinxSerializationJsonVersion = "1.7.3"
 lifecycleRuntimeKtx = "2.8.6"
 activityCompose = "1.9.2"
 composeBom = "2024.09.02"
 navigationCompose = "2.8.1"
-room = "2.7.0-alpha08"
-ksp = "2.0.0-1.0.22"
+# Room 2.7.8-alpha08 is buggy, the command `./gradlew assembleAndroidTest` fails with it
+# According to git bisect, the first bad commit is 95dda8daee20d0807647ab5b8475cac9111f5f74
+room = "2.7.0-alpha07"
+ksp = "2.0.20-1.0.25"
+screengrabVersion = "2.1.1"
 vico = "2.0.0-beta.1"
 emoji2EmojipickerVersion = "1.5.0"
 documentfileVersion = "1.0.1"
@@ -46,6 +49,7 @@ androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit
 androidx-navigation-compose = { module = "androidx.navigation:navigation-compose", version.ref = "navigationCompose" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJsonVersion" }
+screengrab = { module = "tools.fastlane:screengrab", version.ref = "screengrabVersion" }
 vico-compose = { group = "com.patrykandpatrick.vico", name = "compose", version.ref = "vico" }
 vico-compose-m3 = { group = "com.patrykandpatrick.vico", name = "compose-m3", version.ref = "vico" }
 vico-core = { group = "com.patrykandpatrick.vico", name = "core", version.ref = "vico" }
