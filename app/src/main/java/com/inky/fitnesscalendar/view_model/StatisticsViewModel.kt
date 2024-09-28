@@ -106,6 +106,8 @@ class StatisticsViewModel @Inject constructor(
 
                     if (groupData.isNotEmpty()) {
                         series(x = groupData.keys, y = groupData.values)
+                    } else {
+                        series(0)
                     }
                 }
             }
