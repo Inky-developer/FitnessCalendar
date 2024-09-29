@@ -41,6 +41,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -308,7 +309,9 @@ private fun DateFilterChip(selected: Boolean, onSelect: () -> Unit, label: @Comp
                 Icon(Icons.Outlined.Check, stringResource(R.string.time_period))
             }
         },
-        modifier = Modifier.padding(horizontal = 4.dp)
+        modifier = Modifier
+            .padding(horizontal = 4.dp)
+            .testTag("DateFilterChip")
     )
 }
 

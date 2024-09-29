@@ -44,6 +44,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -103,7 +104,8 @@ fun ActivityCard(
                     showContextMenu = true
                 },
             )
-            .skipToLookaheadSize(),
+            .skipToLookaheadSize()
+            .testTag("ActivityCard"),
     ) {
         Box {
             if (trackPreview != null) {
