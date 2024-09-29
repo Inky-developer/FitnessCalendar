@@ -1,0 +1,1 @@
+A private and fully offline activity tracker.
