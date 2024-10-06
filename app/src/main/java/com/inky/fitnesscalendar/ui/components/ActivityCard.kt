@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -63,6 +65,7 @@ import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.util.skipToLookaheadSize
 import com.inky.fitnesscalendar.util.gpx.simplify
+import kotlin.math.roundToInt
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -242,6 +245,7 @@ fun CompactActivityCard(
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun ActivityCardContent(activity: Activity, place: Place?) {
     val timeElapsed = remember(activity) { activity.startTime until activity.endTime }
@@ -250,18 +254,28 @@ private fun ActivityCardContent(activity: Activity, place: Place?) {
         HorizontalDivider()
     }
 
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
+    FlowRow(
+        maxItemsInEachRow = 3,
+        verticalArrangement = Arrangement.Center,
+        horizontalArrangement = Arrangement.SpaceAround,
         modifier = Modifier
             .fillMaxWidth()
-            .padding(all = 8.dp), horizontalArrangement = Arrangement.SpaceAround
+            .padding(all = 8.dp)
     ) {
         if (activity.favorite) {
-            FavoriteIcon(true)
+            FavoriteIcon(
+                true,
+                modifier = Modifier
+                    .align(Alignment.CenterVertically)
+                    .padding(horizontal = 4.dp)
+            )
         }
 
         if (activity.vehicle != null) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(horizontal = 4.dp)
+            ) {
                 Text(activity.vehicle.emoji, style = MaterialTheme.typography.bodyLarge)
                 Text(
                     stringResource(activity.vehicle.nameId),
@@ -271,11 +285,20 @@ private fun ActivityCardContent(activity: Activity, place: Place?) {
         }
 
         if (activity.feel != Feel.Ok) {
-            Text(activity.feel.emoji, style = MaterialTheme.typography.bodyLarge)
+            Text(
+                activity.feel.emoji,
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier
+                    .align(Alignment.CenterVertically)
+                    .padding(horizontal = 4.dp)
+            )
         }
 
         if (timeElapsed.elapsedMs > 0) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(horizontal = 4.dp)
+            ) {
                 Icon(
                     painterResource(R.drawable.outline_timer_24),
                     stringResource(R.string.time)
@@ -285,7 +308,10 @@ private fun ActivityCardContent(activity: Activity, place: Place?) {
         }
 
         if (activity.distance != null) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(horizontal = 4.dp)
+            ) {
                 Icon(
                     Icons.AutoMirrored.Outlined.ArrowForward,
                     stringResource(R.string.distance)
@@ -300,7 +326,10 @@ private fun ActivityCardContent(activity: Activity, place: Place?) {
         }
 
         if (activity.averageSpeed != null) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(horizontal = 4.dp)
+            ) {
                 Icon(
                     painterResource(R.drawable.outline_speed_24),
                     stringResource(R.string.speed)
@@ -312,7 +341,10 @@ private fun ActivityCardContent(activity: Activity, place: Place?) {
         }
 
         if (activity.intensity != null) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(horizontal = 4.dp)
+            ) {
                 Icon(
                     painterResource(R.drawable.twotone_lightbulb_24),
                     stringResource(R.string.intensity),
