@@ -172,6 +172,7 @@
     <string name="projection">Projektion</string>
     <string name="speed">Geschwindigkeit</string>
     <string name="x_kmh">%1$s km/h</string>
+    <string name="x_degrees_celsius">%1$s°C</string>
     <string name="average_kmh">Durchschnittliche km/h</string>
     <string name="average_speed">Durchschnittsgeschwindigkeit</string>
     <string name="has_intensity">Hat Intensität?</string>
@@ -234,4 +235,7 @@
     <string name="open_source_licenses">Open-source Lizenzen</string>
     <string name="star_on_github">Auf Github einen Stern geben</string>
     <string name="show_open_source_licenses">Open-source Lizenzen anzeigen</string>
+    <string name="x_bpm">%1$s bpm</string>
+    <string name="heart_rate">Herzfrequenz</string>
+    <string name="temperature">Temperatur</string>
 </resources>

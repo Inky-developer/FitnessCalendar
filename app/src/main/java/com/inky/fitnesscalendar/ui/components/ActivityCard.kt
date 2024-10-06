@@ -340,6 +340,37 @@ private fun ActivityCardContent(activity: Activity, place: Place?) {
             }
         }
 
+        if (activity.averageHeartRate != null) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(horizontal = 4.dp)
+            ) {
+                Icon(
+                    painterResource(R.drawable.outline_heart_rate_24),
+                    stringResource(R.string.heart_rate)
+                )
+                Text(stringResource(R.string.x_bpm, activity.averageHeartRate.bpm.roundToInt()))
+            }
+        }
+
+        if (activity.temperature != null) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(horizontal = 4.dp)
+            ) {
+                Icon(
+                    painterResource(R.drawable.outline_temperature_24),
+                    stringResource(R.string.temperature)
+                )
+                Text(
+                    stringResource(
+                        R.string.x_degrees_celsius,
+                        activity.temperature.celsius.roundToInt()
+                    )
+                )
+            }
+        }
+
         if (activity.intensity != null) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
