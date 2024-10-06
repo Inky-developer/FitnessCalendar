@@ -53,6 +53,8 @@ class Converters {
         return Intensity(value)
     }
 
+    // TODO: This is very wasteful and should use a more efficient format
+    // (Or ideally sqlite's inbuilt json feature)
     @TypeConverter
     fun trackPointsToByteArray(points: List<GpxTrackPoint>): ByteArray {
         return Json.encodeToString(points).toByteArray()

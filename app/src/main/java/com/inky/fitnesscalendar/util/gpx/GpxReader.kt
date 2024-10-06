@@ -5,6 +5,9 @@ import android.util.Xml
 import com.inky.fitnesscalendar.data.gpx.Coordinate
 import com.inky.fitnesscalendar.data.gpx.GpxTrack
 import com.inky.fitnesscalendar.data.gpx.GpxTrackPoint
+import com.inky.fitnesscalendar.data.measure.Elevation
+import com.inky.fitnesscalendar.data.measure.HeartFrequency
+import com.inky.fitnesscalendar.data.measure.Temperature
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
 import java.io.InputStream
@@ -14,6 +17,10 @@ import java.util.Date
 
 
 private const val TAG = "GpxReader"
+
+private const val TRACK_POINT_EXTENSIONS_GARMIN = "ns3:TrackPointExtension"
+private const val EXTENSION_GARMIN_TEMPERATURE = "ns3:atemp"
+private const val EXTENSION_GARMIN_HEART_RATE = "ns3:hr"
 
 class GpxReader(val tracks: List<GpxTrack>) {
     companion object {
@@ -92,27 +99,86 @@ class GpxReader(val tracks: List<GpxTrack>) {
                             throw XmlPullParserException("Cannot parse coordinate (lat=$lat, lon=$long)")
                         }
 
-                        val times = readTag(it, "trkpt") { inner ->
+                        val attributes = TrackPointAttributes()
+                        readTag(it, "trkpt") { inner ->
                             when (inner.name) {
-                                "time" -> readTime(inner)
-
-                                else -> {
-                                    skipTag(inner)
-                                    null
+                                "time" -> {
+                                    if (attributes.time != null) {
+                                        throw XmlPullParserException("Track point contains multiple times")
+                                    }
+                                    attributes.time = readTime(inner)
                                 }
+
+                                "ele" -> {
+                                    if (attributes.elevation != null) {
+                                        throw XmlPullParserException("Track point contains multiple elevations")
+                                    }
+                                    attributes.elevation = readElevation(inner)
+                                }
+
+                                "extensions" -> {
+                                    readTrackPointExtensions(parser, attributes)
+                                }
+
+                                else -> skipTag(inner)
                             }
                         }
 
-                        if (times.isEmpty()) {
-                            throw XmlPullParserException("Trackpoint without required tag time")
-                        }
-
-                        GpxTrackPoint(coordinate, times[0])
+                        GpxTrackPoint(
+                            coordinate = coordinate,
+                            time = attributes.time
+                                ?: throw XmlPullParserException("Track point without required tag time"),
+                            elevation = attributes.elevation,
+                            heartFrequency = attributes.heartRate,
+                            temperature = attributes.temperature
+                        )
                     }
 
                     else -> {
                         skipTag(it)
                         null
+                    }
+                }
+            }
+        }
+
+        @Throws(XmlPullParserException::class)
+        private fun readTrackPointExtensions(
+            parser: XmlPullParser,
+            attributes: TrackPointAttributes
+        ) {
+            readTag(parser, "extensions") {
+                when (it.name) {
+                    TRACK_POINT_EXTENSIONS_GARMIN ->
+                        readTrackPointExtensionsGarmin(parser, attributes)
+
+                    else -> skipTag(parser)
+                }
+            }
+
+        }
+
+        @Throws(XmlPullParserException::class)
+        private fun readTrackPointExtensionsGarmin(
+            parser: XmlPullParser,
+            attributes: TrackPointAttributes
+        ) {
+            readTag(parser, TRACK_POINT_EXTENSIONS_GARMIN) {
+                when (it.name) {
+                    EXTENSION_GARMIN_TEMPERATURE -> {
+                        val temperatureString = readText(parser, EXTENSION_GARMIN_TEMPERATURE)
+                        attributes.temperature = Temperature(
+                            celsius = temperatureString.toFloatOrNull()
+                                ?: throw XmlPullParserException("Invalid temperature: $temperatureString")
+                        )
+                    }
+
+                    EXTENSION_GARMIN_HEART_RATE -> {
+                        val heartRateString = readText(parser, EXTENSION_GARMIN_HEART_RATE)
+                        attributes.heartRate = HeartFrequency(
+                            bpm = heartRateString.toFloatOrNull()
+                                ?: throw XmlPullParserException("Invalid heart rate: $heartRateString")
+                        )
                     }
                 }
             }
@@ -126,6 +192,14 @@ class GpxReader(val tracks: List<GpxTrack>) {
             } catch (e: DateTimeParseException) {
                 throw XmlPullParserException("Invalid date string: $dateString")
             }
+        }
+
+        @Throws(XmlPullParserException::class)
+        private fun readElevation(parser: XmlPullParser): Elevation {
+            val elevationString = readText(parser, "ele")
+            val elevation = elevationString.toFloatOrNull()
+                ?: throw XmlPullParserException("Invalid elevation: $elevationString")
+            return Elevation(meters = elevation)
         }
 
         @Throws(XmlPullParserException::class)
@@ -180,5 +254,12 @@ class GpxReader(val tracks: List<GpxTrack>) {
         }
 
     }
+
+    private data class TrackPointAttributes(
+        var elevation: Elevation? = null,
+        var time: Date? = null,
+        var temperature: Temperature? = null,
+        var heartRate: HeartFrequency? = null
+    )
 
 }
