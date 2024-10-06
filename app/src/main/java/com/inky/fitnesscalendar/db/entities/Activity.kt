@@ -14,7 +14,9 @@ import com.inky.fitnesscalendar.data.gpx.TrackSvg
 import com.inky.fitnesscalendar.data.measure.Distance
 import com.inky.fitnesscalendar.data.measure.Duration
 import com.inky.fitnesscalendar.data.measure.Duration.Companion.until
+import com.inky.fitnesscalendar.data.measure.HeartFrequency
 import com.inky.fitnesscalendar.data.measure.Speed
+import com.inky.fitnesscalendar.data.measure.Temperature
 import com.inky.fitnesscalendar.util.toLocalDate
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -53,6 +55,9 @@ data class Activity(
     @ColumnInfo(name = "end_time") val endTime: Date = startTime,
     @ColumnInfo(name = "distance") val distance: Distance? = null,
     @ColumnInfo(name = "moving_duration") val movingDuration: Duration? = null,
+    @ColumnInfo(name = "temperature") val temperature: Temperature? = null,
+    @ColumnInfo(name = "average_heart_rate") val averageHeartRate: HeartFrequency? = null,
+    @ColumnInfo(name = "maximal_heart_rate") val maximalHeartRate: HeartFrequency? = null,
 
     // The unique identifier of the wifi network the device was connected to when starting the activity
     @ColumnInfo(name = "wifi_bssid") val wifiBssid: String? = null,

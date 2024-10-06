@@ -10,7 +10,9 @@ import com.inky.fitnesscalendar.data.gpx.GpxTrackStats
 import com.inky.fitnesscalendar.data.measure.Distance
 import com.inky.fitnesscalendar.data.measure.Duration
 import com.inky.fitnesscalendar.data.measure.Duration.Companion.until
+import com.inky.fitnesscalendar.data.measure.HeartFrequency
 import com.inky.fitnesscalendar.data.measure.Speed
+import com.inky.fitnesscalendar.data.measure.Temperature
 import kotlin.math.roundToLong
 
 @Entity(
@@ -44,6 +46,9 @@ data class Track(
             endTime = endTime ?: return null,
             distance = stats.totalDistance,
             movingDuration = stats.movingDuration,
+            temperature = stats.averageTemperature,
+            averageHeartRate = stats.averageHeartFrequency,
+            maximalHeartRate = stats.maxHeartFrequency
         )
     }
 
@@ -60,10 +65,36 @@ data class Track(
                 .sumOf { it.duration.elapsedMs }
         )
 
+        val averageHeartRate = points.mapNotNull { it.heartFrequency?.bpm }.let {
+            if (it.isEmpty()) {
+                null
+            } else {
+                HeartFrequency(bpm = it.sum() / it.size)
+            }
+        }
+        val maxHeartRate = points.mapNotNull { it.heartFrequency }.maxByOrNull { it }
+
+        val averageTemperature = points
+            .mapNotNull { it.temperature?.celsius }
+            .let {
+                if (it.isEmpty()) {
+                    null
+                } else {
+                    Temperature(celsius = it.sum() / it.size)
+                }
+            }
+        val minTemperature = points.mapNotNull { it.temperature }.minByOrNull { it }
+        val maxTemperature = points.mapNotNull { it.temperature }.maxByOrNull { it }
+
         return GpxTrackStats(
             totalDistance = totalDistance,
             totalDuration = duration,
-            movingDuration = movingDuration
+            movingDuration = movingDuration,
+            averageHeartFrequency = averageHeartRate,
+            maxHeartFrequency = maxHeartRate,
+            averageTemperature = averageTemperature,
+            minTemperature = minTemperature,
+            maxTemperature = maxTemperature
         )
     }
 

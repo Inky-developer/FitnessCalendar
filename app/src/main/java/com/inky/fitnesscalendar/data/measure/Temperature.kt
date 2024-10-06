@@ -4,4 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @JvmInline
-value class Temperature(val celsius: Float)
+value class Temperature(val celsius: Float) : Comparable<Temperature> {
+    override fun compareTo(other: Temperature) = this.celsius.compareTo(other.celsius)
+}
