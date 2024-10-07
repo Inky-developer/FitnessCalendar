@@ -3,6 +3,7 @@ package com.inky.fitnesscalendar.ui.views
 import android.content.Context
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -55,7 +56,8 @@ fun TrackDetailsView(
     viewModel: BaseViewModel = hiltViewModel(),
     activityId: Int,
     onEdit: () -> Unit,
-    onBack: () -> Unit
+    onBack: () -> Unit,
+    onNavigateMap: (Int) -> Unit
 ) {
     val context = LocalContext.current
     val activity by remember(activityId) { viewModel.repository.getActivity(activityId) }.collectAsState(
@@ -85,6 +87,10 @@ fun TrackDetailsView(
             state = state,
             onEdit = onEdit,
             onBack = onBack,
+            onNavigateMap = {
+                val id = activity?.activity?.uid
+                if (id != null) onNavigateMap(id)
+            }
         )
     }
 }
@@ -96,6 +102,7 @@ fun TrackDetailsView(
     state: DetailsState,
     onBack: () -> Unit,
     onEdit: () -> Unit,
+    onNavigateMap: () -> Unit,
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
@@ -135,6 +142,7 @@ fun TrackDetailsView(
                     .fillMaxWidth()
                     .aspectRatio(4f / 3f)
                     .background(MaterialTheme.colorScheme.secondaryContainer)
+                    .clickable { onNavigateMap() }
             ) {
                 TrackView(
                     track = preview,
@@ -143,6 +151,7 @@ fun TrackDetailsView(
                         .padding(all = 8.dp)
                         .fillMaxWidth()
                         .aspectRatio(4f / 3)
+                        .sharedBounds(SharedContentKey.Map)
                 )
             }
 

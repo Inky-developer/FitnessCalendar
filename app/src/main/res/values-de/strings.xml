@@ -259,4 +259,5 @@
     <string name="Minimum_elevation">Minimale Höhe</string>
     <string name="Maximum_elevation">Maximale Höhe</string>
     <string name="Edit">Bearbeiten</string>
+    <string name="Map">Karte</string>
 </resources>

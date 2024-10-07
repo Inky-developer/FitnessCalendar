@@ -38,6 +38,9 @@ sealed class Views(val nameId: Int) : Parcelable {
     data class TrackDetails(val activityId: Int) : Views(R.string.track_details)
 
     @Serializable
+    data class Map(val activityId: Int) : Views(R.string.Map)
+
+    @Serializable
     data object RecordActivity : Views(R.string.record_activity)
 
     @Serializable

@@ -31,6 +31,7 @@ import com.inky.fitnesscalendar.ui.views.DayView
 import com.inky.fitnesscalendar.ui.views.EditDayDialog
 import com.inky.fitnesscalendar.ui.views.FilterView
 import com.inky.fitnesscalendar.ui.views.Home
+import com.inky.fitnesscalendar.ui.views.MapView
 import com.inky.fitnesscalendar.ui.views.NewActivity
 import com.inky.fitnesscalendar.ui.views.RecordActivity
 import com.inky.fitnesscalendar.ui.views.StatisticsView
@@ -237,6 +238,19 @@ private fun AppNavigation(
                     TrackDetailsView(
                         activityId = route.activityId,
                         onEdit = { navController.navigate(Views.NewActivity(route.activityId)) },
+                        onBack = { navController.popBackStack() },
+                        onNavigateMap = { navController.navigate(Views.Map(it)) }
+                    )
+                }
+            }
+
+            composable<Views.Map> { backStackEntry ->
+                val route: Views.Map = backStackEntry.toRoute()
+                onCurrentView(route)
+
+                ProvideSharedContent(sharedContentScope = this@SharedTransitionLayout) {
+                    MapView(
+                        activityId = route.activityId,
                         onBack = { navController.popBackStack() }
                     )
                 }
