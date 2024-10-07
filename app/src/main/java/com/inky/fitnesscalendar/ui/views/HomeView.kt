@@ -95,6 +95,7 @@ fun Home(
     viewModel: HomeViewModel = hiltViewModel(),
     onNewActivity: () -> Unit,
     onEditActivity: (Activity) -> Unit,
+    onTrackDetails: (Activity) -> Unit,
     onEditDay: (EpochDay) -> Unit,
     onRecordActivity: () -> Unit,
     onNavigateToday: () -> Unit,
@@ -178,6 +179,7 @@ fun Home(
                 viewModel.repository.localizationRepository,
                 onDelete = { viewModel.deleteActivity(it) },
                 onEdit = onEditActivity,
+                onTrackDetails = onTrackDetails,
             )
             Today(
                 richActivities = activitiesToday ?: emptyList(),
@@ -537,7 +539,8 @@ fun RecentActivityOrNull(
     richActivity: RichActivity?,
     localizationRepository: LocalizationRepository,
     onDelete: (RichActivity) -> Unit,
-    onEdit: (Activity) -> Unit
+    onEdit: (Activity) -> Unit,
+    onTrackDetails: (Activity) -> Unit
 ) {
     AnimatedContent(
         targetState = richActivity,
@@ -548,7 +551,8 @@ fun RecentActivityOrNull(
                 actualActivity,
                 localizationRepository,
                 { onDelete(actualActivity) },
-                { onEdit(actualActivity.activity) }
+                { onEdit(actualActivity.activity) },
+                { onTrackDetails(actualActivity.activity) }
             )
         }
     }
@@ -560,12 +564,14 @@ fun RecentActivity(
     localizationRepository: LocalizationRepository,
     onDelete: () -> Unit,
     onEdit: (Activity) -> Unit,
+    onTrackDetails: (Activity) -> Unit,
 ) {
     ActivityCard(
         richActivity = richActivity,
         localizationRepository = localizationRepository,
         onDelete = onDelete,
         onEdit = onEdit,
+        onDetails = onTrackDetails,
         containerColor = MaterialTheme.colorScheme.tertiaryContainer,
         contentColor = contentColorFor(MaterialTheme.colorScheme.tertiaryContainer),
     )

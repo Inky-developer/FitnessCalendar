@@ -52,7 +52,7 @@ data class Track(
         )
     }
 
-    private fun computeStatistics(): GpxTrackStats? {
+    fun computeStatistics(): GpxTrackStats? {
         val duration = totalDuration ?: return null
 
         val trackPointComputedData = computeTrackPointComputedData()
@@ -86,6 +86,9 @@ data class Track(
         val minTemperature = points.mapNotNull { it.temperature }.minByOrNull { it }
         val maxTemperature = points.mapNotNull { it.temperature }.maxByOrNull { it }
 
+        val minHeight = points.mapNotNull { it.elevation }.minByOrNull { it }
+        val maxHeight = points.mapNotNull { it.elevation }.maxByOrNull { it }
+
         return GpxTrackStats(
             totalDistance = totalDistance,
             totalDuration = duration,
@@ -94,7 +97,9 @@ data class Track(
             maxHeartFrequency = maxHeartRate,
             averageTemperature = averageTemperature,
             minTemperature = minTemperature,
-            maxTemperature = maxTemperature
+            maxTemperature = maxTemperature,
+            minHeight = minHeight,
+            maxHeight = maxHeight
         )
     }
 

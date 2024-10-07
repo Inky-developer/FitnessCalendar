@@ -45,6 +45,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
@@ -65,7 +66,6 @@ import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.util.skipToLookaheadSize
 import com.inky.fitnesscalendar.util.gpx.simplify
-import kotlin.math.roundToInt
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -73,6 +73,7 @@ fun ActivityCard(
     richActivity: RichActivity,
     onDelete: () -> Unit,
     onEdit: (Activity) -> Unit,
+    onDetails: (Activity) -> Unit,
     localizationRepository: LocalizationRepository,
     modifier: Modifier = Modifier,
     onJumpTo: (() -> Unit)? = null,
@@ -101,7 +102,13 @@ fun ActivityCard(
             .fillMaxWidth()
             .padding(horizontal = 8.dp, vertical = 4.dp)
             .combinedClickable(
-                onClick = { onEdit(richActivity.activity) },
+                onClick = {
+                    if (trackPreview != null) {
+                        onDetails(richActivity.activity)
+                    } else {
+                        onEdit(richActivity.activity)
+                    }
+                },
                 onLongClick = {
                     haptics.performHapticFeedback(HapticFeedbackType.LongPress)
                     showContextMenu = true
@@ -316,16 +323,11 @@ private fun ActivityCardContent(activity: Activity, place: Place?) {
                     Icons.AutoMirrored.Outlined.ArrowForward,
                     stringResource(R.string.distance)
                 )
-                Text(
-                    stringResource(
-                        R.string.n_kilometers,
-                        "%.1f".format(activity.distance.kilometers)
-                    )
-                )
+                Text(activity.distance.format(LocalContext.current))
             }
         }
 
-        if (activity.averageSpeed != null) {
+        if (activity.averageMovingSpeed != null) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(horizontal = 4.dp)
@@ -334,9 +336,7 @@ private fun ActivityCardContent(activity: Activity, place: Place?) {
                     painterResource(R.drawable.outline_speed_24),
                     stringResource(R.string.speed)
                 )
-                Text(
-                    stringResource(R.string.x_kmh, "%.1f".format(activity.averageSpeed!!.kmh))
-                )
+                Text(activity.averageMovingSpeed!!.format(LocalContext.current))
             }
         }
 
@@ -349,7 +349,7 @@ private fun ActivityCardContent(activity: Activity, place: Place?) {
                     painterResource(R.drawable.outline_heart_rate_24),
                     stringResource(R.string.heart_rate)
                 )
-                Text(stringResource(R.string.x_bpm, activity.averageHeartRate.bpm.roundToInt()))
+                Text(activity.averageHeartRate.format(LocalContext.current))
             }
         }
 
@@ -362,12 +362,7 @@ private fun ActivityCardContent(activity: Activity, place: Place?) {
                     painterResource(R.drawable.outline_temperature_24),
                     stringResource(R.string.temperature)
                 )
-                Text(
-                    stringResource(
-                        R.string.x_degrees_celsius,
-                        activity.temperature.celsius.roundToInt()
-                    )
-                )
+                Text(activity.temperature.format(LocalContext.current))
             }
         }
 

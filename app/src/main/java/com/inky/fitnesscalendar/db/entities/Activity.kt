@@ -82,11 +82,16 @@ data class Activity(
                 return null
             }
 
-            if (movingDuration != null) {
-                return Speed(metersPerSecond = distance.meters / movingDuration.elapsedSeconds)
+            return Speed(metersPerSecond = distance.meters / duration.elapsedSeconds)
+        }
+
+    val averageMovingSpeed: Speed?
+        get() {
+            if (movingDuration == null || distance == null) {
+                return averageSpeed
             }
 
-            return Speed(metersPerSecond = distance.meters / duration.elapsedSeconds)
+            return Speed(metersPerSecond = distance.meters / movingDuration.elapsedSeconds)
         }
 
     @JvmInline

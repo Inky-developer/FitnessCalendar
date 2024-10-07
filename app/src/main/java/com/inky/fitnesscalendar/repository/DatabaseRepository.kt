@@ -230,4 +230,6 @@ class DatabaseRepository @Inject constructor(
     suspend fun saveTrack(track: Track) = trackDao.upsert(track)
 
     suspend fun loadTracks() = trackDao.loadAll()
+
+    fun getTrackByActivity(activityId: Int) = trackDao.getByActivityId(activityId)
 }

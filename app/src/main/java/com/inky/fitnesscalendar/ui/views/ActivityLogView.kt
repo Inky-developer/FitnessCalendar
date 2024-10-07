@@ -92,6 +92,7 @@ fun ActivityLog(
     onOpenDrawer: () -> Unit,
     onNewActivity: () -> Unit,
     onEditActivity: (Activity) -> Unit,
+    onTrackDetails: (Activity) -> Unit,
     onShowDay: (EpochDay) -> Unit,
     onFilter: () -> Unit,
     initialSelectedActivityId: Int? = null,
@@ -226,6 +227,7 @@ fun ActivityLog(
                     onShowDay = onShowDay,
                     onEditFilter = onEditFilter,
                     onEditActivity = onEditActivity,
+                    onTrackDetails = onTrackDetails,
                     onDeleteActivity = { viewModel.deleteActivity(it) }
                 )
             }
@@ -242,6 +244,7 @@ private fun ActivityList(
     onShowDay: (EpochDay) -> Unit,
     onEditFilter: (ActivityFilter) -> Unit,
     onEditActivity: (Activity) -> Unit,
+    onTrackDetails: (Activity) -> Unit,
     onDeleteActivity: (RichActivity) -> Unit
 ) {
     val numActivities = remember(state) { state.activities.size }
@@ -312,6 +315,7 @@ private fun ActivityList(
                         } else null,
                         onShowDay = { onShowDay(item.richActivity.activity.epochDay) },
                         onEdit = onEditActivity,
+                        onDetails = onTrackDetails,
                         localizationRepository = localizationRepository,
                         modifier = Modifier
                             .animateItem()

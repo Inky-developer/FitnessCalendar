@@ -81,6 +81,7 @@ fun DayView(
     viewModel: BaseViewModel = hiltViewModel(),
     initialEpochDay: EpochDay,
     onEditActivity: (RichActivity) -> Unit,
+    onTrackDetails: (RichActivity) -> Unit,
     onJumpToActivity: (RichActivity) -> Unit,
     onNewActivity: () -> Unit,
     onEditDay: (EpochDay) -> Unit,
@@ -181,6 +182,7 @@ fun DayView(
                         localizationRepository = viewModel.repository.localizationRepository,
                         onDeleteActivity = { viewModel.deleteActivity(it) },
                         onEditActivity = onEditActivity,
+                        onTrackDetails = onTrackDetails,
                         onJumpToActivity = onJumpToActivity,
                         onEditDay = { onEditDay(actualEpochDay) },
                         // Kind of hacky. The problem is that Horizontal Pager instantiates
@@ -218,6 +220,7 @@ fun DayViewInner(
     localizationRepository: LocalizationRepository,
     onDeleteActivity: (RichActivity) -> Unit,
     onEditActivity: (RichActivity) -> Unit,
+    onTrackDetails: (RichActivity) -> Unit,
     onJumpToActivity: (RichActivity) -> Unit,
     onEditDay: () -> Unit,
     sharedElement: @Composable Modifier.(SharedContentKey) -> Modifier,
@@ -306,6 +309,7 @@ fun DayViewInner(
                         richActivity = richActivity,
                         onDelete = { onDeleteActivity(richActivity) },
                         onEdit = { onEditActivity(richActivity) },
+                        onDetails = { onTrackDetails(richActivity) },
                         onJumpTo = { onJumpToActivity(richActivity) },
                         localizationRepository = localizationRepository,
                         modifier = Modifier.sharedBounds(

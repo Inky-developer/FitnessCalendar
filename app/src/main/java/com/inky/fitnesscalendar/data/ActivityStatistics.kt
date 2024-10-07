@@ -41,7 +41,7 @@ data class ActivityStatistics(
     }
 
     fun averageSpeed(): Speed? {
-        val speeds = activities.mapNotNull { it.activity.averageSpeed?.metersPerSecond }
+        val speeds = activities.mapNotNull { it.activity.averageMovingSpeed?.metersPerSecond }
         if (speeds.isEmpty()) {
             return null
         }

@@ -151,7 +151,7 @@
     <string name="has_distance">Has distance?</string>
     <string name="placeholder_distance">Distance…</string>
     <string name="km">km</string>
-    <string name="n_kilometers">%1$s km</string>
+    <string name="x_km">%1$s km</string>
     <string name="distance">Distance</string>
     <string name="total_distance">Total Distance</string>
     <string name="total_kilometers">Total Kilometers</string>
@@ -160,7 +160,8 @@
     <string name="projection">Projection</string>
     <string name="speed">Speed</string>
     <string name="x_kmh">%1$s km/h</string>
-    <string name="x_bpm">%1$s bpm</string>
+    <string name="x_bpm">%1$d bpm</string>
+    <string name="x_m">%1$d m</string>
     <string name="x_degrees_celsius">%1$s°C</string>
     <string name="average_kmh">Average km/h</string>
     <string name="average_speed">Average Speed</string>
@@ -237,4 +238,24 @@
     <string name="show_open_source_licenses">Show open source licenses</string>
     <string name="heart_rate">Heart rate</string>
     <string name="temperature">Temperature</string>
+    <string name="track_details">Track details</string>
+    <string name="Date">Date</string>
+    <string name="Duration">Duration</string>
+    <string name="Moving_duration">Moving duration</string>
+    <string name="Distance">Distance</string>
+    <string name="Time">Time</string>
+    <string name="Velocity">Velocity</string>
+    <string name="Average_velocity">Average velocity</string>
+    <string name="Average_moving_velocity">Average moving velocity</string>
+    <string name="Heart_rate">Heart rate</string>
+    <string name="Average_heart_rate">Average heart rate</string>
+    <string name="Maximum_heart_rate">Maximum heart rate</string>
+    <string name="Temperature">Temperature</string>
+    <string name="Average_temperature">Average temperature</string>
+    <string name="Minimum_temperature">Minimum temperature</string>
+    <string name="Maximum_temperature">Maximum temperature</string>
+    <string name="Elevation">Elevation</string>
+    <string name="Minimum_elevation">Minimum elevation</string>
+    <string name="Maximum_elevation">Maximum_elevation</string>
+    <string name="Edit">Edit</string>
 </resources>

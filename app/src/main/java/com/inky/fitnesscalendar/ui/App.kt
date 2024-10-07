@@ -34,6 +34,7 @@ import com.inky.fitnesscalendar.ui.views.Home
 import com.inky.fitnesscalendar.ui.views.NewActivity
 import com.inky.fitnesscalendar.ui.views.RecordActivity
 import com.inky.fitnesscalendar.ui.views.StatisticsView
+import com.inky.fitnesscalendar.ui.views.TrackDetailsView
 import com.inky.fitnesscalendar.ui.views.Views
 import com.inky.fitnesscalendar.ui.views.settings.SettingsViews
 import com.inky.fitnesscalendar.ui.views.settingsDestination
@@ -112,6 +113,11 @@ private fun AppNavigation(
                         onEditDay = {
                             navController.navigate(Views.EditDay(it.day))
                         },
+                        onTrackDetails = {
+                            if (it.uid != null) {
+                                navController.navigate(Views.TrackDetails(it.uid))
+                            }
+                        },
                         onRecordActivity = { navController.navigate(Views.RecordActivity) },
                         onNavigateToday = { navController.navigate(Views.DayView()) },
                         onNavigateStats = {
@@ -137,14 +143,15 @@ private fun AppNavigation(
                     DayView(
                         initialEpochDay = route.epochDay,
                         onEditActivity = {
-                            navController.navigate(
-                                Views.NewActivity(it.activity.uid)
-                            )
+                            navController.navigate(Views.NewActivity(it.activity.uid))
+                        },
+                        onTrackDetails = {
+                            if (it.activity.uid != null) {
+                                navController.navigate(Views.TrackDetails(it.activity.uid))
+                            }
                         },
                         onJumpToActivity = {
-                            navController.navigate(
-                                Views.ActivityLog(it.activity.uid)
-                            )
+                            navController.navigate(Views.ActivityLog(it.activity.uid))
                         },
                         onNewActivity = { navController.navigate(Views.NewActivity()) },
                         onEditDay = { navController.navigate(Views.EditDay(it.day)) },
@@ -163,6 +170,11 @@ private fun AppNavigation(
                         onNewActivity = { navController.navigate(Views.NewActivity()) },
                         onEditActivity = {
                             navController.navigate(Views.NewActivity(it.uid))
+                        },
+                        onTrackDetails = {
+                            if (it.uid != null) {
+                                navController.navigate(Views.TrackDetails(it.uid))
+                            }
                         },
                         onShowDay = { navController.navigate(Views.DayView(it.day)) },
                         onFilter = {
@@ -213,6 +225,23 @@ private fun AppNavigation(
                     onNavigateNewPlace = { navController.navigate(SettingsViews.PlaceDialog()) }
                 )
             }
+
+            composable<Views.TrackDetails>(
+                enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Up) },
+                exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Down) }
+            ) { backStackEntry ->
+                val route: Views.TrackDetails = backStackEntry.toRoute()
+                onCurrentView(route)
+
+                ProvideSharedContent(sharedContentScope = this@SharedTransitionLayout) {
+                    TrackDetailsView(
+                        activityId = route.activityId,
+                        onEdit = { navController.navigate(Views.NewActivity(route.activityId)) },
+                        onBack = { navController.popBackStack() }
+                    )
+                }
+            }
+
             dialog<Views.RecordActivity> {
                 onCurrentView(Views.RecordActivity)
                 RecordActivity(
