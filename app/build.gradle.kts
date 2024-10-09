@@ -30,8 +30,8 @@ android {
         applicationId = "com.inky.fitnesscalendar"
         minSdk = 27
         targetSdk = 35
-        versionCode = 4
-        versionName = "2024.09.3"
+        versionCode = 5
+        versionName = "2024.10.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
