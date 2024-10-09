@@ -88,6 +88,13 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+    dependenciesInfo {
+        // These two settings exclude dependency information in the apk
+        // As far as I can tell, this might or might not be required by google play, but
+        // it interferes with fdroid reproducible builds.
+        includeInApk = false
+        includeInBundle = false
+    }
     hilt {
         enableAggregatingTask = true
     }
