@@ -197,6 +197,9 @@ private fun rememberKmValueFormatter(): CartesianValueFormatter {
     }
 }
 
+// This annotation is needed as long as [TrackGraphProjection] is used as a NavArg
+// See https://issuetracker.google.com/issues/358687142
+@androidx.annotation.Keep
 enum class TrackGraphProjection(
     @ColorRes val color: Int,
     @StringRes val verticalAxisLabel: Int,
