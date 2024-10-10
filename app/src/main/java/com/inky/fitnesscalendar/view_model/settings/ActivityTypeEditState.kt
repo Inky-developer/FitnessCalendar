@@ -2,7 +2,7 @@ package com.inky.fitnesscalendar.view_model.settings
 
 import android.os.Parcelable
 import com.inky.fitnesscalendar.data.ActivityCategory
-import com.inky.fitnesscalendar.data.ActivityTypeColor
+import com.inky.fitnesscalendar.data.ContentColor
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import kotlinx.parcelize.Parcelize
 
@@ -12,7 +12,7 @@ data class ActivityTypeEditState(
     val category: ActivityCategory? = null,
     val name: String = "",
     val emoji: String = "",
-    val color: ActivityTypeColor? = null,
+    val color: ContentColor? = null,
     val hasPlace: Boolean = false,
     val hasVehicle: Boolean = false,
     val hasDuration: Boolean = false,

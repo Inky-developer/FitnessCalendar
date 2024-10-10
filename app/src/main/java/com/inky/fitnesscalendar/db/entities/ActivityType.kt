@@ -6,7 +6,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.inky.fitnesscalendar.data.ActivityCategory
-import com.inky.fitnesscalendar.data.ActivityTypeColor
+import com.inky.fitnesscalendar.data.ContentColor
 import com.inky.fitnesscalendar.data.Displayable
 import kotlinx.parcelize.Parcelize
 
@@ -17,7 +17,7 @@ data class ActivityType(
     @ColumnInfo(name = "activity_category") val activityCategory: ActivityCategory,
     @ColumnInfo(name = "name") val name: String,
     @ColumnInfo(name = "emoji") val emoji: String,
-    @ColumnInfo(name = "color") val color: ActivityTypeColor,
+    @ColumnInfo(name = "color") val color: ContentColor,
     @ColumnInfo(name = "has_place", defaultValue = "false") val hasPlace: Boolean = false,
     @ColumnInfo(name = "has_vehicle") val hasVehicle: Boolean = false,
     @ColumnInfo(name = "has_duration") val hasDuration: Boolean = true,

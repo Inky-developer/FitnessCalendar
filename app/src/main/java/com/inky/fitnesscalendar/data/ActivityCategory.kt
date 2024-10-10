@@ -10,11 +10,11 @@ enum class ActivityCategory(
     val emoji: String,
     @ColorRes val colorId: Int
 ) : Displayable {
-    Sports(R.string.sports, "⛹️", R.color.stats_sport),
-    Travel(R.string.travel, "🧳", R.color.stats_travel),
-    Work(R.string.work, "💼", R.color.stats_work),
-    Entertainment(R.string.entertainment, "🍿", R.color.stats_entertainment),
-    Other(R.string.other, "🏷️", R.color.stats_other);
+    Sports(R.string.sports, "⛹️", R.color.category_sport),
+    Travel(R.string.travel, "🧳", R.color.category_travel),
+    Work(R.string.work, "💼", R.color.category_work),
+    Entertainment(R.string.entertainment, "🍿", R.color.category_entertainment),
+    Other(R.string.other, "🏷️", R.color.content_other);
 
     override fun getColor(context: Context) = context.getColor(colorId)
 

@@ -4,7 +4,7 @@ import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.inky.fitnesscalendar.data.ActivityTypeColor
+import com.inky.fitnesscalendar.data.ContentColor
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -12,7 +12,7 @@ import kotlinx.parcelize.Parcelize
 data class Place(
     @PrimaryKey val uid: Int? = null,
     @ColumnInfo(name = "name") val name: String,
-    @ColumnInfo(name = "color") val color: ActivityTypeColor
+    @ColumnInfo(name = "color") val color: ContentColor
 ) : Parcelable {
     override fun toString() = name
 }

@@ -7,7 +7,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityCategory
-import com.inky.fitnesscalendar.data.ActivityTypeColor
+import com.inky.fitnesscalendar.data.ContentColor
 
 val MIGRATION_1_2 = object : Migration(1, 2) {
     override fun migrate(db: SupportSQLiteDatabase) {
@@ -75,79 +75,79 @@ enum class LegacyActivityType(
     Bouldering(
         ActivityCategory.Sports,
         title = "Bouldering",
-        colorId = R.color.stats_1,
+        colorId = R.color.content_1,
         emoji = "🧗"
     ),
     Cycling(
         ActivityCategory.Sports,
         title = "Cycling",
-        colorId = R.color.stats_2,
+        colorId = R.color.content_2,
         emoji = "🚴"
     ),
     Running(
         ActivityCategory.Sports,
         title = "Running",
-        colorId = R.color.stats_3,
+        colorId = R.color.content_3,
         emoji = "🏃"
     ),
     KungFu(
         ActivityCategory.Sports,
         title = "Kung Fu",
-        colorId = R.color.stats_4,
+        colorId = R.color.content_4,
         emoji = "🥋"
     ),
     UniversityCommute(
         ActivityCategory.Travel,
         title = "Home → Uni",
-        colorId = R.color.stats_1,
+        colorId = R.color.content_1,
         emoji = "🏢",
         hasVehicle = true
     ),
     HomeCommute(
         ActivityCategory.Travel,
         title = "Uni → Home",
-        colorId = R.color.stats_2,
+        colorId = R.color.content_2,
         emoji = "🏡",
         hasVehicle = true
     ),
     Travel(
         ActivityCategory.Travel,
         title = "Travel",
-        colorId = R.color.stats_3,
+        colorId = R.color.content_3,
         emoji = "🗺️",
         hasVehicle = true
     ),
-    Work(ActivityCategory.Work, title = "Work", colorId = R.color.stats_1, emoji = "💼"),
+    Work(ActivityCategory.Work, title = "Work", colorId = R.color.content_1, emoji = "💼"),
     Gaming(
         ActivityCategory.Entertainment,
         title = "Gaming",
-        colorId = R.color.stats_1,
+        colorId = R.color.content_1,
         emoji = "🎮"
     ),
     Film(
         ActivityCategory.Entertainment,
         title = "Film",
-        colorId = R.color.stats_2,
+        colorId = R.color.content_2,
         emoji = "🎬"
     ),
     Note(
         ActivityCategory.Other,
         title = "Note",
-        colorId = R.color.stats_1,
+        colorId = R.color.content_1,
         emoji = "📓",
         hasDuration = false
     ),
     HealthNote(
         ActivityCategory.Other,
         title = "Health Note",
-        colorId = R.color.stats_2,
+        colorId = R.color.content_2,
         emoji = "🩹",
         hasDuration = false
     ),
     Other(
         ActivityCategory.Other,
         title = "Other",
-        colorId = R.color.stats_3,
+        colorId = R.color.content_3,
         emoji = "🏷️"
     );
 }
@@ -157,7 +157,7 @@ val MIGRATION_6_7 = object : Migration(6, 7) {
         db.execSQL("CREATE TABLE TempActivityType (uid INTEGER PRIMARY KEY, activity_category TEXT NOT NULL, name TEXT NOT NULL, emoji TEXT NOT NULL, color TEXT, color_id INTEGER NOT NULL, has_vehicle INTEGER NOT NULL, has_duration INTEGER NOT NULL)")
         db.execSQL("INSERT INTO TempActivityType(uid, activity_category, name, emoji, color_id, has_vehicle, has_duration) SELECT uid, activity_category, name, emoji, color_id, has_vehicle, has_duration FROM ActivityType")
 
-        for (color in ActivityTypeColor.entries) {
+        for (color in ContentColor.entries) {
             db.execSQL(
                 "UPDATE TempActivityType SET color = ? WHERE color_id = ?",
                 arrayOf(color.toString(), color.colorId)
@@ -165,7 +165,7 @@ val MIGRATION_6_7 = object : Migration(6, 7) {
         }
         db.execSQL(
             "UPDATE TempActivityType SET color = ? WHERE color_id = NULL",
-            arrayOf(ActivityTypeColor.ColorOther)
+            arrayOf(ContentColor.ColorOther)
         )
 
         db.execSQL("DROP TABLE ActivityType")

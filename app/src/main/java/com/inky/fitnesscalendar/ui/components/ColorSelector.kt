@@ -13,15 +13,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.unit.dp
-import com.inky.fitnesscalendar.data.ActivityTypeColor
+import com.inky.fitnesscalendar.data.ContentColor
 
 @Composable
 fun ColorSelector(
-    isSelected: (ActivityTypeColor) -> Boolean,
-    onSelect: (ActivityTypeColor) -> Unit
+    isSelected: (ContentColor) -> Boolean,
+    onSelect: (ContentColor) -> Unit
 ) {
     LazyRow {
-        items(ActivityTypeColor.entries) { color ->
+        items(ContentColor.entries) { color ->
             FilterChip(
                 selected = isSelected(color),
                 onClick = { onSelect(color) },
