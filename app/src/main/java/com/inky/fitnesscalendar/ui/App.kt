@@ -36,6 +36,7 @@ import com.inky.fitnesscalendar.ui.views.NewActivity
 import com.inky.fitnesscalendar.ui.views.RecordActivity
 import com.inky.fitnesscalendar.ui.views.StatisticsView
 import com.inky.fitnesscalendar.ui.views.TrackDetailsView
+import com.inky.fitnesscalendar.ui.views.TrackGraphView
 import com.inky.fitnesscalendar.ui.views.Views
 import com.inky.fitnesscalendar.ui.views.settings.SettingsViews
 import com.inky.fitnesscalendar.ui.views.settingsDestination
@@ -239,7 +240,23 @@ private fun AppNavigation(
                         activityId = route.activityId,
                         onEdit = { navController.navigate(Views.NewActivity(route.activityId)) },
                         onBack = { navController.popBackStack() },
-                        onNavigateMap = { navController.navigate(Views.Map(it)) }
+                        onNavigateMap = { navController.navigate(Views.Map(it)) },
+                        onNavigateGraph = { id, projection ->
+                            navController.navigate(Views.TrackGraph(id, projection))
+                        }
+                    )
+                }
+            }
+
+            composable<Views.TrackGraph> { backStackEntry ->
+                val route: Views.TrackGraph = backStackEntry.toRoute()
+                onCurrentView(route)
+
+                ProvideSharedContent(sharedContentScope = this@SharedTransitionLayout) {
+                    TrackGraphView(
+                        activityId = route.activityId,
+                        projection = route.projection,
+                        onBack = { navController.popBackStack() },
                     )
                 }
             }

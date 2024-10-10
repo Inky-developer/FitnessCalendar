@@ -263,4 +263,16 @@
     <string name="color_ice">Ice</string>
     <string name="color_red">Red</string>
     <string name="color_black">Black</string>
+    <string name="legend_heart_rate_bpm">Heart Rate (bpm)</string>
+    <string name="legend_elevation_m">Elevation (m)</string>
+    <string name="legend_temperature_celsius">Temperature (Celsius)</string>
+    <string name="legend_speed_kmh">Speed (kmh)</string>
+    <string name="legend_distance_km">Distance (km)</string>
+    <string name="unit_kmh">kmh</string>
+    <string name="unit_bpm">bpm</string>
+    <string name="unit_m">m</string>
+    <string name="unit_celsius">°C</string>
+    <string name="track_graph">Track graph</string>
+    <string name="unit_km">km</string>
+    <string name="Chart">Chart</string>
 </resources>

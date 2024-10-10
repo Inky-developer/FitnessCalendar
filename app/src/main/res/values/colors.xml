@@ -25,6 +25,11 @@
     <color name="content_9">#1D1D1D</color>
     <color name="content_other">#818084</color>
 
+    <color name="graph_speed">#1565C0</color>
+    <color name="graph_heart_rate">#C62828</color>
+    <color name="graph_elevation">#558B2F</color>
+    <color name="graph_temperature">#F9A825</color>
+
     <color name="intensity_low">#5E5E5E</color>
     <color name="intensity_high">#E2C400</color>
 

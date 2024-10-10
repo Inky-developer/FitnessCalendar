@@ -52,10 +52,42 @@ data class Track(
         )
     }
 
+    fun computedPoints(): List<ComputedTrackPoint> {
+        if (points.isEmpty()) {
+            return emptyList()
+        }
+
+        val cachedDistanceResultsArray = FloatArray(3)
+        var cumDistanceMeters = 0.0
+        val firstComputedTrackPoint = ComputedTrackPoint(
+            distanceMeters = 0.0,
+            cumDistance = Distance(meters = cumDistanceMeters.roundToLong()),
+            duration = Duration(elapsedMs = 0L),
+            point = points[0]
+        )
+
+        val computedPoints = mutableListOf(firstComputedTrackPoint)
+        points
+            .windowed(2)
+            .mapTo(computedPoints) { (a, b) ->
+                val distance = a.coordinate.distanceMeters(b.coordinate, cachedDistanceResultsArray)
+                cumDistanceMeters += distance
+                val duration = a.time.until(b.time)
+                ComputedTrackPoint(
+                    distanceMeters = distance,
+                    cumDistance = Distance(meters = cumDistanceMeters.roundToLong()),
+                    duration = duration,
+                    point = b,
+                )
+            }
+
+        return computedPoints
+    }
+
     fun computeStatistics(): GpxTrackStats? {
         val duration = totalDuration ?: return null
 
-        val trackPointComputedData = computeTrackPointComputedData()
+        val trackPointComputedData = computedPoints()
 
         val totalDistance =
             Distance(meters = trackPointComputedData.sumOf { it.distanceMeters }.roundToLong())
@@ -103,20 +135,16 @@ data class Track(
         )
     }
 
-    private fun computeTrackPointComputedData(): List<TrackPointComputedData> {
-        val cachedDistanceResultsArray = FloatArray(3)
-        val computedData = points
-            .windowed(2)
-            .map { (a, b) ->
-                val distance = a.coordinate.distanceMeters(b.coordinate, cachedDistanceResultsArray)
-                val duration = a.time.until(b.time)
-                TrackPointComputedData(distance, duration)
-            }
-
-        return computedData
-    }
-
-    private data class TrackPointComputedData(val distanceMeters: Double, val duration: Duration) {
-        val speed get() = Speed(metersPerSecond = distanceMeters / duration.elapsedSeconds)
+    data class ComputedTrackPoint(
+        val distanceMeters: Double,
+        val cumDistance: Distance,
+        val duration: Duration,
+        val point: GpxTrackPoint
+    ) {
+        val speed
+            get() = if (duration.elapsedMs > 0)
+                Speed(metersPerSecond = distanceMeters / duration.elapsedSeconds)
+            else
+                Speed(metersPerSecond = 0.0)
     }
 }

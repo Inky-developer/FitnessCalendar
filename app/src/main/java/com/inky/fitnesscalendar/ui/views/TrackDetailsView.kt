@@ -7,6 +7,8 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -36,6 +38,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -57,7 +60,8 @@ fun TrackDetailsView(
     activityId: Int,
     onEdit: () -> Unit,
     onBack: () -> Unit,
-    onNavigateMap: (Int) -> Unit
+    onNavigateMap: (Int) -> Unit,
+    onNavigateGraph: (Int, TrackGraphProjection) -> Unit,
 ) {
     val context = LocalContext.current
     val activity by remember(activityId) { viewModel.repository.getActivity(activityId) }.collectAsState(
@@ -90,7 +94,8 @@ fun TrackDetailsView(
             onNavigateMap = {
                 val id = activity?.activity?.uid
                 if (id != null) onNavigateMap(id)
-            }
+            },
+            onNavigateGraph = { projection -> onNavigateGraph(activityId, projection) }
         )
     }
 }
@@ -103,6 +108,7 @@ fun TrackDetailsView(
     onBack: () -> Unit,
     onEdit: () -> Unit,
     onNavigateMap: () -> Unit,
+    onNavigateGraph: (TrackGraphProjection) -> Unit
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
@@ -168,28 +174,40 @@ fun TrackDetailsView(
             }
 
             if (state.hasSpeed) {
-                StatsColumn(title = { Text(stringResource(R.string.Velocity)) }) {
+                StatsColumn(
+                    title = { Text(stringResource(R.string.Velocity)) },
+                    onClick = { onNavigateGraph(TrackGraphProjection.Speed) }
+                ) {
                     SimpleStatistic(R.string.Average_velocity, state.averageSpeed)
                     SimpleStatistic(R.string.Average_moving_velocity, state.averageMovingSpeed)
                 }
             }
 
             if (state.hasElevation) {
-                StatsColumn(title = { Text(stringResource(R.string.Elevation)) }) {
+                StatsColumn(
+                    title = { Text(stringResource(R.string.Elevation)) },
+                    onClick = { onNavigateGraph(TrackGraphProjection.Elevation) }
+                ) {
                     SimpleStatistic(R.string.Minimum_elevation, state.minElevation)
                     SimpleStatistic(R.string.Maximum_elevation, state.maxElevation)
                 }
             }
 
             if (state.hasHeartRate) {
-                StatsColumn(title = { Text(stringResource(R.string.Heart_rate)) }) {
+                StatsColumn(
+                    title = { Text(stringResource(R.string.Heart_rate)) },
+                    onClick = { onNavigateGraph(TrackGraphProjection.HeartRate) }
+                ) {
                     SimpleStatistic(R.string.Average_heart_rate, state.averageHeartRate)
                     SimpleStatistic(R.string.Maximum_heart_rate, state.maxHeartRate)
                 }
             }
 
             if (state.hasTemperature) {
-                StatsColumn(title = { Text(stringResource(R.string.Temperature)) }) {
+                StatsColumn(
+                    title = { Text(stringResource(R.string.Temperature)) },
+                    onClick = { onNavigateGraph(TrackGraphProjection.Temperature) }
+                ) {
                     SimpleStatistic(R.string.Average_temperature, state.averageTemperature)
                     SimpleStatistic(R.string.Minimum_temperature, state.minTemperature)
                     SimpleStatistic(R.string.Maximum_temperature, state.maxTemperature)
@@ -202,6 +220,7 @@ fun TrackDetailsView(
 @Composable
 private fun StatsColumn(
     title: @Composable () -> Unit,
+    onClick: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit
 ) {
     Column(
@@ -209,11 +228,19 @@ private fun StatsColumn(
             .padding(all = 8.dp)
             .clip(MaterialTheme.shapes.medium)
             .background(MaterialTheme.colorScheme.surfaceContainer)
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .clickable { onClick?.let { it() } },
     ) {
-        Box(modifier = Modifier.padding(all = 4.dp)) {
+        Row(modifier = Modifier.padding(all = 4.dp)) {
             CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.titleLarge) {
                 title()
+            }
+            Spacer(modifier = Modifier.weight(1f))
+            if (onClick != null) {
+                Icon(
+                    painterResource(R.drawable.outline_show_chart_24),
+                    stringResource(R.string.track_graph)
+                )
             }
         }
         HorizontalDivider()
