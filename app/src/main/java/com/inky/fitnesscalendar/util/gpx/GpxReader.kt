@@ -60,6 +60,7 @@ class GpxReader(val tracks: List<GpxTrack>) {
         @Throws(XmlPullParserException::class)
         private fun readTrack(parser: XmlPullParser): GpxTrack {
             var trackName = ""
+            var trackDescription = ""
             var trackType = ""
 
             val trackPoints = readTag(parser, "trk") {
@@ -69,12 +70,18 @@ class GpxReader(val tracks: List<GpxTrack>) {
                         null
                     }
 
+                    "desc" -> {
+                        trackDescription = readText(it, "desc")
+                        null
+                    }
+
                     "type" -> {
                         trackType = readText(it, "type")
                         null
                     }
 
                     "trkseg" -> readTrackSegment(it)
+
                     else -> {
                         skipTag(it)
                         null
@@ -82,6 +89,9 @@ class GpxReader(val tracks: List<GpxTrack>) {
                 }
             }
 
+            if (trackDescription.isNotBlank()) {
+                trackName += "\n\n" + trackDescription
+            }
             return GpxTrack(name = trackName, type = trackType, points = trackPoints.flatten())
         }
 
