@@ -3,7 +3,9 @@ package com.inky.fitnesscalendar.ui.views.settings
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.CircularProgressIndicator
@@ -77,7 +79,11 @@ private fun EditPlaceDialog(initialPlace: Place?, onDismiss: () -> Unit, onSave:
         saveEnabled = saveEnabled,
         actions = {}
     ) {
-        Column(modifier = Modifier.padding(all = 8.dp)) {
+        Column(
+            modifier = Modifier
+                .padding(all = 8.dp)
+                .verticalScroll(rememberScrollState())
+        ) {
             TextField(
                 value = name,
                 onValueChange = { name = it },

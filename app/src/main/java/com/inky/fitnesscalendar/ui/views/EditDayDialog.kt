@@ -97,11 +97,7 @@ fun EditDayDialog(
             }
         }
     ) {
-        Column(
-            modifier = Modifier
-                .padding(all = 8.dp)
-                .weight(1f, fill = false)
-        ) {
+        Column(modifier = Modifier.padding(all = 8.dp)) {
             AnimatedContent(
                 targetState = editState.imageName?.getImageUri(),
                 label = stringResource(R.string.user_uploaded_image)

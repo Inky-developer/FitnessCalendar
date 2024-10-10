@@ -2,6 +2,7 @@ package com.inky.fitnesscalendar.ui.components
 
 import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -30,7 +31,7 @@ fun BaseEditDialog(
     saveEnabled: Boolean = true,
     actions: @Composable ColumnScope.() -> Unit,
     saveText: @Composable () -> Unit = { Text(stringResource(R.string.save)) },
-    content: @Composable ColumnScope.() -> Unit,
+    content: @Composable () -> Unit,
 ) {
     Dialog(onDismissRequest = onNavigateBack) {
         Card(
@@ -61,7 +62,9 @@ fun BaseEditDialog(
                 HorizontalDivider()
             }
 
-            content()
+            Box(modifier = Modifier.weight(1f, fill = false)) {
+                content()
+            }
 
             OkayCancelRow(
                 onNavigateBack = onNavigateBack,
