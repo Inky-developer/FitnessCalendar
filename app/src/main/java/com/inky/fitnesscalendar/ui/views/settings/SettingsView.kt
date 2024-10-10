@@ -98,7 +98,7 @@ fun SettingsView(
                     )
                 }
 
-                Setting("About…", onClick = onNavigateAbout)
+                Setting(stringResource(R.string.configure_about), onClick = onNavigateAbout)
 
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 

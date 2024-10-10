@@ -276,4 +276,5 @@
     <string name="unit_km">km</string>
     <string name="Chart">Chart</string>
     <string name="Maximum_velocity">Maximum velocity</string>
+    <string name="configure_about">About…</string>
 </resources>
