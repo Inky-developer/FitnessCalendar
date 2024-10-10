@@ -54,7 +54,6 @@ class GpxReader(val tracks: List<GpxTrack>) {
             if (tracks.isEmpty()) {
                 throw XmlPullParserException("Gpx file contained no track")
             }
-
             return GpxReader(tracks)
         }
 
@@ -180,6 +179,8 @@ class GpxReader(val tracks: List<GpxTrack>) {
                                 ?: throw XmlPullParserException("Invalid heart rate: $heartRateString")
                         )
                     }
+
+                    else -> skipTag(it)
                 }
             }
         }
