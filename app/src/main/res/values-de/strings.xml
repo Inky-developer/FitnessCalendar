@@ -260,4 +260,8 @@
     <string name="Maximum_elevation">Maximale Höhe</string>
     <string name="Edit">Bearbeiten</string>
     <string name="Map">Karte</string>
+    <string name="color_purple">Lila</string>
+    <string name="color_ice">Eis</string>
+    <string name="color_red">Rot</string>
+    <string name="color_black">Schwarz</string>
 </resources>

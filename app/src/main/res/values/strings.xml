@@ -259,4 +259,8 @@
     <string name="Maximum_elevation">Maximum_elevation</string>
     <string name="Edit">Edit</string>
     <string name="Map">Map</string>
+    <string name="color_purple">Purple</string>
+    <string name="color_ice">Ice</string>
+    <string name="color_red">Red</string>
+    <string name="color_black">Black</string>
 </resources>
