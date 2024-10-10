@@ -180,6 +180,7 @@ fun TrackDetailsView(
                 ) {
                     SimpleStatistic(R.string.Average_velocity, state.averageSpeed)
                     SimpleStatistic(R.string.Average_moving_velocity, state.averageMovingSpeed)
+                    SimpleStatistic(R.string.Maximum_velocity, state.maxSpeed)
                 }
             }
 
@@ -279,6 +280,7 @@ data class DetailsState(
     val distance: String?,
     val averageSpeed: String?,
     val averageMovingSpeed: String?,
+    val maxSpeed: String?,
     val minElevation: String?,
     val maxElevation: String?,
     val averageHeartRate: String?,
@@ -313,6 +315,7 @@ data class DetailsState(
 
             val averageSpeed = activity.averageSpeed?.format(context)
             val averageMovingSpeed = activity.averageMovingSpeed?.format(context)
+            val maxSpeed = stats.maxSpeed.format(context)
 
             val minHeight = stats.minHeight?.format(context)
             val maxHeight = stats.maxHeight?.format(context)
@@ -332,6 +335,7 @@ data class DetailsState(
                 distance = distance,
                 averageSpeed = averageSpeed,
                 averageMovingSpeed = averageMovingSpeed,
+                maxSpeed = maxSpeed,
                 averageHeartRate = averageHeartRate,
                 maxHeartRate = maxHeartRate,
                 minTemperature = minTemperature,

@@ -275,4 +275,5 @@
     <string name="track_graph">Track graph</string>
     <string name="unit_km">km</string>
     <string name="Chart">Chart</string>
+    <string name="Maximum_velocity">Maximum velocity</string>
 </resources>

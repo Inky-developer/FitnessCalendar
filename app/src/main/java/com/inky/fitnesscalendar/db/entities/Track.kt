@@ -97,6 +97,9 @@ data class Track(
                 .sumOf { it.duration.elapsedMs }
         )
 
+        val maxSpeed = trackPointComputedData.maxByOrNull { it.speed.metersPerSecond }?.speed
+            ?: Speed(metersPerSecond = 0.0)
+
         val averageHeartRate = points.mapNotNull { it.heartFrequency?.bpm }.let {
             if (it.isEmpty()) {
                 null
@@ -125,6 +128,7 @@ data class Track(
             totalDistance = totalDistance,
             totalDuration = duration,
             movingDuration = movingDuration,
+            maxSpeed = maxSpeed,
             averageHeartFrequency = averageHeartRate,
             maxHeartFrequency = maxHeartRate,
             averageTemperature = averageTemperature,
