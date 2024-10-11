@@ -14,10 +14,6 @@ room {
     schemaDirectory("$projectDir/schemas")
 }
 
-composeCompiler {
-    enableStrongSkippingMode = true
-}
-
 android {
     namespace = "com.inky.fitnesscalendar"
     compileSdk = 35

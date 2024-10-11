@@ -267,9 +267,9 @@
     <string name="legend_heart_rate_bpm">Herzfrequenz (bpm)</string>
     <string name="legend_elevation_m">Höhe (m)</string>
     <string name="legend_temperature_celsius">Temperatur (Celsius)</string>
-    <string name="legend_speed_kmh">Geschwindigkeit (kmh)</string>
+    <string name="legend_speed_kmh">Geschwindigkeit (km/h)</string>
     <string name="legend_distance_km">Distanz (km)</string>
-    <string name="unit_kmh">kmh</string>
+    <string name="unit_kmh">km/h</string>
     <string name="unit_bpm">bpm</string>
     <string name="unit_m">m</string>
     <string name="unit_celsius">°C</string>
