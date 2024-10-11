@@ -7,6 +7,7 @@ hiltAndroid = "2.52"
 hiltNavigationCompose = "1.2.0"
 kotlin = "2.0.20"
 coreKtx = "1.13.1"
+androidx-test = "1.6.1"
 junit = "4.13.2"
 junitVersion = "1.2.1"
 robolectricVersion = "4.13"
@@ -25,6 +26,7 @@ emoji2EmojipickerVersion = "1.5.0"
 documentfileVersion = "1.0.1"
 
 [libraries]
+androidx-core = { module = "androidx.test:core", version.ref = "androidx-test" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-datastore-preferences = { module = "androidx.datastore:datastore-preferences", version.ref = "datastorePreferences" }
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }

@@ -1,25 +1,28 @@
 package com.inky.fitnesscalendar.db
 
-import android.content.Context
+import android.os.Build
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.test.core.app.ApplicationProvider
-import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.inky.fitnesscalendar.MainApp
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 
-@RunWith(AndroidJUnit4::class)
+@Config(sdk = [Build.VERSION_CODES.UPSIDE_DOWN_CAKE])
+@RunWith(RobolectricTestRunner::class)
 class DatabaseTest {
     /**
      * Tests that the default data get loaded correctly
      */
     @Test
     fun test_load_default_data() {
-        val context = ApplicationProvider.getApplicationContext<Context>()
+        val context = ApplicationProvider.getApplicationContext<MainApp>()
         val db = Room
             .inMemoryDatabaseBuilder(context, AppDatabase::class.java)
             .addCallback(object : RoomDatabase.Callback() {
