@@ -277,4 +277,5 @@
     <string name="Chart">Chart</string>
     <string name="Maximum_velocity">Maximum velocity</string>
     <string name="configure_about">About…</string>
+    <string name="color_dark_green">Dark green</string>
 </resources>

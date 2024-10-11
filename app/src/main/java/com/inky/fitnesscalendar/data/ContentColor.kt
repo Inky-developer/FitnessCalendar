@@ -13,6 +13,6 @@ enum class ContentColor(@ColorRes val colorId: Int, @StringRes val nameId: Int) 
     Color6(R.color.content_6, R.string.color_purple),
     Color7(R.color.content_7, R.string.color_ice),
     Color8(R.color.content_8, R.string.color_red),
-    Color9(R.color.content_9, R.string.color_black),
+    Color9(R.color.content_9, R.string.color_dark_green),
     ColorOther(R.color.content_other, R.string.color_grey),
 }
