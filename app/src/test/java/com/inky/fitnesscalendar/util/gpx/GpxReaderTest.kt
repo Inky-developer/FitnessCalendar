@@ -64,7 +64,7 @@ class GpxReaderTest {
     fun testParse() {
         val reader = GpxReader.read(ByteArrayInputStream(GPX.encodeToByteArray()))
         assertNotNull(reader)
-        assertEquals(reader!!.tracks.size, 1)
+        assertEquals(1, reader!!.tracks.size)
 
         val track = reader.tracks[0]
         assertEquals("Cool track\n\nWas a nice track", track.name)
