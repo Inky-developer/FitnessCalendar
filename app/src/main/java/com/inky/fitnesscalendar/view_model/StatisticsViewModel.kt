@@ -10,7 +10,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.inky.fitnesscalendar.data.ActivityStatistics
 import com.inky.fitnesscalendar.data.Displayable
-import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.preferences.Preference
 import com.inky.fitnesscalendar.repository.DatabaseRepository
 import com.inky.fitnesscalendar.view_model.statistics.Grouping
@@ -38,36 +37,23 @@ class StatisticsViewModel @Inject constructor(
     @ApplicationContext val context: Context,
     val databaseRepository: DatabaseRepository
 ) : ViewModel() {
-    var grouping by mutableStateOf<Grouping>(Grouping.All)
-    val groupingOptions =
-        derivedStateOf { activityTypes.value?.let { grouping.options(it) } ?: emptyList() }
+    var grouping by mutableStateOf(FilteredGrouping(Grouping.All))
+    val groupingOptions = derivedStateOf { grouping.options() }
     var period by mutableStateOf(Period.Week)
     var projection by mutableStateOf(Projection.ByTotalActivities)
 
     private var _activityStatistics = MutableStateFlow<Map<Long, Period.StatisticsEntry>?>(null)
     val activityStatistics get() = _activityStatistics.filterNotNull()
 
-    private var activityTypes = mutableStateOf<List<ActivityType>?>(null)
-
     val modelProducer = CartesianChartModelProducer()
 
     init {
         viewModelScope.launch(Dispatchers.IO) {
-            databaseRepository.getActivityTypes().collect {
-                activityTypes.value = it
-            }
-        }
-
-        viewModelScope.launch(Dispatchers.IO) {
             snapshotFlow { period to grouping }.collect { refreshActivities() }
         }
         viewModelScope.launch(Dispatchers.IO) {
-            snapshotFlow { projection to activityTypes }.collect { refreshModel() }
+            snapshotFlow { projection }.collect { refreshModel() }
         }
-
-        activityStatistics.onEach {
-            refreshModel()
-        }.launchIn(viewModelScope)
 
         Preference.PREF_STATS_PROJECTION.flow(context)
             .onEach { projection = it }
@@ -83,11 +69,10 @@ class StatisticsViewModel @Inject constructor(
                 .shareIn(viewModelScope, SharingStarted.Eagerly)
                 .first()
                 .let { period.filter(ActivityStatistics(it)) }
+        refreshModel()
     }
 
     private suspend fun refreshModel() {
-        val types = activityTypes.value ?: return
-
         val dataPoints = _activityStatistics.value?.mapValues { entry ->
             ModelData(
                 entryName = entry.value.entryName,
@@ -96,7 +81,7 @@ class StatisticsViewModel @Inject constructor(
         } ?: return
         if (dataPoints.isEmpty()) return
 
-        val groups = grouping.options(types)
+        val groups = grouping.options()
         val groupedDataPoints = groups.map { group ->
             dataPoints.mapNotNull { (key, modelData) ->
                 val value = modelData.groups[group]?.let { projection.apply(it) }
@@ -132,10 +117,41 @@ class StatisticsViewModel @Inject constructor(
         val groups: Map<out Displayable, ActivityStatistics>
     )
 
+    data class FilteredGrouping(
+        val grouping: Grouping,
+        val filteredIndexes: Set<Int> = emptySet()
+    ) : Grouping by grouping {
+        fun withIndex(index: Int): FilteredGrouping {
+            val options = grouping.options()
+            // Don't allow filtering every index, because vico would crash otherwise :(
+            if (options.size == filteredIndexes.size + 1) {
+                return this
+            }
+            return copy(filteredIndexes = filteredIndexes + index)
+        }
+
+        fun withoutIndex(index: Int) = copy(filteredIndexes = filteredIndexes - index)
+
+        // Sets all groups that are filtered out to 0
+        override fun apply(statistics: ActivityStatistics): Map<out Displayable, ActivityStatistics> {
+            val unfilteredMap = grouping.apply(statistics)
+            val validGroups =
+                options().toSet().filterIndexed { index, _ -> !filteredIndexes.contains(index) }
+
+            return unfilteredMap.mapValues {
+                if (validGroups.contains(it.key)) {
+                    it.value
+                } else {
+                    ActivityStatistics(emptyList())
+                }
+            }
+        }
+    }
+
     companion object {
         val xToDateKey = ExtraStore.Key<Map<Long, String>>()
         val periodKey = ExtraStore.Key<Int>()
-        val groupingKey = ExtraStore.Key<Grouping>()
+        val groupingKey = ExtraStore.Key<FilteredGrouping>()
 
         val autoScrollCondition = AutoScrollCondition { newModel, oldModel ->
             if (oldModel == null) {
@@ -146,13 +162,16 @@ class StatisticsViewModel @Inject constructor(
                 return@AutoScrollCondition true
             }
 
-            if (newModel.extraStore.getOrNull(periodKey) != oldModel.extraStore.getOrNull(periodKey)) {
+            if (newModel.extraStore.getOrNull(periodKey) != oldModel.extraStore.getOrNull(
+                    periodKey
+                )
+            ) {
                 return@AutoScrollCondition true
             }
 
             if (
-                newModel.extraStore.getOrNull(groupingKey)
-                != oldModel.extraStore.getOrNull(groupingKey)
+                newModel.extraStore.getOrNull(groupingKey)?.grouping
+                != oldModel.extraStore.getOrNull(groupingKey)?.grouping
             ) {
                 return@AutoScrollCondition true
             }

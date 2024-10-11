@@ -1,18 +1,22 @@
 package com.inky.fitnesscalendar.ui.views
 
-import android.content.Context
 import android.graphics.Typeface
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
 import androidx.compose.material.icons.outlined.Menu
@@ -37,6 +41,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -71,11 +76,7 @@ import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoZoomState
 import com.patrykandpatrick.vico.compose.common.component.rememberShapeComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
-import com.patrykandpatrick.vico.compose.common.data.rememberExtraLambda
 import com.patrykandpatrick.vico.compose.common.dimensions
-import com.patrykandpatrick.vico.compose.common.rememberHorizontalLegend
-import com.patrykandpatrick.vico.core.cartesian.CartesianDrawingContext
-import com.patrykandpatrick.vico.core.cartesian.CartesianMeasuringContext
 import com.patrykandpatrick.vico.core.cartesian.Scroll
 import com.patrykandpatrick.vico.core.cartesian.Zoom
 import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
@@ -85,10 +86,8 @@ import com.patrykandpatrick.vico.core.cartesian.layer.LineCartesianLayer
 import com.patrykandpatrick.vico.core.cartesian.marker.CartesianMarker
 import com.patrykandpatrick.vico.core.cartesian.marker.DefaultCartesianMarker
 import com.patrykandpatrick.vico.core.common.Fill
-import com.patrykandpatrick.vico.core.common.LegendItem
 import com.patrykandpatrick.vico.core.common.component.Shadow
 import com.patrykandpatrick.vico.core.common.component.ShapeComponent
-import com.patrykandpatrick.vico.core.common.component.TextComponent
 import com.patrykandpatrick.vico.core.common.shape.CorneredShape
 import kotlinx.coroutines.launch
 
@@ -136,7 +135,9 @@ fun StatisticsView(
                 actions = {
                     ActivityFilterButton(
                         grouping = viewModel.grouping,
-                        onGrouping = { viewModel.grouping = it }
+                        onGrouping = {
+                            viewModel.grouping = StatisticsViewModel.FilteredGrouping(it)
+                        }
                     )
                     ProjectionSelectButton(viewModel.projection)
                 },
@@ -178,6 +179,19 @@ fun StatisticsView(
                         modifier = Modifier
                             .fillParentMaxHeight(0.9f)
                             .fillMaxWidth()
+                    )
+
+                    GraphLegend(
+                        options = viewModel.groupingOptions.value,
+                        removedGroups = viewModel.grouping.filteredIndexes,
+                        onToggle = { index ->
+                            viewModel.grouping =
+                                if (viewModel.grouping.filteredIndexes.contains(index)) {
+                                    viewModel.grouping.withoutIndex(index)
+                                } else {
+                                    viewModel.grouping.withIndex(index)
+                                }
+                        }
                     )
                 }
             }
@@ -249,6 +263,7 @@ private fun ActivityFilterButton(
     onGrouping: (Grouping) -> Unit
 ) {
     var menuOpen by rememberSaveable { mutableStateOf(false) }
+    val activityTypes = localDatabaseValues.current.activityTypes
 
     val filterId =
         if (grouping is Grouping.All) R.drawable.outline_filter_off_24 else R.drawable.outline_filter_24
@@ -272,7 +287,7 @@ private fun ActivityFilterButton(
                 text = { Text(category.emoji + " " + stringResource(category.nameId)) },
                 onClick = {
                     menuOpen = false
-                    onGrouping(Grouping.Category(category))
+                    onGrouping(Grouping.Category(category, activityTypes))
                 }
             )
         }
@@ -366,7 +381,6 @@ private fun Graph(
                 },
                 itemPlacer = HorizontalAxis.ItemPlacer.aligned(addExtremeLabelPadding = true),
             ),
-            legend = rememberLegend(groupingOptions),
             marker = rememberMarker(projection),
         ),
         modelProducer = modelProducer,
@@ -376,36 +390,37 @@ private fun Graph(
     )
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun rememberLegend(
-    groupingOptions: List<Displayable>,
-    context: Context = LocalContext.current,
-    textColor: Color = MaterialTheme.colorScheme.onPrimaryContainer
-) =
-    rememberHorizontalLegend<CartesianMeasuringContext, CartesianDrawingContext>(
-        items = rememberExtraLambda(groupingOptions) {
-            groupingOptions.map { group ->
-                add(
-                    LegendItem(
-                        icon = ShapeComponent(
-                            shape = CorneredShape.Pill,
-                            color = group.getColor(context)
-                        ),
-                        labelComponent = TextComponent(
-                            color = textColor.toArgb(),
-                            textSizeSp = 12f,
-                            typeface = Typeface.MONOSPACE,
-                        ),
-                        label = group.getText(context),
+private fun GraphLegend(
+    options: List<Displayable>,
+    removedGroups: Set<Int>,
+    onToggle: (Int) -> Unit
+) {
+    FlowRow {
+        for ((index, option) in options.withIndex()) {
+            FilterChip(
+                selected = !removedGroups.contains(index),
+                onClick = { onToggle(index) },
+                label = {
+                    Text(
+                        option.getText(LocalContext.current),
+                        style = MaterialTheme.typography.labelSmall
                     )
-                )
-            }
-        },
-        iconSize = 8.dp,
-        iconPadding = 4.dp,
-        spacing = 16.dp,
-    )
-
+                },
+                leadingIcon = {
+                    Box(
+                        modifier = Modifier
+                            .size(8.dp)
+                            .clip(CircleShape)
+                            .background(Color(option.getColor(LocalContext.current)))
+                    )
+                },
+                modifier = Modifier.padding(horizontal = 4.dp)
+            )
+        }
+    }
+}
 
 @Composable
 private fun rememberMarker(projection: Projection): CartesianMarker =
