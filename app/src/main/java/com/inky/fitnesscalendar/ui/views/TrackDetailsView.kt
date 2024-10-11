@@ -52,6 +52,7 @@ import com.inky.fitnesscalendar.ui.components.TrackView
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.sharedBounds
+import com.inky.fitnesscalendar.util.toLocalDate
 import com.inky.fitnesscalendar.view_model.BaseViewModel
 
 @Composable
@@ -304,7 +305,7 @@ data class DetailsState(
             val activity = richActivity.activity
             val type = richActivity.type
 
-            val startDate = localizationRepository.formatRelativeDate(activity.startTime)
+            val startDate = localizationRepository.formatRelativeLocalDate(activity.startTime.toLocalDate())
             val startTime = localizationRepository.timeFormatter.format(activity.startTime)
             val start = "$startDate $startTime"
 
