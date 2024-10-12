@@ -291,18 +291,6 @@ private fun ActivityFilterButton(
                 }
             )
         }
-
-        HorizontalDivider()
-
-        for (type in localDatabaseValues.current.activityTypes) {
-            DropdownMenuItem(
-                text = { Text(type.emoji + " " + type.name) },
-                onClick = {
-                    menuOpen = false
-                    onGrouping(Grouping.Type(type))
-                }
-            )
-        }
     }
 }
 

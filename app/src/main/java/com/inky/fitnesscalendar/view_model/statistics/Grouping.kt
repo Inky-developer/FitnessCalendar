@@ -41,12 +41,4 @@ interface Grouping {
         override fun options() =
             listOf(category) + activityTypes.filter { it.activityCategory == category }
     }
-
-    data class Type(val type: ActivityType) : Grouping {
-        override fun filter() = ActivityFilter(types = listOf(type))
-
-        override fun apply(statistics: ActivityStatistics) = statistics.activitiesByType
-
-        override fun options() = listOf(type)
-    }
 }
