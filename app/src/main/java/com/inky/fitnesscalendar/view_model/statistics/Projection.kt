@@ -1,10 +1,10 @@
 package com.inky.fitnesscalendar.view_model.statistics
 
+import android.content.Context
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityStatistics
-import com.patrykandpatrick.vico.core.cartesian.marker.DefaultCartesianMarkerValueFormatter
 
 /**
  * A Projection of [ActivityStatistics] to a value that can be displayed in the statistics view
@@ -68,9 +68,11 @@ enum class Projection(
         ByAverageIntensity -> statistics.averageIntensity()
     }
 
-    fun markerFormatter() = when (this) {
+    fun markerFormatter(context: Context) = when (this) {
         ByTotalTime, ByAverageTime -> TimeMarkerFormatter()
-        ByTotalActivities, ByTotalDistance, ByAverageDistance, ByAverageSpeed, ByAverageIntensity -> DefaultCartesianMarkerValueFormatter()
+        ByTotalActivities, ByAverageIntensity -> UnitMarkerFormatter()
+        ByTotalDistance, ByAverageDistance -> UnitMarkerFormatter(context.getString(R.string.unit_km))
+        ByAverageSpeed -> UnitMarkerFormatter(context.getString(R.string.unit_kmh))
     }
 
     /**

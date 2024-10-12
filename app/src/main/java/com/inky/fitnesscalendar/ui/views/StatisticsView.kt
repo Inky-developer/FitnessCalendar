@@ -411,13 +411,14 @@ private fun GraphLegend(
 }
 
 @Composable
-private fun rememberMarker(projection: Projection): CartesianMarker =
-    rememberDefaultCartesianMarker(
+private fun rememberMarker(projection: Projection): CartesianMarker {
+    val context = LocalContext.current
+    return rememberDefaultCartesianMarker(
         label = rememberTextComponent(
             color = MaterialTheme.colorScheme.onPrimaryContainer
         ),
         labelPosition = DefaultCartesianMarker.LabelPosition.Top,
-        valueFormatter = remember(projection) { projection.markerFormatter() },
+        valueFormatter = remember(projection) { projection.markerFormatter(context) },
         guideline = rememberAxisGuidelineComponent(),
         indicator = { color ->
             ShapeComponent(
@@ -427,3 +428,4 @@ private fun rememberMarker(projection: Projection): CartesianMarker =
             )
         }
     )
+}
