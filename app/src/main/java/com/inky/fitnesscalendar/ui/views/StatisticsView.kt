@@ -33,6 +33,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -55,6 +56,7 @@ import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityCategory
 import com.inky.fitnesscalendar.data.Displayable
 import com.inky.fitnesscalendar.db.entities.Activity
+import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.preferences.Preference
 import com.inky.fitnesscalendar.ui.components.CompactActivityCard
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
@@ -62,6 +64,7 @@ import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.localDatabaseValues
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.view_model.StatisticsViewModel
+import com.inky.fitnesscalendar.view_model.statistics.GraphState
 import com.inky.fitnesscalendar.view_model.statistics.Grouping
 import com.inky.fitnesscalendar.view_model.statistics.Period
 import com.inky.fitnesscalendar.view_model.statistics.Projection
@@ -98,26 +101,38 @@ fun StatisticsView(
     onOpenDrawer: () -> Unit,
     onViewActivity: (Activity) -> Unit
 ) {
-    if (initialPeriod != null) {
-        viewModel.period = initialPeriod
+    LaunchedEffect(initialPeriod) {
+        if (initialPeriod != null) {
+            viewModel.setPeriod(initialPeriod)
+        }
     }
 
-    StatisticsView(
-        viewModel = viewModel,
-        onOpenDrawer = onOpenDrawer,
-        onViewActivity = onViewActivity,
-    )
+    val graphState by viewModel.graphState.collectAsState()
+
+    if (graphState != null) {
+        StatisticsView(
+            state = graphState!!,
+            modelProducer = viewModel.modelProducer,
+            localizationRepository = viewModel.databaseRepository.localizationRepository,
+            onGrouping = viewModel::setGrouping,
+            onPeriod = viewModel::setPeriod,
+            onOpenDrawer = onOpenDrawer,
+            onViewActivity = onViewActivity,
+        )
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
 fun StatisticsView(
-    viewModel: StatisticsViewModel,
+    state: GraphState,
+    modelProducer: CartesianChartModelProducer,
+    localizationRepository: LocalizationRepository,
+    onGrouping: (Grouping) -> Unit,
+    onPeriod: (Period) -> Unit,
     onOpenDrawer: () -> Unit,
     onViewActivity: (Activity) -> Unit,
 ) {
-    val selectedActivities by viewModel.activityStatistics.collectAsState(initial = emptyMap())
-
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
         topBar = {
@@ -134,12 +149,10 @@ fun StatisticsView(
                 },
                 actions = {
                     ActivityFilterButton(
-                        grouping = viewModel.grouping,
-                        onGrouping = {
-                            viewModel.grouping = StatisticsViewModel.FilteredGrouping(it)
-                        }
+                        grouping = state.grouping,
+                        onGrouping = onGrouping
                     )
-                    ProjectionSelectButton(viewModel.projection)
+                    ProjectionSelectButton(state.projection)
                 },
                 scrollBehavior = scrollBehavior,
                 modifier = Modifier.sharedBounds(SharedContentKey.AppBar)
@@ -157,8 +170,8 @@ fun StatisticsView(
                 ) {
                     for (period in Period.entries) {
                         DateFilterChip(
-                            selected = viewModel.period == period,
-                            onSelect = { viewModel.period = period },
+                            selected = state.period == period,
+                            onSelect = { onPeriod(period) },
                             label = { Text(stringResource(period.nameId)) }
                         )
                     }
@@ -167,36 +180,38 @@ fun StatisticsView(
 
             item(contentType = ContentType.Graph) {
                 Column(modifier = Modifier.padding(all = 8.dp)) {
+                    val groupingOptions = remember(state.grouping) { state.grouping.options() }
                     Text(
-                        stringResource(viewModel.projection.legendTextId),
+                        stringResource(state.projection.legendTextId),
                         style = MaterialTheme.typography.labelLarge,
                     )
                     Graph(
-                        viewModel.modelProducer,
-                        viewModel.projection,
-                        viewModel.period,
-                        viewModel.groupingOptions.value,
+                        modelProducer,
+                        state.projection,
+                        state.period,
+                        groupingOptions,
                         modifier = Modifier
                             .fillParentMaxHeight(0.9f)
                             .fillMaxWidth()
                     )
 
                     GraphLegend(
-                        options = viewModel.groupingOptions.value,
-                        removedGroups = viewModel.grouping.filteredIndexes,
+                        options = groupingOptions,
+                        removedGroups = state.grouping.filteredIndexes,
                         onToggle = { index ->
-                            viewModel.grouping =
-                                if (viewModel.grouping.filteredIndexes.contains(index)) {
-                                    viewModel.grouping.withoutIndex(index)
+                            onGrouping(
+                                if (state.grouping.filteredIndexes.contains(index)) {
+                                    state.grouping.withoutIndex(index)
                                 } else {
-                                    viewModel.grouping.withIndex(index)
+                                    state.grouping.withIndex(index)
                                 }
+                            )
                         }
                     )
                 }
             }
 
-            for ((activities, header) in selectedActivities.values.reversed()) {
+            for ((activities, header) in state.statistics.values.reversed()) {
                 stickyHeader(contentType = ContentType.Date) {
                     Text(
                         header,
@@ -213,7 +228,7 @@ fun StatisticsView(
                     contentType = { ContentType.Activity }) { typeActivity ->
                     CompactActivityCard(
                         richActivity = typeActivity,
-                        localizationRepository = viewModel.databaseRepository.localizationRepository,
+                        localizationRepository = localizationRepository,
                         modifier = Modifier.clickable { onViewActivity(typeActivity.activity) }
                     )
                 }

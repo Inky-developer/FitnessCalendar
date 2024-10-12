@@ -1,20 +1,15 @@
 package com.inky.fitnesscalendar.view_model
 
 import android.content.Context
-import androidx.compose.runtime.derivedStateOf
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.inky.fitnesscalendar.data.ActivityStatistics
 import com.inky.fitnesscalendar.data.Displayable
 import com.inky.fitnesscalendar.preferences.Preference
 import com.inky.fitnesscalendar.repository.DatabaseRepository
+import com.inky.fitnesscalendar.view_model.statistics.GraphState
 import com.inky.fitnesscalendar.view_model.statistics.Grouping
 import com.inky.fitnesscalendar.view_model.statistics.Period
-import com.inky.fitnesscalendar.view_model.statistics.Projection
 import com.patrykandpatrick.vico.core.cartesian.AutoScrollCondition
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
@@ -24,7 +19,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -37,55 +32,99 @@ class StatisticsViewModel @Inject constructor(
     @ApplicationContext val context: Context,
     val databaseRepository: DatabaseRepository
 ) : ViewModel() {
-    var grouping by mutableStateOf(FilteredGrouping(Grouping.All))
-    val groupingOptions = derivedStateOf { grouping.options() }
-    var period by mutableStateOf(Period.Week)
-    var projection by mutableStateOf(Projection.ByTotalActivities)
+    private var _graphState = MutableStateFlow<GraphState?>(null)
+    val graphState get() = _graphState.asStateFlow()
 
-    private var _activityStatistics = MutableStateFlow<Map<Long, Period.StatisticsEntry>?>(null)
-    val activityStatistics get() = _activityStatistics.filterNotNull()
+    private var initialPeriod: Period = Period.Week
 
     val modelProducer = CartesianChartModelProducer()
 
     init {
-        viewModelScope.launch(Dispatchers.IO) {
-            snapshotFlow { period to grouping }.collect { refreshActivities() }
-        }
-        viewModelScope.launch(Dispatchers.IO) {
-            snapshotFlow { projection }.collect { refreshModel() }
+        viewModelScope.launch(Dispatchers.Default) {
+            val projection = Preference.PREF_STATS_PROJECTION.get(context)
+            _graphState.value = GraphState(
+                grouping = FilteredGrouping(Grouping.All),
+                period = Period.Week,
+                projection = projection,
+                statistics = emptyMap()
+            )
+
+            refreshActivities()
         }
 
-        Preference.PREF_STATS_PROJECTION.flow(context)
-            .onEach { projection = it }
-            .launchIn(viewModelScope)
+        Preference.PREF_STATS_PROJECTION.flow(context).onEach { projection ->
+            val state = graphState.value
+            if (state != null && state.projection != projection) {
+                updateState(state.copy(projection = projection))
+            }
+        }.launchIn(viewModelScope)
     }
 
-    private suspend fun refreshActivities() {
-        val filter = grouping.filter()
+    fun setPeriod(period: Period) {
+        val state = graphState.value
+        if (state != null) {
+            updateState(state.copy(period = period))
+        } else {
+            initialPeriod = period
+        }
+    }
 
-        _activityStatistics.value =
-            databaseRepository
+    fun setGrouping(grouping: Grouping) {
+        val newGrouping = if (grouping is FilteredGrouping) {
+            grouping
+        } else {
+            FilteredGrouping(grouping)
+        }
+        graphState.value?.copy(grouping = newGrouping)?.let { updateState(it) }
+    }
+
+    private fun updateState(newState: GraphState) {
+        val oldState = graphState.value ?: return
+        val diff = oldState.diff(newState)
+
+        _graphState.value = newState
+
+        if (diff.mustRefreshActivities) {
+            refreshActivities()
+        } else {
+            synchronized(this) {
+                viewModelScope.launch(Dispatchers.Default) {
+                    refreshModel()
+                }
+            }
+        }
+    }
+
+    private fun refreshActivities() = synchronized(this) {
+        val state = _graphState.value ?: return@synchronized
+
+        val filter = state.grouping.filter()
+        viewModelScope.launch(Dispatchers.IO) {
+            val statistics = databaseRepository
                 .getActivities(filter)
                 .shareIn(viewModelScope, SharingStarted.Eagerly)
                 .first()
-                .let { period.filter(ActivityStatistics(it)) }
-        refreshModel()
+            val statisticsMap = state.period.filter(ActivityStatistics(statistics))
+            _graphState.value = state.copy(statistics = statisticsMap)
+            refreshModel()
+        }
     }
 
     private suspend fun refreshModel() {
-        val dataPoints = _activityStatistics.value?.mapValues { entry ->
+        val state = _graphState.value ?: return
+        val dataPoints = state.statistics.mapValues { entry ->
             ModelData(
                 entryName = entry.value.entryName,
-                groups = grouping.apply(entry.value.statistics)
+                groups = state.grouping.apply(entry.value.statistics)
             )
-        } ?: return
+        }
         if (dataPoints.isEmpty()) return
 
-        val groups = grouping.options()
+        val groups = state.grouping.options()
         val groupedDataPoints = groups.map { group ->
             dataPoints.mapNotNull { (key, modelData) ->
-                val value = modelData.groups[group]?.let { projection.apply(it) }
-                    ?: projection.getDefault()
+                val value = modelData.groups[group]?.let { state.projection.apply(it) }
+                    ?: state.projection.getDefault()
                 value?.let { key to it }
             }.toMap()
         }
@@ -106,8 +145,8 @@ class StatisticsViewModel @Inject constructor(
             }
             extras {
                 it[xToDateKey] = dataPoints.mapValues { entry -> entry.value.entryName }
-                it[periodKey] = period.ordinal
-                it[groupingKey] = grouping
+                it[periodKey] = state.period.ordinal
+                it[groupingKey] = state.grouping
             }
         }
     }
