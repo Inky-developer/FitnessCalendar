@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - uses: actions/checkout@v4
       - name: Create release apk
         uses: ./.github/actions/build-release-apk
       - name: Rename release apk
