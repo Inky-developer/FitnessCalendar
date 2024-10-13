@@ -23,7 +23,12 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
 
       - name: Run tests
-        run: ./gradlew test --info
+        run: ./gradlew test
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        with:
+          path: app/build/reports/tests
 
         # Unfortunately this does not work
         # TODO: investigate why
