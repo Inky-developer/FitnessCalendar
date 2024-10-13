@@ -3,33 +3,15 @@ name: Create a nightly release
 on:
   push:
     branches:
-      - master
+      - '*'
 
 jobs:
   build:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Retrieve the keystore secret and decode it to a file
-      env:
-        KEYSTORE_B64: ${{ secrets.KEYSTOREB64 }}
-      run: |
-        echo $KEYSTORE_B64 | base64 --decode > app/keystore.jks
-    - name: set up java
-      uses: actions/setup-java@v4
-      with:
-        java-version: '21'
-        distribution: 'temurin'
-        cache: gradle
-
-    - name: Setup gradle
-      uses: gradle/actions/setup-gradle@v3
-    - name: Create release app with gradle
-      env:
-        STORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-        KEY_PASSWORD: ${{ secrets.KEYSTORE_KEY_PASSWORD }}
-      run: ./gradlew assembleRelease
+    - name: Create release apk
+      uses: ./.github/actions/build-release-apk
     - name: Rename release apk
       run: mv app/build/outputs/apk/release/app-release.apk FitnessCalendar-Nightly.apk
     - name: Upload release apk
