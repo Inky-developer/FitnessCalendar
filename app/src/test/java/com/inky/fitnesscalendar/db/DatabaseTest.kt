@@ -40,5 +40,7 @@ class DatabaseTest {
                 "Activity type got created",
                 activityTypes.find { it.name == context.getString(activityType.titleId) })
         }
+
+        db.close()
     }
 }
