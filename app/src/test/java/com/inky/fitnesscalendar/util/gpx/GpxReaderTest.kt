@@ -1,6 +1,8 @@
 package com.inky.fitnesscalendar.util.gpx
 
 import android.os.Build
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import org.approvaltests.Approvals
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -56,6 +58,6 @@ class GpxReaderTest {
     @Test
     fun testParse() {
         val reader = GpxReader.read(ByteArrayInputStream(GPX.encodeToByteArray()))
-        Approvals.verifyAll("Reader", reader?.tracks)
+        Approvals.verify(Json.encodeToString(reader?.tracks))
     }
 }
