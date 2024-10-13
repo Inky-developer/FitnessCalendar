@@ -23,7 +23,7 @@ jobs:
         uses: gradle/actions/setup-gradle@v3
 
       - name: Run tests
-        run: ./gradlew test
+        run: ./gradlew test --info
 
         # Unfortunately this does not work
         # TODO: investigate why
