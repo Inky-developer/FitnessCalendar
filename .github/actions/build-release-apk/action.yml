@@ -4,6 +4,7 @@ description: Builds the release apk and signs it
 runs:
   using: "composite"
   steps:
+    - uses: actions/checkout@v4
     - name: Retrieve the keystore secret and decode it to a file
       env:
         KEYSTORE_B64: ${{ secrets.KEYSTOREB64 }}
