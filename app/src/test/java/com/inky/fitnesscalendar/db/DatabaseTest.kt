@@ -7,8 +7,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import androidx.test.core.app.ApplicationProvider
 import com.inky.fitnesscalendar.MainApp
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
+import org.approvaltests.Approvals
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -34,12 +33,7 @@ class DatabaseTest {
 
         val activityTypeDao = db.activityTypeDao()
         val activityTypes = runBlocking { activityTypeDao.loadTypes() }
-        assertEquals(activityTypes.size, DefaultActivityType.entries.size)
-        for (activityType in DefaultActivityType.entries) {
-            assertNotNull(
-                "Activity type got created",
-                activityTypes.find { it.name == context.getString(activityType.titleId) })
-        }
+        Approvals.verifyAll("ActivityTypes", activityTypes)
 
         db.close()
     }

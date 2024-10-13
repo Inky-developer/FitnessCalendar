@@ -1,0 +1,11 @@
+ActivityTypes[0] = Cycling
+ActivityTypes[1] = Running
+ActivityTypes[2] = Home → Work
+ActivityTypes[3] = Work → Home
+ActivityTypes[4] = Travel
+ActivityTypes[5] = Work
+ActivityTypes[6] = Gaming
+ActivityTypes[7] = Film
+ActivityTypes[8] = Note
+ActivityTypes[9] = Health
+ActivityTypes[10] = Other
