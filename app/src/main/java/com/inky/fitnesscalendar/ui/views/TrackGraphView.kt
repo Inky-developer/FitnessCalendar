@@ -1,5 +1,6 @@
 package com.inky.fitnesscalendar.ui.views
 
+import android.graphics.RectF
 import android.graphics.Typeface
 import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
@@ -45,7 +46,6 @@ import com.patrykandpatrick.vico.compose.cartesian.axis.rememberAxisGuidelineCom
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottom
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStart
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLine
-import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
 import com.patrykandpatrick.vico.compose.cartesian.marker.rememberDefaultCartesianMarker
 import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoZoomState
@@ -53,11 +53,15 @@ import com.patrykandpatrick.vico.compose.common.component.rememberShapeComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
 import com.patrykandpatrick.vico.compose.common.dimensions
 import com.patrykandpatrick.vico.compose.common.fill
+import com.patrykandpatrick.vico.core.cartesian.CartesianDrawingContext
 import com.patrykandpatrick.vico.core.cartesian.Zoom
 import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
 import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
+import com.patrykandpatrick.vico.core.cartesian.data.CartesianLayerModel
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianValueFormatter
+import com.patrykandpatrick.vico.core.cartesian.data.LineCartesianLayerDrawingModel
+import com.patrykandpatrick.vico.core.cartesian.data.LineCartesianLayerModel
 import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
 import com.patrykandpatrick.vico.core.cartesian.layer.LineCartesianLayer
 import com.patrykandpatrick.vico.core.cartesian.marker.DefaultCartesianMarkerValueFormatter
@@ -68,6 +72,9 @@ import kotlinx.coroutines.withContext
 import java.text.DecimalFormat
 import java.time.Instant
 import java.util.Date
+import kotlin.math.log10
+import kotlin.math.pow
+import kotlin.math.roundToInt
 import kotlin.math.roundToLong
 
 
@@ -130,7 +137,7 @@ fun TrackGraph(track: Track, projection: TrackGraphProjection, modifier: Modifie
 
     CartesianChartHost(
         chart = rememberCartesianChart(
-            rememberLineCartesianLayer(
+            rememberLODLineCartesianLayer(
                 lineProvider = LineCartesianLayer.LineProvider.series(
                     LineCartesianLayer.rememberLine(
                         fill = LineCartesianLayer.LineFill.single(fill(colorResource(projection.color))),
@@ -230,6 +237,125 @@ enum class TrackGraphProjection(
         HeartRate -> point.point.heartFrequency?.bpm
         Elevation -> point.point.elevation?.meters
         Temperature -> point.point.temperature?.celsius
+    }
+}
+
+@Composable
+private fun rememberLODLineCartesianLayer(lineProvider: LineCartesianLayer.LineProvider) =
+    remember(lineProvider) {
+        LODLineCartesianLayer(lineProvider = lineProvider)
+    }
+
+/**
+ * A very hacky overwrite over [LineCartesianLayer], which supports Level of detail.
+ * When zoomed out, it groups nearby points together and shows the average only,
+ * but it reveals more details when zoomed in
+ *
+ * Most lines are copy-pasted from [LineCartesianLayer], with some changes to support the LOD
+ * functionality.
+ */
+private class LODLineCartesianLayer(lineProvider: LineProvider) : LineCartesianLayer(lineProvider) {
+    private fun RectF.getStart(isLtr: Boolean): Float = if (isLtr) left else right
+
+    private inline fun <T : CartesianLayerModel.Entry> List<T>.forEachIn(
+        range: ClosedFloatingPointRange<Double>,
+        padding: Int = 0,
+        zoom: Float = 1f,
+        // The minimal distance between two points to be separated
+        // No idea what the unit is
+        minDistance: Float = 0.05f,
+        action: (List<T>, T?) -> Unit,
+    ) {
+        var start = 0
+        var end = 0
+        for (entry in this) {
+            when {
+                entry.x < range.start -> start++
+                entry.x > range.endInclusive -> break
+            }
+            end++
+        }
+        start = (start - padding).coerceAtLeast(0)
+        end = (end + padding).coerceAtMost(lastIndex)
+
+        var lastIndex = start
+        val pointsAccumulator = mutableListOf<T>()
+        ((start + 1)..end).forEach {
+            val point = this[it]
+            val last = this[lastIndex]
+
+            pointsAccumulator.add(point)
+
+            val pointDistance = (point.x - last.x) * zoom
+            if (pointDistance >= minDistance) {
+                action(pointsAccumulator, getOrNull(it + 1))
+                lastIndex = it
+                pointsAccumulator.clear()
+            }
+        }
+        if (pointsAccumulator.isNotEmpty()) {
+            action(pointsAccumulator, null)
+        }
+    }
+
+    override fun CartesianDrawingContext.forEachPointInBounds(
+        series: List<LineCartesianLayerModel.Entry>,
+        drawingStart: Float,
+        pointInfoMap: Map<Double, LineCartesianLayerDrawingModel.PointInfo>?,
+        action: (entry: LineCartesianLayerModel.Entry, x: Float, y: Float, previousX: Float?, nextX: Float?) -> Unit
+    ) {
+        val minX = ranges.minX
+        val maxX = ranges.maxX
+        val xStep = ranges.xStep
+
+        var x: Float? = null
+        var nextX: Float? = null
+
+        val boundsStart = layerBounds.getStart(isLtr = isLtr)
+        val boundsEnd = boundsStart + layoutDirectionMultiplier * layerBounds.width()
+
+        fun getDrawX(entry: LineCartesianLayerModel.Entry): Float =
+            drawingStart +
+                    layoutDirectionMultiplier *
+                    horizontalDimensions.xSpacing *
+                    ((entry.x - minX) / xStep).toFloat()
+
+        fun getDrawY(entry: LineCartesianLayerModel.Entry): Float {
+            val yRange = ranges.getYRange(verticalAxisPosition)
+            return layerBounds.bottom -
+                    (pointInfoMap?.get(entry.x)?.y
+                        ?: ((entry.y - yRange.minY) / yRange.length).toFloat()) *
+                    layerBounds.height()
+        }
+
+        fun pointAvg(points: List<LineCartesianLayerModel.Entry>): LineCartesianLayerModel.Entry {
+            assert(points.isNotEmpty())
+
+            return LineCartesianLayerModel.Entry(
+                x = points.sumOf { it.x } / points.size,
+                y = points.sumOf { it.y } / points.size
+            )
+        }
+
+        // Round the zoom value to the next closest order of magnitude, to prevent too much flickering
+        val effectiveZoom = 10.0.pow(log10(zoom).roundToInt()).toFloat()
+        series.forEachIn(range = minX..maxX, padding = 1, zoom = effectiveZoom) { entries, next ->
+            val entry = pointAvg(entries)
+            val previousX = x
+            val immutableX = nextX ?: getDrawX(entry)
+            val immutableNextX = next?.let(::getDrawX)
+            x = immutableX
+            nextX = immutableNextX
+            if (
+                immutableNextX != null &&
+                (isLtr && immutableX < boundsStart || !isLtr && immutableX > boundsStart) &&
+                (isLtr && immutableNextX < boundsStart || !isLtr && immutableNextX > boundsStart)
+            ) {
+                return@forEachIn
+            }
+            action(entry, immutableX, getDrawY(entry), previousX, nextX)
+            if (isLtr && immutableX > boundsEnd || isLtr.not() && immutableX < boundsEnd) return
+        }
     }
 }
 
