@@ -278,4 +278,5 @@
     <string name="Maximum_velocity">Maximum velocity</string>
     <string name="configure_about">About…</string>
     <string name="color_dark_green">Dark green</string>
+    <string name="Unsaved_changes_warning">You have unsaved changes. Do you really want to exit?</string>
 </resources>

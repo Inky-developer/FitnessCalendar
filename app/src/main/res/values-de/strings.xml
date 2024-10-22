@@ -279,4 +279,5 @@
     <string name="Maximum_velocity">Maximale Geschwindigkeit</string>
     <string name="configure_about">Über…</string>
     <string name="color_dark_green">Dunkelgrün</string>
+    <string name="Unsaved_changes_warning">Es gibt ungespeicherte Änderungen. Trotzdem zurück gehen?</string>
 </resources>

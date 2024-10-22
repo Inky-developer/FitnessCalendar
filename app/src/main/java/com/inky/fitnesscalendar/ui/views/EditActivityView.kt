@@ -1,6 +1,7 @@
 package com.inky.fitnesscalendar.ui.views
 
 import android.os.Parcelable
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -77,6 +78,7 @@ import com.inky.fitnesscalendar.ui.components.DateTimePicker
 import com.inky.fitnesscalendar.ui.components.FavoriteIcon
 import com.inky.fitnesscalendar.ui.components.FeelSelector
 import com.inky.fitnesscalendar.ui.components.ImageViewer
+import com.inky.fitnesscalendar.ui.components.OkayCancelDialog
 import com.inky.fitnesscalendar.ui.components.OptionGroup
 import com.inky.fitnesscalendar.ui.components.SelectImageDropdownMenuItem
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
@@ -127,6 +129,8 @@ fun NewActivity(
     onNavigateBack: () -> Unit,
     onNavigateNewPlace: () -> Unit,
 ) {
+    var showBackDialog by rememberSaveable { mutableStateOf(false) }
+
     val context = LocalContext.current
     val activityPrediction = remember { DecisionTrees.classifyNow(context) }
 
@@ -147,6 +151,32 @@ fun NewActivity(
         editState = editState.copy(imageName = it)
     })
 
+    BackHandler(enabled = editState != initialState) {
+        showBackDialog = true
+    }
+
+    val onBack = remember {
+        {
+            if (editState != initialState) {
+                showBackDialog = true
+            } else {
+                onNavigateBack()
+            }
+        }
+    }
+
+    if (showBackDialog) {
+        OkayCancelDialog(
+            onDismiss = { showBackDialog = false },
+            onOkay = {
+                showBackDialog = false
+                onNavigateBack()
+            }
+        ) {
+            Text(stringResource(R.string.Unsaved_changes_warning))
+        }
+    }
+
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
 
     Scaffold(
@@ -156,7 +186,7 @@ fun NewActivity(
                 colors = defaultTopAppBarColors(),
                 scrollBehavior = scrollBehavior,
                 navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
+                    IconButton(onClick = onBack) {
                         Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.back))
                     }
                 },

@@ -3,6 +3,8 @@ package com.inky.fitnesscalendar.ui.components
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.material3.AlertDialogDefaults
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -26,14 +28,17 @@ fun OkayCancelDialog(
     content: @Composable () -> Unit
 ) {
     BasicAlertDialog(
-        onDismissRequest = onDismiss, properties = DialogProperties(usePlatformDefaultWidth = false)
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
         Surface(
-            color = MaterialTheme.colorScheme.surfaceContainerHigh,
             shape = MaterialTheme.shapes.extraLarge,
-            modifier = Modifier.padding(all = 8.dp)
+            tonalElevation = AlertDialogDefaults.TonalElevation,
+            modifier = Modifier
+                .padding(all = 8.dp)
+                .wrapContentSize()
         ) {
-            Column {
+            Column(modifier = Modifier.padding(16.dp)) {
                 content()
 
                 Row(modifier = Modifier.align(Alignment.End)) {
