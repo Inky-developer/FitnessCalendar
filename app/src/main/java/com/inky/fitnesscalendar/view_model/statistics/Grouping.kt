@@ -3,7 +3,6 @@ package com.inky.fitnesscalendar.view_model.statistics
 import com.inky.fitnesscalendar.data.ActivityCategory
 import com.inky.fitnesscalendar.data.ActivityStatistics
 import com.inky.fitnesscalendar.data.Displayable
-import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.db.entities.ActivityType
 
 /**
@@ -17,14 +16,14 @@ import com.inky.fitnesscalendar.db.entities.ActivityType
  *  - Type: activities will be grouped by their type and filtered by their type
  */
 interface Grouping {
-    fun filter(): ActivityFilter
+    fun filterCategory(): ActivityCategory?
 
     fun apply(statistics: ActivityStatistics): Map<out Displayable, ActivityStatistics>
 
     fun options(): List<Displayable>
 
     data object All : Grouping {
-        override fun filter() = ActivityFilter()
+        override fun filterCategory() = null
 
         override fun apply(statistics: ActivityStatistics) = statistics.activitiesByCategory
 
@@ -33,7 +32,7 @@ interface Grouping {
 
     data class Category(val category: ActivityCategory, val activityTypes: List<ActivityType>) :
         Grouping {
-        override fun filter() = ActivityFilter(categories = listOf(category))
+        override fun filterCategory() = category
 
         override fun apply(statistics: ActivityStatistics) =
             statistics.activitiesByCategory.filter { it.key == category } + statistics.activitiesByType

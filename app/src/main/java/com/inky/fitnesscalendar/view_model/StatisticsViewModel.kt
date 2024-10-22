@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.inky.fitnesscalendar.data.ActivityStatistics
 import com.inky.fitnesscalendar.data.Displayable
+import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.preferences.Preference
 import com.inky.fitnesscalendar.repository.DatabaseRepository
 import com.inky.fitnesscalendar.view_model.statistics.GraphState
@@ -36,6 +37,7 @@ class StatisticsViewModel @Inject constructor(
     val graphState get() = _graphState.asStateFlow()
 
     private var initialPeriod: Period = Period.Week
+    private var initialFilter: ActivityFilter = ActivityFilter()
 
     val modelProducer = CartesianChartModelProducer()
 
@@ -44,9 +46,10 @@ class StatisticsViewModel @Inject constructor(
             val projection = Preference.PREF_STATS_PROJECTION.get(context)
             _graphState.value = GraphState(
                 grouping = FilteredGrouping(Grouping.All),
-                period = Period.Week,
+                period = initialPeriod,
+                filter = initialFilter,
                 projection = projection,
-                statistics = emptyMap()
+                statistics = emptyMap(),
             )
 
             refreshActivities()
@@ -66,6 +69,15 @@ class StatisticsViewModel @Inject constructor(
             updateState(state.copy(period = period))
         } else {
             initialPeriod = period
+        }
+    }
+
+    fun setFilter(filter: ActivityFilter) {
+        val state = graphState.value
+        if (state != null) {
+            updateState(state.copy(filter = filter))
+        } else {
+            initialFilter = filter
         }
     }
 
@@ -98,7 +110,8 @@ class StatisticsViewModel @Inject constructor(
     private fun refreshActivities() = synchronized(this) {
         val state = _graphState.value ?: return@synchronized
 
-        val filter = state.grouping.filter()
+        val filter =
+            state.grouping.filterCategory()?.let { state.filter.withCategory(it) } ?: state.filter
         viewModelScope.launch(Dispatchers.IO) {
             val statistics = databaseRepository
                 .getActivities(filter)

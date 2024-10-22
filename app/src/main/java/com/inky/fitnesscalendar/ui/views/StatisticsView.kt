@@ -1,6 +1,7 @@
 package com.inky.fitnesscalendar.ui.views
 
 import android.graphics.Typeface
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -30,6 +32,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -51,10 +54,12 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Popup
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityCategory
 import com.inky.fitnesscalendar.data.Displayable
+import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.preferences.Preference
@@ -99,12 +104,17 @@ fun StatisticsView(
     viewModel: StatisticsViewModel = hiltViewModel(),
     initialPeriod: Period? = null,
     onOpenDrawer: () -> Unit,
-    onViewActivity: (Activity) -> Unit
+    onViewActivity: (Activity) -> Unit,
 ) {
     LaunchedEffect(initialPeriod) {
         if (initialPeriod != null) {
             viewModel.setPeriod(initialPeriod)
         }
+    }
+
+    var showFilterView by rememberSaveable { mutableStateOf(false) }
+    BackHandler(enabled = showFilterView) {
+        showFilterView = false
     }
 
     val graphState by viewModel.graphState.collectAsState()
@@ -118,7 +128,20 @@ fun StatisticsView(
             onPeriod = viewModel::setPeriod,
             onOpenDrawer = onOpenDrawer,
             onViewActivity = onViewActivity,
+            onNavigateFilterView = { showFilterView = true }
         )
+    }
+
+    if (showFilterView) {
+        Popup {
+            Surface(modifier = Modifier.fillMaxSize()) {
+                FilterViewInner(
+                    filter = graphState?.filter ?: ActivityFilter(),
+                    onFilter = { viewModel.setFilter(it) },
+                    hideActivitiesAndCategories = true,
+                )
+            }
+        }
     }
 }
 
@@ -132,6 +155,7 @@ fun StatisticsView(
     onPeriod: (Period) -> Unit,
     onOpenDrawer: () -> Unit,
     onViewActivity: (Activity) -> Unit,
+    onNavigateFilterView: () -> Unit
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
@@ -148,10 +172,17 @@ fun StatisticsView(
                     }
                 },
                 actions = {
-                    ActivityFilterButton(
+                    GroupingSelectButton(
                         grouping = state.grouping,
                         onGrouping = onGrouping
                     )
+                    IconButton(onClick = onNavigateFilterView) {
+                        val icon = remember(state.filter) {
+                            if (state.filter.isEmpty()) R.drawable.outline_filter_list_off_24
+                            else R.drawable.outline_filter_list_24
+                        }
+                        Icon(painterResource(icon), stringResource(R.string.filter))
+                    }
                     ProjectionSelectButton(state.projection)
                 },
                 scrollBehavior = scrollBehavior,
@@ -273,7 +304,7 @@ private fun ProjectionSelectButton(projection: Projection) {
 }
 
 @Composable
-private fun ActivityFilterButton(
+private fun GroupingSelectButton(
     grouping: Grouping,
     onGrouping: (Grouping) -> Unit
 ) {

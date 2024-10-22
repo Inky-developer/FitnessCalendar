@@ -295,7 +295,7 @@ private fun AppNavigation(
                         onOpenDrawer = openDrawer,
                         onViewActivity = {
                             navController.navigate(Views.ActivityLog(it.uid))
-                        }
+                        },
                     )
                 }
             }

@@ -73,8 +73,6 @@ fun FilterView(
         onBack()
     }
 
-    val scrollState = rememberScrollState()
-
     val appBar = @Composable {
         TopAppBar(
             colors = TopAppBarDefaults.topAppBarColors(
@@ -119,31 +117,44 @@ fun FilterView(
     Scaffold(
         topBar = appBar, containerColor = MaterialTheme.colorScheme.surface
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .padding(paddingValues)
-                .verticalScroll(scrollState)
-        ) {
-            val context = LocalContext.current
-            val selectionLabel = remember(filter) {
-                if (filter.types.isEmpty()) null else filter.types.joinToString(", ") { it.name }
-            }
-            val categorySelectionLabel = remember(filter) {
-                if (filter.categories.isEmpty()) null else filter.categories.joinToString(", ") {
-                    context.getString(it.nameId)
-                }
-            }
-            val placeSelectionLabel = remember(filter) {
-                if (filter.places.isEmpty()) null else filter.places.joinToString(", ") { it.name }
-            }
-            val attributeSelectionLabel = remember(filter) {
-                val entries = filter.attributes.entries()
-                    .filter { (_, state) -> state != AttributeFilter.TriState.Undefined }
-                if (entries.isEmpty()) null else entries.joinToString(", ") { (attribute, state) ->
-                    attribute.getString(context, state.toBooleanOrNull() == true)
-                }
-            }
+        FilterViewInner(
+            filter = filter,
+            onFilter = { filter = it },
+            hideActivitiesAndCategories = false,
+            modifier = Modifier.padding(paddingValues)
+        )
+    }
+}
 
+@Composable
+fun FilterViewInner(
+    modifier: Modifier = Modifier,
+    filter: ActivityFilter,
+    onFilter: (ActivityFilter) -> Unit,
+    hideActivitiesAndCategories: Boolean
+) {
+    Column(modifier = modifier.verticalScroll(rememberScrollState())) {
+        val context = LocalContext.current
+        val selectionLabel = remember(filter) {
+            if (filter.types.isEmpty()) null else filter.types.joinToString(", ") { it.name }
+        }
+        val categorySelectionLabel = remember(filter) {
+            if (filter.categories.isEmpty()) null else filter.categories.joinToString(", ") {
+                context.getString(it.nameId)
+            }
+        }
+        val placeSelectionLabel = remember(filter) {
+            if (filter.places.isEmpty()) null else filter.places.joinToString(", ") { it.name }
+        }
+        val attributeSelectionLabel = remember(filter) {
+            val entries = filter.attributes.entries()
+                .filter { (_, state) -> state != AttributeFilter.TriState.Undefined }
+            if (entries.isEmpty()) null else entries.joinToString(", ") { (attribute, state) ->
+                attribute.getString(context, state.toBooleanOrNull() == true)
+            }
+        }
+
+        if (!hideActivitiesAndCategories) {
             OptionGroup(
                 label = stringResource(R.string.filter_by_categories),
                 selectionLabel = categorySelectionLabel,
@@ -154,7 +165,7 @@ fun FilterView(
                 ActivityCategorySelector(
                     isSelected = { filter.categories.contains(it) },
                     onSelect = { category ->
-                        filter = filter.copy(categories = filter.categories.toggled(category))
+                        onFilter(filter.copy(categories = filter.categories.toggled(category)))
                     }
                 )
             }
@@ -167,131 +178,135 @@ fun FilterView(
                 ActivityTypeSelector(
                     isSelected = { filter.types.contains(it) },
                     onSelect = { activityType ->
-                        filter = filter.copy(types = filter.types.toggled(activityType))
+                        onFilter(filter.copy(types = filter.types.toggled(activityType)))
                     },
                 )
             }
+        }
 
-            if (localDatabaseValues.current.places.isNotEmpty()) {
-                OptionGroup(
-                    label = stringResource(R.string.filter_by_places),
-                    selectionLabel = placeSelectionLabel,
-                    modifier = Modifier.padding(all = 8.dp)
-                ) {
-                    PlacesSelector(
-                        isSelected = { filter.places.contains(it) },
-                        onSelect = { place ->
-                            filter = filter.copy(places = filter.places.toggled(place))
-                        }
+        if (localDatabaseValues.current.places.isNotEmpty()) {
+            OptionGroup(
+                label = stringResource(R.string.filter_by_places),
+                selectionLabel = placeSelectionLabel,
+                modifier = Modifier.padding(all = 8.dp)
+            ) {
+                PlacesSelector(
+                    isSelected = { filter.places.contains(it) },
+                    onSelect = { place ->
+                        onFilter(filter.copy(places = filter.places.toggled(place)))
+                    }
+                )
+            }
+        }
+
+        OptionGroup(
+            label = stringResource(R.string.filter_by_date),
+            selectionLabel = filter.range?.getText(context),
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+        ) {
+            LazyRow {
+                items(DateRangeKind.entries) { range ->
+                    FilterChip(
+                        selected = filter.range?.name == range.rangeName,
+                        onClick = {
+                            val newRange = if (filter.range?.name == range.rangeName) {
+                                null
+                            } else {
+                                range.toOption()
+                            }
+                            onFilter(filter.copy(range = newRange))
+                        },
+                        label = {
+                            Text(
+                                range.toOption().getText(context),
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                        },
+                        modifier = Modifier.padding(all = 4.dp)
                     )
                 }
             }
+        }
 
-            OptionGroup(
-                label = stringResource(R.string.filter_by_date),
-                selectionLabel = filter.range?.getText(context),
-                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-            ) {
-                LazyRow {
-                    items(DateRangeKind.entries) { range ->
-                        FilterChip(
-                            selected = filter.range?.name == range.rangeName,
-                            onClick = {
-                                val newRange = if (filter.range?.name == range.rangeName) {
-                                    null
-                                } else {
-                                    range.toOption()
-                                }
-                                filter = filter.copy(range = newRange)
-                            },
-                            label = {
-                                Text(
-                                    range.toOption().getText(context),
-                                    style = MaterialTheme.typography.titleMedium
-                                )
-                            },
-                            modifier = Modifier.padding(all = 4.dp)
-                        )
-                    }
-                }
-            }
+        FilterSelectionGroup(
+            label = stringResource(R.string.filter_by_vehicles),
+            text = { context.getString(it.nameId) },
+            selection = filter.vehicles,
+            options = Vehicle.entries,
+            onSelection = { onFilter(filter.copy(vehicles = it)) }
+        ) {
+            Text(it.emoji, style = MaterialTheme.typography.headlineMedium)
+        }
 
-            FilterSelectionGroup(
-                label = stringResource(R.string.filter_by_vehicles),
-                text = { context.getString(it.nameId) },
-                selection = filter.vehicles,
-                options = Vehicle.entries,
-                onSelection = { filter = filter.copy(vehicles = it) }
-            ) {
-                Text(it.emoji, style = MaterialTheme.typography.headlineMedium)
-            }
+        FilterSelectionGroup(
+            label = stringResource(R.string.filter_by_feels),
+            text = { context.getString(it.nameId) },
+            selection = filter.feels,
+            options = Feel.entries,
+            onSelection = { onFilter(filter.copy(feels = it)) }
+        ) {
+            Text(it.emoji, style = MaterialTheme.typography.headlineMedium)
+        }
 
-            FilterSelectionGroup(
-                label = stringResource(R.string.filter_by_feels),
-                text = { context.getString(it.nameId) },
-                selection = filter.feels,
-                options = Feel.entries,
-                onSelection = { filter = filter.copy(feels = it) }
-            ) {
-                Text(it.emoji, style = MaterialTheme.typography.headlineMedium)
-            }
-
-            val currentFavoriteOption = filter.favorite?.let { FavoriteOption.fromBoolean(it) }
-            OptionGroup(
-                label = stringResource(R.string.filter_by_favorites),
-                selectionLabel = currentFavoriteOption?.let { context.getString(it.nameId) },
-                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-            ) {
-                LazyRow {
-                    items(FavoriteOption.entries) { option ->
-                        FilterChip(
-                            selected = currentFavoriteOption == option,
-                            onClick = {
-                                filter = if (filter.favorite == option.isFavorite()) {
+        val currentFavoriteOption = filter.favorite?.let { FavoriteOption.fromBoolean(it) }
+        OptionGroup(
+            label = stringResource(R.string.filter_by_favorites),
+            selectionLabel = currentFavoriteOption?.let { context.getString(it.nameId) },
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+        ) {
+            LazyRow {
+                items(FavoriteOption.entries) { option ->
+                    FilterChip(
+                        selected = currentFavoriteOption == option,
+                        onClick = {
+                            onFilter(
+                                if (filter.favorite == option.isFavorite()) {
                                     filter.copy(favorite = null)
                                 } else {
                                     filter.copy(favorite = option.isFavorite())
                                 }
-                            },
-                            label = { option.Icon() },
-                            modifier = Modifier.padding(all = 4.dp)
-                        )
-                    }
+                            )
+                        },
+                        label = { option.Icon() },
+                        modifier = Modifier.padding(all = 4.dp)
+                    )
                 }
             }
+        }
 
-            OptionGroup(
-                label = stringResource(R.string.filter_by_attributes),
-                selectionLabel = attributeSelectionLabel,
-                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-            ) {
-                LazyRow {
-                    items(AttributeFilter.Attribute.entries) { attribute ->
-                        FilterChip(
-                            selected = filter.attributes.get(attribute).toBooleanOrNull() != null,
-                            onClick = {
-                                val newState = when (filter.attributes.get(attribute)) {
-                                    AttributeFilter.TriState.Undefined -> AttributeFilter.TriState.Yes
-                                    AttributeFilter.TriState.Yes -> AttributeFilter.TriState.No
-                                    AttributeFilter.TriState.No -> AttributeFilter.TriState.Undefined
-                                }
-                                filter = filter.copy(
+        OptionGroup(
+            label = stringResource(R.string.filter_by_attributes),
+            selectionLabel = attributeSelectionLabel,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+        ) {
+            LazyRow {
+                items(AttributeFilter.Attribute.entries) { attribute ->
+                    FilterChip(
+                        selected = filter.attributes.get(attribute).toBooleanOrNull() != null,
+                        onClick = {
+                            val newState = when (filter.attributes.get(attribute)) {
+                                AttributeFilter.TriState.Undefined -> AttributeFilter.TriState.Yes
+                                AttributeFilter.TriState.Yes -> AttributeFilter.TriState.No
+                                AttributeFilter.TriState.No -> AttributeFilter.TriState.Undefined
+                            }
+                            onFilter(
+                                filter.copy(
                                     attributes = filter.attributes.with(
                                         attribute,
                                         newState
                                     )
                                 )
+                            )
 
-                            },
-                            label = {
-                                Text(
-                                    stringResource(attribute.nameId),
-                                    style = MaterialTheme.typography.titleMedium
-                                )
-                            },
-                            modifier = Modifier.padding(all = 4.dp)
-                        )
-                    }
+                        },
+                        label = {
+                            Text(
+                                stringResource(attribute.nameId),
+                                style = MaterialTheme.typography.titleMedium
+                            )
+                        },
+                        modifier = Modifier.padding(all = 4.dp)
+                    )
                 }
             }
         }
