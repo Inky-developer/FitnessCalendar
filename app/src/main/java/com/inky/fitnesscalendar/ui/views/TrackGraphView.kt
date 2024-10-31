@@ -1,5 +1,6 @@
 package com.inky.fitnesscalendar.ui.views
 
+import android.content.Context
 import android.graphics.RectF
 import android.graphics.Typeface
 import androidx.annotation.ColorRes
@@ -26,6 +27,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -187,10 +189,9 @@ private fun legendComponent() = rememberTextComponent(
 
 @Composable
 private fun rememberMarkerFormatter(projection: TrackGraphProjection): DefaultCartesianMarkerValueFormatter {
-    val unit = stringResource(projection.unit)
-
+    val context = LocalContext.current
     return remember(projection) {
-        DefaultCartesianMarkerValueFormatter(decimalFormat = DecimalFormat("#.#$unit;-#.#$unit"))
+        DefaultCartesianMarkerValueFormatter(decimalFormat = projection.format(context))
     }
 }
 
@@ -230,6 +231,14 @@ enum class TrackGraphProjection(
         }
 
         return result
+    }
+
+    fun format(context: Context): DecimalFormat {
+        val unitString = context.getString(unit)
+        return when(this) {
+            HeartRate, Elevation -> DecimalFormat("0$unitString")
+            else -> DecimalFormat("#.#$unitString")
+        }
     }
 
     private fun mapPoint(point: Track.ComputedTrackPoint): Float? = when (this) {
