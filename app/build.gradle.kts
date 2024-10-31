@@ -1,3 +1,6 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
@@ -23,11 +26,15 @@ android {
         generateLocaleConfig = true
     }
     defaultConfig {
+        val properties = Properties().apply {
+            load(FileInputStream(projectDir.resolve("version.properties")))
+        }
+
         applicationId = "com.inky.fitnesscalendar"
         minSdk = 27
         targetSdk = 35
-        versionCode = 6
-        versionName = "2024.10.2"
+        versionCode = properties.getProperty("versionCode").toInt()
+        versionName = properties.getProperty("versionName").toString()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
