@@ -17,8 +17,8 @@ A private and fully offline activity tracker.
 ## Screenshots
 
 <div>
-  <img src="https://github.com/Inky-developer/FitnessCalendar/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/initial_view_1727607981852.png" width="128">
-  <img src="https://github.com/Inky-developer/FitnessCalendar/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/activity_log_1727607983005.png" width="128">
-  <img src="https://github.com/Inky-developer/FitnessCalendar/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/day_view_1727607982460.png" width="128">
-  <img src="https://github.com/Inky-developer/FitnessCalendar/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/statistics_1727607984506.png" width="128">
+  <img alt="Home Screen" src="https://github.com/Inky-developer/FitnessCalendar/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/initial_view_1727607981852.png" width="128">
+  <img alt="Activity Log" src="https://github.com/Inky-developer/FitnessCalendar/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/activity_log_1727607983005.png" width="128">
+  <img alt="Day View" src="https://github.com/Inky-developer/FitnessCalendar/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/day_view_1727607982460.png" width="128">
+  <img alt="Statistics" src="https://github.com/Inky-developer/FitnessCalendar/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/statistics_1727607984506.png" width="128">
 </div>
