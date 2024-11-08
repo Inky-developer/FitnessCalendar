@@ -21,4 +21,4 @@ dependencyResolutionManagement {
 
 rootProject.name = "FitnessCalendar"
 include(":app")
- 
+include(":p2psync")

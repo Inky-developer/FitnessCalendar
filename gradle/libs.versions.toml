@@ -24,6 +24,8 @@ screengrabVersion = "2.1.1"
 vico = "2.0.0-beta.2"
 emoji2EmojipickerVersion = "1.5.0"
 documentfileVersion = "1.0.1"
+jetbrainsKotlinJvmVersion = "2.0.20"
+junitJupiterVersion = "5.8.1"
 
 [libraries]
 androidx-core = { module = "androidx.test:core", version.ref = "androidx-test" }
@@ -57,6 +59,7 @@ vico-compose-m3 = { group = "com.patrykandpatrick.vico", name = "compose-m3", ve
 vico-core = { group = "com.patrykandpatrick.vico", name = "core", version.ref = "vico" }
 androidx-emoji2-emojipicker = { group = "androidx.emoji2", name = "emoji2-emojipicker", version.ref = "emoji2EmojipickerVersion" }
 androidx-documentfile = { group = "androidx.documentfile", name = "documentfile", version.ref = "documentfileVersion" }
+junit-jupiter = { group = "org.junit.jupiter", name = "junit-jupiter", version.ref = "junitJupiterVersion" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
@@ -65,3 +68,4 @@ hilt = { id = "com.google.dagger.hilt.android", version.ref = "hiltAndroid" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 room = { id = "androidx.room", version.ref = "room" }
+jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvmVersion" }
