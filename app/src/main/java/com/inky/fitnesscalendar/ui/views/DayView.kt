@@ -83,7 +83,7 @@ fun DayView(
     onEditActivity: (RichActivity) -> Unit,
     onTrackDetails: (RichActivity) -> Unit,
     onJumpToActivity: (RichActivity) -> Unit,
-    onNewActivity: () -> Unit,
+    onNewActivity: (EpochDay) -> Unit,
     onEditDay: (EpochDay) -> Unit,
     onOpenDrawer: () -> Unit
 ) {
@@ -158,7 +158,7 @@ fun DayView(
                 }
             )
         },
-        floatingActionButton = { NewActivityFAB(onClick = onNewActivity) },
+        floatingActionButton = { NewActivityFAB(onClick = { onNewActivity(epochDay) }) },
         snackbarHost = { SnackbarHost(viewModel.snackbarHostState) },
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { paddingValues ->

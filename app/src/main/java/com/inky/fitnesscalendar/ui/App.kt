@@ -155,7 +155,9 @@ private fun AppNavigation(
                         onJumpToActivity = {
                             navController.navigate(Views.ActivityLog(it.activity.uid))
                         },
-                        onNewActivity = { navController.navigate(Views.NewActivity()) },
+                        onNewActivity = {
+                            navController.navigate(Views.NewActivity(rawInitialStartDay = it.day))
+                        },
                         onEditDay = { navController.navigate(Views.EditDay(it.day)) },
                         onOpenDrawer = openDrawer
                     )
@@ -224,7 +226,8 @@ private fun AppNavigation(
                         navController.popBackStack()
                     },
                     onNavigateBack = { navController.popBackStack() },
-                    onNavigateNewPlace = { navController.navigate(SettingsViews.PlaceDialog()) }
+                    onNavigateNewPlace = { navController.navigate(SettingsViews.PlaceDialog()) },
+                    initialDay = route.initialStartDay
                 )
             }
 

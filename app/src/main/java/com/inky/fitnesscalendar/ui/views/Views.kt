@@ -32,7 +32,10 @@ sealed class Views(val nameId: Int) : Parcelable {
     data object FilterActivity : Views(R.string.filter)
 
     @Serializable
-    data class NewActivity(val activityId: Int? = null) : Views(R.string.new_activity)
+    data class NewActivity(val activityId: Int? = null, val rawInitialStartDay: Long? = null) :
+        Views(R.string.new_activity) {
+        val initialStartDay: EpochDay? get() = rawInitialStartDay?.let { EpochDay(it) }
+    }
 
     @Serializable
     data class TrackDetails(val activityId: Int) : Views(R.string.track_details)

@@ -64,6 +64,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImagePainter
 import com.inky.fitnesscalendar.R
+import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.data.Feel
 import com.inky.fitnesscalendar.data.ImageName
 import com.inky.fitnesscalendar.data.Intensity
@@ -91,6 +92,7 @@ import com.inky.fitnesscalendar.view_model.NewActivityViewModel
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
+import java.time.Duration
 import java.time.LocalDateTime
 import kotlin.math.roundToInt
 
@@ -100,7 +102,8 @@ fun NewActivity(
     viewModel: NewActivityViewModel = hiltViewModel(),
     onSave: (RichActivity) -> Unit,
     onNavigateBack: () -> Unit,
-    onNavigateNewPlace: () -> Unit
+    onNavigateNewPlace: () -> Unit,
+    initialDay: EpochDay?
 ) {
     val activity =
         (activityId?.let { viewModel.repository.getActivity(it) } ?: flowOf(null)).collectAsState(
@@ -115,6 +118,7 @@ fun NewActivity(
             onSave = onSave,
             onNavigateBack = onNavigateBack,
             onNavigateNewPlace = onNavigateNewPlace,
+            initialDay = initialDay
         )
     } else {
         CircularProgressIndicator()
@@ -129,6 +133,7 @@ fun NewActivity(
     onSave: (RichActivity) -> Unit,
     onNavigateBack: () -> Unit,
     onNavigateNewPlace: () -> Unit,
+    initialDay: EpochDay? = null,
     isTest: Boolean = false
 ) {
     var showBackDialog by rememberSaveable { mutableStateOf(false) }
@@ -140,7 +145,22 @@ fun NewActivity(
         richActivity?.type?.let { context.getString(R.string.edit_object, it.name) }
             ?: context.getString(R.string.new_activity)
     }
-    val initialState = remember { ActivityEditState(richActivity, activityPrediction) }
+    val initialState = remember {
+        val state = ActivityEditState(richActivity, activityPrediction)
+        if (initialDay != null) {
+            val newStartDateTime =
+                initialDay.toLocalDate().atTime(state.startDateTime.toLocalTime())
+            state.copy(
+                startDateTime = newStartDateTime,
+                endDateTime = newStartDateTime + Duration.between(
+                    state.startDateTime,
+                    state.endDateTime
+                ),
+            )
+        } else {
+            state
+        }
+    }
 
     var editState by rememberSaveable { mutableStateOf(initialState) }
     val scrollState = rememberScrollState()
