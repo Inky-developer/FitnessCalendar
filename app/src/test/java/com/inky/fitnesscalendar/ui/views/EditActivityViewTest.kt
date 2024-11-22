@@ -12,7 +12,7 @@ import com.inky.fitnesscalendar.MainApp
 import com.inky.fitnesscalendar.data.ActivityCategory
 import com.inky.fitnesscalendar.data.ContentColor
 import com.inky.fitnesscalendar.data.EpochDay
-import com.inky.fitnes`scalendar.db.entities.Activity
+import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.localization.LocalizationRepository
