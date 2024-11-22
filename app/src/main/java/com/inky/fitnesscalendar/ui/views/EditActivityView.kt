@@ -56,6 +56,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
@@ -128,6 +129,7 @@ fun NewActivity(
     onSave: (RichActivity) -> Unit,
     onNavigateBack: () -> Unit,
     onNavigateNewPlace: () -> Unit,
+    isTest: Boolean = false
 ) {
     var showBackDialog by rememberSaveable { mutableStateOf(false) }
 
@@ -146,7 +148,9 @@ fun NewActivity(
     var showImageViewer by rememberSaveable { mutableStateOf(false) }
 
     val isKeyboardVisible = WindowInsets.isImeVisible
-    val showSaveButton by remember(isKeyboardVisible) { derivedStateOf { !isKeyboardVisible && (richActivity == null || editState != initialState) && editState.isValid } }
+    // TODO: Get rid of the `isTest` hack
+    // In testing, the ime is always visible for some reason which means that the save button can never be clicked.
+    val showSaveButton by remember(isKeyboardVisible) { derivedStateOf { (!isKeyboardVisible || isTest) && (richActivity == null || editState != initialState) && editState.isValid } }
     val imagePickerLauncher = rememberImagePickerLauncher(onName = {
         editState = editState.copy(imageName = it)
     })
@@ -220,7 +224,8 @@ fun NewActivity(
                         if (editState.isValid) {
                             onSave(editState.toActivity(richActivity))
                         }
-                    }
+                    },
+                    modifier = Modifier.testTag("button-confirm")
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Outlined.Done, stringResource(R.string.save))
@@ -360,6 +365,7 @@ fun NewActivity(
                 colors = TextFieldDefaults.colors(unfocusedContainerColor = optionGroupDefaultBackground()),
                 shape = MaterialTheme.shapes.small,
                 modifier = Modifier
+                    .testTag("input-description")
                     .fillMaxWidth()
                     .padding(vertical = 4.dp)
             )
@@ -484,7 +490,8 @@ private data class ActivityEditState(
         distanceString.isNotBlank() && kilometerStringToDistance(distanceString) == null
 
     @IgnoredOnParcel
-    val isEndDateTimeError = endDateTime.isBefore(startDateTime)
+    val isEndDateTimeError =
+        endDateTime.isBefore(startDateTime) && activitySelectorState.activityType?.hasDuration == true
 
     @IgnoredOnParcel
     val isValid = activitySelectorState.isValid()

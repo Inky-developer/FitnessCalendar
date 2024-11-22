@@ -1,5 +1,6 @@
 # Unreleased
 
+- Fix bug where saving an activity was not possible in some cases if the activity type had no duration
 
 # 2024.10.3
 

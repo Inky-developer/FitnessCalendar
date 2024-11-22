@@ -138,9 +138,9 @@ dependencies {
     testImplementation(libs.approvaltests)
     testImplementation(libs.robolectric)
     testImplementation(libs.androidx.core)
+    testImplementation(libs.androidx.ui.test.junit4)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
-    androidTestImplementation(libs.androidx.ui.test.junit4)
     androidTestImplementation(libs.screengrab)
 
     debugImplementation(libs.androidx.ui.tooling)
