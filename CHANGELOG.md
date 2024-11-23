@@ -1,11 +1,8 @@
 # Unreleased
 
 - Allow setting a custom start time when starting a recording
-
-# 2024.11.1
-
-- Fix bug where saving an activity was not possible in some cases if the activity type had no duration
-- Creating a new activity from the day view now defaults it to the correct day
+- (2024.11.1) Fix bug where saving an activity was not possible in some cases if the activity type had no duration
+- (2024.11.1) Creating a new activity from the day view now defaults it to the correct day
 
 # 2024.10.3
 
