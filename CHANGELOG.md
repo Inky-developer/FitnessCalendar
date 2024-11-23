@@ -1,5 +1,8 @@
 # Unreleased
 
+
+# 2024.11.1
+
 - Fix bug where saving an activity was not possible in some cases if the activity type had no duration
 - Creating a new activity from the day view now defaults it to the correct day
 
