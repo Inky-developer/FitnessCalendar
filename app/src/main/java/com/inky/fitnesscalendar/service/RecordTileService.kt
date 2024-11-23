@@ -21,9 +21,9 @@ import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
-import com.inky.fitnesscalendar.repository.DatabaseRepository
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.db.entities.RichRecording
+import com.inky.fitnesscalendar.repository.DatabaseRepository
 import com.inky.fitnesscalendar.ui.components.AppFrame
 import com.inky.fitnesscalendar.ui.util.ProvideDatabaseValues
 import com.inky.fitnesscalendar.ui.views.QsTileRecordActivityDialog
@@ -93,6 +93,7 @@ class RecordTileService : TileService() {
                     AppFrame {
                         ProvideDatabaseValues(repository = repository) {
                             QsTileRecordActivityDialog(
+                                localizationRepository = repository.localizationRepository,
                                 onSave = {
                                     onStartRecording(it)
                                     dismiss()

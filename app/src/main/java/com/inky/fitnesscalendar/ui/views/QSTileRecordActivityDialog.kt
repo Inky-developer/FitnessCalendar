@@ -2,10 +2,8 @@ package com.inky.fitnesscalendar.ui.views
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -17,8 +15,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.db.entities.RichRecording
-import com.inky.fitnesscalendar.ui.components.ActivitySelector
-import com.inky.fitnesscalendar.ui.components.ActivitySelectorState
+import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.OkayCancelRow
 import com.inky.fitnesscalendar.ui.util.localDatabaseValues
 
@@ -28,24 +25,25 @@ import com.inky.fitnesscalendar.ui.util.localDatabaseValues
  */
 @Composable
 fun QsTileRecordActivityDialog(
+    localizationRepository: LocalizationRepository,
     onDismiss: () -> Unit,
     onSave: (RichRecording) -> Unit
 ) {
     val context = LocalContext.current
     var state by rememberSaveable {
-        mutableStateOf(ActivitySelectorState.fromPrediction(context, requireTypeHasDuration = true))
+        mutableStateOf(RecordActivityState.fromPrediction(context))
     }
-    val saveEnabled by remember { derivedStateOf { state.isValid() } }
     val typeRows = localDatabaseValues.current.activityTypeRows
     val filteredTypeRows =
         remember(typeRows) { typeRows.map { row -> row.filter { it.hasDuration } } }
 
     Column(modifier = Modifier.padding(all = 16.dp)) {
-        ActivitySelector(
+        RecordActivityInner(
             state = state,
             typeRows = filteredTypeRows,
-            background = MaterialTheme.colorScheme.background,
-            onState = { state = it }
+            localizationRepository = localizationRepository,
+            onState = { state = it },
+            includeTimePicker = false,
         )
 
         OkayCancelRow(
@@ -53,7 +51,7 @@ fun QsTileRecordActivityDialog(
             onSave = {
                 onSave(state.toRecording()!!)
             },
-            saveEnabled = saveEnabled,
+            saveEnabled = state.isValid,
             saveText = { Text(stringResource(R.string.action_record)) }
         )
     }

@@ -11,6 +11,7 @@
     <string name="back">Zurück</string>
     <string name="datetime_date">Datum: %1$s %2$s</string>
     <string name="datetime_start">Start: %1$s %2$s</string>
+    <string name="start_time">Startzeit: %1$s</string>
     <string name="datetime_end">Ende: %1$s %2$s</string>
     <string name="edit_object">%1$s bearbeiten</string>
     <string name="ok">OK</string>
@@ -279,5 +280,6 @@
     <string name="Maximum_velocity">Maximale Geschwindigkeit</string>
     <string name="configure_about">Über…</string>
     <string name="color_dark_green">Dunkelgrün</string>
-    <string name="Unsaved_changes_warning">Es gibt ungespeicherte Änderungen. Trotzdem zurück gehen?</string>
+    <string name="Unsaved_changes_warning">Es gibt ungespeicherte Änderungen. Trotzdem zurückgehen?</string>
+    <string name="select_custom_start_time">Andere Startzeit wählen…</string>
 </resources>

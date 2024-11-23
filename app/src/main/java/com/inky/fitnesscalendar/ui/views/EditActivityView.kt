@@ -514,7 +514,7 @@ private data class ActivityEditState(
         endDateTime.isBefore(startDateTime) && activitySelectorState.activityType?.hasDuration == true
 
     @IgnoredOnParcel
-    val isValid = activitySelectorState.isValid()
+    val isValid = activitySelectorState.isValid
             && !isDistanceStringError
             && !isEndDateTimeError
 

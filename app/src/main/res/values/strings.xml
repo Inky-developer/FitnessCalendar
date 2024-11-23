@@ -12,6 +12,7 @@
     <string name="back">Back</string>
     <string name="datetime_date">Date: %1$s %2$s</string>
     <string name="datetime_start">Start: %1$s %2$s</string>
+    <string name="start_time">Start time: %1$s</string>
     <string name="datetime_end">End: %1$s %2$s</string>
     <string name="edit_object">Edit %1$s</string>
     <string name="ok">OK</string>
@@ -279,4 +280,5 @@
     <string name="configure_about">About…</string>
     <string name="color_dark_green">Dark green</string>
     <string name="Unsaved_changes_warning">You have unsaved changes. Do you really want to exit?</string>
+    <string name="select_custom_start_time">Select custom start time…</string>
 </resources>

@@ -38,6 +38,7 @@ import com.inky.fitnesscalendar.db.entities.Recording
 import com.inky.fitnesscalendar.db.entities.RichRecording
 import com.inky.fitnesscalendar.di.DecisionTrees
 import com.inky.fitnesscalendar.ui.util.localDatabaseValues
+import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import java.time.Instant
 import java.util.Date
@@ -48,8 +49,8 @@ data class ActivitySelectorState(
     val vehicle: Vehicle?,
     val place: Place?
 ) : Parcelable {
-    fun isValid() =
-        activityType != null && (!activityType.hasVehicle || vehicle != null)
+    @IgnoredOnParcel
+    val isValid get() = activityType != null && (!activityType.hasVehicle || vehicle != null)
 
     fun toRecording(): RichRecording? {
         return RichRecording(

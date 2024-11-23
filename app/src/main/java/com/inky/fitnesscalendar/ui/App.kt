@@ -285,6 +285,7 @@ private fun AppNavigation(
                         }
                         navController.popBackStack()
                     },
+                    localizationRepository = viewModel.repository.localizationRepository,
                     onNavigateBack = { navController.popBackStack() },
                 )
             }

@@ -1,5 +1,6 @@
 # Unreleased
 
+- Allow setting a custom start time when starting a recording
 
 # 2024.11.1
 
