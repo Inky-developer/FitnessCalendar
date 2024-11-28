@@ -138,7 +138,7 @@ fun DaySelector(date: LocalDate, onDate: (LocalDate) -> Unit) {
         ) {
             DatePicker(
                 state = datePickerState,
-                colors = DatePickerDefaults.colors(containerColor = MaterialTheme.colorScheme.surfaceContainerHigh)
+                colors = DatePickerDefaults.colors(containerColor = MaterialTheme.colorScheme.background)
             )
         }
     }
