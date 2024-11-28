@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.MapColumn
 import androidx.room.Query
 import androidx.room.Upsert
+import com.inky.fitnesscalendar.data.ImageName
 import com.inky.fitnesscalendar.db.entities.Place
 import kotlinx.coroutines.flow.Flow
 
@@ -19,6 +20,9 @@ interface PlaceDao {
 
     @Query("SELECT * FROM place WHERE uid = :id")
     fun get(id: Int): Flow<Place>
+
+    @Query("SELECT image_name FROM Place WHERE image_name IS NOT NULL")
+    suspend fun getImages(): List<ImageName>
 
     @Upsert
     suspend fun upsert(place: Place)

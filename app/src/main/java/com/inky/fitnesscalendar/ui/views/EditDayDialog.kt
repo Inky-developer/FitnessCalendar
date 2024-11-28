@@ -149,7 +149,10 @@ fun EditDayDialog(
         ImageViewer(
             imageUri = imageUri,
             onDismiss = { showImageViewer = false },
-            onDelete = { editState = editState.copy(imageName = null) })
+            onDelete = {
+                showImageViewer = false
+                editState = editState.copy(imageName = null)
+            })
     }
 }
 

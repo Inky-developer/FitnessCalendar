@@ -41,7 +41,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.db.entities.Place
+import com.inky.fitnesscalendar.ui.components.ActivityImage
 import com.inky.fitnesscalendar.ui.components.BottomSheetButton
+import com.inky.fitnesscalendar.ui.components.ImageViewer
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.view_model.PlaceListViewModel
 
@@ -119,6 +121,9 @@ private fun PlaceCard(
 ) {
     var showContextMenu by rememberSaveable { mutableStateOf(false) }
     var showDeleteDialog by rememberSaveable { mutableStateOf(false) }
+    var showImageViewer by rememberSaveable { mutableStateOf(false) }
+
+    val imageUri = place.imageName?.getImageUri()
 
     Card(
         border = BorderStroke(2.dp, colorResource(place.color.colorId)),
@@ -130,6 +135,15 @@ private fun PlaceCard(
                 onLongClick = { showContextMenu = true }
             )
     ) {
+        if (imageUri != null) {
+            HorizontalDivider()
+            ActivityImage(
+                imageUri,
+                onClick = { showImageViewer = true },
+                modifier = Modifier.padding(all = 8.dp)
+            )
+        }
+
         Text(
             place.name,
             style = MaterialTheme.typography.displaySmall,
@@ -189,6 +203,13 @@ private fun PlaceCard(
                     Text(stringResource(R.string.cancel))
                 }
             }
+        )
+    }
+
+    if (showImageViewer && imageUri != null) {
+        ImageViewer(
+            imageUri = imageUri,
+            onDismiss = { showImageViewer = false },
         )
     }
 }

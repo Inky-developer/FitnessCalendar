@@ -126,7 +126,7 @@ class DatabaseRepository @Inject constructor(
     suspend fun loadActivity(id: Int) = activityDao.load(id)
 
     suspend fun getUsedImages(): Set<ImageName> =
-        activityDao.getImages().toSet() + dayDao.getImages()
+        activityDao.getImages().toSet() + dayDao.getImages() + placeDao.getImages()
 
     suspend fun startRecording(richRecording: RichRecording, context: Context) {
         val includeWifi = Preference.COLLECT_BSSID.get(context)

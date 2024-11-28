@@ -1,5 +1,6 @@
 package com.inky.fitnesscalendar.ui.views.settings
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -8,8 +9,11 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Edit
+import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -26,12 +30,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.compose.AsyncImagePainter
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.db.entities.Place
+import com.inky.fitnesscalendar.ui.components.ActivityImage
 import com.inky.fitnesscalendar.ui.components.BaseEditDialog
 import com.inky.fitnesscalendar.ui.components.ColorSelector
+import com.inky.fitnesscalendar.ui.components.ImageViewer
 import com.inky.fitnesscalendar.ui.components.OptionGroup
+import com.inky.fitnesscalendar.ui.components.SelectImageDropdownMenuItem
 import com.inky.fitnesscalendar.ui.components.optionGroupDefaultBackground
+import com.inky.fitnesscalendar.ui.components.rememberImagePickerLauncher
 import com.inky.fitnesscalendar.view_model.PlaceListViewModel
 import kotlinx.coroutines.flow.flowOf
 
@@ -65,6 +74,11 @@ private fun EditPlaceDialog(initialPlace: Place?, onDismiss: () -> Unit, onSave:
         stringResource(R.string.new_place)
     }
 
+    var imageName by rememberSaveable(initialPlace) { mutableStateOf(initialPlace?.imageName) }
+    var showImageViewer by rememberSaveable { mutableStateOf(false) }
+    val imagePickerLauncher =
+        rememberImagePickerLauncher(onName = { imageName = it })
+
     var name by rememberSaveable(initialPlace) { mutableStateOf(initialPlace?.name ?: "") }
     var color by rememberSaveable(initialPlace) { mutableStateOf(initialPlace?.color) }
 
@@ -75,15 +89,55 @@ private fun EditPlaceDialog(initialPlace: Place?, onDismiss: () -> Unit, onSave:
     BaseEditDialog(
         title = title,
         onNavigateBack = onDismiss,
-        onSave = { onSave(Place(uid = initialPlace?.uid, name = name, color = color!!)) },
+        onSave = {
+            onSave(
+                Place(
+                    uid = initialPlace?.uid,
+                    name = name,
+                    color = color!!,
+                    imageName = imageName
+                )
+            )
+        },
         saveEnabled = saveEnabled,
-        actions = {}
+        actions = {
+            var showMenu by rememberSaveable { mutableStateOf(false) }
+            IconButton(onClick = { showMenu = true }) {
+                Icon(Icons.Outlined.Menu, stringResource(R.string.Menu))
+            }
+
+            DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
+                SelectImageDropdownMenuItem(
+                    imagePickerLauncher = imagePickerLauncher,
+                    onDismissMenu = { showMenu = false },
+                )
+            }
+        }
     ) {
+
         Column(
             modifier = Modifier
                 .padding(all = 8.dp)
                 .verticalScroll(rememberScrollState())
         ) {
+            AnimatedContent(
+                targetState = imageName?.getImageUri(),
+                label = stringResource(R.string.user_uploaded_image)
+            ) { imageUri ->
+                if (imageUri != null) {
+                    ActivityImage(
+                        uri = imageUri,
+                        onState = { state ->
+                            if (state is AsyncImagePainter.State.Error) {
+                                imageName = initialPlace?.imageName
+                            }
+                        },
+                        onClick = { showImageViewer = true },
+                        modifier = Modifier.padding(vertical = 4.dp)
+                    )
+                }
+            }
+
             TextField(
                 value = name,
                 onValueChange = { name = it },
@@ -108,5 +162,17 @@ private fun EditPlaceDialog(initialPlace: Place?, onDismiss: () -> Unit, onSave:
                 )
             }
         }
+    }
+
+    val imageUri = imageName?.getImageUri()
+    if (showImageViewer && imageUri != null) {
+        ImageViewer(
+            imageUri = imageUri,
+            onDismiss = { showImageViewer = false },
+            onDelete = {
+                imageName = null
+                showImageViewer = false
+            }
+        )
     }
 }

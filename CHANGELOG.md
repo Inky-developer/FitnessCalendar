@@ -1,5 +1,6 @@
 # Unreleased
 
+- Add ability to add images to places 
 - Fix date picker background color 
 - Allow setting a custom start time when starting a recording
 - (2024.11.1) Fix bug where saving an activity was not possible in some cases if the activity type had no duration
