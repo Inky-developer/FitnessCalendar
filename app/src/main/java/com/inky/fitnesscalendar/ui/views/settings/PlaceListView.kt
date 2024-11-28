@@ -1,6 +1,5 @@
 package com.inky.fitnesscalendar.ui.views.settings
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Spacer
@@ -126,7 +125,6 @@ private fun PlaceCard(
     val imageUri = place.imageName?.getImageUri()
 
     Card(
-        border = BorderStroke(2.dp, colorResource(place.color.colorId)),
         modifier = modifier
             .padding(horizontal = 8.dp, vertical = 4.dp)
             .fillMaxWidth()
@@ -147,12 +145,13 @@ private fun PlaceCard(
         Text(
             place.name,
             style = MaterialTheme.typography.displaySmall,
-            modifier = Modifier.padding(all = 8.dp)
+            modifier = Modifier.padding(horizontal = 8.dp).padding(top = 8.dp)
         )
+        HorizontalDivider(color = colorResource(place.color.colorId), thickness = 2.dp, modifier = Modifier.padding(horizontal = 8.dp))
         Text(
             stringResource(R.string.number_of_activities_n, activityCount),
             style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(all = 4.dp)
+            modifier = Modifier.padding(all = 8.dp)
         )
     }
 

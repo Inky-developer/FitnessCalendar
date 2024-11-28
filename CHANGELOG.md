@@ -1,5 +1,6 @@
 # Unreleased
 
+- Improve place list design
 - Add ability to add images to places 
 - Fix date picker background color 
 - Allow setting a custom start time when starting a recording
