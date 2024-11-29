@@ -1,5 +1,6 @@
 package com.inky.fitnesscalendar.ui.views
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Text
@@ -17,6 +18,7 @@ import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.db.entities.RichRecording
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.OkayCancelRow
+import com.inky.fitnesscalendar.ui.components.optionGroupDefaultBackground
 import com.inky.fitnesscalendar.ui.util.localDatabaseValues
 
 
@@ -37,7 +39,11 @@ fun QsTileRecordActivityDialog(
     val filteredTypeRows =
         remember(typeRows) { typeRows.map { row -> row.filter { it.hasDuration } } }
 
-    Column(modifier = Modifier.padding(all = 16.dp)) {
+    Column(
+        modifier = Modifier
+            .background(optionGroupDefaultBackground())
+            .padding(all = 16.dp)
+    ) {
         RecordActivityInner(
             state = state,
             typeRows = filteredTypeRows,

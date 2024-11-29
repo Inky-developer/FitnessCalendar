@@ -1,5 +1,6 @@
 # Unreleased
 
+- Fix quick settings dialog background color 
 - Improve place list design
 - Add ability to add images to places 
 - Fix date picker background color 
