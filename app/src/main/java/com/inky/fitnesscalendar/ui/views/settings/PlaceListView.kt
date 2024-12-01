@@ -133,26 +133,26 @@ private fun PlaceCard(
                 onLongClick = { showContextMenu = true }
             )
     ) {
-        if (imageUri != null) {
-            HorizontalDivider()
-            ActivityImage(
-                imageUri,
-                onClick = { showImageViewer = true },
-                modifier = Modifier.padding(all = 8.dp)
-            )
-        }
-
         Text(
             place.name,
             style = MaterialTheme.typography.displaySmall,
             modifier = Modifier.padding(horizontal = 8.dp).padding(top = 8.dp)
         )
         HorizontalDivider(color = colorResource(place.color.colorId), thickness = 2.dp, modifier = Modifier.padding(horizontal = 8.dp))
+        if (imageUri != null) {
+            ActivityImage(
+                imageUri,
+                onClick = { showImageViewer = true },
+                modifier = Modifier.padding(all = 8.dp)
+            )
+            HorizontalDivider()
+        }
         Text(
             stringResource(R.string.number_of_activities_n, activityCount),
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(all = 8.dp)
         )
+
     }
 
     if (showContextMenu) {
