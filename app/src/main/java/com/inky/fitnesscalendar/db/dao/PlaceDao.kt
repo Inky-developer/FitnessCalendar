@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface PlaceDao {
-    @Query("SELECT Place.*, COUNT(Activity.place_id) as count FROM Place LEFT JOIN Activity ON Place.uid = Activity.place_id GROUP BY place.uid ORDER BY count DESC")
+    @Query("SELECT Place.*, COUNT(Activity.place_id) as count, MAX(Activity.start_time) AS last_used FROM Place LEFT JOIN Activity ON Place.uid = Activity.place_id GROUP BY place.uid ORDER BY count DESC, last_used DESC  ")
     fun getAll(): Flow<List<Place>>
 
     @Query("SELECT place_id, COUNT(*) AS count FROM Activity WHERE place_id IS NOT NULL GROUP BY place_id")
