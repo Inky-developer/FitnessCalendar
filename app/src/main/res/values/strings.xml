@@ -286,4 +286,5 @@
     <string name="auto_import_help_text">Automatically import all new activities from configured folders</string>
     <string name="no_folders_configured_yet">No folders configured yet.</string>
     <string name="configured_folders">Configured folders:</string>
+    <string name="add_folder_to_auto_import">Add folder to auto-import</string>
 </resources>

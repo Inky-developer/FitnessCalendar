@@ -141,6 +141,6 @@ private fun AddFolderButton(onUri: (Uri?) -> Unit) {
     )
 
     FilledTonalButton(onClick = { launcher.launch(null) }, modifier = Modifier.fillMaxWidth()) {
-        Text("Add auto-import folder")
+        Text(stringResource(R.string.add_folder_to_auto_import))
     }
 }

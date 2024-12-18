@@ -287,4 +287,5 @@
     <string name="auto_import_help_text">Importiert automatisch alle Dateien in den konfigurierten Ordnern</string>
     <string name="no_folders_configured_yet">Noch keine Ordner konfiguriert.</string>
     <string name="configured_folders">Konfigurierte Ordner:</string>
+    <string name="add_folder_to_auto_import">Ordner zum Automatischen Import hinzufügen</string>
 </resources>
