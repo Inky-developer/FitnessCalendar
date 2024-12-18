@@ -23,6 +23,7 @@ import com.inky.fitnesscalendar.view_model.statistics.Projection
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
+import java.util.Date
 import kotlin.reflect.KClass
 
 val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
@@ -47,9 +48,12 @@ sealed class Preference<T, P>(
     fun collectAsState(context: Context = LocalContext.current) =
         remember { flow(context) }.collectAsState(initial = default)
 
-    suspend fun set(context: Context, value: T) {
+    suspend fun set(context: Context, value: T) = update(context) { value }
+
+    suspend fun update(context: Context, func: (T) -> T) {
         context.dataStore.edit { settings ->
-            settings[key] = serialize(value)
+            val value = settings[key]?.let { deserialize(it) } ?: default
+            settings[key] = serialize(func(value))
         }
     }
 
@@ -109,6 +113,30 @@ sealed class Preference<T, P>(
         }
     }
 
+    class UriSetPreference(name: String) :
+        Preference<Set<Uri>, Set<String>>(stringSetPreferencesKey(name), emptySet()) {
+        override fun serialize(value: Set<Uri>): Set<String> {
+            return value.map { it.toString() }.toSet()
+        }
+
+        override fun deserialize(primitive: Set<String>): Set<Uri> {
+            return primitive.map { Uri.parse(it) }.toSet()
+        }
+
+        suspend fun add(context: Context, value: Uri) = update(context) { it + value }
+    }
+
+    class DatePreference(name: String) :
+        Preference<Date, Long>(longPreferencesKey(name), Date(0)) {
+        override fun serialize(value: Date): Long {
+            return value.time
+        }
+
+        override fun deserialize(primitive: Long): Date {
+            return Date(primitive)
+        }
+    }
+
     companion object {
         val PREF_STATS_PROJECTION = EnumPreference("PREF_STATS_PROJECTION", Projection::class)
         val PREF_BACKUP_URI = UriPreference("PREF_BACKUP_URI")
@@ -117,5 +145,8 @@ sealed class Preference<T, P>(
             titleId = R.string.setting_title_store_location_information
             descriptionId = R.string.setting_description_store_location_information
         }
+
+        val PREF_WATCHED_FOLDERS = UriSetPreference("PREF_WATCHED_FOLDERS")
+        val PREF_WATCHED_FOLDERS_LAST_IMPORT = DatePreference("PREF_WATCHED_FOLDERS_LAST_IMPORT")
     }
 }

@@ -56,6 +56,7 @@ fun SettingsView(
     onNavigateDebug: () -> Unit,
     onNavigateTypes: () -> Unit,
     onNavigatePlaces: () -> Unit,
+    onNavigateAutoImport: () -> Unit,
     onNavigateBackup: () -> Unit,
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -90,6 +91,10 @@ fun SettingsView(
                 Setting(
                     title = stringResource(R.string.configure_places),
                     onClick = onNavigatePlaces,
+                )
+                Setting(
+                    title = stringResource(R.string.configure_auto_import),
+                    onClick = onNavigateAutoImport
                 )
                 if (BackupRepository.isBackupSupported()) {
                     Setting(

@@ -1,5 +1,6 @@
 # Unreleased
 
+- The app will now automatically import tracks from configurable folders
 
 # 2024.12.1
 

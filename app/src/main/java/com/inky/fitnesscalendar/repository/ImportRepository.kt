@@ -12,6 +12,7 @@ import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.db.entities.Track
 import com.inky.fitnesscalendar.util.gpx.GpxReader
+import kotlinx.coroutines.flow.first
 import java.io.FileInputStream
 import java.io.InputStream
 import javax.inject.Inject
@@ -23,12 +24,38 @@ private const val TAG = "ImportRepository"
 @Singleton
 class ImportRepository @Inject constructor(private val dbRepository: DatabaseRepository) {
     /**
+     * Tries to import the given files without user interaction.
+     * This only works if the activity type mapping is known.
+     * Either imports all files or none, and returns true iff successful.
+     */
+    suspend fun tryImportFiles(files: List<ParcelFileDescriptor>): Boolean {
+        val tracks = loadFiles(files)
+        val activityTypeNames = dbRepository.getActivityTypeNames().first()
+
+        val importData = tracks.map { importTrack ->
+            val activityType = activityTypeNames[importTrack.track.type] ?: return false
+            val richActivity = importTrack.toRichActivity(activityType) ?: return false
+            richActivity to importTrack
+        }
+
+        for ((richActivity, track) in importData) {
+            importActivity(richActivity, track)
+        }
+
+        return true
+    }
+
+    /**
      * Tries to import the track as activity and returns the activity id in case of success
      * or null if the track could not get imported
      */
     suspend fun importTrack(importTrack: ImportTrack, type: ActivityType): Int? {
         val activity = importTrack.toRichActivity(type) ?: return null
-        val activityId = dbRepository.saveActivity(activity)
+        return importActivity(activity, importTrack)
+    }
+
+    private suspend fun importActivity(richActivity: RichActivity, importTrack: ImportTrack): Int {
+        val activityId = dbRepository.saveActivity(richActivity)
         val track = Track(activityId = activityId, points = importTrack.track.points)
         dbRepository.saveTrack(track)
         return activityId

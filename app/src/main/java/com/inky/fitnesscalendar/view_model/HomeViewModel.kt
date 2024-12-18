@@ -10,6 +10,7 @@ import com.inky.fitnesscalendar.data.activity_filter.DateRangeOption
 import com.inky.fitnesscalendar.data.measure.Duration.Companion.until
 import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.db.entities.Recording
+import com.inky.fitnesscalendar.repository.RecordingRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
@@ -28,7 +29,8 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     @ApplicationContext context: Context,
-    repository: DatabaseRepository
+    repository: DatabaseRepository,
+    private val recordingRepository: RecordingRepository
 ) : BaseViewModel(context, repository) {
     val weekStats = loadWeekStats()
     val monthStats = loadMonthStats()
@@ -44,7 +46,7 @@ class HomeViewModel @Inject constructor(
             null
         }
     }
-    val recordings = repository.getRecordings()
+    val recordings = recordingRepository.getRecordings()
 
     init {
         repository.getDay(EpochDay.today()).onEach { _today.emit(it) }.launchIn(viewModelScope)
@@ -56,13 +58,13 @@ class HomeViewModel @Inject constructor(
 
     fun abortRecording(recording: Recording) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.deleteRecording(recording)
+            recordingRepository.deleteRecording(recording)
         }
     }
 
     fun saveRecording(recording: Recording) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.endRecording(recording)
+            recordingRepository.endRecording(recording)
         }
     }
 

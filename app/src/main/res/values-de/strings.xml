@@ -282,4 +282,9 @@
     <string name="color_dark_green">Dunkelgrün</string>
     <string name="Unsaved_changes_warning">Es gibt ungespeicherte Änderungen. Trotzdem zurückgehen?</string>
     <string name="select_custom_start_time">Andere Startzeit wählen…</string>
+    <string name="configure_auto_import">Auto-import…</string>
+    <string name="auto_import">Auto-Import</string>
+    <string name="auto_import_help_text">Importiert automatisch alle Dateien in den konfigurierten Ordnern</string>
+    <string name="no_folders_configured_yet">Noch keine Ordner konfiguriert.</string>
+    <string name="configured_folders">Konfigurierte Ordner:</string>
 </resources>

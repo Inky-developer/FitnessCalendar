@@ -281,4 +281,9 @@
     <string name="color_dark_green">Dark green</string>
     <string name="Unsaved_changes_warning">You have unsaved changes. Do you really want to exit?</string>
     <string name="select_custom_start_time">Select custom start time…</string>
+    <string name="configure_auto_import">Automatic import…</string>
+    <string name="auto_import">Automatic Import</string>
+    <string name="auto_import_help_text">Automatically import all new activities from configured folders</string>
+    <string name="no_folders_configured_yet">No folders configured yet.</string>
+    <string name="configured_folders">Configured folders:</string>
 </resources>
