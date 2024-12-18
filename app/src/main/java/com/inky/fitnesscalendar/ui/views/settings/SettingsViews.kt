@@ -26,5 +26,8 @@ sealed interface SettingsViews {
     data class PlaceDialog(val placeId: Int? = null)
 
     @Serializable
+    object AutoImport
+
+    @Serializable
     object Backup
 }

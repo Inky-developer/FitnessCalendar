@@ -4,6 +4,7 @@ import android.app.Application
 import android.util.Log
 import com.inky.fitnesscalendar.di.ActivityTypeOrder
 import com.inky.fitnesscalendar.di.DecisionTrees
+import com.inky.fitnesscalendar.repository.AutoImportRepository
 import com.inky.fitnesscalendar.repository.DatabaseRepository
 import com.inky.fitnesscalendar.util.cleanImageStorage
 import com.inky.fitnesscalendar.util.getOrCreateImagesDir
@@ -19,12 +20,16 @@ class MainApp : Application() {
     @Inject
     lateinit var databaseRepository: DatabaseRepository
 
+    @Inject
+    lateinit var autoImportRepository: AutoImportRepository
+
     override fun onCreate() {
         super.onCreate()
 
         MainScope().launch(Dispatchers.IO) {
             initializeData()
             cleanupStorage()
+            autoImportActivities()
         }
     }
 
@@ -46,5 +51,11 @@ class MainApp : Application() {
         ActivityTypeOrder.init(activities)
         DecisionTrees.init(activities)
         Log.i("MainApp", "App data successfully initialized")
+    }
+
+    private suspend fun autoImportActivities() {
+        Log.i("MainApp", "Auto-importing activities")
+        autoImportRepository.performAutoImport()
+        Log.i("MainApp", "Auto-importing activities done")
     }
 }
