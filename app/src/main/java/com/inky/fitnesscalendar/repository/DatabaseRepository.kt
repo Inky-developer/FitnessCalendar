@@ -1,7 +1,6 @@
 package com.inky.fitnesscalendar.repository
 
 import android.content.Context
-import android.util.Log
 import androidx.compose.runtime.Immutable
 import androidx.room.withTransaction
 import com.inky.fitnesscalendar.data.EpochDay
@@ -19,24 +18,17 @@ import com.inky.fitnesscalendar.db.dao.ActivityTypeNameDao
 import com.inky.fitnesscalendar.db.dao.DayDao
 import com.inky.fitnesscalendar.db.dao.FilterHistoryDao
 import com.inky.fitnesscalendar.db.dao.PlaceDao
-import com.inky.fitnesscalendar.db.dao.RecordingDao
 import com.inky.fitnesscalendar.db.dao.TrackDao
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.ActivityTypeName
 import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.db.entities.Place
-import com.inky.fitnesscalendar.db.entities.Recording
 import com.inky.fitnesscalendar.db.entities.RichActivity
-import com.inky.fitnesscalendar.db.entities.RichRecording
 import com.inky.fitnesscalendar.db.entities.Track
 import com.inky.fitnesscalendar.di.ActivityTypeOrder
 import com.inky.fitnesscalendar.localization.LocalizationRepository
-import com.inky.fitnesscalendar.preferences.Preference
 import com.inky.fitnesscalendar.util.Ordering
-import com.inky.fitnesscalendar.util.getCurrentBssid
-import com.inky.fitnesscalendar.util.hideRecordingNotification
-import com.inky.fitnesscalendar.util.showRecordingNotification
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -44,15 +36,12 @@ import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
-private const val TAG = "AppRepository"
-
 @Immutable
 @Singleton
 class DatabaseRepository @Inject constructor(
     @ApplicationContext val context: Context,
     private val database: AppDatabase,
     private val activityDao: ActivityDao,
-    private val recordingDao: RecordingDao,
     private val activityTypeDao: ActivityTypeDao,
     private val filterHistoryDao: FilterHistoryDao,
     private val activityTypeNameDao: ActivityTypeNameDao,
@@ -128,51 +117,12 @@ class DatabaseRepository @Inject constructor(
     suspend fun getUsedImages(): Set<ImageName> =
         activityDao.getImages().toSet() + dayDao.getImages() + placeDao.getImages()
 
-    suspend fun startRecording(richRecording: RichRecording, context: Context) {
-        val includeWifi = Preference.COLLECT_BSSID.get(context)
-        val recording = if (includeWifi) {
-            richRecording.recording.copy(wifiBssid = context.getCurrentBssid())
-        } else {
-            richRecording.recording
-        }
-        val recordingId = recordingDao.insert(recording).toInt()
-        context.showRecordingNotification(
-            recordingId,
-            richRecording.type,
-            richRecording.recording.startTime.time
-        )
-    }
-
-    fun getRecordings() = recordingDao.getRecordings()
-
-    suspend fun getRecording(uid: Int) = recordingDao.getById(uid)
-
-    suspend fun deleteRecording(recording: Recording) {
-        Log.d(TAG, "Deleting $recording")
-        recording.uid?.let { context.hideRecordingNotification(it) }
-        recordingDao.delete(recording)
-    }
-
-    suspend fun endRecording(recording: Recording) {
-        Log.d(TAG, "Ending recording $recording")
-        recording.uid?.let { context.hideRecordingNotification(it) }
-        val type = getActivityType(recording.typeId)
-        if (type == null) {
-            Log.e(TAG, "Could not retrieve type for activity")
-            return
-        }
-        val activity = recording.toActivity(type)
-        activityDao.stopRecording(recording, activity)
-    }
-
     suspend fun saveActivityType(activityType: ActivityType) = activityTypeDao.save(activityType)
 
     suspend fun deleteActivityType(activityType: ActivityType) =
         activityTypeDao.delete(activityType)
 
     fun getActivityTypes() = activityTypeDao.getTypes()
-
-    private suspend fun getActivityType(id: Int): ActivityType? = activityTypeDao.get(id)
 
     fun getActivityTypeRows() =
         getActivityTypesByCategory().map { ActivityTypeOrder.getRowsOrDefault(it) }

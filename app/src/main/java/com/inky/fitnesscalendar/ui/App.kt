@@ -15,7 +15,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
-import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -40,6 +39,7 @@ import com.inky.fitnesscalendar.ui.views.TrackGraphView
 import com.inky.fitnesscalendar.ui.views.Views
 import com.inky.fitnesscalendar.ui.views.settings.SettingsViews
 import com.inky.fitnesscalendar.ui.views.settingsDestination
+import com.inky.fitnesscalendar.view_model.AppViewModel
 import com.inky.fitnesscalendar.view_model.BaseViewModel
 import kotlinx.coroutines.launch
 
@@ -89,7 +89,7 @@ fun App(viewModel: BaseViewModel = hiltViewModel()) {
 @Composable
 @OptIn(ExperimentalSharedTransitionApi::class)
 private fun AppNavigation(
-    viewModel: BaseViewModel = hiltViewModel(),
+    viewModel: AppViewModel = hiltViewModel(),
     navController: NavHostController,
     openDrawer: () -> Unit,
     onCurrentView: (Views) -> Unit,
@@ -97,7 +97,6 @@ private fun AppNavigation(
     var filterState by rememberSaveable { mutableStateOf(ActivityFilter()) }
 
     val scope = rememberCoroutineScope()
-    val context = LocalContext.current
 
     SharedTransitionLayout {
         NavHost(
@@ -280,9 +279,7 @@ private fun AppNavigation(
                 onCurrentView(Views.RecordActivity)
                 RecordActivity(
                     onStart = {
-                        scope.launch {
-                            viewModel.repository.startRecording(it, context)
-                        }
+                        scope.launch { viewModel.recordingRepository.startRecording(it) }
                         navController.popBackStack()
                     },
                     localizationRepository = viewModel.repository.localizationRepository,

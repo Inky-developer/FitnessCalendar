@@ -24,6 +24,7 @@ import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.db.entities.RichRecording
 import com.inky.fitnesscalendar.repository.DatabaseRepository
+import com.inky.fitnesscalendar.repository.RecordingRepository
 import com.inky.fitnesscalendar.ui.components.AppFrame
 import com.inky.fitnesscalendar.ui.util.ProvideDatabaseValues
 import com.inky.fitnesscalendar.ui.views.QsTileRecordActivityDialog
@@ -37,7 +38,10 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class RecordTileService : TileService() {
     @Inject
-    lateinit var repository: DatabaseRepository
+    lateinit var dbRepository: DatabaseRepository
+
+    @Inject
+    lateinit var recordingRepository: RecordingRepository
 
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.IO + job)
@@ -45,7 +49,7 @@ class RecordTileService : TileService() {
     override fun onClick() {
         super.onClick()
         showDialog(
-            TileServiceDialog(this, repository, onStartRecording = { startRecording(it) })
+            TileServiceDialog(this, dbRepository, onStartRecording = { startRecording(it) })
         )
     }
 
@@ -66,10 +70,7 @@ class RecordTileService : TileService() {
     }
 
     private fun startRecording(richRecording: RichRecording) = scope.launch {
-        repository.startRecording(
-            richRecording,
-            this@RecordTileService
-        )
+        recordingRepository.startRecording(richRecording)
     }
 
     class TileServiceDialog(
