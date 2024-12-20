@@ -20,6 +20,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.approvaltests.Approvals
+import org.approvaltests.utils.WithTimeZone
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -27,6 +28,7 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.annotation.Config
 import org.robolectric.shadows.ShadowLog
+
 
 @Config(sdk = [Build.VERSION_CODES.UPSIDE_DOWN_CAKE])
 @RunWith(RobolectricTestRunner::class)
@@ -109,9 +111,11 @@ class ImportViewTest {
             // Wait so there is time to save
             delay(1000)
 
-            Approvals.verifyAll(
-                databaseRepository.getActivities(ActivityFilter()).first().toTypedArray()
-            ) { it.toString() }
+            WithTimeZone("UTC").use {
+                Approvals.verifyAll(
+                    databaseRepository.getActivities(ActivityFilter()).first().toTypedArray()
+                ) { it.toString() }
+            }
         }
 
     }
