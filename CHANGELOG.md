@@ -1,6 +1,7 @@
 # Unreleased
 
 - The app will now automatically import tracks from configurable folders
+- Fix y-range for elevation graphs
 
 # 2024.12.1
 

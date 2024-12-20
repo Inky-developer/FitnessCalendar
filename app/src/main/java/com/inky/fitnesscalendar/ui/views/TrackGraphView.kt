@@ -61,6 +61,7 @@ import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
 import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianLayerModel
+import com.patrykandpatrick.vico.core.cartesian.data.CartesianLayerRangeProvider
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianValueFormatter
 import com.patrykandpatrick.vico.core.cartesian.data.LineCartesianLayerDrawingModel
 import com.patrykandpatrick.vico.core.cartesian.data.LineCartesianLayerModel
@@ -68,12 +69,15 @@ import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
 import com.patrykandpatrick.vico.core.cartesian.layer.LineCartesianLayer
 import com.patrykandpatrick.vico.core.cartesian.marker.DefaultCartesianMarkerValueFormatter
 import com.patrykandpatrick.vico.core.common.Dimensions
+import com.patrykandpatrick.vico.core.common.data.ExtraStore
 import com.patrykandpatrick.vico.core.common.shape.CorneredShape
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.text.DecimalFormat
 import java.time.Instant
 import java.util.Date
+import kotlin.math.ceil
+import kotlin.math.floor
 import kotlin.math.log10
 import kotlin.math.pow
 import kotlin.math.roundToInt
@@ -145,7 +149,8 @@ fun TrackGraph(track: Track, projection: TrackGraphProjection, modifier: Modifie
                         fill = LineCartesianLayer.LineFill.single(fill(colorResource(projection.color))),
                         thickness = 1.dp
                     )
-                )
+                ),
+                rangeProvider = projection.rangeProvider()
             ),
             startAxis = VerticalAxis.rememberStart(
                 title = stringResource(projection.verticalAxisLabel),
@@ -235,10 +240,15 @@ enum class TrackGraphProjection(
 
     fun format(context: Context): DecimalFormat {
         val unitString = context.getString(unit)
-        return when(this) {
+        return when (this) {
             HeartRate, Elevation -> DecimalFormat("0$unitString")
             else -> DecimalFormat("#.#$unitString")
         }
+    }
+
+    fun rangeProvider() = when (this) {
+        Elevation -> ElevationLayerRangeProvider()
+        else -> CartesianLayerRangeProvider.auto()
     }
 
     private fun mapPoint(point: Track.ComputedTrackPoint): Float? = when (this) {
@@ -250,9 +260,12 @@ enum class TrackGraphProjection(
 }
 
 @Composable
-private fun rememberLODLineCartesianLayer(lineProvider: LineCartesianLayer.LineProvider) =
+private fun rememberLODLineCartesianLayer(
+    lineProvider: LineCartesianLayer.LineProvider,
+    rangeProvider: CartesianLayerRangeProvider
+) =
     remember(lineProvider) {
-        LODLineCartesianLayer(lineProvider = lineProvider)
+        LODLineCartesianLayer(lineProvider = lineProvider, rangeProvider = rangeProvider)
     }
 
 /**
@@ -263,7 +276,13 @@ private fun rememberLODLineCartesianLayer(lineProvider: LineCartesianLayer.LineP
  * Most lines are copy-pasted from [LineCartesianLayer], with some changes to support the LOD
  * functionality.
  */
-private class LODLineCartesianLayer(lineProvider: LineProvider) : LineCartesianLayer(lineProvider) {
+private class LODLineCartesianLayer(
+    lineProvider: LineProvider,
+    rangeProvider: CartesianLayerRangeProvider
+) : LineCartesianLayer(
+    lineProvider,
+    rangeProvider = rangeProvider
+) {
     private fun RectF.getStart(isLtr: Boolean): Float = if (isLtr) left else right
 
     private inline fun <T : CartesianLayerModel.Entry> List<T>.forEachIn(
@@ -366,6 +385,22 @@ private class LODLineCartesianLayer(lineProvider: LineProvider) : LineCartesianL
             if (isLtr && immutableX > boundsEnd || isLtr.not() && immutableX < boundsEnd) return
         }
     }
+}
+
+// The resolution for the min y and max y values on the vertical graph axis
+private const val ElevationGraphYStep = 100.0
+
+/**
+ * Alternative to the auto range provider, which usually starts at y-0.
+ * That is not very good for elevation graphs, so instead, this class
+ * provides a dynamic range based on [ElevationGraphYStep].
+ */
+private class ElevationLayerRangeProvider : CartesianLayerRangeProvider {
+    override fun getMinY(minY: Double, maxY: Double, extraStore: ExtraStore) =
+        floor(minY / ElevationGraphYStep) * ElevationGraphYStep
+
+    override fun getMaxY(minY: Double, maxY: Double, extraStore: ExtraStore) =
+        ceil(maxY / ElevationGraphYStep) * ElevationGraphYStep
 }
 
 @Preview
