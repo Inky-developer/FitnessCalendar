@@ -37,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -131,6 +132,7 @@ fun ImportView(
             modifier = Modifier
                 .padding(paddingValues)
                 .fillMaxSize()
+                .testTag("import_list")
         ) {
             items(tracks) { track ->
                 val type = typeMapping[track.track.type]
@@ -162,7 +164,9 @@ fun TrackView(
         return@remember result.ok() to result.err()
     }
 
-    Box(modifier = Modifier.clickable { dialogOpen = true }) {
+    Box(modifier = Modifier
+        .clickable { dialogOpen = true }
+        .testTag("import_list_item")) {
         if (richActivity != null) {
             CompactActivityCard(
                 richActivity = richActivity,

@@ -1,7 +1,6 @@
 package com.inky.fitnesscalendar.ui.views
 
 import android.os.Build
-import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
@@ -18,7 +17,8 @@ import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.util.toDate
 import com.inky.fitnesscalendar.util.toLocalDateTime
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -37,7 +37,6 @@ class EditActivityViewTest {
      * This tests that the save button can be clicked when the activity type does not have an end time,
      * even if the end time is invalid, because it is before the start time
      */
-    @OptIn(ExperimentalTestApi::class)
     @Test
     fun test_can_save_activity_without_end_time() {
         var success = false

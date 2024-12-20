@@ -105,7 +105,7 @@ class ImportRepository @Inject constructor(private val dbRepository: DatabaseRep
     }
 
 
-    private fun loadFile(stream: InputStream): List<ImportTrack> {
+    fun loadFile(stream: InputStream): List<ImportTrack> {
         val gpx = GpxReader.read(stream)
         return gpx?.tracks?.map { ImportTrack(track = it) } ?: emptyList()
     }

@@ -19,6 +19,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.io.ByteArrayInputStream
 import javax.inject.Inject
 
 @HiltViewModel
@@ -79,6 +80,16 @@ class ImportViewModel @Inject constructor(
 
         _tracks.emit(_tracks.value.toMutableList().apply { addAll(loadedTracks) })
 
+        _done.value = true
+    }
+
+    suspend fun loadTestFiles(files: List<String>) {
+        val loadedTracks = mutableListOf<ImportRepository.ImportTrack>()
+        for (file in files) {
+            loadedTracks.addAll(importRepository.loadFile(ByteArrayInputStream(file.encodeToByteArray())))
+        }
+
+        _tracks.emit(_tracks.value.toMutableList().apply { addAll(loadedTracks) })
         _done.value = true
     }
 }

@@ -1,7 +1,6 @@
 package com.inky.fitnesscalendar.ui.views
 
 import android.os.Build
-import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
@@ -29,7 +28,6 @@ class RecordActivityDialogTest {
     /**
      * Test that the record activity composable works and allows creating a recording
      */
-    @OptIn(ExperimentalTestApi::class)
     @Test
     fun test_can_create_recording() {
         var success = false
