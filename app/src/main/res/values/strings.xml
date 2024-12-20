@@ -287,4 +287,7 @@
     <string name="no_folders_configured_yet">No folders configured yet.</string>
     <string name="configured_folders">Configured folders:</string>
     <string name="add_folder_to_auto_import">Add folder to auto-import</string>
+    <string name="import_error_no_activity_type">No activity type defined</string>
+    <string name="import_error_no_start_and_end_time">The activity contains no start and end time information</string>
+    <string name="cannot_import_activity_due_to_error">An error occurred. Cannot import this activity.\n%1$s</string>
 </resources>

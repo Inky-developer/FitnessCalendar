@@ -2,7 +2,9 @@ package com.inky.fitnesscalendar.repository
 
 import android.os.ParcelFileDescriptor
 import android.util.Log
+import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
+import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.gpx.GpxTrack
 import com.inky.fitnesscalendar.data.gpx.TrackSvg
 import com.inky.fitnesscalendar.data.gpx.TrackSvg.Companion.toTrackSvg
@@ -12,6 +14,10 @@ import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.db.entities.Track
 import com.inky.fitnesscalendar.util.gpx.GpxReader
+import com.inky.fitnesscalendar.util.result.TypedResult
+import com.inky.fitnesscalendar.util.result.asErr
+import com.inky.fitnesscalendar.util.result.asOk
+import com.inky.fitnesscalendar.util.result.map
 import kotlinx.coroutines.flow.first
 import java.io.FileInputStream
 import java.io.InputStream
@@ -34,7 +40,7 @@ class ImportRepository @Inject constructor(private val dbRepository: DatabaseRep
 
         val importData = tracks.map { importTrack ->
             val activityType = activityTypeNames[importTrack.track.type] ?: return false
-            val richActivity = importTrack.toRichActivity(activityType) ?: return false
+            val richActivity = importTrack.toRichActivity(activityType).ok() ?: return false
             richActivity to importTrack
         }
 
@@ -49,9 +55,11 @@ class ImportRepository @Inject constructor(private val dbRepository: DatabaseRep
      * Tries to import the track as activity and returns the activity id in case of success
      * or null if the track could not get imported
      */
-    suspend fun importTrack(importTrack: ImportTrack, type: ActivityType): Int? {
-        val activity = importTrack.toRichActivity(type) ?: return null
-        return importActivity(activity, importTrack)
+    suspend fun importTrack(
+        importTrack: ImportTrack,
+        type: ActivityType
+    ): TypedResult<Int, ImportError> {
+        return importTrack.toRichActivity(type).map { importActivity(it, importTrack) }
     }
 
     private suspend fun importActivity(richActivity: RichActivity, importTrack: ImportTrack): Int {
@@ -107,22 +115,30 @@ class ImportRepository @Inject constructor(private val dbRepository: DatabaseRep
         val dbTrack: Track = Track(activityId = -1, points = track.points),
         val trackSvg: TrackSvg? = track.toTrackSvg()
     ) {
-        fun toRichActivity(type: ActivityType): RichActivity? {
+        fun toRichActivity(type: ActivityType): TypedResult<RichActivity, ImportError> {
             val initialActivity = Activity(
-                typeId = type.uid ?: return null,
+                typeId = type.uid ?: return ImportError.NoActivityType.asErr(),
                 description = track.name,
-                startTime = track.startTime ?: return null,
-                endTime = track.endTime ?: return null,
+                startTime = track.startTime
+                    ?: return ImportError.NoStartAndEndTime.asErr(),
+                endTime = track.endTime ?: return ImportError.NoStartAndEndTime.asErr(),
                 trackPreview = trackSvg?.serialize()
             )
 
-            val activity = dbTrack.addStatsToActivity(initialActivity) ?: return null
+            val activity = dbTrack.addStatsToActivity(initialActivity)
+                ?: return ImportError.NoStartAndEndTime.asErr()
+
 
             return RichActivity(
                 activity = activity,
                 type = type,
                 place = null,
-            )
+            ).asOk()
         }
+    }
+
+    enum class ImportError(@StringRes val messageId: Int) {
+        NoActivityType(R.string.import_error_no_activity_type),
+        NoStartAndEndTime(R.string.import_error_no_start_and_end_time);
     }
 }

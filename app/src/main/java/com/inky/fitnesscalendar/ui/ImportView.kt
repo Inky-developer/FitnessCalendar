@@ -1,8 +1,10 @@
 package com.inky.fitnesscalendar.ui
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -34,6 +36,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -85,9 +88,8 @@ fun ImportView(
 ) {
     val typeMapping = localDatabaseValues.current.activityTypeNames
     val saveButtonEnabled = remember(tracks, typeMapping) {
-        tracks.all {
-            val type = typeMapping[it.track.type]
-            type != null && it.toRichActivity(type) != null
+        tracks.all { typeMapping[it.track.type] != null } && tracks.any {
+            it.toRichActivity(typeMapping[it.track.type]!!).isOk()
         }
     }
 
@@ -152,8 +154,13 @@ fun TrackView(
 ) {
     var dialogOpen by rememberSaveable { mutableStateOf(false) }
     var selectedActivityType by rememberSaveable { mutableStateOf<ActivityType?>(null) }
-    val richActivity =
-        remember(track, selectedType) { selectedType?.let { track.toRichActivity(selectedType) } }
+    val (richActivity, error) = remember(track, selectedType) {
+        if (selectedType == null) {
+            return@remember null to null
+        }
+        val result = track.toRichActivity(selectedType)
+        return@remember result.ok() to result.err()
+    }
 
     Box(modifier = Modifier.clickable { dialogOpen = true }) {
         if (richActivity != null) {
@@ -163,7 +170,9 @@ fun TrackView(
                 expand = true
             )
         } else {
-            ActivityCardWithoutType(track.track, localizationRepository)
+            Column {
+                ActivityCardWithoutType(track.track, error, localizationRepository)
+            }
         }
     }
 
@@ -194,11 +203,14 @@ fun TrackView(
 @Composable
 private fun ActivityCardWithoutType(
     track: GpxTrack,
+    error: ImportRepository.ImportError?,
     localizationRepository: LocalizationRepository
 ) {
     val time = remember(track) {
         track.startTime?.let { localizationRepository.formatRelativeDate(it) } ?: ""
     }
+    val context = LocalContext.current
+    val errorMessage = remember(error) { error?.let { context.getString(error.messageId) } }
 
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
@@ -233,5 +245,16 @@ private fun ActivityCardWithoutType(
             color = MaterialTheme.colorScheme.primary,
             modifier = Modifier.padding(all = 8.dp)
         )
+
+        if (errorMessage != null) {
+            Text(
+                stringResource(R.string.cannot_import_activity_due_to_error, errorMessage),
+                color = MaterialTheme.colorScheme.onErrorContainer,
+                modifier = Modifier
+                    .background(MaterialTheme.colorScheme.errorContainer)
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp)
+            )
+        }
     }
 }

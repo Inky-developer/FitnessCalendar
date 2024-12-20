@@ -44,7 +44,7 @@ class ImportViewModel @Inject constructor(
 
             for ((importTrack, activityType) in importTracks) {
                 val result = importRepository.importTrack(importTrack, activityType)
-                if (result != null) {
+                if (result.isOk()) {
                     numImportedActivities += 1
                 }
             }
