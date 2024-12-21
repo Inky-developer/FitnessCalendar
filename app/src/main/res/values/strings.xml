@@ -299,4 +299,5 @@
     <string name="total_meters">Total meters</string>
     <string name="Average_meters">Average Meters</string>
     <string name="Average_ascent">Average Ascent</string>
+    <string name="summary">Summary</string>
 </resources>

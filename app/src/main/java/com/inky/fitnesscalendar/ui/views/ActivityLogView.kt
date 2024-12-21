@@ -95,6 +95,7 @@ fun ActivityLog(
     onTrackDetails: (Activity) -> Unit,
     onShowDay: (EpochDay) -> Unit,
     onFilter: () -> Unit,
+    onSummary: () -> Unit,
     initialSelectedActivityId: Int? = null,
 ) {
     val scope = rememberCoroutineScope()
@@ -141,7 +142,13 @@ fun ActivityLog(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { onFilter() }) {
+                    IconButton(onClick = onSummary) {
+                        Icon(
+                            painterResource(R.drawable.outline_assessment_24),
+                            stringResource(R.string.summary)
+                        )
+                    }
+                    IconButton(onClick = onFilter) {
                         Icon(Icons.Outlined.Search, stringResource(R.string.filter))
                     }
                 },

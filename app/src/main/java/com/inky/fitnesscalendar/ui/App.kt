@@ -34,6 +34,7 @@ import com.inky.fitnesscalendar.ui.views.MapView
 import com.inky.fitnesscalendar.ui.views.NewActivity
 import com.inky.fitnesscalendar.ui.views.RecordActivity
 import com.inky.fitnesscalendar.ui.views.StatisticsView
+import com.inky.fitnesscalendar.ui.views.SummaryView
 import com.inky.fitnesscalendar.ui.views.TrackDetailsView
 import com.inky.fitnesscalendar.ui.views.TrackGraphView
 import com.inky.fitnesscalendar.ui.views.Views
@@ -183,6 +184,9 @@ private fun AppNavigation(
                         onFilter = {
                             navController.navigate(Views.FilterActivity)
                         },
+                        onSummary = {
+                            navController.navigate(Views.SummaryView)
+                        },
                         onEditFilter = {
                             filterState = it
                             viewModel.addToFilterHistory(filterState)
@@ -272,6 +276,22 @@ private fun AppNavigation(
                         activityId = route.activityId,
                         onBack = { navController.popBackStack() }
                     )
+                }
+            }
+
+            composable<Views.SummaryView>(
+                enterTransition = {
+                    slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Up)
+                },
+                exitTransition = {
+                    slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Down)
+                }
+            ) { backStackEntry ->
+                val route: Views.SummaryView = backStackEntry.toRoute()
+                onCurrentView(route)
+
+                ProvideSharedContent(sharedContentScope = this@SharedTransitionLayout) {
+                    SummaryView(filter = filterState, onBack = { navController.popBackStack() })
                 }
             }
 
