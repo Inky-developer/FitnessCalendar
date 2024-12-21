@@ -297,4 +297,7 @@
     <string name="average_bpm">Durchschnittliche bpm</string>
     <string name="maximal_bpm">Maximale bpm</string>
     <string name="Maximal_heart_rate">Maximale Herzfrequenz</string>
+    <string name="total_meters">Meter gesamt</string>
+    <string name="Average_meters">Durchschnittliche Meter</string>
+    <string name="Average_ascent">Durchschnittlicher Anstieg</string>
 </resources>

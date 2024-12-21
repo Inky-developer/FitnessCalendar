@@ -63,6 +63,18 @@ enum class Projection(
         R.drawable.outline_heart_rate_24,
         null
     ),
+    ByTotalAscent(
+        R.string.total_meters,
+        R.string.Total_ascent,
+        R.drawable.outline_total_ascent_24,
+        null
+    ),
+    ByAverageAscent(
+        R.string.Average_meters,
+        R.string.Average_ascent,
+        R.drawable.outline_ascent_24,
+        null
+    ),
     ByAverageIntensity(
         R.string.average_intensity,
         R.string.average_intensity,
@@ -79,6 +91,8 @@ enum class Projection(
         ByAverageSpeed -> statistics.averageSpeed()?.kmh
         ByMaximumHeartRate -> statistics.maximalHeartRate()?.bpm?.toDouble()
         ByAverageHeartRate -> statistics.averageHeartRate()?.bpm?.toDouble()
+        ByTotalAscent -> statistics.totalAscent().meters.toDouble()
+        ByAverageAscent -> statistics.averageAscent()?.meters?.toDouble()
         ByAverageIntensity -> statistics.averageIntensity()
     }
 
@@ -88,6 +102,7 @@ enum class Projection(
         ByTotalDistance, ByAverageDistance -> UnitMarkerFormatter(context.getString(R.string.unit_km))
         ByAverageSpeed -> UnitMarkerFormatter(context.getString(R.string.unit_kmh))
         ByMaximumHeartRate, ByAverageHeartRate -> UnitMarkerFormatter(context.getString(R.string.unit_bpm))
+        ByTotalAscent, ByAverageAscent -> UnitMarkerFormatter(context.getString(R.string.unit_m))
     }
 
     /**
@@ -95,7 +110,7 @@ enum class Projection(
      * This is not wanted for total projections though, since here it is important to know when it is zero (explicitly return 0).
      */
     fun getDefault(): Double? = when (this) {
-        ByTotalTime, ByTotalActivities, ByTotalDistance, ByAverageTime, ByAverageDistance -> 0.0
+        ByTotalTime, ByTotalActivities, ByTotalDistance, ByAverageTime, ByAverageDistance, ByTotalAscent, ByAverageAscent -> 0.0
         ByAverageSpeed, ByAverageHeartRate, ByMaximumHeartRate, ByAverageIntensity -> null
     }
 }

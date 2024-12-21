@@ -60,6 +60,17 @@ data class ActivityStatistics(
     fun maximalHeartRate(): HeartFrequency? =
         activities.mapNotNull { it.activity.maximalHeartRate }.maxOrNull()
 
+    fun averageAscent(): Distance? {
+        val ascents = activities.mapNotNull { it.activity.totalAscent?.meters }
+        if (ascents.isEmpty()) {
+            return null
+        }
+        return Distance(meters = ascents.sum() / ascents.size)
+    }
+
+    fun totalAscent(): Distance =
+        Distance(meters = activities.sumOf { it.activity.totalAscent?.meters ?: 0 })
+
     fun averageIntensity(): Double? {
         val intensities = activities.mapNotNull { it.activity.intensity?.value }
         if (intensities.isEmpty()) {
