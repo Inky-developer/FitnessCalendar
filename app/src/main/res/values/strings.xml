@@ -293,4 +293,7 @@
     <string name="Total_ascent">Total ascent</string>
     <string name="Total_descent">Total descent</string>
     <string name="total_ascent">total ascent</string>
+    <string name="average_bpm">Average bpm</string>
+    <string name="maximal_bpm">Maximal bpm</string>
+    <string name="Maximal_heart_rate">Maximal heart reate</string>
 </resources>

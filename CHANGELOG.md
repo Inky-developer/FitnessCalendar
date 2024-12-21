@@ -3,6 +3,7 @@
 - The app will now automatically import tracks from configurable folders
 - Fix y-range for elevation graphs
 - Display total ascent and total descent
+- Add average heart rate and total heart rate to statistics
 
 # 2024.12.1
 

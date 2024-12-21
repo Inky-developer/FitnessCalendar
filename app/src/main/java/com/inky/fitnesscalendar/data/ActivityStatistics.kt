@@ -3,6 +3,7 @@ package com.inky.fitnesscalendar.data
 import com.inky.fitnesscalendar.data.measure.Distance
 import com.inky.fitnesscalendar.data.measure.Duration
 import com.inky.fitnesscalendar.data.measure.Duration.Companion.until
+import com.inky.fitnesscalendar.data.measure.HeartFrequency
 import com.inky.fitnesscalendar.data.measure.Speed
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.RichActivity
@@ -47,6 +48,17 @@ data class ActivityStatistics(
         }
         return Speed(metersPerSecond = speeds.sum() / speeds.size)
     }
+
+    fun averageHeartRate(): HeartFrequency? {
+        val heartRates = activities.mapNotNull { it.activity.averageHeartRate?.bpm }
+        if (heartRates.isEmpty()) {
+            return null
+        }
+        return HeartFrequency(bpm = heartRates.sum() / heartRates.size)
+    }
+
+    fun maximalHeartRate(): HeartFrequency? =
+        activities.mapNotNull { it.activity.maximalHeartRate }.maxOrNull()
 
     fun averageIntensity(): Double? {
         val intensities = activities.mapNotNull { it.activity.intensity?.value }

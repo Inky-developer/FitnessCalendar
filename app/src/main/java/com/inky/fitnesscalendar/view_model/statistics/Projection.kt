@@ -51,6 +51,18 @@ enum class Projection(
         R.drawable.outline_speed_24,
         null
     ),
+    ByMaximumHeartRate(
+        R.string.maximal_bpm,
+        R.string.Maximal_heart_rate,
+        R.drawable.outline_max_heart_rate_24,
+        null
+    ),
+    ByAverageHeartRate(
+        R.string.average_bpm,
+        R.string.Average_heart_rate,
+        R.drawable.outline_heart_rate_24,
+        null
+    ),
     ByAverageIntensity(
         R.string.average_intensity,
         R.string.average_intensity,
@@ -65,6 +77,8 @@ enum class Projection(
         ByTotalDistance -> statistics.totalDistance().kilometers
         ByAverageDistance -> statistics.averageDistance()?.kilometers
         ByAverageSpeed -> statistics.averageSpeed()?.kmh
+        ByMaximumHeartRate -> statistics.maximalHeartRate()?.bpm?.toDouble()
+        ByAverageHeartRate -> statistics.averageHeartRate()?.bpm?.toDouble()
         ByAverageIntensity -> statistics.averageIntensity()
     }
 
@@ -73,6 +87,7 @@ enum class Projection(
         ByTotalActivities, ByAverageIntensity -> UnitMarkerFormatter()
         ByTotalDistance, ByAverageDistance -> UnitMarkerFormatter(context.getString(R.string.unit_km))
         ByAverageSpeed -> UnitMarkerFormatter(context.getString(R.string.unit_kmh))
+        ByMaximumHeartRate, ByAverageHeartRate -> UnitMarkerFormatter(context.getString(R.string.unit_bpm))
     }
 
     /**
@@ -81,6 +96,6 @@ enum class Projection(
      */
     fun getDefault(): Double? = when (this) {
         ByTotalTime, ByTotalActivities, ByTotalDistance, ByAverageTime, ByAverageDistance -> 0.0
-        ByAverageSpeed, ByAverageIntensity -> null
+        ByAverageSpeed, ByAverageHeartRate, ByMaximumHeartRate, ByAverageIntensity -> null
     }
 }
