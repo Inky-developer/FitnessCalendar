@@ -112,18 +112,24 @@ data class Track(
         val minHeight = points.mapNotNull { it.elevation }.minByOrNull { it }
         val maxHeight = points.mapNotNull { it.elevation }.maxByOrNull { it }
 
-        var totalAscent = 0.0
-        var totalDescent = 0.0
-        for ((prev, curr) in trackPointComputedData.windowed(2)) {
-            val prevEle = prev.computedElevation
-            val currEle = curr.computedElevation
-            if (prevEle == null || currEle == null) continue
+        var totalAscent: Distance? = null
+        var totalDescent: Distance? = null
+        if (minHeight != null) {
+            var ascent = 0.0
+            var descent = 0.0
+            for ((prev, curr) in trackPointComputedData.windowed(2)) {
+                val prevEle = prev.computedElevation
+                val currEle = curr.computedElevation
+                if (prevEle == null || currEle == null) continue
 
-            if (prevEle > currEle) {
-                totalDescent += prevEle.meters - currEle.meters
-            } else {
-                totalAscent += currEle.meters - prevEle.meters
+                if (prevEle > currEle) {
+                    descent += prevEle.meters - currEle.meters
+                } else {
+                    ascent += currEle.meters - prevEle.meters
+                }
             }
+            totalAscent = Distance(meters = ascent.roundToLong())
+            totalDescent = Distance(meters = descent.roundToLong())
         }
 
         return GpxTrackStats(
@@ -138,8 +144,8 @@ data class Track(
             maxTemperature = maxTemperature,
             minHeight = minHeight,
             maxHeight = maxHeight,
-            totalAscent = Distance(meters = totalAscent.roundToLong()),
-            totalDescent = Distance(meters = totalDescent.roundToLong())
+            totalAscent = totalAscent,
+            totalDescent = totalDescent
         )
     }
 
