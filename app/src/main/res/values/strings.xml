@@ -290,4 +290,7 @@
     <string name="import_error_no_activity_type">No activity type defined</string>
     <string name="import_error_no_start_and_end_time">The activity contains no start and end time information</string>
     <string name="cannot_import_activity_due_to_error">An error occurred. Cannot import this activity.\n%1$s</string>
+    <string name="Total_ascent">Total ascent</string>
+    <string name="Total_descent">Total descent</string>
+    <string name="total_ascent">total ascent</string>
 </resources>

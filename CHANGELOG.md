@@ -2,6 +2,7 @@
 
 - The app will now automatically import tracks from configurable folders
 - Fix y-range for elevation graphs
+- Display total ascent and total descent
 
 # 2024.12.1
 

@@ -192,6 +192,8 @@ fun TrackDetailsView(
                 ) {
                     SimpleStatistic(R.string.Minimum_elevation, state.minElevation)
                     SimpleStatistic(R.string.Maximum_elevation, state.maxElevation)
+                    SimpleStatistic(R.string.Total_ascent, state.totalAscent)
+                    SimpleStatistic(R.string.Total_descent, state.totalDescent)
                 }
             }
 
@@ -284,6 +286,8 @@ data class DetailsState(
     val maxSpeed: String?,
     val minElevation: String?,
     val maxElevation: String?,
+    val totalAscent: String?,
+    val totalDescent: String?,
     val averageHeartRate: String?,
     val maxHeartRate: String?,
     val minTemperature: String?,
@@ -305,28 +309,31 @@ data class DetailsState(
             val activity = richActivity.activity
             val type = richActivity.type
 
-            val startDate = localizationRepository.formatRelativeLocalDate(activity.startTime.toLocalDate())
+            val startDate =
+                localizationRepository.formatRelativeLocalDate(activity.startTime.toLocalDate())
             val startTime = localizationRepository.timeFormatter.format(activity.startTime)
             val start = "$startDate $startTime"
 
             val duration = activity.duration.format()
             val movingDuration = activity.movingDuration?.format()
 
-            val distance = activity.distance?.format(context)
+            val distance = activity.distance?.formatWithContext(context)
 
-            val averageSpeed = activity.averageSpeed?.format(context)
-            val averageMovingSpeed = activity.averageMovingSpeed?.format(context)
-            val maxSpeed = stats.maxSpeed.format(context)
+            val averageSpeed = activity.averageSpeed?.formatWithContext(context)
+            val averageMovingSpeed = activity.averageMovingSpeed?.formatWithContext(context)
+            val maxSpeed = stats.maxSpeed.formatWithContext(context)
 
             val minHeight = stats.minHeight?.format(context)
             val maxHeight = stats.maxHeight?.format(context)
+            val totalAscent = stats.totalAscent?.formatWithContext(context)
+            val totalDescent = stats.totalDescent?.formatWithContext(context)
 
-            val averageHeartRate = activity.averageHeartRate?.format(context)
-            val maxHeartRate = activity.maximalHeartRate?.format(context)
+            val averageHeartRate = activity.averageHeartRate?.formatWithContext(context)
+            val maxHeartRate = activity.maximalHeartRate?.formatWithContext(context)
 
-            val minTemperature = stats.minTemperature?.format(context)
-            val maxTemperature = stats.maxTemperature?.format(context)
-            val averageTemperature = activity.temperature?.format(context)
+            val minTemperature = stats.minTemperature?.formatWithContext(context)
+            val maxTemperature = stats.maxTemperature?.formatWithContext(context)
+            val averageTemperature = activity.temperature?.formatWithContext(context)
 
             return DetailsState(
                 type = type,
@@ -343,7 +350,9 @@ data class DetailsState(
                 maxTemperature = maxTemperature,
                 averageTemperature = averageTemperature,
                 minElevation = minHeight,
-                maxElevation = maxHeight
+                maxElevation = maxHeight,
+                totalAscent = totalAscent,
+                totalDescent = totalDescent
             )
         }
     }

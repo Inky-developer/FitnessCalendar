@@ -45,7 +45,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
@@ -64,6 +63,7 @@ import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.Place
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.localization.LocalizationRepository
+import com.inky.fitnesscalendar.ui.util.ContextFormat
 import com.inky.fitnesscalendar.ui.util.skipToLookaheadSize
 import com.inky.fitnesscalendar.util.gpx.simplify
 
@@ -301,87 +301,52 @@ private fun ActivityCardContent(activity: Activity, place: Place?) {
             )
         }
 
-        if (timeElapsed.elapsedMs > 0) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(horizontal = 4.dp)
-            ) {
-                Icon(
-                    painterResource(R.drawable.outline_timer_24),
-                    stringResource(R.string.time)
-                )
-                Text(timeElapsed.format(), style = MaterialTheme.typography.bodyLarge)
-            }
+        IconStatistic(timeElapsed) {
+            Icon(
+                painterResource(R.drawable.outline_timer_24),
+                stringResource(R.string.time)
+            )
         }
-
-        if (activity.distance != null) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(horizontal = 4.dp)
-            ) {
-                Icon(
-                    Icons.AutoMirrored.Outlined.ArrowForward,
-                    stringResource(R.string.distance)
-                )
-                Text(activity.distance.format(LocalContext.current))
-            }
+        IconStatistic(activity.distance) {
+            Icon(
+                Icons.AutoMirrored.Outlined.ArrowForward,
+                stringResource(R.string.distance)
+            )
         }
-
-        if (activity.averageMovingSpeed != null) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(horizontal = 4.dp)
-            ) {
-                Icon(
-                    painterResource(R.drawable.outline_speed_24),
-                    stringResource(R.string.speed)
-                )
-                Text(activity.averageMovingSpeed!!.format(LocalContext.current))
-            }
+        IconStatistic(activity.averageMovingSpeed) {
+            Icon(
+                painterResource(R.drawable.outline_speed_24),
+                stringResource(R.string.speed)
+            )
         }
-
-        if (activity.averageHeartRate != null) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(horizontal = 4.dp)
-            ) {
-                Icon(
-                    painterResource(R.drawable.outline_heart_rate_24),
-                    stringResource(R.string.heart_rate)
-                )
-                Text(activity.averageHeartRate.format(LocalContext.current))
-            }
+        IconStatistic(activity.averageHeartRate) {
+            Icon(
+                painterResource(R.drawable.outline_heart_rate_24),
+                stringResource(R.string.heart_rate)
+            )
         }
-
-        if (activity.temperature != null) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(horizontal = 4.dp)
-            ) {
-                Icon(
-                    painterResource(R.drawable.outline_temperature_24),
-                    stringResource(R.string.temperature)
-                )
-                Text(activity.temperature.format(LocalContext.current))
-            }
+        IconStatistic(activity.totalAscent) {
+            Icon(
+                painterResource(R.drawable.outline_ascent_24),
+                stringResource(R.string.total_ascent)
+            )
         }
-
-        if (activity.intensity != null) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(horizontal = 4.dp)
-            ) {
-                Icon(
-                    painterResource(R.drawable.twotone_lightbulb_24),
-                    stringResource(R.string.intensity),
-                    tint = lerp(
-                        colorResource(R.color.intensity_low),
-                        colorResource(R.color.intensity_high),
-                        activity.intensity.value.toFloat() / 10f
-                    )
+        IconStatistic(activity.temperature) {
+            Icon(
+                painterResource(R.drawable.outline_temperature_24),
+                stringResource(R.string.temperature)
+            )
+        }
+        IconStatistic(activity.intensity) {
+            Icon(
+                painterResource(R.drawable.twotone_lightbulb_24),
+                stringResource(R.string.intensity),
+                tint = lerp(
+                    colorResource(R.color.intensity_low),
+                    colorResource(R.color.intensity_high),
+                    (activity.intensity?.value?.toFloat() ?: 0f) / 10f
                 )
-                Text(activity.intensity.value.toString())
-            }
+            )
         }
     }
 
@@ -403,6 +368,19 @@ private fun ActivityCardContent(activity: Activity, place: Place?) {
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(all = 8.dp)
         )
+    }
+}
+
+@Composable
+private fun IconStatistic(stat: ContextFormat?, icon: @Composable () -> Unit) {
+    if (stat != null) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.padding(horizontal = 4.dp)
+        ) {
+            icon()
+            Text(stat.text())
+        }
     }
 }
 

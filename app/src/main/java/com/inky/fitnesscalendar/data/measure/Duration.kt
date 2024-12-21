@@ -1,11 +1,13 @@
 package com.inky.fitnesscalendar.data.measure
 
+import android.content.Context
+import com.inky.fitnesscalendar.ui.util.ContextFormat
 import java.time.temporal.ChronoUnit
 import java.util.Date
 import java.util.concurrent.TimeUnit
 
 @JvmInline
-value class Duration(val elapsedMs: Long) {
+value class Duration(val elapsedMs: Long) : ContextFormat {
     val elapsedSeconds
         get() = elapsedMs.toDouble() / ChronoUnit.SECONDS.duration.toMillis().toDouble()
 
@@ -31,6 +33,8 @@ value class Duration(val elapsedMs: Long) {
 
         return entries.joinToString(" ")
     }
+
+    override fun formatWithContext(context: Context) = format()
 
     companion object {
         infix fun Date.until(end: Date): Duration {

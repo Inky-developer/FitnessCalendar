@@ -291,4 +291,7 @@
     <string name="import_error_no_activity_type">Kein Aktivitätstyp definiert</string>
     <string name="import_error_no_start_and_end_time">Die Aktivität hat keine Daten zur Startzeit und Endzeit</string>
     <string name="cannot_import_activity_due_to_error">Ein Fehler is aufgetreten. Kann diese Aktivitiät nicht importieren.\n%1$s</string>
+    <string name="Total_ascent">Anstieg gesamt</string>
+    <string name="Total_descent">Abstieg gesamt</string>
+    <string name="total_ascent">Anstieg gesamt</string>
 </resources>
