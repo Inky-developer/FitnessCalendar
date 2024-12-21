@@ -58,6 +58,8 @@ data class Activity(
     @ColumnInfo(name = "temperature") val temperature: Temperature? = null,
     @ColumnInfo(name = "average_heart_rate") val averageHeartRate: HeartFrequency? = null,
     @ColumnInfo(name = "maximal_heart_rate") val maximalHeartRate: HeartFrequency? = null,
+    @ColumnInfo(name = "total_ascent") val totalAscent: Distance? = null,
+    @ColumnInfo(name = "total_descent") val totalDescent: Distance? = null,
 
     // The unique identifier of the wifi network the device was connected to when starting the activity
     @ColumnInfo(name = "wifi_bssid") val wifiBssid: String? = null,

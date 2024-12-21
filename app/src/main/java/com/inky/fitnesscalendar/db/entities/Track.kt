@@ -11,6 +11,7 @@ import com.inky.fitnesscalendar.data.gpx.GpxTrackStats
 import com.inky.fitnesscalendar.data.measure.Distance
 import com.inky.fitnesscalendar.data.measure.Duration
 import com.inky.fitnesscalendar.data.measure.Duration.Companion.until
+import com.inky.fitnesscalendar.data.measure.Elevation
 import com.inky.fitnesscalendar.data.measure.HeartFrequency
 import com.inky.fitnesscalendar.data.measure.Speed
 import com.inky.fitnesscalendar.data.measure.Temperature
@@ -53,7 +54,9 @@ data class Track(
             movingDuration = stats.movingDuration,
             temperature = stats.averageTemperature,
             averageHeartRate = stats.averageHeartFrequency,
-            maximalHeartRate = stats.maxHeartFrequency
+            maximalHeartRate = stats.maxHeartFrequency,
+            totalAscent = stats.totalAscent,
+            totalDescent = stats.totalDescent
         )
     }
 
@@ -109,6 +112,20 @@ data class Track(
         val minHeight = points.mapNotNull { it.elevation }.minByOrNull { it }
         val maxHeight = points.mapNotNull { it.elevation }.maxByOrNull { it }
 
+        var totalAscent = 0.0
+        var totalDescent = 0.0
+        for ((prev, curr) in trackPointComputedData.windowed(2)) {
+            val prevEle = prev.computedElevation
+            val currEle = curr.computedElevation
+            if (prevEle == null || currEle == null) continue
+
+            if (prevEle > currEle) {
+                totalDescent += prevEle.meters - currEle.meters
+            } else {
+                totalAscent += currEle.meters - prevEle.meters
+            }
+        }
+
         return GpxTrackStats(
             totalDistance = totalDistance,
             totalDuration = duration,
@@ -120,7 +137,9 @@ data class Track(
             minTemperature = minTemperature,
             maxTemperature = maxTemperature,
             minHeight = minHeight,
-            maxHeight = maxHeight
+            maxHeight = maxHeight,
+            totalAscent = Distance(meters = totalAscent.roundToLong()),
+            totalDescent = Distance(meters = totalDescent.roundToLong())
         )
     }
 
@@ -129,6 +148,7 @@ data class Track(
         val cumDistance: Distance,
         val duration: Duration,
         val point: GpxTrackPoint,
+        var computedElevation: Elevation? = null,
         var acceleration: Double = 0.0,
     ) {
         val speed
@@ -173,7 +193,42 @@ data class Track(
                 p1.acceleration = (p1.speed - p2.speed).metersPerSecond / p1.duration.elapsedSeconds
             }
 
+            smoothElevations(computedPoints)
+
             return computedPoints
+        }
+
+        /**
+         * Implements a moving average to smooth elevations out a bit
+         */
+        private fun smoothElevations(data: List<ComputedTrackPoint>) {
+            // This is quite arbitrary, but yields somewhat decent results
+            // Still, the computed totals ascent and descent can differ wildly from source data :(
+            val windowSize = 6
+            var runningSum = 0f
+
+            if (data.size <= windowSize) {
+                for (point in data) {
+                    point.computedElevation = point.point.elevation
+                }
+                return
+            }
+
+            for (point in data.subList(0, windowSize)) {
+                runningSum += point.point.elevation?.meters ?: 0f
+                point.computedElevation = point.point.elevation
+            }
+
+            for ((index, point) in data.subList(windowSize / 2, data.size - windowSize / 2)
+                .withIndex()) {
+                point.computedElevation = Elevation(meters = runningSum / windowSize)
+                runningSum -= data[index].point.elevation?.meters ?: 0f
+                runningSum += data[index + windowSize].point.elevation?.meters ?: 0f
+            }
+
+            for (point in data.subList(data.size - windowSize / 2, data.size)) {
+                point.computedElevation = Elevation(meters = runningSum / windowSize)
+            }
         }
 
         private fun filterOutliers(points: List<ComputedTrackPoint>): List<ComputedTrackPoint> {

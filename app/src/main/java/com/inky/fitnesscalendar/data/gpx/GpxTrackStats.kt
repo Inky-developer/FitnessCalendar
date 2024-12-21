@@ -18,5 +18,7 @@ data class GpxTrackStats(
     val minTemperature: Temperature?,
     val maxTemperature: Temperature?,
     val minHeight: Elevation?,
-    val maxHeight: Elevation?
+    val maxHeight: Elevation?,
+    val totalAscent: Distance?,
+    val totalDescent: Distance?
 )
