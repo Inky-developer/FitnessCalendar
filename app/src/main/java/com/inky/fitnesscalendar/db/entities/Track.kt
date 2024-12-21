@@ -1,5 +1,6 @@
 package com.inky.fitnesscalendar.db.entities
 
+import android.util.Log
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
@@ -13,7 +14,11 @@ import com.inky.fitnesscalendar.data.measure.Duration.Companion.until
 import com.inky.fitnesscalendar.data.measure.HeartFrequency
 import com.inky.fitnesscalendar.data.measure.Speed
 import com.inky.fitnesscalendar.data.measure.Temperature
+import kotlin.math.pow
 import kotlin.math.roundToLong
+import kotlin.math.sqrt
+
+private const val TAG = "Track"
 
 @Entity(
     foreignKeys = [
@@ -53,35 +58,15 @@ data class Track(
     }
 
     fun computedPoints(): List<ComputedTrackPoint> {
-        if (points.isEmpty()) {
-            return emptyList()
+        val computedPoints = computeTrackPoints(points)
+
+        // Unfortunately gpx files have some outliers, so here we remove all points with an unlikely acceleration
+        // FIXME: the distance data can still be messed up here
+        val filteredPoints = filterOutliers(computedPoints)
+        if (filteredPoints.size != computedPoints.size) {
+            Log.i(TAG, "Removed ${computedPoints.size - filteredPoints.size} outlier(s)")
         }
-
-        val cachedDistanceResultsArray = FloatArray(3)
-        var cumDistanceMeters = 0.0
-        val firstComputedTrackPoint = ComputedTrackPoint(
-            distanceMeters = 0.0,
-            cumDistance = Distance(meters = cumDistanceMeters.roundToLong()),
-            duration = Duration(elapsedMs = 0L),
-            point = points[0]
-        )
-
-        val computedPoints = mutableListOf(firstComputedTrackPoint)
-        points
-            .windowed(2)
-            .mapTo(computedPoints) { (a, b) ->
-                val distance = a.coordinate.distanceMeters(b.coordinate, cachedDistanceResultsArray)
-                cumDistanceMeters += distance
-                val duration = a.time.until(b.time)
-                ComputedTrackPoint(
-                    distanceMeters = distance,
-                    cumDistance = Distance(meters = cumDistanceMeters.roundToLong()),
-                    duration = duration,
-                    point = b,
-                )
-            }
-
-        return computedPoints
+        return filteredPoints
     }
 
     fun computeStatistics(): GpxTrackStats? {
@@ -143,12 +128,72 @@ data class Track(
         val distanceMeters: Double,
         val cumDistance: Distance,
         val duration: Duration,
-        val point: GpxTrackPoint
+        val point: GpxTrackPoint,
+        var acceleration: Double = 0.0,
     ) {
         val speed
             get() = if (duration.elapsedMs > 0)
                 Speed(metersPerSecond = distanceMeters / duration.elapsedSeconds)
             else
                 Speed(metersPerSecond = 0.0)
+    }
+
+    companion object {
+        private fun computeTrackPoints(points: List<GpxTrackPoint>): List<ComputedTrackPoint> {
+            if (points.isEmpty()) {
+                return emptyList()
+            }
+
+            val cachedDistanceResultsArray = FloatArray(3)
+            var cumDistanceMeters = 0.0
+            val firstComputedTrackPoint = ComputedTrackPoint(
+                distanceMeters = 0.0,
+                cumDistance = Distance(meters = cumDistanceMeters.roundToLong()),
+                duration = Duration(elapsedMs = 0L),
+                point = points[0]
+            )
+
+            val computedPoints = mutableListOf(firstComputedTrackPoint)
+            points
+                .windowed(2)
+                .mapTo(computedPoints) { (a, b) ->
+                    val distance =
+                        a.coordinate.distanceMeters(b.coordinate, cachedDistanceResultsArray)
+                    cumDistanceMeters += distance
+                    val duration = a.time.until(b.time)
+                    ComputedTrackPoint(
+                        distanceMeters = distance,
+                        cumDistance = Distance(meters = cumDistanceMeters.roundToLong()),
+                        duration = duration,
+                        point = b,
+                    )
+                }
+
+            for ((p1, p2) in computedPoints.subList(1, computedPoints.size).windowed(2)) {
+                p1.acceleration = (p1.speed - p2.speed).metersPerSecond / p1.duration.elapsedSeconds
+            }
+
+            return computedPoints
+        }
+
+        private fun filterOutliers(points: List<ComputedTrackPoint>): List<ComputedTrackPoint> {
+            val accelerations = points.map { it.acceleration }
+            val accAvg = accelerations.average()
+            val accStd = sqrt(accelerations.map { (it - accAvg).pow(2) }.average())
+
+            val (accMin, accMax) = normalDistributionQuantile(accAvg, accStd)
+            return points.filter { it.acceleration > accMin && it.acceleration < accMax }
+        }
+
+        /// Returns quantiles with 90% probability [0.05 to 0.95] for the given normal distribution
+        private fun normalDistributionQuantile(
+            mean: Double,
+            standardDeviation: Double
+        ): Pair<Double, Double> {
+            // See https://en.wikipedia.org/wiki/Normal_distribution#Quantile_function
+            val z = 1.959963984540
+            val quantile0995 = mean + standardDeviation * z
+            return -quantile0995 to quantile0995
+        }
     }
 }
