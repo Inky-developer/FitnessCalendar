@@ -44,6 +44,7 @@ fun PieChart(
     state: PieChartState,
     fontSize: TextUnit = TextUnit.Unspecified,
     style: TextStyle = LocalTextStyle.current,
+    modifier: Modifier = Modifier,
     animate: Boolean = true
 ) {
     val angleAnimation = remember(state) { Animatable(if (animate) 0f else 1f) }
@@ -55,7 +56,7 @@ fun PieChart(
     val textStyle = style.merge(fontSize = fontSize)
 
     Canvas(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxSize()
             .aspectRatio(1f)
             .shadow(4.dp, shape = CircleShape)

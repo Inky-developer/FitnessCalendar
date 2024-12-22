@@ -109,6 +109,14 @@ value class ActivityStatistics(
             .toMap()
             .mapValues { ActivityStatistics(it.value) }
 
+    val activitiesByFeel: Map<Feel, ActivityStatistics>
+        get() = activities
+            .groupBy { it.activity.feel }
+            .toList()
+            .sortedBy { (_, v) -> -v.size }
+            .toMap()
+            .mapValues { ActivityStatistics(it.value) }
+
     val activitiesByCategory: Map<ActivityCategory, ActivityStatistics>
         get() = activities
             .groupBy { it.type.activityCategory }

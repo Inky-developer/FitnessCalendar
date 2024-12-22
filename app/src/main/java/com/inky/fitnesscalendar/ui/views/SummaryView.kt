@@ -5,6 +5,7 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
@@ -47,6 +48,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityStatistics
 import com.inky.fitnesscalendar.data.Displayable
+import com.inky.fitnesscalendar.data.Feel
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.db.entities.Place
 import com.inky.fitnesscalendar.ui.components.FilterInformation
@@ -154,6 +156,13 @@ fun SummaryView(
                 SummaryBox(state.summaryBoxState)
                 PlaceBox(state.places)
 
+                if (state.feelLegendItems.size > 1) {
+                    PieChart(state.feelChartState, modifier = Modifier.padding(top = 8.dp))
+                }
+                AnimatedContent(state.feelLegendItems, label = "FeelLegendItems") { legendItems ->
+                    Legend(legendItems)
+                }
+
                 Spacer(modifier = Modifier.height(128.dp))
             }
         }
@@ -171,31 +180,33 @@ private fun PlaceBox(placeStats: Map<Place?, Int>) {
     val activitiesWithPlace =
         remember(placeStats) { placeStats.filterKeys { it != null }.values.sum() }
 
-    Surface(
-        color = MaterialTheme.colorScheme.surfaceContainer,
-        shape = MaterialTheme.shapes.medium,
-        modifier = Modifier.padding(vertical = 8.dp)
-    ) {
-        Column(modifier = Modifier.padding(all = 8.dp)) {
-            Text("Places")
-            SummaryItem(stringResource(R.string.summary_activities_with_place), activitiesWithPlace.toString())
-            SummaryItem(stringResource(R.string.summary_activities_without_place), (placeStats[null] ?: 0).toString())
+    InfoBox {
+        Text(stringResource(R.string.places))
+        SummaryItem(
+            stringResource(R.string.summary_activities_with_place),
+            activitiesWithPlace.toString()
+        )
+        SummaryItem(
+            stringResource(R.string.summary_activities_without_place),
+            (placeStats[null] ?: 0).toString()
+        )
 
-            HorizontalDivider(modifier = Modifier
+        HorizontalDivider(
+            modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 4.dp))
+                .padding(vertical = 4.dp)
+        )
 
-            for ((place, count) in placeStats) {
-                if (place == null) {
-                    continue
-                }
+        for ((place, count) in placeStats) {
+            if (place == null) {
+                continue
+            }
 
-                SummaryItem(place.name, count.toString()) {
-                    CircleIcon(
-                        color = colorResource(place.color.colorId),
-                        modifier = Modifier.padding(horizontal = 2.dp)
-                    )
-                }
+            SummaryItem(place.name, count.toString()) {
+                CircleIcon(
+                    color = colorResource(place.color.colorId),
+                    modifier = Modifier.padding(horizontal = 2.dp)
+                )
             }
         }
     }
@@ -203,30 +214,37 @@ private fun PlaceBox(placeStats: Map<Place?, Int>) {
 
 @Composable
 private fun SummaryBox(state: SummaryBoxState) {
+    InfoBox {
+        SummaryItem(stringResource(R.string.summary_total_activities), state.totalActivities)
+        SummaryItem(stringResource(R.string.summary_total_time), state.totalTime)
+        SummaryItem(stringResource(R.string.summary_average_time), state.averageTime)
+        SummaryItem(stringResource(R.string.summary_total_distance), state.totalDistance)
+        SummaryItem(stringResource(R.string.summary_average_distance), state.averageDistance)
+        SummaryItem(stringResource(R.string.summary_average_speed), state.averageSpeed)
+        SummaryItem(
+            stringResource(R.string.summary_average_moving_speed),
+            state.averageMovingSpeed
+        )
+        SummaryItem(stringResource(R.string.summary_total_ascent), state.totalAscent)
+        SummaryItem(stringResource(R.string.summary_total_descent), state.totalDescent)
+        SummaryItem(stringResource(R.string.summary_average_heart_rate), state.averageHeartRate)
+        SummaryItem(stringResource(R.string.summary_maximal_heart_rate), state.maximumHeartRate)
+        SummaryItem(
+            stringResource(R.string.summary_average_temperature),
+            state.averageTemperature,
+        )
+    }
+}
+
+@Composable
+private fun InfoBox(content: @Composable ColumnScope.() -> Unit) {
     Surface(
         color = MaterialTheme.colorScheme.surfaceContainer,
         shape = MaterialTheme.shapes.medium,
         modifier = Modifier.padding(vertical = 8.dp)
     ) {
         Column(modifier = Modifier.padding(all = 8.dp)) {
-            SummaryItem(stringResource(R.string.summary_total_activities), state.totalActivities)
-            SummaryItem(stringResource(R.string.summary_total_time), state.totalTime)
-            SummaryItem(stringResource(R.string.summary_average_time), state.averageTime)
-            SummaryItem(stringResource(R.string.summary_total_distance), state.totalDistance)
-            SummaryItem(stringResource(R.string.summary_average_distance), state.averageDistance)
-            SummaryItem(stringResource(R.string.summary_average_speed), state.averageSpeed)
-            SummaryItem(
-                stringResource(R.string.summary_average_moving_speed),
-                state.averageMovingSpeed
-            )
-            SummaryItem(stringResource(R.string.summary_total_ascent), state.totalAscent)
-            SummaryItem(stringResource(R.string.summary_total_descent), state.totalDescent)
-            SummaryItem(stringResource(R.string.summary_average_heart_rate), state.averageHeartRate)
-            SummaryItem(stringResource(R.string.summary_maximal_heart_rate), state.maximumHeartRate)
-            SummaryItem(
-                stringResource(R.string.summary_average_temperature),
-                state.averageTemperature,
-            )
+            content()
         }
     }
 }
@@ -283,7 +301,9 @@ data class SummaryState internal constructor(
     val pieChartState: PieChartState,
     val legendItems: List<Displayable>,
     val summaryBoxState: SummaryBoxState,
-    val places: Map<Place?, Int>
+    val places: Map<Place?, Int>,
+    val feelChartState: PieChartState,
+    val feelLegendItems: List<Feel>,
 ) {
     companion object {
         operator fun invoke(
@@ -314,13 +334,24 @@ data class SummaryState internal constructor(
 
             val places = statistics.activitiesByPlace.mapValues { it.value.size }
 
+            val feelChartState = PieChartState(statistics.activitiesByFeel.map { (key, value) ->
+                PieChartEntry(
+                    value = value.size.toDouble(),
+                    label = value.size.toString(),
+                    color = Color(key.getColor(context))
+                )
+            })
+            val feelLegendItems = Feel.entries.reversed()
+
             return SummaryState(
                 statistics = statistics,
                 filter = filter,
                 pieChartState = pieChartState,
                 legendItems = legendItems,
                 summaryBoxState = summaryBoxState,
-                places = places
+                places = places,
+                feelChartState = feelChartState,
+                feelLegendItems = feelLegendItems,
             )
         }
     }

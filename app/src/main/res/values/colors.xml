@@ -36,5 +36,9 @@
     <color name="start_point">#2E7D32</color>
     <color name="end_point">#D84315</color>
 
+    <color name="feel_good">#1B5E20</color>
+    <color name="feel_ok">#B6711F</color>
+    <color name="feel_bad">#8E0F0F</color>
+
     <color name="favorite">#AD1457</color>
 </resources>

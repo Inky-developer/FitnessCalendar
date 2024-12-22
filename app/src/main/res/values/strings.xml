@@ -314,4 +314,5 @@
     <string name="summary_average_temperature">Average temperature:</string>
     <string name="summary_activities_with_place">Activities with place:</string>
     <string name="summary_activities_without_place">Activities without place:</string>
+    <string name="feels">Feels</string>
 </resources>
