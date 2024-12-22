@@ -76,21 +76,28 @@ fun PieChart(
         angleStart = 0f
         for (dataPoint in state.dataPoints) {
             val angle = dataPoint.value.toFloat() / sum.toFloat() * 360 * angleAnimation.value
-            val centerAngleRad = (angleStart + angle / 2) / 360 * PI.toFloat() * 2
+            val centerAngleRad = degToRad(angleStart + angle / 2)
             val textX = cos(centerAngleRad) * size.width / 4
             val textY = sin(centerAngleRad) * size.height / 4
 
-            // Simple heuristic to calculate how much space is available: for width always use the
-            // radius, for height calculate the height of a slice of the same angle starting at angle 0
-            val curAngleRad = angle / 360 * PI.toFloat() * 2
+            // This is how available space is calculated:
+            // First, assume the slice is not rotated. This means that the available width is
+            // the radius. For available height calculate the height (y-coordinate of endpoint).
+            // Then apply the actual rotation to these values. For example, if the rotation is 90 degrees,
+            // available width and available height will just swap, since the slice is now pointing down.
+            val curAngleRad = degToRad(angle)
             val endPointY = sin(curAngleRad) * size.height / 2
-            val availableHeight = if (angle > 45) size.height / 2 else abs(endPointY / 2f)
-            val availableWidth = size.width / 2
+            val initialAvailableHeight = if (angle > 90) size.height / 2 else abs(endPointY / 2f)
+            val initialAvailableWidth = size.width / 2
+            val availableWidth =
+                interpolateCircle(centerAngleRad, initialAvailableWidth, initialAvailableHeight)
+            val availableHeight =
+                interpolateCircle(centerAngleRad, initialAvailableHeight, initialAvailableWidth)
 
             val measuredText = textMeasurer.measure(
                 dataPoint.label,
                 maxLines = 2,
-                overflow = TextOverflow.Ellipsis,
+                overflow = TextOverflow.Visible,
                 style = textStyle,
                 constraints = Constraints.fitPrioritizingWidth(
                     0,
@@ -118,16 +125,26 @@ fun PieChart(
     }
 }
 
+/**
+ * Interpolates between the two given values periodically every 90 degrees (0.5PI rad)
+ */
+private fun interpolateCircle(angleRad: Float, max: Float, min: Float): Float {
+    val base = 0.5f * (max - min)
+    return base * cos(angleRad) + base + min
+}
+
+private fun degToRad(angleDegrees: Float): Float = angleDegrees / 360 * PI.toFloat() * 2
+
 @Preview(device = "spec:width=512px,height=1024px,dpi=440")
 @Composable
 private fun PreviewPieChart() {
     val state = PieChartState(
         listOf(
-            PieChartEntry(2.0, "Entry a", Color.Red),
-            PieChartEntry(1.0, "Entry b", Color.Black),
+            PieChartEntry(20.0, "Entry a", Color.Red),
+            PieChartEntry(10.0, "Entry b", Color.Black),
             PieChartEntry(5.0, "Entry c", Color.Green),
-            PieChartEntry(5.0, "Entry c", Color.Yellow),
-        )
+            PieChartEntry(3.0, "Entry d", Color.Yellow),
+        ).sortedBy { it.value }
     )
     Surface(modifier = Modifier.fillMaxWidth()) {
         PieChart(state, animate = false)
