@@ -46,7 +46,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
@@ -437,17 +436,14 @@ private fun GraphLegend(
                 selected = !removedGroups.contains(index),
                 onClick = { onToggle(index) },
                 label = {
-                    Text(
-                        option.getText(LocalContext.current),
-                        style = MaterialTheme.typography.labelSmall
-                    )
+                    Text(option.text(), style = MaterialTheme.typography.labelSmall)
                 },
                 leadingIcon = {
                     Box(
                         modifier = Modifier
                             .size(8.dp)
                             .clip(CircleShape)
-                            .background(Color(option.getColor(LocalContext.current)))
+                            .background(option.color())
                     )
                 },
                 modifier = Modifier.padding(horizontal = 4.dp)

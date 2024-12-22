@@ -1,5 +1,6 @@
 package com.inky.fitnesscalendar.ui.views
 
+import android.content.Context
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,15 +32,13 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityStatistics
+import com.inky.fitnesscalendar.data.Displayable
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
-import com.inky.fitnesscalendar.db.entities.ActivityType
-import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.ui.components.PieChart
 import com.inky.fitnesscalendar.ui.components.PieChartEntry
 import com.inky.fitnesscalendar.ui.components.PieChartState
@@ -53,36 +53,30 @@ fun SummaryView(
     filter: ActivityFilter,
     onBack: () -> Unit,
 ) {
-    val activitiesState = viewModel.repository.getActivities(filter).collectAsState(initial = null)
+    val activities by viewModel.repository.getActivities(filter).collectAsState(initial = null)
+    val context = LocalContext.current
+    val state = remember(activities, filter) {
+        activities?.let {
+            SummaryState(
+                context,
+                ActivityStatistics(it),
+                filter
+            )
+        }
+    }
 
-    when (val activities = activitiesState.value) {
+    when (state) {
         null -> {}
-        else -> SummaryView(activities = activities, onBack = onBack)
+        else -> SummaryView(state = state, onBack = onBack)
     }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SummaryView(
-    activities: List<RichActivity>,
+    state: SummaryState,
     onBack: () -> Unit,
 ) {
-    val context = LocalContext.current
-
-    val statistics = remember(activities) { ActivityStatistics(activities) }
-    val activitiesByType = remember(statistics) { statistics.activitiesByType }
-    val pieChartState = remember(activitiesByType) {
-        PieChartState(
-            activitiesByType.map { (type, value) ->
-                PieChartEntry(
-                    value = value.size.toDouble(),
-                    label = value.size.toString(),
-                    color = Color(context.getColor(type.color.colorId))
-                )
-            }.sortedBy { it.value }
-        )
-    }
-
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
         topBar = {
@@ -110,19 +104,19 @@ fun SummaryView(
                 .padding(horizontal = 8.dp)
                 .verticalScroll(rememberScrollState())
         ) {
-            PieChart(pieChartState)
-            Legend(activitiesByType)
-            Text(stringResource(R.string.number_of_activities_n, activities.size))
+            PieChart(state.pieChartState)
+            Legend(state.legendItems)
+            Text(stringResource(R.string.number_of_activities_n, state.numActivities))
         }
     }
 }
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun Legend(activitiesByType: Map<ActivityType, ActivityStatistics>) {
+private fun Legend(legendItems: List<Displayable>) {
     FlowRow(modifier = Modifier.padding(vertical = 8.dp)) {
-        for (type in activitiesByType.keys) {
-            val color = colorResource(type.color.colorId)
+        for (item in legendItems) {
+            val color = item.color()
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(horizontal = 4.dp)
@@ -134,8 +128,48 @@ private fun Legend(activitiesByType: Map<ActivityType, ActivityStatistics>) {
                         .size(16.dp)
                         .background(color)
                 )
-                Text(type.name)
+                Text(item.text())
             }
+        }
+    }
+}
+
+data class SummaryState internal constructor(
+    private val statistics: ActivityStatistics,
+    val pieChartState: PieChartState,
+    val legendItems: List<Displayable>
+) {
+    val numActivities get() = statistics.size
+
+    companion object {
+        operator fun invoke(
+            context: Context,
+            statistics: ActivityStatistics,
+            filter: ActivityFilter
+        ): SummaryState {
+            val singleCategory = filter.categories.singleOrNull()
+
+            val chartStats = if (singleCategory != null) {
+                statistics.activitiesByType
+            } else {
+                statistics.activitiesByCategory
+            }
+            val pieChartState = PieChartState(
+                chartStats.map { (key, value) ->
+                    PieChartEntry(
+                        value = value.size.toDouble(),
+                        label = value.size.toString(),
+                        color = Color(key.getColor(context))
+                    )
+                }
+            )
+            val legendItems = chartStats.toList().sortedBy { (_, v) -> v.size }.map { (k, _) -> k }
+
+            return SummaryState(
+                statistics = statistics,
+                pieChartState = pieChartState,
+                legendItems = legendItems
+            )
         }
     }
 }
