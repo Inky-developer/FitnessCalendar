@@ -6,6 +6,7 @@ import com.inky.fitnesscalendar.data.measure.HeartFrequency
 import com.inky.fitnesscalendar.data.measure.Speed
 import com.inky.fitnesscalendar.data.measure.Temperature
 import com.inky.fitnesscalendar.db.entities.ActivityType
+import com.inky.fitnesscalendar.db.entities.Place
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.util.toDate
 import com.inky.fitnesscalendar.util.toLocalDate
@@ -16,7 +17,8 @@ import java.util.Date
 import java.util.Locale
 import kotlin.math.roundToLong
 
-data class ActivityStatistics(
+@JvmInline
+value class ActivityStatistics(
     val activities: List<RichActivity>,
 ) {
     val size
@@ -98,6 +100,14 @@ data class ActivityStatistics(
     }
 
     fun isEmpty() = activities.isEmpty()
+
+    val activitiesByPlace: Map<Place?, ActivityStatistics>
+        get() = activities
+            .groupBy { it.place }
+            .toList()
+            .sortedBy { (_, v) -> -v.size }
+            .toMap()
+            .mapValues { ActivityStatistics(it.value) }
 
     val activitiesByCategory: Map<ActivityCategory, ActivityStatistics>
         get() = activities

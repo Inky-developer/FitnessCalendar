@@ -20,6 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -37,6 +38,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -46,6 +48,7 @@ import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityStatistics
 import com.inky.fitnesscalendar.data.Displayable
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
+import com.inky.fitnesscalendar.db.entities.Place
 import com.inky.fitnesscalendar.ui.components.FilterInformation
 import com.inky.fitnesscalendar.ui.components.PieChart
 import com.inky.fitnesscalendar.ui.components.PieChartEntry
@@ -149,6 +152,7 @@ fun SummaryView(
                 }
 
                 SummaryBox(state.summaryBoxState)
+                PlaceBox(state.places)
 
                 Spacer(modifier = Modifier.height(128.dp))
             }
@@ -158,10 +162,51 @@ fun SummaryView(
 }
 
 @Composable
+private fun PlaceBox(placeStats: Map<Place?, Int>) {
+    // Only show place information if there is at least one place that is not null
+    if (placeStats.keys.find { it != null } == null) {
+        return
+    }
+
+    val activitiesWithPlace =
+        remember(placeStats) { placeStats.filterKeys { it != null }.values.sum() }
+
+    Surface(
+        color = MaterialTheme.colorScheme.surfaceContainer,
+        shape = MaterialTheme.shapes.medium,
+        modifier = Modifier.padding(vertical = 8.dp)
+    ) {
+        Column(modifier = Modifier.padding(all = 8.dp)) {
+            Text("Places")
+            SummaryItem(stringResource(R.string.summary_activities_with_place), activitiesWithPlace.toString())
+            SummaryItem(stringResource(R.string.summary_activities_without_place), (placeStats[null] ?: 0).toString())
+
+            HorizontalDivider(modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp))
+
+            for ((place, count) in placeStats) {
+                if (place == null) {
+                    continue
+                }
+
+                SummaryItem(place.name, count.toString()) {
+                    CircleIcon(
+                        color = colorResource(place.color.colorId),
+                        modifier = Modifier.padding(horizontal = 2.dp)
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
 private fun SummaryBox(state: SummaryBoxState) {
     Surface(
         color = MaterialTheme.colorScheme.surfaceContainer,
-        shape = MaterialTheme.shapes.medium
+        shape = MaterialTheme.shapes.medium,
+        modifier = Modifier.padding(vertical = 8.dp)
     ) {
         Column(modifier = Modifier.padding(all = 8.dp)) {
             SummaryItem(stringResource(R.string.summary_total_activities), state.totalActivities)
@@ -187,20 +232,20 @@ private fun SummaryBox(state: SummaryBoxState) {
 }
 
 @Composable
-private fun SummaryItem(label: String, value: String?) {
+private fun SummaryItem(label: String, value: String?, icon: @Composable () -> Unit = {}) {
     if (value == null) return
 
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+    Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+            icon()
             Text(
                 label,
                 style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.weight(1f)
             )
+        }
 
-            AnimatedContent(value, label = "SummaryItemValue") { actualValue ->
-                Text(actualValue, modifier = Modifier.weight(1f))
-            }
+        AnimatedContent(value, label = "SummaryItemValue") { actualValue ->
+            Text(actualValue, modifier = Modifier.weight(1f))
         }
     }
 }
@@ -215,17 +260,21 @@ private fun Legend(legendItems: List<Displayable>) {
                 verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier.padding(horizontal = 4.dp)
             ) {
-                Box(
-                    modifier = Modifier
-                        .padding(end = 2.dp)
-                        .clip(CircleShape)
-                        .size(16.dp)
-                        .background(color)
-                )
+                CircleIcon(color = color, modifier = Modifier.padding(end = 2.dp))
                 Text(item.text())
             }
         }
     }
+}
+
+@Composable
+private fun CircleIcon(color: Color, modifier: Modifier = Modifier) {
+    Box(
+        modifier = modifier
+            .clip(CircleShape)
+            .size(16.dp)
+            .background(color)
+    )
 }
 
 data class SummaryState internal constructor(
@@ -234,6 +283,7 @@ data class SummaryState internal constructor(
     val pieChartState: PieChartState,
     val legendItems: List<Displayable>,
     val summaryBoxState: SummaryBoxState,
+    val places: Map<Place?, Int>
 ) {
     companion object {
         operator fun invoke(
@@ -262,12 +312,15 @@ data class SummaryState internal constructor(
 
             val summaryBoxState = SummaryBoxState(context, statistics)
 
+            val places = statistics.activitiesByPlace.mapValues { it.value.size }
+
             return SummaryState(
                 statistics = statistics,
                 filter = filter,
                 pieChartState = pieChartState,
                 legendItems = legendItems,
-                summaryBoxState = summaryBoxState
+                summaryBoxState = summaryBoxState,
+                places = places
             )
         }
     }

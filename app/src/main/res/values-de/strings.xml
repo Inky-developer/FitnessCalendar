@@ -313,4 +313,6 @@
     <string name="summary_average_heart_rate">Durchschnittliche Herzfrequenz:</string>
     <string name="summary_maximal_heart_rate">Maximale Herzfrequenz:</string>
     <string name="summary_average_temperature">Durchschnittliche Temperatur:</string>
+    <string name="summary_activities_with_place">Aktivitäten mit Ort</string>
+    <string name="summary_activities_without_place">Aktivitäten ohne Ort</string>
 </resources>
