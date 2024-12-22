@@ -1,5 +1,6 @@
 # Unreleased
 
+- Add a summary view for a detailed summary of the current filter
 - The app will now automatically import tracks from configurable folders
 - Fix y-range for elevation graphs
 - Display total ascent and total descent
