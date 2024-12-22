@@ -300,4 +300,16 @@
     <string name="Average_meters">Average Meters</string>
     <string name="Average_ascent">Average Ascent</string>
     <string name="summary">Summary</string>
+    <string name="summary_total_activities">Total activities:</string>
+    <string name="summary_total_time">Total time:</string>
+    <string name="summary_average_time">Average time:</string>
+    <string name="summary_total_distance">Total distance:</string>
+    <string name="summary_average_distance">Average distance:</string>
+    <string name="summary_average_speed">Average speed:</string>
+    <string name="summary_average_moving_speed">Average moving speed:</string>
+    <string name="summary_total_ascent">Total ascent:</string>
+    <string name="summary_total_descent">Total descent:</string>
+    <string name="summary_average_heart_rate">Average heart rate:</string>
+    <string name="summary_maximal_heart_rate">Maximal heart rate:</string>
+    <string name="summary_average_temperature">Average temperature:</string>
 </resources>

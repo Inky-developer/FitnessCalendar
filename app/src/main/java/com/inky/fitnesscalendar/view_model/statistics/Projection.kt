@@ -88,7 +88,7 @@ enum class Projection(
         ByTotalActivities -> statistics.size.toDouble()
         ByTotalDistance -> statistics.totalDistance().kilometers
         ByAverageDistance -> statistics.averageDistance()?.kilometers
-        ByAverageSpeed -> statistics.averageSpeed()?.kmh
+        ByAverageSpeed -> statistics.averageMovingSpeed()?.kmh
         ByMaximumHeartRate -> statistics.maximalHeartRate()?.bpm?.toDouble()
         ByAverageHeartRate -> statistics.averageHeartRate()?.bpm?.toDouble()
         ByTotalAscent -> statistics.totalAscent().meters.toDouble()

@@ -301,4 +301,16 @@
     <string name="Average_meters">Durchschnittliche Meter</string>
     <string name="Average_ascent">Durchschnittlicher Anstieg</string>
     <string name="summary">Gesamt</string>
+    <string name="summary_total_activities">Anzahl Aktivitäten:</string>
+    <string name="summary_total_time">Gesamtzeit:</string>
+    <string name="summary_average_time">Durchschnittliche Dauer:</string>
+    <string name="summary_total_distance">Gesamtdistanz:</string>
+    <string name="summary_average_distance">Durchschnittliche Distanz:</string>
+    <string name="summary_average_speed">Durchschnittsgeschwindigkeit:</string>
+    <string name="summary_average_moving_speed">Durchschnittsgeschwindigkeit bei Bewegung:</string>
+    <string name="summary_total_ascent">Gesamtanstieg:</string>
+    <string name="summary_total_descent">Gesamtabstieg:</string>
+    <string name="summary_average_heart_rate">Durchschnittliche Herzfrequenz:</string>
+    <string name="summary_maximal_heart_rate">Maximale Herzfrequenz:</string>
+    <string name="summary_average_temperature">Durchschnittliche Temperatur:</string>
 </resources>
