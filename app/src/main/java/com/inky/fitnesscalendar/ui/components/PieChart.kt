@@ -77,8 +77,16 @@ fun PieChart(
         for (dataPoint in state.dataPoints) {
             val angle = dataPoint.value.toFloat() / sum.toFloat() * 360 * angleAnimation.value
             val centerAngleRad = degToRad(angleStart + angle / 2)
-            val textX = cos(centerAngleRad) * size.width / 4
-            val textY = sin(centerAngleRad) * size.height / 4
+
+            val textX: Float
+            val textY: Float
+            if (state.dataPoints.size == 1) {
+                textX = 0f
+                textY = 0f
+            } else {
+                textX = cos(centerAngleRad) * size.width / 4
+                textY = sin(centerAngleRad) * size.height / 4
+            }
 
             // This is how available space is calculated:
             // First, assume the slice is not rotated. This means that the available width is
@@ -146,6 +154,15 @@ private fun PreviewPieChart() {
             PieChartEntry(3.0, "Entry d", Color.Yellow),
         ).sortedBy { it.value }
     )
+    Surface(modifier = Modifier.fillMaxWidth()) {
+        PieChart(state, animate = false)
+    }
+}
+
+@Preview(device = "spec:width=512px,height=1024px,dpi=440")
+@Composable
+private fun PreviewPieChartSingleEntry() {
+    val state = PieChartState(listOf(PieChartEntry(20.0, "Entry a", Color.Red)))
     Surface(modifier = Modifier.fillMaxWidth()) {
         PieChart(state, animate = false)
     }
