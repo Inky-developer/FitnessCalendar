@@ -291,7 +291,16 @@ private fun AppNavigation(
                 onCurrentView(route)
 
                 ProvideSharedContent(sharedContentScope = this@SharedTransitionLayout) {
-                    SummaryView(filter = filterState, onBack = { navController.popBackStack() })
+                    SummaryView(
+                        filter = filterState,
+                        onBack = { navController.popBackStack() },
+                        onNavigateFilter = {
+                            navController.navigate(Views.FilterActivity)
+                        },
+                        onEditFilter = {
+                            filterState = it
+                            viewModel.addToFilterHistory(filterState)
+                        })
                 }
             }
 

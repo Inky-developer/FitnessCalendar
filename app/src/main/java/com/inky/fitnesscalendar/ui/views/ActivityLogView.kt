@@ -17,14 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyItemScope
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Clear
-import androidx.compose.material.icons.outlined.DateRange
-import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.KeyboardArrowUp
 import androidx.compose.material.icons.outlined.Menu
@@ -33,13 +26,10 @@ import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.InputChip
-import androidx.compose.material3.InputChipDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -55,7 +45,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -65,14 +54,12 @@ import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.data.Feel
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
-import com.inky.fitnesscalendar.data.activity_filter.ActivityFilterChip
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivityCard
-import com.inky.fitnesscalendar.ui.components.FavoriteIcon
+import com.inky.fitnesscalendar.ui.components.FilterInformation
 import com.inky.fitnesscalendar.ui.components.NewActivityFAB
-import com.inky.fitnesscalendar.ui.components.PlaceIcon
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.components.getAppBarContainerColor
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
@@ -101,7 +88,6 @@ fun ActivityLog(
     val scope = rememberCoroutineScope()
 
     val activityListState by viewModel.activityListState.collectAsState()
-    val filterHistoryItems by viewModel.filterHistory.collectAsState(initial = emptyList())
 
     val isAtTopOfList by remember { derivedStateOf { activityListState.listState.firstVisibleItemIndex <= 1 } }
     val activitiesEmpty by remember { derivedStateOf { activityListState.activities.isEmpty() } }
@@ -191,11 +177,7 @@ fun ActivityLog(
                     .background(appBarContainerColor)
                     .padding(all = 8.dp)
             ) {
-                FilterInformation(
-                    filter = filter,
-                    historyItems = filterHistoryItems,
-                    onChange = onEditFilter
-                )
+                FilterInformation(filter = filter, onChange = onEditFilter)
             }
             if (activitiesEmpty) {
                 Row(
@@ -334,126 +316,3 @@ private fun ActivityList(
     }
 }
 
-@Composable
-private fun FilterInformation(
-    filter: ActivityFilter,
-    historyItems: List<ActivityFilterChip>,
-    onChange: (ActivityFilter) -> Unit
-) {
-    val context = LocalContext.current
-    val listState = rememberLazyListState()
-    val filterItems = remember(filter) { filter.items() }
-    val filteredHistoryItems = remember(filter, historyItems) {
-        historyItems.filter {
-            !filterItems.contains(
-                it
-            )
-        }
-    }
-
-    LaunchedEffect(filterItems) {
-        listState.animateScrollToItem(0)
-    }
-
-    LazyRow(state = listState, modifier = Modifier.fillMaxWidth()) {
-        items(filterItems, key = { it }) { chip ->
-            FilterChip(
-                onClick = { onChange(chip.removeFrom(filter)) },
-                label = { Text(chip.displayText(context)) },
-                leadingIcon = { FilterChipIcon(chip) }
-            )
-        }
-
-        items(filteredHistoryItems, key = { it }) { chip ->
-            SuggestionFilterChip(
-                onClick = { onChange(chip.addTo(filter)) },
-                label = { Text(chip.displayText(context)) },
-            )
-        }
-    }
-}
-
-@Composable
-private fun FilterChipIcon(chip: ActivityFilterChip) {
-    when (chip) {
-        is ActivityFilterChip.AttributeFilterChip -> Icon(
-            painterResource(R.drawable.outline_label_24),
-            stringResource(R.string.attribute)
-        )
-
-        is ActivityFilterChip.CategoryFilterChip -> Text(
-            chip.category.emoji,
-            style = MaterialTheme.typography.titleLarge
-        )
-
-        is ActivityFilterChip.DateFilterChip -> Icon(
-            Icons.Outlined.DateRange,
-            stringResource(R.string.date_range)
-        )
-
-        is ActivityFilterChip.TextFilterChip -> Icon(
-            Icons.Outlined.Edit,
-            stringResource(R.string.text)
-        )
-
-        is ActivityFilterChip.TypeFilterChip -> Text(
-            chip.type.emoji,
-            style = MaterialTheme.typography.titleLarge
-        )
-
-        is ActivityFilterChip.PlaceFilterChip -> PlaceIcon(chip.place)
-
-        is ActivityFilterChip.VehicleFilterChip -> Text(
-            chip.vehicle.emoji,
-            style = MaterialTheme.typography.titleLarge
-        )
-
-        is ActivityFilterChip.FeelFilterChip -> Text(
-            chip.feel.emoji,
-            style = MaterialTheme.typography.titleLarge
-        )
-
-        is ActivityFilterChip.FavoriteFilterChip -> FavoriteIcon(chip.favorite)
-    }
-}
-
-@Composable
-private fun LazyItemScope.FilterChip(
-    leadingIcon: @Composable () -> Unit,
-    label: @Composable () -> Unit,
-    onClick: () -> Unit
-) {
-    InputChip(
-        selected = false,
-        onClick = onClick,
-        label = label,
-        leadingIcon = leadingIcon,
-        trailingIcon = { Icon(Icons.Outlined.Clear, stringResource(R.string.clear)) },
-        colors = InputChipDefaults.inputChipColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer),
-        modifier = Modifier
-            .padding(horizontal = 4.dp)
-            .animateItem()
-    )
-}
-
-@Composable
-private fun LazyItemScope.SuggestionFilterChip(
-    label: @Composable () -> Unit,
-    onClick: () -> Unit
-) {
-    SuggestionChip(
-        onClick = onClick,
-        label = label,
-        icon = {
-            Icon(
-                painterResource(
-                    R.drawable.outline_history_24,
-                ),
-                stringResource(R.string.recent)
-            )
-        },
-        modifier = Modifier
-            .padding(horizontal = 4.dp)
-            .animateItem()
-    )
-}

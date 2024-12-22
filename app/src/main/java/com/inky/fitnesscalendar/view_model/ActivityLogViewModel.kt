@@ -2,10 +2,9 @@ package com.inky.fitnesscalendar.view_model
 
 import android.content.Context
 import androidx.lifecycle.viewModelScope
-import com.inky.fitnesscalendar.repository.DatabaseRepository
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
-import com.inky.fitnesscalendar.data.activity_filter.ActivityFilterChip.Companion.toActivityFilterChip
 import com.inky.fitnesscalendar.db.entities.RichActivity
+import com.inky.fitnesscalendar.repository.DatabaseRepository
 import com.inky.fitnesscalendar.util.toLocalDate
 import com.inky.fitnesscalendar.view_model.activity_log.ActivityListItem
 import com.inky.fitnesscalendar.view_model.activity_log.ActivityListState
@@ -19,7 +18,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.time.ZoneId
@@ -30,9 +28,6 @@ class ActivityLogViewModel @Inject constructor(
     @ApplicationContext context: Context,
     repository: DatabaseRepository
 ) : BaseViewModel(context, repository) {
-    val filterHistory = repository.getFilterHistoryItems()
-        .map { item -> item.mapNotNull { it.toActivityFilterChip() } }
-
     private val _activityListState = MutableStateFlow(
         ActivityListState(
             items = emptyList(),

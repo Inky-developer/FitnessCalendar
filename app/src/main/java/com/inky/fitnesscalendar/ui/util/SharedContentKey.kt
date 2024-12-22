@@ -21,6 +21,8 @@ sealed class SharedContentKey {
     data object DayTitle : SharedContentKey()
 
     data object Map : SharedContentKey()
+
+    data object FilterInformation : SharedContentKey()
 }
 
 

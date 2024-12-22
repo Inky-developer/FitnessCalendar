@@ -46,8 +46,8 @@ fun PieChart(
     style: TextStyle = LocalTextStyle.current,
     animate: Boolean = true
 ) {
-    val angleAnimation = remember { Animatable(if (animate) 0f else 1f) }
-    LaunchedEffect(Unit) {
+    val angleAnimation = remember(state) { Animatable(if (animate) 0f else 1f) }
+    LaunchedEffect(state) {
         angleAnimation.animateTo(1.0f, animationSpec = tween(durationMillis = 1000))
     }
 

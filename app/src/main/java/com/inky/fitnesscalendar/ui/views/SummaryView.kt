@@ -1,6 +1,7 @@
 package com.inky.fitnesscalendar.ui.views
 
 import android.content.Context
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,7 +20,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -37,6 +37,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -45,10 +46,12 @@ import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityStatistics
 import com.inky.fitnesscalendar.data.Displayable
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
+import com.inky.fitnesscalendar.ui.components.FilterInformation
 import com.inky.fitnesscalendar.ui.components.PieChart
 import com.inky.fitnesscalendar.ui.components.PieChartEntry
 import com.inky.fitnesscalendar.ui.components.PieChartState
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
+import com.inky.fitnesscalendar.ui.components.getAppBarContainerColor
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.view_model.BaseViewModel
@@ -58,6 +61,8 @@ fun SummaryView(
     viewModel: BaseViewModel = hiltViewModel(),
     filter: ActivityFilter,
     onBack: () -> Unit,
+    onNavigateFilter: () -> Unit,
+    onEditFilter: (ActivityFilter) -> Unit
 ) {
     val activities by viewModel.repository.getActivities(filter).collectAsState(initial = null)
     val context = LocalContext.current
@@ -73,7 +78,12 @@ fun SummaryView(
 
     when (state) {
         null -> {}
-        else -> SummaryView(state = state, onBack = onBack)
+        else -> SummaryView(
+            state = state,
+            onBack = onBack,
+            onNavigateFilter = onNavigateFilter,
+            onEditFilter = onEditFilter
+        )
     }
 }
 
@@ -82,8 +92,10 @@ fun SummaryView(
 fun SummaryView(
     state: SummaryState,
     onBack: () -> Unit,
+    onNavigateFilter: () -> Unit,
+    onEditFilter: (ActivityFilter) -> Unit,
 ) {
-    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
+    val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -97,6 +109,14 @@ fun SummaryView(
                         )
                     }
                 },
+                actions = {
+                    IconButton(onClick = onNavigateFilter) {
+                        Icon(
+                            painterResource(R.drawable.outline_filter_24),
+                            stringResource(R.string.filter)
+                        )
+                    }
+                },
                 scrollBehavior = scrollBehavior,
                 modifier = Modifier.sharedBounds(SharedContentKey.AppBar)
             )
@@ -105,18 +125,35 @@ fun SummaryView(
     ) { paddingValues ->
         Column(
             modifier = Modifier
-                .fillMaxWidth()
                 .padding(paddingValues)
-                .padding(horizontal = 8.dp)
-                .verticalScroll(rememberScrollState())
+                .fillMaxWidth()
         ) {
-            PieChart(state.pieChartState)
-            Legend(state.legendItems)
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(getAppBarContainerColor(scrollBehavior = scrollBehavior))
+                    .padding(all = 8.dp)
+            ) {
+                FilterInformation(filter = state.filter, onChange = onEditFilter)
+            }
 
-            SummaryBox(state.summaryBoxState)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp)
+                    .verticalScroll(rememberScrollState())
+            ) {
+                PieChart(state.pieChartState)
+                AnimatedContent(state.legendItems, label = "LegendItems") { legendItems ->
+                    Legend(legendItems)
+                }
 
-            Spacer(modifier = Modifier.height(128.dp))
+                SummaryBox(state.summaryBoxState)
+
+                Spacer(modifier = Modifier.height(128.dp))
+            }
         }
+
     }
 }
 
@@ -144,14 +181,13 @@ private fun SummaryBox(state: SummaryBoxState) {
             SummaryItem(
                 stringResource(R.string.summary_average_temperature),
                 state.averageTemperature,
-                showDivider = false
             )
         }
     }
 }
 
 @Composable
-private fun SummaryItem(label: String, value: String?, showDivider: Boolean = true) {
+private fun SummaryItem(label: String, value: String?) {
     if (value == null) return
 
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -162,10 +198,9 @@ private fun SummaryItem(label: String, value: String?, showDivider: Boolean = tr
                 modifier = Modifier.weight(1f)
             )
 
-            Text(value, modifier = Modifier.weight(1f))
-        }
-        if (showDivider) {
-            HorizontalDivider(modifier = Modifier.fillMaxWidth())
+            AnimatedContent(value, label = "SummaryItemValue") { actualValue ->
+                Text(actualValue, modifier = Modifier.weight(1f))
+            }
         }
     }
 }
@@ -195,6 +230,7 @@ private fun Legend(legendItems: List<Displayable>) {
 
 data class SummaryState internal constructor(
     private val statistics: ActivityStatistics,
+    val filter: ActivityFilter,
     val pieChartState: PieChartState,
     val legendItems: List<Displayable>,
     val summaryBoxState: SummaryBoxState,
@@ -205,9 +241,10 @@ data class SummaryState internal constructor(
             statistics: ActivityStatistics,
             filter: ActivityFilter
         ): SummaryState {
-            val singleCategory = filter.categories.singleOrNull()
+            val activitiesByCategory = statistics.activitiesByCategory
+            val isSingleCategory = activitiesByCategory.size == 1
 
-            val chartStats = if (singleCategory != null) {
+            val chartStats = if (isSingleCategory) {
                 statistics.activitiesByType
             } else {
                 statistics.activitiesByCategory
@@ -227,6 +264,7 @@ data class SummaryState internal constructor(
 
             return SummaryState(
                 statistics = statistics,
+                filter = filter,
                 pieChartState = pieChartState,
                 legendItems = legendItems,
                 summaryBoxState = summaryBoxState
