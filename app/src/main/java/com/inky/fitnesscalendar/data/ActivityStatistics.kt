@@ -77,6 +77,14 @@ value class ActivityStatistics(
         return Distance(meters = ascents.sum() / ascents.size)
     }
 
+    fun averageDescent(): Distance? {
+        val descents = activities.mapNotNull { it.activity.totalDescent?.meters }
+        if (descents.isEmpty()) {
+            return null
+        }
+        return Distance(meters = descents.sum() / descents.size)
+    }
+
     fun totalAscent(): Distance =
         Distance(meters = activities.sumOf { it.activity.totalAscent?.meters ?: 0 })
 

@@ -230,6 +230,8 @@ private fun SummaryBox(state: SummaryBoxState) {
         )
         SummaryItem(stringResource(R.string.summary_total_ascent), state.totalAscent)
         SummaryItem(stringResource(R.string.summary_total_descent), state.totalDescent)
+        SummaryItem(stringResource(R.string.summary_average_ascent), state.averageAscent)
+        SummaryItem(stringResource(R.string.summary_average_descent), state.averageDescent)
         SummaryItem(stringResource(R.string.summary_average_heart_rate), state.averageHeartRate)
         SummaryItem(stringResource(R.string.summary_maximal_heart_rate), state.maximumHeartRate)
         SummaryItem(
@@ -373,6 +375,8 @@ data class SummaryBoxState(
 //    val maximumElevation: String?,
     val totalAscent: String?,
     val totalDescent: String?,
+    val averageAscent: String?,
+    val averageDescent: String?,
     val averageHeartRate: String?,
     val maximumHeartRate: String?,
 //    val minimumTemperature: String?,
@@ -392,6 +396,8 @@ data class SummaryBoxState(
             ?.formatWithContext(context),
         totalDescent = statistics.totalDescent().takeIf { it.meters > 0 }
             ?.formatWithContext(context),
+        averageAscent = statistics.averageAscent()?.formatWithContext(context),
+        averageDescent = statistics.averageDescent()?.formatWithContext(context),
         averageHeartRate = statistics.averageHeartRate()?.formatWithContext(context),
         maximumHeartRate = statistics.maximalHeartRate()?.formatWithContext(context),
         averageTemperature = statistics.averageTemperature()?.formatWithContext(context),
@@ -412,6 +418,8 @@ fun PreviewSummaryBox() {
         averageMovingSpeed = "35km/h",
         totalAscent = "100.000m",
         totalDescent = "100.000m",
+        averageAscent = "150m",
+        averageDescent = "150m",
         averageHeartRate = "150bpm",
         maximumHeartRate = "190bpm",
         averageTemperature = "15°C"

@@ -315,4 +315,6 @@
     <string name="summary_activities_with_place">Activities with place:</string>
     <string name="summary_activities_without_place">Activities without place:</string>
     <string name="feels">Feels</string>
+    <string name="summary_average_ascent">Average ascent:</string>
+    <string name="summary_average_descent">Average descent:</string>
 </resources>
