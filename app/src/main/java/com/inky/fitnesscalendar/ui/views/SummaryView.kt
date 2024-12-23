@@ -98,10 +98,19 @@ fun SummaryView(
 ) {
     val activities by viewModel.repository.getActivities(filter).collectAsState(initial = null)
     val context = LocalContext.current
+
+    val dayOfWeekModelProducer = remember { CartesianChartModelProducer() }
+    val timeOfDayModelProducer = remember { CartesianChartModelProducer() }
     var state by remember { mutableStateOf<SummaryState?>(null) }
     LaunchedEffect(activities, filter) {
         activities?.let {
-            state = SummaryState(context, ActivityStatistics(it), filter)
+            state = SummaryState(
+                context = context,
+                statistics = ActivityStatistics(it),
+                filter = filter,
+                dayOfWeekModelProducer = dayOfWeekModelProducer,
+                timeOfDayModelProducer = timeOfDayModelProducer
+            )
         }
     }
 
@@ -417,7 +426,9 @@ data class SummaryState internal constructor(
         suspend operator fun invoke(
             context: Context,
             statistics: ActivityStatistics,
-            filter: ActivityFilter
+            filter: ActivityFilter,
+            dayOfWeekModelProducer: CartesianChartModelProducer,
+            timeOfDayModelProducer: CartesianChartModelProducer
         ): SummaryState {
             val activitiesByCategory = statistics.activitiesByCategory
             val isSingleCategory = activitiesByCategory.size == 1
@@ -451,7 +462,7 @@ data class SummaryState internal constructor(
             })
             val feelLegendItems = Feel.entries.reversed()
 
-            val dayOfWeekModelProducer = CartesianChartModelProducer().apply {
+            dayOfWeekModelProducer.apply {
                 val weekdayStats =
                     statistics.activitiesByWeekday.toSortedMap().mapValues { it.value.size }
                 runTransaction {
@@ -468,7 +479,7 @@ data class SummaryState internal constructor(
                 }
             }
 
-            val timeOfDayModelProducer = CartesianChartModelProducer().apply {
+            timeOfDayModelProducer.apply {
                 val hourOfDayStats =
                     statistics.activitiesByHourOfDay.toSortedMap().mapValues { it.value.size }
                 runTransaction {
