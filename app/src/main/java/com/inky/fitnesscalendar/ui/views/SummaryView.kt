@@ -339,7 +339,7 @@ data class SummaryState internal constructor(
                     )
                 }
             )
-            val legendItems = chartStats.toList().sortedBy { (_, v) -> v.size }.map { (k, _) -> k }
+            val legendItems = chartStats.toList().sortedBy { (_, v) -> -v.size }.map { (k, _) -> k }
 
             val summaryBoxState = SummaryBoxState(context, statistics)
 
