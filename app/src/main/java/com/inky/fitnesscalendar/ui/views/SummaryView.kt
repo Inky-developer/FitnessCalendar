@@ -156,15 +156,15 @@ fun SummaryView(
                 item { SummaryBox(state.summaryBoxState) }
                 item { PlaceBox(state.places) }
 
-                if (state.feelLegendItems.size > 1) {
+                if (state.feelChartState.dataPoints.size > 1) {
                     item { PieChart(state.feelChartState, modifier = Modifier.padding(top = 8.dp)) }
-                }
-                item {
-                    AnimatedContent(
-                        state.feelLegendItems,
-                        label = "FeelLegendItems"
-                    ) { legendItems ->
-                        Legend(legendItems)
+                    item {
+                        AnimatedContent(
+                            state.feelLegendItems,
+                            label = "FeelLegendItems"
+                        ) { legendItems ->
+                            Legend(legendItems)
+                        }
                     }
                 }
             }
