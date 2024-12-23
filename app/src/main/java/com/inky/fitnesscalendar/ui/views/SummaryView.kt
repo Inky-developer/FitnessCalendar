@@ -157,13 +157,19 @@ fun SummaryView(
                 item { PlaceBox(state.places) }
 
                 if (state.feelChartState.dataPoints.size > 1) {
-                    item { PieChart(state.feelChartState, modifier = Modifier.padding(top = 8.dp)) }
                     item {
-                        AnimatedContent(
-                            state.feelLegendItems,
-                            label = "FeelLegendItems"
-                        ) { legendItems ->
-                            Legend(legendItems)
+                        Column(modifier = Modifier.padding(vertical = 8.dp)) {
+                            Text(
+                                stringResource(R.string.feels),
+                                style = MaterialTheme.typography.titleLarge
+                            )
+                            PieChart(state.feelChartState, modifier = Modifier.padding(top = 8.dp))
+                            AnimatedContent(
+                                state.feelLegendItems,
+                                label = "FeelLegendItems"
+                            ) { legendItems ->
+                                Legend(legendItems)
+                            }
                         }
                     }
                 }
