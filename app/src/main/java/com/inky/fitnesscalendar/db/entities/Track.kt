@@ -15,6 +15,9 @@ import com.inky.fitnesscalendar.data.measure.Elevation
 import com.inky.fitnesscalendar.data.measure.HeartFrequency
 import com.inky.fitnesscalendar.data.measure.Speed
 import com.inky.fitnesscalendar.data.measure.Temperature
+import com.inky.fitnesscalendar.repository.ImportRepository.ImportError
+import com.inky.fitnesscalendar.util.result.TypedResult
+import com.inky.fitnesscalendar.util.result.tryScope
 import kotlin.math.pow
 import kotlin.math.roundToLong
 import kotlin.math.sqrt
@@ -45,11 +48,11 @@ data class Track(
     /**
      * Adds all relevant data of this track to the activity
      */
-    fun addStatsToActivity(activity: Activity): Activity? {
-        val stats = computeStatistics() ?: return null
-        return activity.copy(
-            startTime = startTime ?: return null,
-            endTime = endTime ?: return null,
+    fun addStatsToActivity(activity: Activity): TypedResult<Activity, ImportError> = tryScope {
+        val stats = computeStatistics().unwrap()
+        activity.copy(
+            startTime = startTime ?: raise(ImportError.NoStartAndEndTime),
+            endTime = endTime ?: raise(ImportError.NoStartAndEndTime),
             distance = stats.totalDistance,
             movingDuration = stats.movingDuration,
             temperature = stats.averageTemperature,
@@ -72,8 +75,8 @@ data class Track(
         return filteredPoints
     }
 
-    fun computeStatistics(): GpxTrackStats? {
-        val duration = totalDuration ?: return null
+    fun computeStatistics(): TypedResult<GpxTrackStats, ImportError> = tryScope {
+        val duration = totalDuration ?: raise(ImportError.NoStartAndEndTime)
 
         val trackPointComputedData = computedPoints()
 
@@ -132,7 +135,7 @@ data class Track(
             totalDescent = Distance(meters = descent.roundToLong())
         }
 
-        return GpxTrackStats(
+        GpxTrackStats(
             totalDistance = totalDistance,
             totalDuration = duration,
             movingDuration = movingDuration,

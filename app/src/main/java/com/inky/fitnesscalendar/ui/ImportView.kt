@@ -52,6 +52,7 @@ import com.inky.fitnesscalendar.ui.components.CompactActivityCard
 import com.inky.fitnesscalendar.ui.components.OptionGroup
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.util.localDatabaseValues
+import com.inky.fitnesscalendar.util.result.isOk
 import com.inky.fitnesscalendar.view_model.ImportViewModel
 
 @Composable

@@ -15,9 +15,7 @@ import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.db.entities.Track
 import com.inky.fitnesscalendar.util.gpx.GpxReader
 import com.inky.fitnesscalendar.util.result.TypedResult
-import com.inky.fitnesscalendar.util.result.asErr
-import com.inky.fitnesscalendar.util.result.asOk
-import com.inky.fitnesscalendar.util.result.map
+import com.inky.fitnesscalendar.util.result.tryScope
 import kotlinx.coroutines.flow.first
 import java.io.FileInputStream
 import java.io.InputStream
@@ -58,8 +56,8 @@ class ImportRepository @Inject constructor(private val dbRepository: DatabaseRep
     suspend fun importTrack(
         importTrack: ImportTrack,
         type: ActivityType
-    ): TypedResult<Int, ImportError> {
-        return importTrack.toRichActivity(type).map { importActivity(it, importTrack) }
+    ): TypedResult<Int, ImportError> = tryScope {
+        importActivity(importTrack.toRichActivity(type).unwrap(), importTrack)
     }
 
     private suspend fun importActivity(richActivity: RichActivity, importTrack: ImportTrack): Int {
@@ -80,7 +78,7 @@ class ImportRepository @Inject constructor(private val dbRepository: DatabaseRep
         for (track in tracks) {
             val richActivity = dbRepository.loadActivity(track.activityId)
 
-            val updatedActivity = track.addStatsToActivity(richActivity.activity) ?: continue
+            val updatedActivity = track.addStatsToActivity(richActivity.activity).ok() ?: continue
             val cleanedActivity = updatedActivity.clean(richActivity.type)
             if (cleanedActivity == richActivity.activity) {
                 continue
@@ -115,25 +113,22 @@ class ImportRepository @Inject constructor(private val dbRepository: DatabaseRep
         val dbTrack: Track = Track(activityId = -1, points = track.points),
         val trackSvg: TrackSvg? = track.toTrackSvg()
     ) {
-        fun toRichActivity(type: ActivityType): TypedResult<RichActivity, ImportError> {
+        fun toRichActivity(type: ActivityType): TypedResult<RichActivity, ImportError> = tryScope {
             val initialActivity = Activity(
-                typeId = type.uid ?: return ImportError.NoActivityType.asErr(),
+                typeId = type.uid ?: raise(ImportError.NoActivityType),
                 description = track.name,
-                startTime = track.startTime
-                    ?: return ImportError.NoStartAndEndTime.asErr(),
-                endTime = track.endTime ?: return ImportError.NoStartAndEndTime.asErr(),
+                startTime = track.startTime ?: raise(ImportError.NoStartAndEndTime),
+                endTime = track.endTime ?: raise(ImportError.NoStartAndEndTime),
                 trackPreview = trackSvg?.serialize()
             )
 
-            val activity = dbTrack.addStatsToActivity(initialActivity)
-                ?: return ImportError.NoStartAndEndTime.asErr()
+            val activity = dbTrack.addStatsToActivity(initialActivity).unwrap()
 
-
-            return RichActivity(
+            RichActivity(
                 activity = activity,
                 type = type,
                 place = null,
-            ).asOk()
+            )
         }
     }
 

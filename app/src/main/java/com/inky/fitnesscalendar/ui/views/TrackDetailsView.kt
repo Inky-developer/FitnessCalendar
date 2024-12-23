@@ -72,7 +72,7 @@ fun TrackDetailsView(
         null
     )
     val preview = remember(activity) { activity?.activity?.trackPreview?.toTrackSvg() }
-    val stats = remember(track) { track?.computeStatistics() }
+    val stats = remember(track) { track?.computeStatistics()?.ok() }
     val state = remember(stats, activity) {
         if (activity != null && stats != null) {
             DetailsState.initialize(

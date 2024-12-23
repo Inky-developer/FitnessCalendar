@@ -13,6 +13,7 @@ import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.repository.DatabaseRepository
 import com.inky.fitnesscalendar.repository.ImportRepository
 import com.inky.fitnesscalendar.util.EXTRA_TOAST
+import com.inky.fitnesscalendar.util.result.isOk
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
