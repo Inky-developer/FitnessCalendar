@@ -301,7 +301,7 @@ private fun ActivityCardContent(activity: Activity, place: Place?) {
             )
         }
 
-        IconStatistic(timeElapsed) {
+        IconStatistic(timeElapsed.takeIf { it.elapsedMs > 0 }) {
             Icon(
                 painterResource(R.drawable.outline_timer_24),
                 stringResource(R.string.time)
