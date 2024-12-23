@@ -317,4 +317,5 @@
     <string name="feels">Feels</string>
     <string name="summary_average_ascent">Average ascent:</string>
     <string name="summary_average_descent">Average descent:</string>
+    <string name="warning_backups_not_encrypted">Backups are currently not encrypted. Only backup to cloud services that you trust.</string>
 </resources>

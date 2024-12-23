@@ -318,4 +318,5 @@
     <string name="feels">Stimmungen</string>
     <string name="summary_average_ascent">Durchschnittlicher Anstieg:</string>
     <string name="summary_average_descent">Durchschnittlicher Abstieg:</string>
+    <string name="warning_backups_not_encrypted">Sicherungen sind momentan noch nicht verschlüsselt. Verwende nur Clouddienste, denen du vertraust.</string>
 </resources>
