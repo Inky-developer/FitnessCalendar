@@ -1,6 +1,7 @@
 package com.inky.fitnesscalendar.ui.views
 
 import android.content.Context
+import android.graphics.Typeface
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -27,10 +29,14 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -58,6 +64,29 @@ import com.inky.fitnesscalendar.ui.components.getAppBarContainerColor
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.view_model.BaseViewModel
+import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
+import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottom
+import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStart
+import com.patrykandpatrick.vico.compose.cartesian.layer.rememberColumnCartesianLayer
+import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
+import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
+import com.patrykandpatrick.vico.compose.cartesian.rememberVicoZoomState
+import com.patrykandpatrick.vico.compose.common.component.rememberLineComponent
+import com.patrykandpatrick.vico.compose.common.component.rememberShapeComponent
+import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
+import com.patrykandpatrick.vico.compose.common.dimensions
+import com.patrykandpatrick.vico.core.cartesian.Zoom
+import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
+import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
+import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
+import com.patrykandpatrick.vico.core.cartesian.data.columnSeries
+import com.patrykandpatrick.vico.core.cartesian.layer.ColumnCartesianLayer
+import com.patrykandpatrick.vico.core.common.Dimensions
+import com.patrykandpatrick.vico.core.common.data.ExtraStore
+import com.patrykandpatrick.vico.core.common.shape.CorneredShape
+import java.time.DayOfWeek
+import java.time.format.TextStyle
+import java.util.Locale
 
 @Composable
 fun SummaryView(
@@ -69,20 +98,17 @@ fun SummaryView(
 ) {
     val activities by viewModel.repository.getActivities(filter).collectAsState(initial = null)
     val context = LocalContext.current
-    val state = remember(activities, filter) {
+    var state by remember { mutableStateOf<SummaryState?>(null) }
+    LaunchedEffect(activities, filter) {
         activities?.let {
-            SummaryState(
-                context,
-                ActivityStatistics(it),
-                filter
-            )
+            state = SummaryState(context, ActivityStatistics(it), filter)
         }
     }
 
-    when (state) {
+    when (val value = state) {
         null -> {}
         else -> SummaryView(
-            state = state,
+            state = value,
             onBack = onBack,
             onNavigateFilter = onNavigateFilter,
             onEditFilter = onEditFilter
@@ -172,6 +198,22 @@ fun SummaryView(
                             }
                         }
                     }
+                }
+
+                item {
+                    Histogram(
+                        modelProducer = state.dayOfWeekModelProducer,
+                        title = stringResource(R.string.Activities_by_weekday),
+                        xAxisLabel = stringResource(R.string.Weekday)
+                    )
+                }
+
+                item {
+                    Histogram(
+                        modelProducer = state.timeOfDayModelProducer,
+                        title = stringResource(R.string.Activities_by_time_of_day),
+                        xAxisLabel = stringResource(R.string.Hour)
+                    )
                 }
             }
         }
@@ -306,6 +348,59 @@ private fun CircleIcon(color: Color, modifier: Modifier = Modifier) {
     )
 }
 
+@Composable
+private fun Histogram(
+    modelProducer: CartesianChartModelProducer,
+    title: String,
+    xAxisLabel: String
+) {
+    Column(modifier = Modifier.padding(vertical = 8.dp)) {
+        Text(title, style = MaterialTheme.typography.titleLarge)
+        CartesianChartHost(
+            chart = rememberCartesianChart(
+                rememberColumnCartesianLayer(
+                    columnProvider = ColumnCartesianLayer.ColumnProvider.series(
+                        rememberLineComponent(
+                            color = colorResource(R.color.graph_default),
+                            thickness = 32.dp
+                        ),
+                    ),
+                ),
+                startAxis = VerticalAxis.rememberStart(
+                    title = stringResource(R.string.number_of_activities),
+                    titleComponent = graphTextComponent(),
+                    itemPlacer = VerticalAxis.ItemPlacer.step({ 1.0 }),
+                    horizontalLabelPosition = VerticalAxis.HorizontalLabelPosition.Inside
+                ),
+                bottomAxis = HorizontalAxis.rememberBottom(
+                    guideline = null,
+                    title = xAxisLabel,
+                    titleComponent = graphTextComponent(),
+                    valueFormatter = { ctx, value, _ ->
+                        ctx.model.extraStore[SummaryState.xToLabelKey][value.toInt()]!!
+                    }
+                ),
+            ),
+            modelProducer = modelProducer,
+            zoomState = rememberVicoZoomState(initialZoom = Zoom.Content, zoomEnabled = false),
+            scrollState = rememberVicoScrollState(scrollEnabled = false),
+            modifier = Modifier.aspectRatio(4 / 3f)
+        )
+    }
+}
+
+@Composable
+private fun graphTextComponent() = rememberTextComponent(
+    background = rememberShapeComponent(
+        color = MaterialTheme.colorScheme.surfaceContainer,
+        shape = CorneredShape.Pill,
+        margins = Dimensions(allDp = 2f)
+    ),
+    color = contentColorFor(MaterialTheme.colorScheme.surfaceContainer),
+    padding = dimensions(horizontal = 8.dp, vertical = 4.dp),
+    typeface = Typeface.MONOSPACE
+)
+
 data class SummaryState internal constructor(
     private val statistics: ActivityStatistics,
     val filter: ActivityFilter,
@@ -315,9 +410,11 @@ data class SummaryState internal constructor(
     val places: Map<Place?, Int>,
     val feelChartState: PieChartState,
     val feelLegendItems: List<Feel>,
+    val dayOfWeekModelProducer: CartesianChartModelProducer,
+    val timeOfDayModelProducer: CartesianChartModelProducer
 ) {
     companion object {
-        operator fun invoke(
+        suspend operator fun invoke(
             context: Context,
             statistics: ActivityStatistics,
             filter: ActivityFilter
@@ -354,6 +451,36 @@ data class SummaryState internal constructor(
             })
             val feelLegendItems = Feel.entries.reversed()
 
+            val dayOfWeekModelProducer = CartesianChartModelProducer().apply {
+                val weekdayStats =
+                    statistics.activitiesByWeekday.toSortedMap().mapValues { it.value.size }
+                runTransaction {
+                    columnSeries {
+                        series(DayOfWeek.entries.map { weekdayStats[it] ?: 0 })
+                    }
+                    extras {
+                        val locale = Locale.getDefault()
+                        it[xToLabelKey] =
+                            DayOfWeek.entries.withIndex().associate { (index, value) ->
+                                index to value.getDisplayName(TextStyle.SHORT, locale)
+                            }
+                    }
+                }
+            }
+
+            val timeOfDayModelProducer = CartesianChartModelProducer().apply {
+                val hourOfDayStats =
+                    statistics.activitiesByHourOfDay.toSortedMap().mapValues { it.value.size }
+                runTransaction {
+                    columnSeries {
+                        series((0..<24).map { hourOfDayStats[it] ?: 0 })
+                    }
+                    extras {
+                        it[xToLabelKey] = (0..<24).associateWith { hour -> hour.toString() }
+                    }
+                }
+            }
+
             return SummaryState(
                 statistics = statistics,
                 filter = filter,
@@ -363,8 +490,12 @@ data class SummaryState internal constructor(
                 places = places,
                 feelChartState = feelChartState,
                 feelLegendItems = feelLegendItems,
+                dayOfWeekModelProducer = dayOfWeekModelProducer,
+                timeOfDayModelProducer = timeOfDayModelProducer
             )
         }
+
+        internal val xToLabelKey = ExtraStore.Key<Map<Int, String>>()
     }
 }
 

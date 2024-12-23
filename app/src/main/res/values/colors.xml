@@ -30,6 +30,8 @@
     <color name="graph_elevation">#558B2F</color>
     <color name="graph_temperature">#F9A825</color>
 
+    <color name="graph_default">#BC8222</color>
+
     <color name="intensity_low">#5E5E5E</color>
     <color name="intensity_high">#E2C400</color>
 

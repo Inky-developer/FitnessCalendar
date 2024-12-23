@@ -318,4 +318,8 @@
     <string name="summary_average_ascent">Average ascent:</string>
     <string name="summary_average_descent">Average descent:</string>
     <string name="warning_backups_not_encrypted">Backups are currently not encrypted. Only backup to cloud services that you trust.</string>
+    <string name="Activities_by_weekday">Activities by weekday</string>
+    <string name="Weekday">Weekday</string>
+    <string name="Activities_by_time_of_day">Activities by time of day</string>
+    <string name="Hour">Hour</string>
 </resources>

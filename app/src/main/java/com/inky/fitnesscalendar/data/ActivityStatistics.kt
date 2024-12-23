@@ -10,6 +10,8 @@ import com.inky.fitnesscalendar.db.entities.Place
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.util.toDate
 import com.inky.fitnesscalendar.util.toLocalDate
+import com.inky.fitnesscalendar.util.toLocalDateTime
+import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.temporal.WeekFields
@@ -167,15 +169,27 @@ value class ActivityStatistics(
     val activitiesByYear: Map<LocalDate, ActivityStatistics>
         get() = groupByLocalDate { it.withDayOfYear(1) }
 
-    private fun groupByLocalDate(func: (LocalDate) -> LocalDate): Map<LocalDate, ActivityStatistics> {
+    val activitiesByWeekday: Map<DayOfWeek, ActivityStatistics>
+        get() {
+            val zoneId = ZoneId.systemDefault()
+            return groupBy { it.activity.startTime.toLocalDate(zoneId).dayOfWeek }
+        }
+
+    val activitiesByHourOfDay: Map<Int, ActivityStatistics>
+        get() {
+            val zoneId = ZoneId.systemDefault()
+            return groupBy { it.activity.startTime.toLocalDateTime(zoneId).hour }
+        }
+
+    private inline fun groupByLocalDate(func: (LocalDate) -> LocalDate): Map<LocalDate, ActivityStatistics> {
         val zoneId = ZoneId.systemDefault()
         return groupBy { func(it.activity.startTime.toLocalDate(zoneId)) }
     }
 
-    private fun <T> groupBy(func: (RichActivity) -> T): Map<T, ActivityStatistics> =
+    private inline fun <T> groupBy(func: (RichActivity) -> T): Map<T, ActivityStatistics> =
         activities.groupBy(func).mapValues { ActivityStatistics(it.value) }
 
-    fun filter(func: (RichActivity) -> Boolean) = ActivityStatistics(activities.filter(func))
+    inline fun filter(func: (RichActivity) -> Boolean) = ActivityStatistics(activities.filter(func))
 
     private fun keepNewer(date: Date): ActivityStatistics =
         filter { it.activity.startTime.after(date) }

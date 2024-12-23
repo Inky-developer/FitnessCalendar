@@ -319,4 +319,8 @@
     <string name="summary_average_ascent">Durchschnittlicher Anstieg:</string>
     <string name="summary_average_descent">Durchschnittlicher Abstieg:</string>
     <string name="warning_backups_not_encrypted">Sicherungen sind momentan noch nicht verschlüsselt. Verwende nur Clouddienste, denen du vertraust.</string>
+    <string name="Activities_by_weekday">Wochtentage von Aktivitäten</string>
+    <string name="Weekday">Wochentag</string>
+    <string name="Activities_by_time_of_day">Uhrzeiten von Aktivitäten</string>
+    <string name="Hour">Stunde</string>
 </resources>
