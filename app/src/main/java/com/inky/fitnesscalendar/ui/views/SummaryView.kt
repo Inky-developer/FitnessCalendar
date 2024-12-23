@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
@@ -181,19 +182,23 @@ fun SummaryView(
                     .fillMaxWidth()
                     .padding(horizontal = 8.dp)
             ) {
-                item { PieChart(state.pieChartState) }
-                item {
+                item(key = "PieChart") {
+                    PieChart(state.pieChartState)
                     AnimatedContent(state.legendItems, label = "LegendItems") { legendItems ->
                         Legend(legendItems)
                     }
                 }
 
-                item { SummaryBox(state.summaryBoxState) }
-                item { PlaceBox(state.places) }
+                item(key = "SummaryBox") { SummaryBox(state.summaryBoxState) }
+                item(key = "PlaceBox") { PlaceBox(state.places) }
 
                 if (state.feelChartState.dataPoints.size > 1) {
-                    item {
-                        Column(modifier = Modifier.padding(vertical = 8.dp)) {
+                    item(key = "FeelChart") {
+                        Column(
+                            modifier = Modifier
+                                .padding(vertical = 8.dp)
+                                .animateItem()
+                        ) {
                             Text(
                                 stringResource(R.string.feels),
                                 style = MaterialTheme.typography.titleLarge
@@ -209,7 +214,7 @@ fun SummaryView(
                     }
                 }
 
-                item {
+                item(key = "DayOfWeekHistogram") {
                     Histogram(
                         modelProducer = state.dayOfWeekModelProducer,
                         title = stringResource(R.string.Activities_by_weekday),
@@ -217,7 +222,7 @@ fun SummaryView(
                     )
                 }
 
-                item {
+                item(key = "TimeOfDayHistogram") {
                     Histogram(
                         modelProducer = state.timeOfDayModelProducer,
                         title = stringResource(R.string.Activities_by_time_of_day),
@@ -231,7 +236,7 @@ fun SummaryView(
 }
 
 @Composable
-private fun PlaceBox(placeStats: Map<Place?, Int>) {
+private fun LazyItemScope.PlaceBox(placeStats: Map<Place?, Int>) {
     // Only show place information if there is at least one place that is not null
     if (placeStats.keys.find { it != null } == null) {
         return
@@ -240,7 +245,7 @@ private fun PlaceBox(placeStats: Map<Place?, Int>) {
     val activitiesWithPlace =
         remember(placeStats) { placeStats.filterKeys { it != null }.values.sum() }
 
-    InfoBox {
+    InfoBox(modifier = Modifier.animateItem()) {
         Text(stringResource(R.string.places))
         SummaryItem(
             stringResource(R.string.summary_activities_with_place),
@@ -299,11 +304,11 @@ private fun SummaryBox(state: SummaryBoxState) {
 }
 
 @Composable
-private fun InfoBox(content: @Composable ColumnScope.() -> Unit) {
+private fun InfoBox(modifier: Modifier = Modifier, content: @Composable ColumnScope.() -> Unit) {
     Surface(
         color = MaterialTheme.colorScheme.surfaceContainer,
         shape = MaterialTheme.shapes.medium,
-        modifier = Modifier.padding(vertical = 8.dp)
+        modifier = modifier.padding(vertical = 8.dp)
     ) {
         Column(modifier = Modifier.padding(all = 8.dp)) {
             content()
