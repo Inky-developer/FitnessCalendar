@@ -1,6 +1,5 @@
 package com.inky.fitnesscalendar.ui.views
 
-import android.content.Context
 import android.graphics.Typeface
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
@@ -54,18 +53,17 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityStatistics
 import com.inky.fitnesscalendar.data.Displayable
-import com.inky.fitnesscalendar.data.Feel
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.db.entities.Place
 import com.inky.fitnesscalendar.ui.components.FilterInformation
 import com.inky.fitnesscalendar.ui.components.PieChart
-import com.inky.fitnesscalendar.ui.components.PieChartEntry
-import com.inky.fitnesscalendar.ui.components.PieChartState
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.components.getAppBarContainerColor
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.view_model.BaseViewModel
+import com.inky.fitnesscalendar.view_model.summary_view.SummaryBoxState
+import com.inky.fitnesscalendar.view_model.summary_view.SummaryState
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottom
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStart
@@ -81,14 +79,9 @@ import com.patrykandpatrick.vico.core.cartesian.Zoom
 import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
 import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
-import com.patrykandpatrick.vico.core.cartesian.data.columnSeries
 import com.patrykandpatrick.vico.core.cartesian.layer.ColumnCartesianLayer
 import com.patrykandpatrick.vico.core.common.Dimensions
-import com.patrykandpatrick.vico.core.common.data.ExtraStore
 import com.patrykandpatrick.vico.core.common.shape.CorneredShape
-import java.time.DayOfWeek
-import java.time.format.TextStyle
-import java.util.Locale
 
 @Composable
 fun SummaryView(
@@ -417,149 +410,6 @@ private fun graphTextComponent() = rememberTextComponent(
     padding = dimensions(horizontal = 8.dp, vertical = 4.dp),
     typeface = Typeface.MONOSPACE
 )
-
-data class SummaryState internal constructor(
-    private val statistics: ActivityStatistics,
-    val filter: ActivityFilter,
-    val pieChartState: PieChartState,
-    val legendItems: List<Displayable>,
-    val summaryBoxState: SummaryBoxState,
-    val places: Map<Place?, Int>,
-    val feelChartState: PieChartState,
-    val feelLegendItems: List<Feel>,
-    val dayOfWeekModelProducer: CartesianChartModelProducer,
-    val timeOfDayModelProducer: CartesianChartModelProducer
-) {
-    companion object {
-        suspend operator fun invoke(
-            context: Context,
-            statistics: ActivityStatistics,
-            filter: ActivityFilter,
-            dayOfWeekModelProducer: CartesianChartModelProducer,
-            timeOfDayModelProducer: CartesianChartModelProducer
-        ): SummaryState {
-            val activitiesByCategory = statistics.activitiesByCategory
-            val isSingleCategory = activitiesByCategory.size == 1
-
-            val chartStats = if (isSingleCategory) {
-                statistics.activitiesByType
-            } else {
-                statistics.activitiesByCategory
-            }
-            val pieChartState = PieChartState(
-                chartStats.map { (key, value) ->
-                    PieChartEntry(
-                        value = value.size.toDouble(),
-                        label = value.size.toString(),
-                        color = Color(key.getColor(context))
-                    )
-                }
-            )
-            val legendItems = chartStats.toList().sortedBy { (_, v) -> -v.size }.map { (k, _) -> k }
-
-            val summaryBoxState = SummaryBoxState(context, statistics)
-
-            val places = statistics.activitiesByPlace.mapValues { it.value.size }
-
-            val feelChartState = PieChartState(statistics.activitiesByFeel.map { (key, value) ->
-                PieChartEntry(
-                    value = value.size.toDouble(),
-                    label = value.size.toString(),
-                    color = Color(key.getColor(context))
-                )
-            })
-            val feelLegendItems = Feel.entries.reversed()
-
-            dayOfWeekModelProducer.apply {
-                val weekdayStats =
-                    statistics.activitiesByWeekday.toSortedMap().mapValues { it.value.size }
-                runTransaction {
-                    columnSeries {
-                        series(DayOfWeek.entries.map { weekdayStats[it] ?: 0 })
-                    }
-                    extras {
-                        val locale = Locale.getDefault()
-                        it[xToLabelKey] =
-                            DayOfWeek.entries.withIndex().associate { (index, value) ->
-                                index to value.getDisplayName(TextStyle.SHORT, locale)
-                            }
-                    }
-                }
-            }
-
-            timeOfDayModelProducer.apply {
-                val hourOfDayStats =
-                    statistics.activitiesByHourOfDay.toSortedMap().mapValues { it.value.size }
-                runTransaction {
-                    columnSeries {
-                        series((0..<24).map { hourOfDayStats[it] ?: 0 })
-                    }
-                    extras {
-                        it[xToLabelKey] = (0..<24).associateWith { hour -> hour.toString() }
-                    }
-                }
-            }
-
-            return SummaryState(
-                statistics = statistics,
-                filter = filter,
-                pieChartState = pieChartState,
-                legendItems = legendItems,
-                summaryBoxState = summaryBoxState,
-                places = places,
-                feelChartState = feelChartState,
-                feelLegendItems = feelLegendItems,
-                dayOfWeekModelProducer = dayOfWeekModelProducer,
-                timeOfDayModelProducer = timeOfDayModelProducer
-            )
-        }
-
-        internal val xToLabelKey = ExtraStore.Key<Map<Int, String>>()
-    }
-}
-
-data class SummaryBoxState(
-    val totalActivities: String,
-    val totalTime: String?,
-    val averageTime: String?,
-    val totalDistance: String?,
-    val averageDistance: String?,
-    val averageSpeed: String?,
-    val averageMovingSpeed: String?,
-//    val maximumSpeed: String?,
-//    val minimumElevation: String?,
-//    val maximumElevation: String?,
-    val totalAscent: String?,
-    val totalDescent: String?,
-    val averageAscent: String?,
-    val averageDescent: String?,
-    val averageHeartRate: String?,
-    val maximumHeartRate: String?,
-//    val minimumTemperature: String?,
-//    val maximumTemperature: String?,
-    val averageTemperature: String?,
-) {
-    constructor(context: Context, statistics: ActivityStatistics) : this(
-        totalActivities = statistics.size.toString(),
-        totalTime = statistics.totalTime().takeIf { it.elapsedMs > 0L }?.format(),
-        averageTime = statistics.averageTime()?.format(),
-        totalDistance = statistics.totalDistance().takeIf { it.meters > 0 }
-            ?.formatWithContext(context),
-        averageDistance = statistics.averageDistance()?.formatWithContext(context),
-        averageSpeed = statistics.averageSpeed()?.formatWithContext(context),
-        averageMovingSpeed = statistics.averageMovingSpeed()?.formatWithContext(context),
-        totalAscent = statistics.totalAscent().takeIf { it.meters > 0 }
-            ?.formatWithContext(context),
-        totalDescent = statistics.totalDescent().takeIf { it.meters > 0 }
-            ?.formatWithContext(context),
-        averageAscent = statistics.averageAscent()?.formatWithContext(context),
-        averageDescent = statistics.averageDescent()?.formatWithContext(context),
-        averageHeartRate = statistics.averageHeartRate()?.formatWithContext(context),
-        maximumHeartRate = statistics.maximalHeartRate()?.formatWithContext(context),
-        averageTemperature = statistics.averageTemperature()?.formatWithContext(context),
-    )
-
-}
 
 @Preview
 @Composable
