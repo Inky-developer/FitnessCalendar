@@ -4,6 +4,7 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,11 +14,17 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.translate
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
@@ -29,12 +36,31 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import kotlin.math.PI
 import kotlin.math.abs
+import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.roundToInt
 import kotlin.math.sin
 
 data class PieChartState(val dataPoints: List<PieChartEntry>) {
     fun sum(): Double = dataPoints.sumOf { it.value }
+
+    fun segmentIndexByAngle(angleDegrees: Float): Int {
+        assert(angleDegrees in 0.0..360.0)
+
+        val total = sum()
+        var lastAngle = 0.0
+        for ((index, segment) in dataPoints.withIndex()) {
+            val segmentAngle = segment.value / total * 360
+            val angleEnd = lastAngle + segmentAngle
+            if (angleDegrees in lastAngle..<angleEnd) {
+                return index
+            }
+
+            lastAngle = angleEnd
+        }
+
+        throw IllegalStateException("Angles don't add up to 360 or input is invalid")
+    }
 }
 
 data class PieChartEntry(val value: Double, val label: String, val color: Color)
@@ -44,8 +70,9 @@ fun PieChart(
     state: PieChartState,
     fontSize: TextUnit = TextUnit.Unspecified,
     style: TextStyle = LocalTextStyle.current,
+    onClick: (Int) -> Unit = {},
     modifier: Modifier = Modifier,
-    animate: Boolean = true
+    animate: Boolean = true,
 ) {
     val angleAnimation = remember(state) { Animatable(if (animate) 0f else 1f) }
     LaunchedEffect(state) {
@@ -55,13 +82,33 @@ fun PieChart(
     val textMeasurer = rememberTextMeasurer()
     val textStyle = style.merge(fontSize = fontSize)
 
+    var canvasSize by remember { mutableStateOf(Size.Zero) }
+
     Canvas(
         modifier = modifier
             .fillMaxSize()
             .aspectRatio(1f)
+            .pointerInput(onClick, state) {
+                detectTapGestures { offset ->
+                    val offsetFromCenter =
+                        offset - Offset(canvasSize.width / 2, canvasSize.height / 2)
+                    val angle = radToDeg(
+                        -atan2(
+                            offsetFromCenter.x,
+                            offsetFromCenter.y
+                        ) + 0.5f * PI.toFloat()
+                    )
+                    val segmentIndex = state.segmentIndexByAngle(angle)
+                    onClick(segmentIndex)
+                }
+            }
             .shadow(4.dp, shape = CircleShape)
             .background(MaterialTheme.colorScheme.surface)
     ) {
+        if (canvasSize != size) {
+            canvasSize = size
+        }
+
         var angleStart = 0f
         val sum = state.sum()
 
@@ -143,6 +190,9 @@ private fun interpolateCircle(angleRad: Float, max: Float, min: Float): Float {
 }
 
 private fun degToRad(angleDegrees: Float): Float = angleDegrees / 360 * PI.toFloat() * 2
+
+private fun radToDeg(angleRadians: Float): Float =
+    (angleRadians / (PI.toFloat() * 2) * 360).mod(360f)
 
 @Preview(device = "spec:width=512px,height=1024px,dpi=440")
 @Composable
