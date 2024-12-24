@@ -30,6 +30,8 @@ data class SummaryState internal constructor(
     val dayOfWeekModelProducer: CartesianChartModelProducer,
     val timeOfDayModelProducer: CartesianChartModelProducer
 ) {
+    val isEmpty = statistics.isEmpty()
+
     fun handlePieChartClick(element: Any): ActivityFilter? {
         return when (element) {
             is ActivityType -> filter.withType(element)

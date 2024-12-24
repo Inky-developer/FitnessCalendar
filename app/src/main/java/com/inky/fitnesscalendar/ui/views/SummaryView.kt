@@ -3,6 +3,7 @@ package com.inky.fitnesscalendar.ui.views
 import android.graphics.Typeface
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -11,15 +12,18 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -170,69 +174,102 @@ fun SummaryView(
                 FilterInformation(filter = state.filter, onChange = onEditFilter)
             }
 
-            LazyColumn(
-                contentPadding = PaddingValues(bottom = 128.dp),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp)
-            ) {
-                item(key = "PieChart") {
-                    PieChart(state.pieChartState, onClick = {
-                        val newFilter = state.handlePieChartClick(it)
-                        newFilter?.let(onEditFilter)
-                    })
-                    AnimatedContent(state.legendItems, label = "LegendItems") { legendItems ->
+            AnimatedContent(state.isEmpty, label = "EmptyStateAnimation") { isEmpty ->
+                if (isEmpty) {
+                    Row(
+                        horizontalArrangement = Arrangement.Center,
+                        modifier = Modifier
+                            .padding(vertical = 8.dp)
+                            .fillMaxSize()
+                    ) {
+                        Icon(
+                            Icons.Outlined.Info,
+                            stringResource(R.string.info),
+                            tint = MaterialTheme.colorScheme.primary,
+                            modifier = Modifier
+                                .padding(horizontal = 8.dp)
+                                .width(32.dp)
+                                .aspectRatio(1f)
+                                .align(Alignment.CenterVertically)
+                        )
+                        val textId =
+                            if (state.filter.isEmpty()) R.string.no_activities_yet else R.string.no_activities_with_filter
+                        Text(
+                            stringResource(textId),
+                            style = MaterialTheme.typography.displaySmall,
+                            modifier = Modifier.align(Alignment.CenterVertically)
+                        )
+                    }
+                } else {
+                    SummaryViewInner(state = state, onEditFilter = onEditFilter)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SummaryViewInner(state: SummaryState, onEditFilter: (ActivityFilter) -> Unit) {
+    LazyColumn(
+        contentPadding = PaddingValues(bottom = 128.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 8.dp)
+    ) {
+        item(key = "PieChart") {
+            PieChart(state.pieChartState, onClick = {
+                val newFilter = state.handlePieChartClick(it)
+                newFilter?.let(onEditFilter)
+            })
+            AnimatedContent(state.legendItems, label = "LegendItems") { legendItems ->
+                Legend(legendItems)
+            }
+        }
+
+        item(key = "SummaryBox") { SummaryBox(state.summaryBoxState) }
+        item(key = "PlaceBox") { PlaceBox(state.places) }
+
+        if (state.feelChartState.dataPoints.size > 1) {
+            item(key = "FeelChart") {
+                Column(
+                    modifier = Modifier
+                        .padding(vertical = 8.dp)
+                        .animateItem()
+                ) {
+                    Text(
+                        stringResource(R.string.feels),
+                        style = MaterialTheme.typography.titleLarge
+                    )
+                    PieChart(
+                        state.feelChartState,
+                        onClick = { onEditFilter(state.filter.withFeel(it)) },
+                        modifier = Modifier.padding(top = 8.dp)
+                    )
+                    AnimatedContent(
+                        state.feelLegendItems,
+                        label = "FeelLegendItems"
+                    ) { legendItems ->
                         Legend(legendItems)
                     }
-                }
-
-                item(key = "SummaryBox") { SummaryBox(state.summaryBoxState) }
-                item(key = "PlaceBox") { PlaceBox(state.places) }
-
-                if (state.feelChartState.dataPoints.size > 1) {
-                    item(key = "FeelChart") {
-                        Column(
-                            modifier = Modifier
-                                .padding(vertical = 8.dp)
-                                .animateItem()
-                        ) {
-                            Text(
-                                stringResource(R.string.feels),
-                                style = MaterialTheme.typography.titleLarge
-                            )
-                            PieChart(
-                                state.feelChartState,
-                                onClick = { onEditFilter(state.filter.withFeel(it)) },
-                                modifier = Modifier.padding(top = 8.dp)
-                            )
-                            AnimatedContent(
-                                state.feelLegendItems,
-                                label = "FeelLegendItems"
-                            ) { legendItems ->
-                                Legend(legendItems)
-                            }
-                        }
-                    }
-                }
-
-                item(key = "DayOfWeekHistogram") {
-                    Histogram(
-                        modelProducer = state.dayOfWeekModelProducer,
-                        title = stringResource(R.string.Activities_by_weekday),
-                        xAxisLabel = stringResource(R.string.Weekday)
-                    )
-                }
-
-                item(key = "TimeOfDayHistogram") {
-                    Histogram(
-                        modelProducer = state.timeOfDayModelProducer,
-                        title = stringResource(R.string.Activities_by_time_of_day),
-                        xAxisLabel = stringResource(R.string.Hour)
-                    )
                 }
             }
         }
 
+        item(key = "DayOfWeekHistogram") {
+            Histogram(
+                modelProducer = state.dayOfWeekModelProducer,
+                title = stringResource(R.string.Activities_by_weekday),
+                xAxisLabel = stringResource(R.string.Weekday)
+            )
+        }
+
+        item(key = "TimeOfDayHistogram") {
+            Histogram(
+                modelProducer = state.timeOfDayModelProducer,
+                title = stringResource(R.string.Activities_by_time_of_day),
+                xAxisLabel = stringResource(R.string.Hour)
+            )
+        }
     }
 }
 
