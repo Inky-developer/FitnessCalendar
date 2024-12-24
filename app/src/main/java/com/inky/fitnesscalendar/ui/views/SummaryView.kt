@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -310,8 +311,10 @@ private fun InfoBox(modifier: Modifier = Modifier, content: @Composable ColumnSc
         shape = MaterialTheme.shapes.medium,
         modifier = modifier.padding(vertical = 8.dp)
     ) {
-        Column(modifier = Modifier.padding(all = 8.dp)) {
-            content()
+        SelectionContainer {
+            Column(modifier = Modifier.padding(all = 8.dp)) {
+                content()
+            }
         }
     }
 }
