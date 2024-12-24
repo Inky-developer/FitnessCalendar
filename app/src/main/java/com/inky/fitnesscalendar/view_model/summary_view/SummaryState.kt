@@ -2,10 +2,12 @@ package com.inky.fitnesscalendar.view_model.summary_view
 
 import android.content.Context
 import androidx.compose.ui.graphics.Color
+import com.inky.fitnesscalendar.data.ActivityCategory
 import com.inky.fitnesscalendar.data.ActivityStatistics
 import com.inky.fitnesscalendar.data.Displayable
 import com.inky.fitnesscalendar.data.Feel
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
+import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.Place
 import com.inky.fitnesscalendar.ui.components.PieChartEntry
 import com.inky.fitnesscalendar.ui.components.PieChartState
@@ -19,15 +21,23 @@ import java.util.Locale
 data class SummaryState internal constructor(
     private val statistics: ActivityStatistics,
     val filter: ActivityFilter,
-    val pieChartState: PieChartState,
+    val pieChartState: PieChartState<Displayable>,
     val legendItems: List<Displayable>,
     val summaryBoxState: SummaryBoxState,
     val places: Map<Place?, Int>,
-    val feelChartState: PieChartState,
+    val feelChartState: PieChartState<Feel>,
     val feelLegendItems: List<Feel>,
     val dayOfWeekModelProducer: CartesianChartModelProducer,
     val timeOfDayModelProducer: CartesianChartModelProducer
 ) {
+    fun handlePieChartClick(element: Any): ActivityFilter? {
+        return when (element) {
+            is ActivityType -> filter.withType(element)
+            is ActivityCategory -> filter.withCategory(element)
+            else -> null
+        }
+    }
+
     companion object {
         suspend operator fun invoke(
             context: Context,
@@ -49,7 +59,8 @@ data class SummaryState internal constructor(
                     PieChartEntry(
                         value = value.size.toDouble(),
                         label = value.size.toString(),
-                        color = Color(key.getColor(context))
+                        color = Color(key.getColor(context)),
+                        payload = key
                     )
                 }
             )
@@ -63,7 +74,8 @@ data class SummaryState internal constructor(
                 PieChartEntry(
                     value = value.size.toDouble(),
                     label = value.size.toString(),
-                    color = Color(key.getColor(context))
+                    color = Color(key.getColor(context)),
+                    payload = key
                 )
             })
             val feelLegendItems = Feel.entries.reversed()

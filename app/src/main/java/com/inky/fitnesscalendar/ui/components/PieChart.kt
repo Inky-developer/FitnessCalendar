@@ -41,19 +41,19 @@ import kotlin.math.cos
 import kotlin.math.roundToInt
 import kotlin.math.sin
 
-data class PieChartState(val dataPoints: List<PieChartEntry>) {
+data class PieChartState<T>(val dataPoints: List<PieChartEntry<T>>) {
     fun sum(): Double = dataPoints.sumOf { it.value }
 
-    fun segmentIndexByAngle(angleDegrees: Float): Int {
+    fun segmentByAngle(angleDegrees: Float): T {
         assert(angleDegrees in 0.0..360.0)
 
         val total = sum()
         var lastAngle = 0.0
-        for ((index, segment) in dataPoints.withIndex()) {
+        for (segment in dataPoints) {
             val segmentAngle = segment.value / total * 360
             val angleEnd = lastAngle + segmentAngle
             if (angleDegrees in lastAngle..<angleEnd) {
-                return index
+                return segment.payload
             }
 
             lastAngle = angleEnd
@@ -63,14 +63,14 @@ data class PieChartState(val dataPoints: List<PieChartEntry>) {
     }
 }
 
-data class PieChartEntry(val value: Double, val label: String, val color: Color)
+data class PieChartEntry<T>(val value: Double, val label: String, val color: Color, val payload: T)
 
 @Composable
-fun PieChart(
-    state: PieChartState,
+fun <T> PieChart(
+    state: PieChartState<T>,
     fontSize: TextUnit = TextUnit.Unspecified,
     style: TextStyle = LocalTextStyle.current,
-    onClick: (Int) -> Unit = {},
+    onClick: (T) -> Unit = {},
     modifier: Modifier = Modifier,
     animate: Boolean = true,
 ) {
@@ -98,7 +98,7 @@ fun PieChart(
                             offsetFromCenter.y
                         ) + 0.5f * PI.toFloat()
                     )
-                    val segmentIndex = state.segmentIndexByAngle(angle)
+                    val segmentIndex = state.segmentByAngle(angle)
                     onClick(segmentIndex)
                 }
             }
@@ -199,10 +199,10 @@ private fun radToDeg(angleRadians: Float): Float =
 private fun PreviewPieChart() {
     val state = PieChartState(
         listOf(
-            PieChartEntry(20.0, "Entry a", Color.Red),
-            PieChartEntry(10.0, "Entry b", Color.Black),
-            PieChartEntry(5.0, "Entry c", Color.Green),
-            PieChartEntry(3.0, "Entry d", Color.Yellow),
+            PieChartEntry(20.0, "Entry a", Color.Red, Unit),
+            PieChartEntry(10.0, "Entry b", Color.Black, Unit),
+            PieChartEntry(5.0, "Entry c", Color.Green, Unit),
+            PieChartEntry(3.0, "Entry d", Color.Yellow, Unit),
         ).sortedBy { it.value }
     )
     Surface(modifier = Modifier.fillMaxWidth()) {
@@ -213,7 +213,7 @@ private fun PreviewPieChart() {
 @Preview(device = "spec:width=512px,height=1024px,dpi=440")
 @Composable
 private fun PreviewPieChartSingleEntry() {
-    val state = PieChartState(listOf(PieChartEntry(20.0, "Entry a", Color.Red)))
+    val state = PieChartState(listOf(PieChartEntry(20.0, "Entry a", Color.Red, Unit)))
     Surface(modifier = Modifier.fillMaxWidth()) {
         PieChart(state, animate = false)
     }

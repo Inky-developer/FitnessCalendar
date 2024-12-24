@@ -177,7 +177,10 @@ fun SummaryView(
                     .padding(horizontal = 8.dp)
             ) {
                 item(key = "PieChart") {
-                    PieChart(state.pieChartState)
+                    PieChart(state.pieChartState, onClick = {
+                        val newFilter = state.handlePieChartClick(it)
+                        newFilter?.let(onEditFilter)
+                    })
                     AnimatedContent(state.legendItems, label = "LegendItems") { legendItems ->
                         Legend(legendItems)
                     }
@@ -197,7 +200,11 @@ fun SummaryView(
                                 stringResource(R.string.feels),
                                 style = MaterialTheme.typography.titleLarge
                             )
-                            PieChart(state.feelChartState, modifier = Modifier.padding(top = 8.dp))
+                            PieChart(
+                                state.feelChartState,
+                                onClick = { onEditFilter(state.filter.withFeel(it)) },
+                                modifier = Modifier.padding(top = 8.dp)
+                            )
                             AnimatedContent(
                                 state.feelLegendItems,
                                 label = "FeelLegendItems"
