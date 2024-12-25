@@ -40,6 +40,7 @@ import kotlin.math.atan2
 import kotlin.math.cos
 import kotlin.math.roundToInt
 import kotlin.math.sin
+import kotlin.math.sqrt
 
 data class PieChartState<T>(val dataPoints: List<PieChartEntry<T>>) {
     fun sum(): Double = dataPoints.sumOf { it.value }
@@ -92,6 +93,10 @@ fun <T> PieChart(
                 detectTapGestures { offset ->
                     val offsetFromCenter =
                         offset - Offset(canvasSize.width / 2, canvasSize.height / 2)
+                    val distanceFromCenter = sqrt(offsetFromCenter.x * offsetFromCenter.x + offsetFromCenter.y * offsetFromCenter.y)
+                    if (distanceFromCenter > canvasSize.width / 2) {
+                        return@detectTapGestures
+                    }
                     val angle = radToDeg(
                         -atan2(
                             offsetFromCenter.x,
