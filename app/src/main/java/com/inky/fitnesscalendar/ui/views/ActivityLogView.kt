@@ -1,5 +1,6 @@
 package com.inky.fitnesscalendar.ui.views
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -11,14 +12,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.KeyboardArrowUp
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material.icons.outlined.Search
@@ -60,6 +58,7 @@ import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivityCard
 import com.inky.fitnesscalendar.ui.components.FilterInformation
 import com.inky.fitnesscalendar.ui.components.NewActivityFAB
+import com.inky.fitnesscalendar.ui.components.NoActivitiesInfoBox
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.components.getAppBarContainerColor
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
@@ -179,46 +178,25 @@ fun ActivityLog(
             ) {
                 FilterInformation(filter = filter, onChange = onEditFilter)
             }
-            if (activitiesEmpty) {
-                Row(
-                    horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier
-                        .padding(innerPadding)
-                        .padding(vertical = 8.dp)
-                        .fillMaxSize()
-                ) {
-                    Icon(
-                        Icons.Outlined.Info,
-                        stringResource(R.string.info),
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier
-                            .padding(horizontal = 8.dp)
-                            .width(32.dp)
-                            .aspectRatio(1f)
-                            .align(Alignment.CenterVertically)
-                    )
-                    val textId =
-                        if (filter.isEmpty()) R.string.no_activities_yet else R.string.no_activities_with_filter
-                    Text(
-                        stringResource(textId),
-                        style = MaterialTheme.typography.displaySmall,
-                        modifier = Modifier.align(Alignment.CenterVertically)
+
+            AnimatedContent(activitiesEmpty, label = "EmptyStateAnimation") { isEmpty ->
+                if (isEmpty) {
+                    NoActivitiesInfoBox(filter.isEmpty(), modifier = Modifier.fillMaxSize())
+                } else {
+                    ActivityList(
+                        state = activityListState,
+                        localizationRepository = viewModel.repository.localizationRepository,
+                        onJumpToActivity = { activity ->
+                            nextScrollTarget = activity.uid
+                            onEditFilter(ActivityFilter())
+                        },
+                        onShowDay = onShowDay,
+                        onEditFilter = onEditFilter,
+                        onEditActivity = onEditActivity,
+                        onTrackDetails = onTrackDetails,
+                        onDeleteActivity = { viewModel.deleteActivity(it) }
                     )
                 }
-            } else {
-                ActivityList(
-                    state = activityListState,
-                    localizationRepository = viewModel.repository.localizationRepository,
-                    onJumpToActivity = { activity ->
-                        nextScrollTarget = activity.uid
-                        onEditFilter(ActivityFilter())
-                    },
-                    onShowDay = onShowDay,
-                    onEditFilter = onEditFilter,
-                    onEditActivity = onEditActivity,
-                    onTrackDetails = onTrackDetails,
-                    onDeleteActivity = { viewModel.deleteActivity(it) }
-                )
             }
         }
     }

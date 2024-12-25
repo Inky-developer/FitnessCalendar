@@ -3,7 +3,6 @@ package com.inky.fitnesscalendar.ui.views
 import android.graphics.Typeface
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -16,14 +15,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -60,6 +57,7 @@ import com.inky.fitnesscalendar.data.Displayable
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.db.entities.Place
 import com.inky.fitnesscalendar.ui.components.FilterInformation
+import com.inky.fitnesscalendar.ui.components.NoActivitiesInfoBox
 import com.inky.fitnesscalendar.ui.components.PieChart
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.components.getAppBarContainerColor
@@ -176,30 +174,7 @@ fun SummaryView(
 
             AnimatedContent(state.isEmpty, label = "EmptyStateAnimation") { isEmpty ->
                 if (isEmpty) {
-                    Row(
-                        horizontalArrangement = Arrangement.Center,
-                        modifier = Modifier
-                            .padding(vertical = 8.dp)
-                            .fillMaxSize()
-                    ) {
-                        Icon(
-                            Icons.Outlined.Info,
-                            stringResource(R.string.info),
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier
-                                .padding(horizontal = 8.dp)
-                                .width(32.dp)
-                                .aspectRatio(1f)
-                                .align(Alignment.CenterVertically)
-                        )
-                        val textId =
-                            if (state.filter.isEmpty()) R.string.no_activities_yet else R.string.no_activities_with_filter
-                        Text(
-                            stringResource(textId),
-                            style = MaterialTheme.typography.displaySmall,
-                            modifier = Modifier.align(Alignment.CenterVertically)
-                        )
-                    }
+                    NoActivitiesInfoBox(state.filter.isEmpty(), modifier = Modifier.fillMaxSize())
                 } else {
                     SummaryViewInner(state = state, onEditFilter = onEditFilter)
                 }
