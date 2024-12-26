@@ -45,8 +45,8 @@
     <color name="favorite">#AD1457</color>
 
     <color name="mosaic_0">#EBEBEB</color>
-    <color name="mosaic_1">#DCEDC8</color>
-    <color name="mosaic_2">#AED581</color>
-    <color name="mosaic_3">#7CB342</color>
-    <color name="mosaic_4">#558B2F</color>
+    <color name="mosaic_1">#AED581</color>
+    <color name="mosaic_2">#7CB342</color>
+    <color name="mosaic_3">#558B2F</color>
+    <color name="mosaic_4">#33691E</color>
 </resources>
