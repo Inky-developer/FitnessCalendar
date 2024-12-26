@@ -47,6 +47,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -203,14 +204,25 @@ private fun SummaryViewInner(state: SummaryState, onEditFilter: (ActivityFilter)
             }
         }
 
+        item(key = "SummaryBox") { SummaryBox(state.summaryBoxState) }
+
         item(key = "mosaic") {
-            MosaicChart(
-                state.mosaicState,
-                hoverText = { entry -> entry.data.format(LocalizationRepository.shortLocalDateFormatter) }
-            )
+            if (state.filter.range == null) {
+                MosaicChart(
+                    state.mosaicState,
+                    hoverText = { entry ->
+                        val date = entry.data.format(LocalizationRepository.shortLocalDateFormatter)
+                        pluralStringResource(
+                            R.plurals.tooltip_activities_on_day,
+                            entry.count,
+                            date,
+                            entry.count
+                        )
+                    }
+                )
+            }
         }
 
-        item(key = "SummaryBox") { SummaryBox(state.summaryBoxState) }
         item(key = "PlaceBox") { PlaceBox(state.places) }
 
         if (state.feelChartState.dataPoints.size > 1) {

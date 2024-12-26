@@ -195,6 +195,7 @@
     <string name="no_activities_on_day">No activities on that day</string>
     <string name="number_of_activities_n">Number of activities: %1s</string>
     <string name="show_day">Show day</string>
+
     <plurals name="num_activities">
         <item quantity="one">%1d activity</item>
         <item quantity="other">%1d activities</item>
@@ -207,6 +208,11 @@
         <item quantity="one">Updated %1d activity</item>
         <item quantity="other">Updated %1d activities</item>
     </plurals>
+    <plurals name="tooltip_activities_on_day">
+        <item quantity="one">On %1$s: %2$s activity</item>
+        <item quantity="other">On %1$s: %2$s activities</item>
+    </plurals>
+
     <string name="title_activity_import">Import activities</string>
     <string name="click_to_set_type">Click to set type…</string>
     <string name="confirm_import">Import</string>

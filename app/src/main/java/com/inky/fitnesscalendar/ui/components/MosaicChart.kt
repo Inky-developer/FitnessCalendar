@@ -7,13 +7,13 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -23,22 +23,15 @@ import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.rememberTooltipState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityStatistics
-import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.util.toLocalDate
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -46,8 +39,8 @@ import java.time.format.TextStyle
 import java.time.temporal.WeekFields
 import java.util.Locale
 import kotlin.math.ceil
-import kotlin.random.Random
 
+@Immutable
 data class MosaicChartState<T>(
     val tiles: List<MosaicEntry<T>>,
     val height: Int,
@@ -73,7 +66,7 @@ data class MosaicEntry<T>(val count: Int, val data: T)
 
 fun ActivityStatistics.calculateMosaicState(colors: List<Color>): MosaicChartState<LocalDate> {
     val dayOfWeekField = WeekFields.of(Locale.getDefault()).dayOfWeek()
-    val lastDay = activities.last().activity.startTime.toLocalDate()
+    val lastDay = activities.firstOrNull()?.activity?.startTime?.toLocalDate() ?: LocalDate.now()
     val firstDay = lastDay.minusYears(1).with(dayOfWeekField, 1)
     val locale = Locale.getDefault()
 
@@ -88,7 +81,7 @@ fun ActivityStatistics.calculateMosaicState(colors: List<Color>): MosaicChartSta
         days.add(MosaicEntry(count = activityData[day]?.size ?: 0, data = day))
         val nextDay = day.plusDays(1)
         if (day.month != nextDay.month) {
-            xLabels[index / 7] = nextDay.month.getDisplayName(TextStyle.SHORT, locale)
+            xLabels[(index + 1) / 7] = nextDay.month.getDisplayName(TextStyle.SHORT, locale)
         }
         day = nextDay
         index += 1
@@ -127,7 +120,7 @@ fun <T> MosaicChart(
             }
 
             val textMeasurer = rememberTextMeasurer()
-            LazyRow {
+            LazyRow(state = rememberLazyListState(initialFirstVisibleItemIndex = state.rows.size - 1)) {
                 items(state.rows) { (index, row) ->
                     Column {
                         val xLabel = state.xLabels[index]
@@ -159,14 +152,27 @@ fun <T> MosaicChart(
 private fun MosaicTile(color: Color, message: String) {
     val state = rememberTooltipState()
     val positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider()
-    TooltipBox(state = state, positionProvider = positionProvider, tooltip = { Text(message) }) {
+    TooltipBox(
+        state = state,
+        positionProvider = positionProvider,
+        tooltip = {
+            Text(
+                message,
+                modifier = Modifier
+                    .shadow(1.dp, MaterialTheme.shapes.small)
+                    .clip(MaterialTheme.shapes.small)
+                    .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+                    .padding(horizontal = 2.dp)
+            )
+        },
+    ) {
         Box(
             modifier = Modifier
                 .requiredSize(TILE_SIZE_DP.dp)
                 .padding(1.dp)
                 .clip(RoundedCornerShape(percent = 25))
                 .border(
-                    width = 1.dp,
+                    width = 0.5.dp,
                     color = Color(0.2f, 0.2f, 0.2f, 0.3f),
                     shape = RoundedCornerShape(percent = 25)
                 )
@@ -175,56 +181,56 @@ private fun MosaicTile(color: Color, message: String) {
     }
 }
 
-@Preview
-@Composable
-private fun PreviewMosaicChart() {
-    var data by remember { mutableStateOf<MosaicChartState<LocalDate>?>(null) }
-    val context = LocalContext.current
-    LaunchedEffect(Unit) {
-        val random = Random(1)
-
-        val days = mutableListOf<MosaicEntry<LocalDate>>()
-        val xLabels = mutableMapOf<Int, String>()
-
-        val dayOfWeekField = WeekFields.of(Locale.getDefault()).dayOfWeek()
-        val today = LocalDate.now()
-        val start = today.minusYears(1).with(dayOfWeekField, 1)
-        var currentDay = start
-        var index = 0
-        while (!currentDay.isAfter(today)) {
-            days.add(MosaicEntry(random.nextInt(5), currentDay))
-            val nextDay = currentDay.plusDays(1)
-            if (nextDay.month != currentDay.month) {
-                xLabels[index / 7] = nextDay.month.getDisplayName(
-                    TextStyle.SHORT,
-                    Locale.getDefault()
-                )
-            }
-            currentDay = nextDay
-            index += 1
-        }
-
-        val yLabels =
-            DayOfWeek.entries.map { it.getDisplayName(TextStyle.SHORT, Locale.getDefault()) }
-        val colors = listOf(
-            Color(context.getColor(R.color.mosaic_0)),
-            Color(context.getColor(R.color.mosaic_1)),
-            Color(context.getColor(R.color.mosaic_2)),
-            Color(context.getColor(R.color.mosaic_3)),
-        )
-
-        data = MosaicChartState(days, 7, xLabels, yLabels, colors)
-    }
-
-
-    data?.let {
-        MosaicChart(
-            it,
-            hoverText = { entry ->
-                val date = entry.data.format(LocalizationRepository.localDateFormatter)
-                "$date: ${entry.count}"
-            },
-            modifier = Modifier.fillMaxWidth()
-        )
-    }
-}
+//@Preview
+//@Composable
+//private fun PreviewMosaicChart() {
+//    var data by remember { mutableStateOf<MosaicChartState<LocalDate>?>(null) }
+//    val context = LocalContext.current
+//    LaunchedEffect(Unit) {
+//        val random = Random(1)
+//
+//        val days = mutableListOf<MosaicEntry<LocalDate>>()
+//        val xLabels = mutableMapOf<Int, String>()
+//
+//        val dayOfWeekField = WeekFields.of(Locale.getDefault()).dayOfWeek()
+//        val today = LocalDate.now()
+//        val start = today.minusYears(1).with(dayOfWeekField, 1)
+//        var currentDay = start
+//        var index = 0
+//        while (!currentDay.isAfter(today)) {
+//            days.add(MosaicEntry(random.nextInt(5), currentDay))
+//            val nextDay = currentDay.plusDays(1)
+//            if (nextDay.month != currentDay.month) {
+//                xLabels[index / 7] = nextDay.month.getDisplayName(
+//                    TextStyle.SHORT,
+//                    Locale.getDefault()
+//                )
+//            }
+//            currentDay = nextDay
+//            index += 1
+//        }
+//
+//        val yLabels =
+//            DayOfWeek.entries.map { it.getDisplayName(TextStyle.SHORT, Locale.getDefault()) }
+//        val colors = listOf(
+//            Color(context.getColor(R.color.mosaic_0)),
+//            Color(context.getColor(R.color.mosaic_1)),
+//            Color(context.getColor(R.color.mosaic_2)),
+//            Color(context.getColor(R.color.mosaic_3)),
+//        )
+//
+//        data = MosaicChartState(days, 7, xLabels, yLabels, colors)
+//    }
+//
+//
+//    data?.let {
+//        MosaicChart(
+//            it,
+//            hoverText = { entry ->
+//                val date = entry.data.format(LocalizationRepository.localDateFormatter)
+//                "$date: ${entry.count}"
+//            },
+//            modifier = Modifier.fillMaxWidth()
+//        )
+//    }
+//}

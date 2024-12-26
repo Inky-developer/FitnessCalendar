@@ -105,6 +105,10 @@
         <item quantity="one">%1d Aktivität aktualisiert</item>
         <item quantity="other">%1d Aktivitäten aktualisiert</item>
     </plurals>
+    <plurals name="tooltip_activities_on_day">
+        <item quantity="one">Am %1$s: %2$s Aktivität</item>
+        <item quantity="other">Am %1$s: %2$s Aktivitäten</item>
+    </plurals>
 
     <string name="days">Tage</string>
     <string name="weeks">Wochen</string>

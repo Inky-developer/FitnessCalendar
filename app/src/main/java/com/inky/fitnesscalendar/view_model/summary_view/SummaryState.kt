@@ -1,6 +1,7 @@
 package com.inky.fitnesscalendar.view_model.summary_view
 
 import android.content.Context
+import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityCategory
@@ -22,6 +23,7 @@ import java.time.LocalDate
 import java.time.format.TextStyle
 import java.util.Locale
 
+@Immutable
 data class SummaryState internal constructor(
     private val statistics: ActivityStatistics,
     val filter: ActivityFilter,
@@ -51,7 +53,7 @@ data class SummaryState internal constructor(
             statistics: ActivityStatistics,
             filter: ActivityFilter,
             dayOfWeekModelProducer: CartesianChartModelProducer,
-            timeOfDayModelProducer: CartesianChartModelProducer
+            timeOfDayModelProducer: CartesianChartModelProducer,
         ): SummaryState {
             val activitiesByCategory = statistics.activitiesByCategory
             val isSingleCategory = activitiesByCategory.size == 1
@@ -137,7 +139,12 @@ data class SummaryState internal constructor(
 
         internal val xToLabelKey = ExtraStore.Key<Map<Int, String>>()
 
-        private val mosaicColors =
-            listOf(R.color.mosaic_0, R.color.mosaic_1, R.color.mosaic_2, R.color.mosaic_3)
+        private val mosaicColors = listOf(
+            R.color.mosaic_0,
+            R.color.mosaic_1,
+            R.color.mosaic_2,
+            R.color.mosaic_3,
+            R.color.mosaic_4
+        )
     }
 }
