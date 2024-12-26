@@ -206,23 +206,6 @@ private fun SummaryViewInner(state: SummaryState, onEditFilter: (ActivityFilter)
 
         item(key = "SummaryBox") { SummaryBox(state.summaryBoxState) }
 
-        item(key = "mosaic") {
-            if (state.filter.range == null) {
-                MosaicChart(
-                    state.mosaicState,
-                    hoverText = { entry ->
-                        val date = entry.data.format(LocalizationRepository.shortLocalDateFormatter)
-                        pluralStringResource(
-                            R.plurals.tooltip_activities_on_day,
-                            entry.count,
-                            date,
-                            entry.count
-                        )
-                    }
-                )
-            }
-        }
-
         item(key = "PlaceBox") { PlaceBox(state.places) }
 
         if (state.feelChartState.dataPoints.size > 1) {
@@ -265,6 +248,24 @@ private fun SummaryViewInner(state: SummaryState, onEditFilter: (ActivityFilter)
                 title = stringResource(R.string.Activities_by_time_of_day),
                 xAxisLabel = stringResource(R.string.Hour)
             )
+        }
+
+        item(key = "mosaic") {
+            if (state.filter.range == null) {
+                MosaicChart(
+                    state.mosaicState,
+                    hoverText = { entry ->
+                        val date = entry.data.format(LocalizationRepository.shortLocalDateFormatter)
+                        pluralStringResource(
+                            R.plurals.tooltip_activities_on_day,
+                            entry.count,
+                            date,
+                            entry.count
+                        )
+                    },
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+            }
         }
     }
 }
