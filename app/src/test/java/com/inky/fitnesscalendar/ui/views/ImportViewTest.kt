@@ -16,7 +16,6 @@ import com.inky.fitnesscalendar.testUtils.mockDatabaseRepository
 import com.inky.fitnesscalendar.ui.ImportView
 import com.inky.fitnesscalendar.ui.util.ProvideDatabaseValues
 import com.inky.fitnesscalendar.view_model.ImportViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.approvaltests.Approvals
@@ -106,11 +105,14 @@ class ImportViewTest {
             }
 
             onNodeWithText("Import").performClick()
+
+            waitUntil(timeoutMillis = 5000) {
+                runBlocking {
+                    databaseRepository.getActivities(ActivityFilter()).first().isNotEmpty()
+                }
+            }
         }
         runBlocking {
-            // Wait so there is time to save
-            delay(1000)
-
             WithTimeZone("UTC").use {
                 Approvals.verifyAll(
                     databaseRepository.getActivities(ActivityFilter()).first().toTypedArray()
