@@ -9,6 +9,7 @@ import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
@@ -341,6 +342,7 @@ private fun AppNavigation(
 }
 
 @OptIn(ExperimentalSharedTransitionApi::class)
+@Immutable
 class SharedTransitionData(
     private val _sharedTransitionScope: SharedTransitionScope?,
     private val _animatedContentScope: AnimatedContentScope?
