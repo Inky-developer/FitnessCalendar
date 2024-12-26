@@ -2,6 +2,7 @@ package com.inky.fitnesscalendar.view_model.summary_view
 
 import android.content.Context
 import androidx.compose.ui.graphics.Color
+import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityCategory
 import com.inky.fitnesscalendar.data.ActivityStatistics
 import com.inky.fitnesscalendar.data.Displayable
@@ -9,12 +10,15 @@ import com.inky.fitnesscalendar.data.Feel
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.Place
+import com.inky.fitnesscalendar.ui.components.MosaicChartState
 import com.inky.fitnesscalendar.ui.components.PieChartEntry
 import com.inky.fitnesscalendar.ui.components.PieChartState
+import com.inky.fitnesscalendar.ui.components.calculateMosaicState
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.data.columnSeries
 import com.patrykandpatrick.vico.core.common.data.ExtraStore
 import java.time.DayOfWeek
+import java.time.LocalDate
 import java.time.format.TextStyle
 import java.util.Locale
 
@@ -24,6 +28,7 @@ data class SummaryState internal constructor(
     val pieChartState: PieChartState<Displayable>,
     val legendItems: List<Displayable>,
     val summaryBoxState: SummaryBoxState,
+    val mosaicState: MosaicChartState<LocalDate>,
     val places: Map<Place?, Int>,
     val feelChartState: PieChartState<Feel>,
     val feelLegendItems: List<Feel>,
@@ -69,6 +74,9 @@ data class SummaryState internal constructor(
             val legendItems = chartStats.toList().sortedBy { (_, v) -> -v.size }.map { (k, _) -> k }
 
             val summaryBoxState = SummaryBoxState(context, statistics)
+
+            val mosaicState =
+                statistics.calculateMosaicState(mosaicColors.map { Color(context.getColor(it)) })
 
             val places = statistics.activitiesByPlace.mapValues { it.value.size }
 
@@ -118,6 +126,7 @@ data class SummaryState internal constructor(
                 pieChartState = pieChartState,
                 legendItems = legendItems,
                 summaryBoxState = summaryBoxState,
+                mosaicState = mosaicState,
                 places = places,
                 feelChartState = feelChartState,
                 feelLegendItems = feelLegendItems,
@@ -127,5 +136,8 @@ data class SummaryState internal constructor(
         }
 
         internal val xToLabelKey = ExtraStore.Key<Map<Int, String>>()
+
+        private val mosaicColors =
+            listOf(R.color.mosaic_0, R.color.mosaic_1, R.color.mosaic_2, R.color.mosaic_3)
     }
 }

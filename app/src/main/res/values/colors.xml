@@ -43,4 +43,9 @@
     <color name="feel_bad">#8E0F0F</color>
 
     <color name="favorite">#AD1457</color>
+
+    <color name="mosaic_0">#AFAFAF</color>
+    <color name="mosaic_1">#AED581</color>
+    <color name="mosaic_2">#7CB342</color>
+    <color name="mosaic_3">#558B2F</color>
 </resources>

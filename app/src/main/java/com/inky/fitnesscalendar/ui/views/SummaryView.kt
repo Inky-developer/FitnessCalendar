@@ -56,7 +56,9 @@ import com.inky.fitnesscalendar.data.ActivityStatistics
 import com.inky.fitnesscalendar.data.Displayable
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.db.entities.Place
+import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.FilterInformation
+import com.inky.fitnesscalendar.ui.components.MosaicChart
 import com.inky.fitnesscalendar.ui.components.NoActivitiesInfoBox
 import com.inky.fitnesscalendar.ui.components.PieChart
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
@@ -199,6 +201,13 @@ private fun SummaryViewInner(state: SummaryState, onEditFilter: (ActivityFilter)
             AnimatedContent(state.legendItems, label = "LegendItems") { legendItems ->
                 Legend(legendItems)
             }
+        }
+
+        item(key = "mosaic") {
+            MosaicChart(
+                state.mosaicState,
+                hoverText = { entry -> entry.data.format(LocalizationRepository.shortLocalDateFormatter) }
+            )
         }
 
         item(key = "SummaryBox") { SummaryBox(state.summaryBoxState) }

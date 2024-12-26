@@ -80,5 +80,9 @@ class LocalizationRepository @Inject constructor(@ApplicationContext private val
         val localDateFormatter: DateTimeFormatter by lazy {
             DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL)
         }
+
+        val shortLocalDateFormatter: DateTimeFormatter by lazy {
+            DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)
+        }
     }
 }
