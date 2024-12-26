@@ -84,7 +84,7 @@ fun ActivityStatistics.calculateMosaicState(colors: List<Color>): MosaicChartSta
 
     var day = firstDay
     var index = 0
-    while (!firstDay.isAfter(lastDay)) {
+    while (!day.isAfter(lastDay)) {
         days.add(MosaicEntry(count = activityData[day]?.size ?: 0, data = day))
         val nextDay = day.plusDays(1)
         if (day.month != nextDay.month) {
