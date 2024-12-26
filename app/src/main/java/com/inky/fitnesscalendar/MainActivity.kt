@@ -28,9 +28,11 @@ class MainActivity : ComponentActivity() {
 
         requestNotificationPermission()
 
-        val toastMsg = intent.getStringExtra(EXTRA_TOAST)
-        if (toastMsg != null) {
-            Toast.makeText(this, toastMsg, Toast.LENGTH_LONG).show()
+        if (savedInstanceState == null) {
+            val toastMsg = intent.getStringExtra(EXTRA_TOAST)
+            if (toastMsg != null) {
+                Toast.makeText(this, toastMsg, Toast.LENGTH_LONG).show()
+            }
         }
 
         setContent {
