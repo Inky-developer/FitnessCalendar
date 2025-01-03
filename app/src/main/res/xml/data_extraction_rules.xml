@@ -4,7 +4,7 @@
    for details.
 -->
 <data-extraction-rules>
-    <cloud-backup>
+    <cloud-backup disableIfNoEncryptionCapabilities="true">
         <!-- TODO: Use <include> and <exclude> to control what is backed up.
         <include .../>
         <exclude .../>

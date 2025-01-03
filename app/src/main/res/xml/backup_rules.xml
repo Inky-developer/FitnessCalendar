@@ -10,4 +10,8 @@
    <include domain="sharedpref" path="."/>
    <exclude domain="sharedpref" path="device.xml"/>
 -->
+    <include
+        domain="file"
+        path="."
+        requireFlags="clientSideEncryption" />
 </full-backup-content>
