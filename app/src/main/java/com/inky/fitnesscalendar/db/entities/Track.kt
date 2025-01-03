@@ -15,6 +15,7 @@ import com.inky.fitnesscalendar.data.measure.Elevation
 import com.inky.fitnesscalendar.data.measure.HeartFrequency
 import com.inky.fitnesscalendar.data.measure.Speed
 import com.inky.fitnesscalendar.data.measure.Temperature
+import com.inky.fitnesscalendar.data.measure.kmh
 import com.inky.fitnesscalendar.repository.ImportRepository.ImportError
 import com.inky.fitnesscalendar.util.result.TypedResult
 import com.inky.fitnesscalendar.util.result.tryScope
@@ -82,9 +83,16 @@ data class Track(
 
         val totalDistance =
             Distance(meters = trackPointComputedData.sumOf { it.distanceMeters }.roundToLong())
+
+        val avgSpeed = Speed(metersPerSecond = totalDistance.meters / duration.elapsedSeconds)
+        val movingThreshold = if (avgSpeed > 3.kmh()) {
+            3.0.kmh()
+        } else {
+            0.5.kmh()
+        }
         val movingDuration = Duration(
             elapsedMs = trackPointComputedData
-                .filter { it.speed.kmh > 3 }
+                .filter { it.speed > movingThreshold }
                 .sumOf { it.duration.elapsedMs }
         )
 

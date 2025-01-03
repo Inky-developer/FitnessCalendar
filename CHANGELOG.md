@@ -5,6 +5,7 @@
 - Fix y-range for elevation graphs
 - Display total ascent and total descent
 - Add average heart rate, total heart rate, average ascent and total ascent to statistics
+- Fix average moving speed for slow activities
 
 # 2024.12.1
 
