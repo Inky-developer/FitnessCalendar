@@ -1,5 +1,8 @@
 # Unreleased
 
+
+# 2025.01.1
+
 - Add a summary view for a detailed summary of the current filter
 - The app will now automatically import tracks from configurable folders
 - Fix y-range for elevation graphs
