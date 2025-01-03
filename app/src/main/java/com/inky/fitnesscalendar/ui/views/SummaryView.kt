@@ -189,6 +189,7 @@ fun SummaryView(
 @Composable
 private fun SummaryViewInner(state: SummaryState, onEditFilter: (ActivityFilter) -> Unit) {
     LazyColumn(
+        horizontalAlignment = Alignment.CenterHorizontally,
         contentPadding = PaddingValues(bottom = 128.dp),
         modifier = Modifier
             .fillMaxWidth()
