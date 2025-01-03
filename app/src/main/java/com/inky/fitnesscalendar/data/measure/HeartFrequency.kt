@@ -8,8 +8,12 @@ import kotlin.math.roundToInt
 
 @Serializable
 @JvmInline
-value class HeartFrequency(val bpm: Float) : Comparable<HeartFrequency>, ContextFormat {
+value class HeartFrequency internal constructor(val bpm: Float) : Comparable<HeartFrequency>,
+    ContextFormat {
     override fun compareTo(other: HeartFrequency) = this.bpm.compareTo(other.bpm)
 
-    override fun formatWithContext(context: Context) = context.getString(R.string.x_bpm, bpm.roundToInt())
+    override fun formatWithContext(context: Context) =
+        context.getString(R.string.x_bpm, bpm.roundToInt())
 }
+
+fun Float.bpm() = HeartFrequency(bpm = this)

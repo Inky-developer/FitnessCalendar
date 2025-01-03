@@ -63,8 +63,6 @@ import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityStatistics
 import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.data.Feel
-import com.inky.fitnesscalendar.data.measure.Duration
-import com.inky.fitnesscalendar.data.measure.Duration.Companion.until
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.db.entities.Recording
@@ -306,9 +304,7 @@ fun Statistics(name: String, stats: ActivityStatistics, onClick: () -> Unit) {
                 }
 
                 val durationString = remember(categoryStats) {
-                    Duration(categoryStats.activities.map { it.activity.startTime until it.activity.endTime }
-                        .sumOf { it.elapsedMs }).format()
-
+                    categoryStats.totalTime().format()
                 }
 
                 Row(

@@ -10,9 +10,7 @@ import kotlin.math.roundToLong
 
 @Parcelize
 @JvmInline
-value class Distance(val meters: Long) : Parcelable, ContextFormat {
-    constructor(kilometers: Double) : this(meters = (kilometers * 1000).roundToLong())
-
+value class Distance internal constructor(val meters: Long) : Parcelable, ContextFormat {
     override fun formatWithContext(context: Context) = if (kilometers >= 1) {
         context.getString(R.string.x_km, "%.1f".format(kilometers))
     } else {
@@ -22,3 +20,10 @@ value class Distance(val meters: Long) : Parcelable, ContextFormat {
     val kilometers
         get() = meters / 1000.0
 }
+
+fun Long.meters() = Distance(meters = this)
+fun Double.meters() = roundToLong().meters()
+
+fun Long.kilometers() = Distance(meters = this * 1000)
+fun Int.kilometers() = toLong().kilometers()
+fun Double.kilometers() = roundToLong().kilometers()

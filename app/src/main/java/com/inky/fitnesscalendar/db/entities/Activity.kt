@@ -17,6 +17,7 @@ import com.inky.fitnesscalendar.data.measure.Duration.Companion.until
 import com.inky.fitnesscalendar.data.measure.HeartFrequency
 import com.inky.fitnesscalendar.data.measure.Speed
 import com.inky.fitnesscalendar.data.measure.Temperature
+import com.inky.fitnesscalendar.data.measure.metersPerSecond
 import com.inky.fitnesscalendar.util.toLocalDate
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -84,7 +85,7 @@ data class Activity(
                 return null
             }
 
-            return Speed(metersPerSecond = distance.meters / duration.elapsedSeconds)
+            return (distance.meters / duration.elapsedSeconds).metersPerSecond()
         }
 
     val averageMovingSpeed: Speed?
@@ -93,7 +94,7 @@ data class Activity(
                 return averageSpeed
             }
 
-            return Speed(metersPerSecond = distance.meters / movingDuration.elapsedSeconds)
+            return (distance.meters / movingDuration.elapsedSeconds).metersPerSecond()
         }
 
     @JvmInline

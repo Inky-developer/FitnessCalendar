@@ -13,3 +13,5 @@ value class Temperature(val celsius: Float) : Comparable<Temperature>, ContextFo
     override fun formatWithContext(context: Context) =
         context.getString(R.string.x_degrees_celsius, "%.1f".format(celsius))
 }
+
+fun Float.celsius() = Temperature(celsius = this)

@@ -12,15 +12,16 @@ import com.inky.fitnesscalendar.data.measure.Distance
 import com.inky.fitnesscalendar.data.measure.Duration
 import com.inky.fitnesscalendar.data.measure.Duration.Companion.until
 import com.inky.fitnesscalendar.data.measure.Elevation
-import com.inky.fitnesscalendar.data.measure.HeartFrequency
-import com.inky.fitnesscalendar.data.measure.Speed
-import com.inky.fitnesscalendar.data.measure.Temperature
+import com.inky.fitnesscalendar.data.measure.bpm
+import com.inky.fitnesscalendar.data.measure.celsius
 import com.inky.fitnesscalendar.data.measure.kmh
+import com.inky.fitnesscalendar.data.measure.meters
+import com.inky.fitnesscalendar.data.measure.metersPerSecond
+import com.inky.fitnesscalendar.data.measure.ms
 import com.inky.fitnesscalendar.repository.ImportRepository.ImportError
 import com.inky.fitnesscalendar.util.result.TypedResult
 import com.inky.fitnesscalendar.util.result.tryScope
 import kotlin.math.pow
-import kotlin.math.roundToLong
 import kotlin.math.sqrt
 
 private const val TAG = "Track"
@@ -81,29 +82,26 @@ data class Track(
 
         val trackPointComputedData = computedPoints()
 
-        val totalDistance =
-            Distance(meters = trackPointComputedData.sumOf { it.distanceMeters }.roundToLong())
+        val totalDistance = trackPointComputedData.sumOf { it.distanceMeters }.meters()
 
-        val avgSpeed = Speed(metersPerSecond = totalDistance.meters / duration.elapsedSeconds)
+        val avgSpeed = (totalDistance.meters / duration.elapsedSeconds).metersPerSecond()
         val movingThreshold = if (avgSpeed > 3.kmh()) {
             3.0.kmh()
         } else {
             0.5.kmh()
         }
-        val movingDuration = Duration(
-            elapsedMs = trackPointComputedData
-                .filter { it.speed > movingThreshold }
-                .sumOf { it.duration.elapsedMs }
-        )
+        val movingDuration = trackPointComputedData
+            .filter { it.speed > movingThreshold }
+            .sumOf { it.duration.elapsedMs }
+            .ms()
 
-        val maxSpeed = trackPointComputedData.maxByOrNull { it.speed.metersPerSecond }?.speed
-            ?: Speed(metersPerSecond = 0.0)
+        val maxSpeed = trackPointComputedData.maxByOrNull { it.speed }?.speed ?: 0.metersPerSecond()
 
         val averageHeartRate = points.mapNotNull { it.heartFrequency?.bpm }.let {
             if (it.isEmpty()) {
                 null
             } else {
-                HeartFrequency(bpm = it.sum() / it.size)
+                (it.sum() / it.size).bpm()
             }
         }
         val maxHeartRate = points.mapNotNull { it.heartFrequency }.maxByOrNull { it }
@@ -114,7 +112,7 @@ data class Track(
                 if (it.isEmpty()) {
                     null
                 } else {
-                    Temperature(celsius = it.sum() / it.size)
+                    (it.sum() / it.size).celsius()
                 }
             }
         val minTemperature = points.mapNotNull { it.temperature }.minByOrNull { it }
@@ -139,8 +137,8 @@ data class Track(
                     ascent += currEle.meters - prevEle.meters
                 }
             }
-            totalAscent = Distance(meters = ascent.roundToLong())
-            totalDescent = Distance(meters = descent.roundToLong())
+            totalAscent = ascent.meters()
+            totalDescent = descent.meters()
         }
 
         GpxTrackStats(
@@ -170,9 +168,9 @@ data class Track(
     ) {
         val speed
             get() = if (duration.elapsedMs > 0)
-                Speed(metersPerSecond = distanceMeters / duration.elapsedSeconds)
+                (distanceMeters / duration.elapsedSeconds).metersPerSecond()
             else
-                Speed(metersPerSecond = 0.0)
+                0.0.metersPerSecond()
     }
 
     companion object {
@@ -185,8 +183,8 @@ data class Track(
             var cumDistanceMeters = 0.0
             val firstComputedTrackPoint = ComputedTrackPoint(
                 distanceMeters = 0.0,
-                cumDistance = Distance(meters = cumDistanceMeters.roundToLong()),
-                duration = Duration(elapsedMs = 0L),
+                cumDistance = cumDistanceMeters.meters(),
+                duration = 0.ms(),
                 point = points[0]
             )
 
@@ -200,7 +198,7 @@ data class Track(
                     val duration = a.time.until(b.time)
                     ComputedTrackPoint(
                         distanceMeters = distance,
-                        cumDistance = Distance(meters = cumDistanceMeters.roundToLong()),
+                        cumDistance = cumDistanceMeters.meters(),
                         duration = duration,
                         point = b,
                     )

@@ -8,6 +8,8 @@ import com.inky.fitnesscalendar.data.gpx.GpxTrackPoint
 import com.inky.fitnesscalendar.data.measure.Elevation
 import com.inky.fitnesscalendar.data.measure.HeartFrequency
 import com.inky.fitnesscalendar.data.measure.Temperature
+import com.inky.fitnesscalendar.data.measure.bpm
+import com.inky.fitnesscalendar.data.measure.celsius
 import org.xmlpull.v1.XmlPullParser
 import org.xmlpull.v1.XmlPullParserException
 import java.io.InputStream
@@ -176,18 +178,14 @@ class GpxReader(val tracks: List<GpxTrack>) {
                 when (it.name) {
                     EXTENSION_GARMIN_TEMPERATURE -> {
                         val temperatureString = readText(parser, EXTENSION_GARMIN_TEMPERATURE)
-                        attributes.temperature = Temperature(
-                            celsius = temperatureString.toFloatOrNull()
-                                ?: throw XmlPullParserException("Invalid temperature: $temperatureString")
-                        )
+                        attributes.temperature = temperatureString.toFloatOrNull()?.celsius()
+                            ?: throw XmlPullParserException("Invalid temperature: $temperatureString")
                     }
 
                     EXTENSION_GARMIN_HEART_RATE -> {
                         val heartRateString = readText(parser, EXTENSION_GARMIN_HEART_RATE)
-                        attributes.heartRate = HeartFrequency(
-                            bpm = heartRateString.toFloatOrNull()
-                                ?: throw XmlPullParserException("Invalid heart rate: $heartRateString")
-                        )
+                        attributes.heartRate = heartRateString.toFloatOrNull()?.bpm()
+                            ?: throw XmlPullParserException("Invalid heart rate: $heartRateString")
                     }
 
                     else -> skipTag(it)

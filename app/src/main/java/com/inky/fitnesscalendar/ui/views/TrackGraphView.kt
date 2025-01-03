@@ -36,8 +36,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.gpx.Coordinate
 import com.inky.fitnesscalendar.data.gpx.GpxTrackPoint
-import com.inky.fitnesscalendar.data.measure.Distance
 import com.inky.fitnesscalendar.data.measure.Elevation
+import com.inky.fitnesscalendar.data.measure.kilometers
+import com.inky.fitnesscalendar.data.measure.meters
 import com.inky.fitnesscalendar.db.entities.Track
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
@@ -81,7 +82,6 @@ import kotlin.math.floor
 import kotlin.math.log10
 import kotlin.math.pow
 import kotlin.math.roundToInt
-import kotlin.math.roundToLong
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -162,7 +162,7 @@ fun TrackGraph(track: Track, projection: TrackGraphProjection, modifier: Modifie
                 titleComponent = legendComponent(),
                 itemPlacer = HorizontalAxis.ItemPlacer.aligned(
                     addExtremeLabelPadding = true,
-                    spacing = Distance(kilometers = 1.0).meters.toInt()
+                    spacing = 1.kilometers().meters.toInt()
                 ),
                 valueFormatter = rememberKmValueFormatter()
             ),
@@ -205,7 +205,7 @@ private fun rememberKmValueFormatter(): CartesianValueFormatter {
     val unit = stringResource(R.string.unit_km)
     val format = DecimalFormat("#.#$unit;-#.#$unit")
     return CartesianValueFormatter { _, distanceMeters, _ ->
-        val kilometers = Distance(meters = distanceMeters.roundToLong()).kilometers
+        val kilometers = distanceMeters.meters().kilometers
         format.format(kilometers)
     }
 }

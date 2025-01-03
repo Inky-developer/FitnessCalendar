@@ -8,7 +8,8 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 @JvmInline
-value class Speed(val metersPerSecond: Double) : Parcelable, ContextFormat, Comparable<Speed> {
+value class Speed internal constructor(val metersPerSecond: Double) : Parcelable, ContextFormat,
+    Comparable<Speed> {
     val kmh get() = metersPerSecond * 3.6
 
     override fun formatWithContext(context: Context) =
@@ -17,8 +18,11 @@ value class Speed(val metersPerSecond: Double) : Parcelable, ContextFormat, Comp
     override fun compareTo(other: Speed) = this.metersPerSecond.compareTo(other.metersPerSecond)
 
     operator fun minus(other: Speed) =
-        Speed(metersPerSecond = this.metersPerSecond - other.metersPerSecond)
+        (this.metersPerSecond - other.metersPerSecond).metersPerSecond()
 }
 
+fun Double.metersPerSecond() = Speed(metersPerSecond = this)
+fun Int.metersPerSecond() = toDouble().metersPerSecond()
+
 fun Double.kmh() = Speed(metersPerSecond = this / 3.6)
-fun Int.kmh() = this.toDouble().kmh()
+fun Int.kmh() = toDouble().kmh()

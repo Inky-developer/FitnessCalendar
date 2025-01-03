@@ -7,6 +7,8 @@ import com.inky.fitnesscalendar.data.Intensity
 import com.inky.fitnesscalendar.data.gpx.GpxTrackPoint
 import com.inky.fitnesscalendar.data.measure.Distance
 import com.inky.fitnesscalendar.data.measure.Duration
+import com.inky.fitnesscalendar.data.measure.meters
+import com.inky.fitnesscalendar.data.measure.ms
 import com.inky.fitnesscalendar.db.entities.Activity
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
@@ -40,7 +42,7 @@ class Converters {
 
     @TypeConverter
     fun longToDistance(value: Long): Distance {
-        return Distance(meters = value)
+        return value.meters()
     }
 
     @TypeConverter
@@ -85,5 +87,5 @@ class Converters {
     fun durationToLong(duration: Duration) = duration.elapsedMs
 
     @TypeConverter
-    fun longToDuration(value: Long) = Duration(elapsedMs = value)
+    fun longToDuration(value: Long) = value.ms()
 }

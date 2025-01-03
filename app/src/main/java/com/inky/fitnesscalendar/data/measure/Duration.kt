@@ -38,11 +38,14 @@ value class Duration(val elapsedMs: Long) : ContextFormat {
 
     companion object {
         infix fun Date.until(end: Date): Duration {
-            return Duration(end.time - this.time)
+            return (end.time - this.time).ms()
         }
     }
 }
 
 fun kotlin.time.Duration.format(): String {
-    return Duration(inWholeMilliseconds).format()
+    return inWholeMilliseconds.ms().format()
 }
+
+fun Long.ms() = Duration(elapsedMs = this)
+fun Int.ms() = toLong().ms()

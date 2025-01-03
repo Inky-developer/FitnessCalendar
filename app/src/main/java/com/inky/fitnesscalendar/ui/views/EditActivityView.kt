@@ -68,7 +68,7 @@ import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.data.Feel
 import com.inky.fitnesscalendar.data.ImageName
 import com.inky.fitnesscalendar.data.Intensity
-import com.inky.fitnesscalendar.data.measure.Distance
+import com.inky.fitnesscalendar.data.measure.kilometers
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.di.DecisionTrees
@@ -468,7 +468,7 @@ private fun DateTimeInput(
 private fun kilometerStringToDistance(string: String) = if (string.isBlank()) {
     null
 } else {
-    string.replace(",", ".").toDoubleOrNull()?.let { Distance(kilometers = it) }
+    string.replace(",", ".").toDoubleOrNull()?.kilometers()
 }
 
 @Stable

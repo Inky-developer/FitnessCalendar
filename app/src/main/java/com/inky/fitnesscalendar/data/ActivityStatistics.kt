@@ -5,6 +5,11 @@ import com.inky.fitnesscalendar.data.measure.Duration
 import com.inky.fitnesscalendar.data.measure.HeartFrequency
 import com.inky.fitnesscalendar.data.measure.Speed
 import com.inky.fitnesscalendar.data.measure.Temperature
+import com.inky.fitnesscalendar.data.measure.bpm
+import com.inky.fitnesscalendar.data.measure.celsius
+import com.inky.fitnesscalendar.data.measure.meters
+import com.inky.fitnesscalendar.data.measure.metersPerSecond
+import com.inky.fitnesscalendar.data.measure.ms
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.Place
 import com.inky.fitnesscalendar.db.entities.RichActivity
@@ -17,7 +22,6 @@ import java.time.ZoneId
 import java.time.temporal.WeekFields
 import java.util.Date
 import java.util.Locale
-import kotlin.math.roundToLong
 
 @JvmInline
 value class ActivityStatistics(
@@ -26,22 +30,22 @@ value class ActivityStatistics(
     val size
         get() = activities.size
 
-    fun totalTime() = Duration(activities.sumOf { it.activity.duration.elapsedMs })
+    fun totalTime() = activities.sumOf { it.activity.duration.elapsedMs }.ms()
 
     fun averageTime(): Duration? {
         val totalMs = totalTime().elapsedMs
         if (totalMs == 0L) return null
-        return Duration(totalTime().elapsedMs / size)
+        return (totalTime().elapsedMs / size).ms()
     }
 
-    fun totalDistance() = Distance(meters = activities.sumOf { it.activity.distance?.meters ?: 0 })
+    fun totalDistance() = activities.sumOf { it.activity.distance?.meters ?: 0 }.meters()
 
     fun averageDistance(): Distance? {
         val distances = activities.mapNotNull { it.activity.distance?.meters }
         if (distances.isEmpty()) {
             return null
         }
-        return Distance(meters = (distances.sum().toDouble() / distances.size).roundToLong())
+        return (distances.sum().toDouble() / distances.size).meters()
     }
 
     fun averageMovingSpeed(): Speed? {
@@ -49,7 +53,7 @@ value class ActivityStatistics(
         if (speeds.isEmpty()) {
             return null
         }
-        return Speed(metersPerSecond = speeds.sum() / speeds.size)
+        return (speeds.sum() / speeds.size).metersPerSecond()
     }
 
     fun averageSpeed(): Speed? {
@@ -57,7 +61,7 @@ value class ActivityStatistics(
         if (speeds.isEmpty()) {
             return null
         }
-        return Speed(metersPerSecond = speeds.sum() / speeds.size)
+        return (speeds.sum() / speeds.size).metersPerSecond()
     }
 
     fun averageHeartRate(): HeartFrequency? {
@@ -65,7 +69,7 @@ value class ActivityStatistics(
         if (heartRates.isEmpty()) {
             return null
         }
-        return HeartFrequency(bpm = heartRates.sum() / heartRates.size)
+        return (heartRates.sum() / heartRates.size).bpm()
     }
 
     fun maximalHeartRate(): HeartFrequency? =
@@ -76,7 +80,7 @@ value class ActivityStatistics(
         if (ascents.isEmpty()) {
             return null
         }
-        return Distance(meters = ascents.sum() / ascents.size)
+        return (ascents.sum() / ascents.size).meters()
     }
 
     fun averageDescent(): Distance? {
@@ -84,21 +88,20 @@ value class ActivityStatistics(
         if (descents.isEmpty()) {
             return null
         }
-        return Distance(meters = descents.sum() / descents.size)
+        return (descents.sum() / descents.size).meters()
     }
 
-    fun totalAscent(): Distance =
-        Distance(meters = activities.sumOf { it.activity.totalAscent?.meters ?: 0 })
+    fun totalAscent(): Distance = activities.sumOf { it.activity.totalAscent?.meters ?: 0 }.meters()
 
     fun totalDescent(): Distance =
-        Distance(meters = activities.sumOf { it.activity.totalDescent?.meters ?: 0 })
+        activities.sumOf { it.activity.totalDescent?.meters ?: 0 }.meters()
 
     fun averageTemperature(): Temperature? {
         val temperatures = activities.mapNotNull { it.activity.temperature?.celsius }
         if (temperatures.isEmpty()) {
             return null
         }
-        return Temperature(celsius = temperatures.sum() / temperatures.size)
+        return (temperatures.sum() / temperatures.size).celsius()
     }
 
     fun averageIntensity(): Double? {
