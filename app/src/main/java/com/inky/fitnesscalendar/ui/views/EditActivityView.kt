@@ -492,8 +492,16 @@ private data class ActivityEditState(
     ) : this(
         activitySelectorState = ActivitySelectorState(
             activityType = activity?.type ?: prediction.activityType,
-            vehicle = activity?.activity?.vehicle ?: prediction.vehicle,
-            place = activity?.place ?: prediction.place
+            vehicle = if (activity != null) {
+                activity.activity.vehicle
+            } else {
+                prediction.vehicle
+            },
+            place = if (activity != null) {
+                activity.place
+            } else {
+                prediction.place
+            }
         ),
         startDateTime = activity?.activity?.startTime?.toLocalDateTime() ?: now,
         endDateTime = activity?.activity?.endTime?.toLocalDateTime() ?: now.plusHours(1),
