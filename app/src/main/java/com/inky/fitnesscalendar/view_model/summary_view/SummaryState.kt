@@ -24,7 +24,7 @@ import java.time.format.TextStyle
 import java.util.Locale
 
 @Immutable
-data class SummaryState internal constructor(
+data class SummaryState(
     private val statistics: ActivityStatistics,
     val filter: ActivityFilter,
     val pieChartState: PieChartState<Displayable>,
