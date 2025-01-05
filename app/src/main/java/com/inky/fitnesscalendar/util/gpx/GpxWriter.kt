@@ -30,6 +30,7 @@ class GpxWriter {
 }
 
 private fun TagScope.writeTrack(activity: RichActivity, track: Track) {
+    tag("name") { text(activity.type.name) }
     tag("desc") { text(activity.activity.description) }
     tag("type") { text(activity.type.name) }
     tag("trkseg") {

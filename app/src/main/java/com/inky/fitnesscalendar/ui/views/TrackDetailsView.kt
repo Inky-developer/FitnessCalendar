@@ -63,7 +63,6 @@ import com.inky.fitnesscalendar.util.toLocalDate
 import com.inky.fitnesscalendar.view_model.BaseViewModel
 import java.io.File
 import java.io.FileWriter
-import java.util.UUID
 
 @Composable
 fun TrackDetailsView(
@@ -375,7 +374,8 @@ data class DetailsState(
 
 private fun Context.shareTrack(richActivity: RichActivity, track: Track) {
     val cache = getOrCreateSharedTracksCache()
-    val file = File(cache, UUID.randomUUID().toString())
+    val file = File(cache, getSharedTrackTitle(richActivity))
+    file.delete()
     file.deleteOnExit()
     FileWriter(file).use { writer ->
         GpxWriter.write(richActivity, track, this, writer)
@@ -390,4 +390,11 @@ private fun Context.shareTrack(richActivity: RichActivity, track: Track) {
         flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
     }
     startActivity(Intent.createChooser(intent, getString(R.string.share_gpx)))
+}
+
+private fun getSharedTrackTitle(richActivity: RichActivity): String {
+    val time =
+        LocalizationRepository.localDateFormatter.format(richActivity.activity.startTime.toLocalDate())
+    val name = richActivity.type.name
+    return "$name $time.gpx"
 }
