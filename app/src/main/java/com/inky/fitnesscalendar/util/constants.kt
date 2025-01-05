@@ -16,6 +16,7 @@ const val EXTRA_RECORDING_ID = "recording_id"
 
 const val IMAGES_DIR = "activity_images"
 const val SHARED_MEDIA_DIR = "shared_media_cache"
+const val SHARED_TRACKS_DIR = "shared_tracks_cache"
 
 // Support for VACUUM INTO was added at sqlite 3.28,
 // which is supported at android sdk version 30 (Android 11) and higher

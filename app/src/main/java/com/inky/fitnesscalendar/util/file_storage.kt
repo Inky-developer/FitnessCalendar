@@ -63,6 +63,12 @@ fun Context.getOrCreateSharedMediaCache(): File {
     return dir
 }
 
+fun Context.getOrCreateSharedTracksCache(): File {
+    val dir = File(cacheDir, SHARED_TRACKS_DIR)
+    dir.mkdir()
+    return dir
+}
+
 fun Context.cleanImageStorage(liveUris: Set<Uri>) {
     val deadFiles = getOrCreateImagesDir().listFiles { file ->
         !liveUris.contains(file.toUri()) && System.currentTimeMillis() - file.lastModified() > ChronoUnit.DAYS.duration.toMillis()

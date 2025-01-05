@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <paths>
     <cache-path name="shared_media_cache" path="shared_media_cache/" />
+    <cache-path name="shared_tracks_cache" path="shared_tracks_cache/" />
 </paths>

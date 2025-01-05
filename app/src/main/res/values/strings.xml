@@ -328,4 +328,5 @@
     <string name="Weekday">Weekday</string>
     <string name="Activities_by_time_of_day">Activities by time of day</string>
     <string name="Hour">Hour</string>
+    <string name="share_gpx">Share GPX</string>
 </resources>
