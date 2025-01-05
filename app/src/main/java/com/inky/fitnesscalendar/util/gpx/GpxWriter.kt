@@ -19,6 +19,10 @@ class GpxWriter {
                     attribute("creator", context.getString(R.string.app_name))
                     attribute("version", "1.1")
                     attribute("xmlns", "http://www.topografix.com/GPX/1/1")
+                    attribute(
+                        "xmlns:$TRACK_POINT_EXTENSION_NAMESPACE",
+                        "http://www.garmin.com/xmlschemas/TrackPointExtension/v1"
+                    )
 
                     tag("trk") {
                         writeTrack(activity, track)
@@ -28,6 +32,8 @@ class GpxWriter {
         }
     }
 }
+
+private const val TRACK_POINT_EXTENSION_NAMESPACE = "gpxtpx"
 
 private fun TagScope.writeTrack(activity: RichActivity, track: Track) {
     tag("name") { text(activity.type.name) }
@@ -50,7 +56,18 @@ private fun TagScope.writeTrack(activity: RichActivity, track: Track) {
                     tag("ele") { text(point.elevation.meters.toString()) }
                 }
 
-                // TODO: Include other attributes like temperature and heart rate
+                val extensionAttributes = mapOf(
+                    "atemp" to point.temperature?.celsius?.toString(),
+                    "hr" to point.heartFrequency?.bpm?.toString()
+                )
+                if (extensionAttributes.filterValues { it != null }.isNotEmpty()) {
+                    tag("$TRACK_POINT_EXTENSION_NAMESPACE:TrackPointExtension") {
+                        for ((name, value) in extensionAttributes) {
+                            if (value == null) continue
+                            tag("$TRACK_POINT_EXTENSION_NAMESPACE:$name") { text(value) }
+                        }
+                    }
+                }
             }
         }
     }
