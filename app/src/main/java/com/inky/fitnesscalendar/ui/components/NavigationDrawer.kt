@@ -43,13 +43,14 @@ val selectableViews = listOf(
 @Composable
 fun NavigationDrawer(
     drawerState: DrawerState,
+    enabled: Boolean,
     currentView: Views?,
     onNavigate: (Views) -> Unit,
     content: @Composable () -> Unit
 ) {
-
     ModalNavigationDrawer(
         drawerState = drawerState,
+        gesturesEnabled = enabled,
         drawerContent = {
             ModalDrawerSheet(drawerContainerColor = MaterialTheme.colorScheme.primaryContainer) {
                 val scrollState = rememberScrollState()

@@ -21,8 +21,10 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -126,6 +128,8 @@ fun SettingsView(
                     title = stringResource(R.string.debug),
                     onClick = onNavigateDebug,
                 )
+
+                PreferenceInput(Preference.PREF_JAWG_API_KEY)
             }
         }
     }
@@ -230,6 +234,38 @@ private fun <T> PreferenceToggle(
             checked = checked,
             onCheckedChange = onCheckedChange,
             modifier = Modifier.padding(start = 8.dp)
+        )
+    }
+}
+
+@Composable
+private fun PreferenceInput(preference: Preference<String, *>) {
+    val context = LocalContext.current
+    val title = remember(preference) { preference.titleId?.let { context.getString(it) } }
+    val description =
+        remember(preference) { preference.descriptionId?.let { context.getString(it) } }
+
+    var initialText by remember { mutableStateOf("") }
+    LaunchedEffect(preference) {
+        initialText = preference.get(context)
+    }
+
+    var text by rememberSaveable(initialText) { mutableStateOf(initialText) }
+    LaunchedEffect(text) {
+        preference.set(context, text)
+    }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+    ) {
+        Text(title ?: "", style = MaterialTheme.typography.titleMedium, maxLines = 1)
+        TextField(
+            text,
+            onValueChange = { text = it },
+            placeholder = { Text(description ?: "") },
+            modifier = Modifier.fillMaxWidth()
         )
     }
 }

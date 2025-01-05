@@ -327,4 +327,6 @@
     <string name="Weekday">Wochentag</string>
     <string name="Activities_by_time_of_day">Uhrzeiten von Aktivitäten</string>
     <string name="Hour">Stunde</string>
+    <string name="jawg_maps_api_key">Jawg API-Schlüssel</string>
+    <string name="the_api_key_for_the_jawg_maps_service">Der API-Schlüssel für Jawg Karten</string>
 </resources>

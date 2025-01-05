@@ -9,6 +9,7 @@ import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -52,6 +53,7 @@ fun App(viewModel: BaseViewModel = hiltViewModel()) {
     val scope = rememberCoroutineScope()
 
     val navigationDrawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
+    var navigationDrawerEnabled by rememberSaveable { mutableStateOf(true) }
     val openDrawer = {
         scope.launch {
             if (navigationDrawerState.isClosed) {
@@ -67,6 +69,7 @@ fun App(viewModel: BaseViewModel = hiltViewModel()) {
     ProvideDatabaseValues(repository = viewModel.repository) {
         NavigationDrawer(
             drawerState = navigationDrawerState,
+            enabled = navigationDrawerEnabled,
             currentView = currentView,
             onNavigate = {
                 navController.navigate(it) {
@@ -82,6 +85,7 @@ fun App(viewModel: BaseViewModel = hiltViewModel()) {
             AppNavigation(
                 navController = navController,
                 openDrawer = openDrawer,
+                setDrawerEnabled = { navigationDrawerEnabled = it },
                 onCurrentView = { currentView = it }
             )
         }
@@ -94,6 +98,7 @@ private fun AppNavigation(
     viewModel: AppViewModel = hiltViewModel(),
     navController: NavHostController,
     openDrawer: () -> Unit,
+    setDrawerEnabled: (Boolean) -> Unit,
     onCurrentView: (Views) -> Unit,
 ) {
     var filterState by rememberSaveable { mutableStateOf(ActivityFilter()) }
@@ -272,11 +277,16 @@ private fun AppNavigation(
                 val route: Views.Map = backStackEntry.toRoute()
                 onCurrentView(route)
 
+                DisposableEffect(Unit) {
+                    setDrawerEnabled(false)
+
+                    onDispose {
+                        setDrawerEnabled(true)
+                    }
+                }
+
                 ProvideSharedContent(sharedContentScope = this@SharedTransitionLayout) {
-                    MapView(
-                        activityId = route.activityId,
-                        onBack = { navController.popBackStack() }
-                    )
+                    MapView(activityId = route.activityId)
                 }
             }
 

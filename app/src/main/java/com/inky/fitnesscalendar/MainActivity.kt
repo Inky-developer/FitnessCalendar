@@ -14,6 +14,7 @@ import com.inky.fitnesscalendar.ui.App
 import com.inky.fitnesscalendar.ui.components.AppFrame
 import com.inky.fitnesscalendar.util.EXTRA_TOAST
 import dagger.hilt.android.AndroidEntryPoint
+import org.maplibre.android.MapLibre
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -34,6 +35,8 @@ class MainActivity : ComponentActivity() {
                 Toast.makeText(this, toastMsg, Toast.LENGTH_LONG).show()
             }
         }
+
+        MapLibre.getInstance(this)
 
         setContent {
             AppFrame {

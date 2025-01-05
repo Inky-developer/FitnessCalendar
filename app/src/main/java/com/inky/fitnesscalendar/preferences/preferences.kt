@@ -148,5 +148,10 @@ sealed class Preference<T, P>(
 
         val PREF_WATCHED_FOLDERS = UriSetPreference("PREF_WATCHED_FOLDERS")
         val PREF_WATCHED_FOLDERS_LAST_IMPORT = DatePreference("PREF_WATCHED_FOLDERS_LAST_IMPORT")
+
+        val PREF_JAWG_API_KEY = PrimitivePreference.create("PREF_JAWG_API_KEY", "").apply {
+            titleId = R.string.jawg_maps_api_key
+            descriptionId = R.string.the_api_key_for_the_jawg_maps_service
+        }
     }
 }
