@@ -205,7 +205,7 @@ class StatisticsViewModel @Inject constructor(
         val periodKey = ExtraStore.Key<Int>()
         val groupingKey = ExtraStore.Key<FilteredGrouping>()
 
-        val autoScrollCondition = AutoScrollCondition { newModel, oldModel ->
+        val autoScrollCondition = AutoScrollCondition { oldModel, newModel ->
             if (oldModel == null) {
                 return@AutoScrollCondition true
             }

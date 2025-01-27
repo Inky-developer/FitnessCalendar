@@ -54,6 +54,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
+import androidx.core.graphics.toColor
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityCategory
@@ -65,6 +66,7 @@ import com.inky.fitnesscalendar.preferences.Preference
 import com.inky.fitnesscalendar.ui.components.CompactActivityCard
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
+import com.inky.fitnesscalendar.ui.util.defaultAreaFill
 import com.inky.fitnesscalendar.ui.util.localDatabaseValues
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.view_model.StatisticsViewModel
@@ -83,7 +85,8 @@ import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoZoomState
 import com.patrykandpatrick.vico.compose.common.component.rememberShapeComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
-import com.patrykandpatrick.vico.compose.common.dimensions
+import com.patrykandpatrick.vico.compose.common.fill
+import com.patrykandpatrick.vico.compose.common.insets
 import com.patrykandpatrick.vico.core.cartesian.Scroll
 import com.patrykandpatrick.vico.core.cartesian.Zoom
 import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
@@ -374,8 +377,11 @@ private fun Graph(
     val context = LocalContext.current
     val lines = remember(groupingOptions) {
         groupingOptions.map { group ->
+            val color = group.getColor(context)
             LineCartesianLayer.Line(
-                fill = LineCartesianLayer.LineFill.single(Fill(group.getColor(context)))
+                fill = LineCartesianLayer.LineFill.single(Fill(color)),
+                areaFill = defaultAreaFill(color.toColor()),
+                pointConnector = LineCartesianLayer.PointConnector.cubic()
             )
         }
     }
@@ -400,12 +406,12 @@ private fun Graph(
                 guideline = null,
                 titleComponent = rememberTextComponent(
                     background = rememberShapeComponent(
-                        color = MaterialTheme.colorScheme.secondaryContainer,
+                        fill = fill(MaterialTheme.colorScheme.secondaryContainer),
                         shape = CorneredShape.Pill,
                     ),
                     color = MaterialTheme.colorScheme.onSecondaryContainer,
-                    padding = dimensions(horizontal = 8.dp, vertical = 2.dp),
-                    margins = dimensions(top = 4.dp),
+                    padding = insets(horizontal = 8.dp, vertical = 2.dp),
+                    margins = insets(top = 4.dp),
                     typeface = Typeface.MONOSPACE
                 ),
                 title = stringResource(period.xLabelId),
@@ -417,7 +423,7 @@ private fun Graph(
             marker = rememberMarker(projection),
         ),
         modelProducer = modelProducer,
-        runInitialAnimation = true,
+        animateIn = true,
         scrollState = scrollState,
         zoomState = rememberVicoZoomState(initialZoom = remember(period) { Zoom.x(period.numVisibleDays) }),
     )
@@ -464,7 +470,7 @@ private fun rememberMarker(projection: Projection): CartesianMarker {
         guideline = rememberAxisGuidelineComponent(),
         indicator = { color ->
             ShapeComponent(
-                color = color.toArgb(),
+                fill = fill(color),
                 shape = CorneredShape.Pill,
                 shadow = Shadow(radiusDp = 12f, color = color.toArgb()),
             )

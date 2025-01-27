@@ -28,10 +28,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.graphics.toColor
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.gpx.Coordinate
@@ -42,20 +42,22 @@ import com.inky.fitnesscalendar.data.measure.meters
 import com.inky.fitnesscalendar.db.entities.Track
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
+import com.inky.fitnesscalendar.ui.util.defaultAreaFill
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.view_model.BaseViewModel
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberAxisGuidelineComponent
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottom
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStart
+import com.patrykandpatrick.vico.compose.cartesian.layer.continuous
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLine
 import com.patrykandpatrick.vico.compose.cartesian.marker.rememberDefaultCartesianMarker
 import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoZoomState
 import com.patrykandpatrick.vico.compose.common.component.rememberShapeComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
-import com.patrykandpatrick.vico.compose.common.dimensions
 import com.patrykandpatrick.vico.compose.common.fill
+import com.patrykandpatrick.vico.compose.common.insets
 import com.patrykandpatrick.vico.core.cartesian.CartesianDrawingContext
 import com.patrykandpatrick.vico.core.cartesian.Zoom
 import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
@@ -68,8 +70,9 @@ import com.patrykandpatrick.vico.core.cartesian.data.LineCartesianLayerDrawingMo
 import com.patrykandpatrick.vico.core.cartesian.data.LineCartesianLayerModel
 import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
 import com.patrykandpatrick.vico.core.cartesian.layer.LineCartesianLayer
-import com.patrykandpatrick.vico.core.cartesian.marker.DefaultCartesianMarkerValueFormatter
-import com.patrykandpatrick.vico.core.common.Dimensions
+import com.patrykandpatrick.vico.core.cartesian.marker.DefaultCartesianMarker
+import com.patrykandpatrick.vico.core.common.Fill
+import com.patrykandpatrick.vico.core.common.Insets
 import com.patrykandpatrick.vico.core.common.data.ExtraStore
 import com.patrykandpatrick.vico.core.common.shape.CorneredShape
 import kotlinx.coroutines.Dispatchers
@@ -141,16 +144,23 @@ fun TrackGraph(track: Track, projection: TrackGraphProjection, modifier: Modifie
         }
     }
 
+    val context = LocalContext.current
+
     CartesianChartHost(
         chart = rememberCartesianChart(
             rememberLODLineCartesianLayer(
                 lineProvider = LineCartesianLayer.LineProvider.series(
                     LineCartesianLayer.rememberLine(
-                        fill = LineCartesianLayer.LineFill.single(fill(colorResource(projection.color))),
-                        thickness = 1.dp
+                        fill = remember(projection) {
+                            LineCartesianLayer.LineFill.single(Fill(context.getColor(projection.color)))
+                        },
+                        areaFill = remember(projection) {
+                            defaultAreaFill(context.getColor(projection.color).toColor())
+                        },
+                        stroke = remember { LineCartesianLayer.LineStroke.continuous(thickness = 1.dp) },
                     )
                 ),
-                rangeProvider = projection.rangeProvider()
+                rangeProvider = remember(projection) { projection.rangeProvider() }
             ),
             startAxis = VerticalAxis.rememberStart(
                 title = stringResource(projection.verticalAxisLabel),
@@ -160,10 +170,12 @@ fun TrackGraph(track: Track, projection: TrackGraphProjection, modifier: Modifie
                 guideline = null,
                 title = stringResource(R.string.legend_distance_km),
                 titleComponent = legendComponent(),
-                itemPlacer = HorizontalAxis.ItemPlacer.aligned(
-                    addExtremeLabelPadding = true,
-                    spacing = 1.kilometers().meters.toInt()
-                ),
+                itemPlacer = remember {
+                    HorizontalAxis.ItemPlacer.aligned(
+                        addExtremeLabelPadding = true,
+                        spacing = { 1.kilometers().meters.toInt() }
+                    )
+                },
                 valueFormatter = rememberKmValueFormatter()
             ),
             marker = rememberDefaultCartesianMarker(
@@ -183,20 +195,20 @@ fun TrackGraph(track: Track, projection: TrackGraphProjection, modifier: Modifie
 @Composable
 private fun legendComponent() = rememberTextComponent(
     background = rememberShapeComponent(
-        color = MaterialTheme.colorScheme.secondaryContainer,
+        fill = fill(MaterialTheme.colorScheme.secondaryContainer),
         shape = CorneredShape.Pill,
-        margins = Dimensions(allDp = 2f)
+        margins = Insets(allDp = 2f)
     ),
     color = MaterialTheme.colorScheme.onSecondaryContainer,
-    padding = dimensions(horizontal = 8.dp, vertical = 4.dp),
+    padding = insets(horizontal = 8.dp, vertical = 4.dp),
     typeface = Typeface.MONOSPACE
 )
 
 @Composable
-private fun rememberMarkerFormatter(projection: TrackGraphProjection): DefaultCartesianMarkerValueFormatter {
+private fun rememberMarkerFormatter(projection: TrackGraphProjection): DefaultCartesianMarker.ValueFormatter {
     val context = LocalContext.current
     return remember(projection) {
-        DefaultCartesianMarkerValueFormatter(decimalFormat = projection.format(context))
+        DefaultCartesianMarker.ValueFormatter.default(decimalFormat = projection.format(context))
     }
 }
 
@@ -329,7 +341,8 @@ private class LODLineCartesianLayer(
     override fun CartesianDrawingContext.forEachPointInBounds(
         series: List<LineCartesianLayerModel.Entry>,
         drawingStart: Float,
-        pointInfoMap: Map<Double, LineCartesianLayerDrawingModel.PointInfo>?,
+        pointInfoMap: Map<Double, LineCartesianLayerDrawingModel.Entry>?,
+        drawFullLineLength: Boolean,
         action: (entry: LineCartesianLayerModel.Entry, x: Float, y: Float, previousX: Float?, nextX: Float?) -> Unit
     ) {
         val minX = ranges.minX
@@ -344,9 +357,7 @@ private class LODLineCartesianLayer(
 
         fun getDrawX(entry: LineCartesianLayerModel.Entry): Float =
             drawingStart +
-                    layoutDirectionMultiplier *
-                    horizontalDimensions.xSpacing *
-                    ((entry.x - minX) / xStep).toFloat()
+                    layoutDirectionMultiplier * layerDimensions.xSpacing * ((entry.x - minX) / xStep).toFloat()
 
         fun getDrawY(entry: LineCartesianLayerModel.Entry): Float {
             val yRange = ranges.getYRange(verticalAxisPosition)
@@ -375,6 +386,7 @@ private class LODLineCartesianLayer(
             x = immutableX
             nextX = immutableNextX
             if (
+                drawFullLineLength.not() &&
                 immutableNextX != null &&
                 (isLtr && immutableX < boundsStart || !isLtr && immutableX > boundsStart) &&
                 (isLtr && immutableNextX < boundsStart || !isLtr && immutableNextX > boundsStart)

@@ -79,13 +79,14 @@ import com.patrykandpatrick.vico.compose.cartesian.rememberVicoZoomState
 import com.patrykandpatrick.vico.compose.common.component.rememberLineComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberShapeComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
-import com.patrykandpatrick.vico.compose.common.dimensions
+import com.patrykandpatrick.vico.compose.common.fill
+import com.patrykandpatrick.vico.compose.common.insets
 import com.patrykandpatrick.vico.core.cartesian.Zoom
 import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
 import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.layer.ColumnCartesianLayer
-import com.patrykandpatrick.vico.core.common.Dimensions
+import com.patrykandpatrick.vico.core.common.Insets
 import com.patrykandpatrick.vico.core.common.shape.CorneredShape
 
 @Composable
@@ -413,7 +414,7 @@ private fun Histogram(
                 rememberColumnCartesianLayer(
                     columnProvider = ColumnCartesianLayer.ColumnProvider.series(
                         rememberLineComponent(
-                            color = colorResource(R.color.graph_default),
+                            fill = fill(colorResource(R.color.graph_default)),
                             thickness = 32.dp
                         ),
                     ),
@@ -444,12 +445,12 @@ private fun Histogram(
 @Composable
 private fun graphTextComponent() = rememberTextComponent(
     background = rememberShapeComponent(
-        color = MaterialTheme.colorScheme.surfaceContainer,
+        fill = fill(MaterialTheme.colorScheme.surfaceContainer),
         shape = CorneredShape.Pill,
-        margins = Dimensions(allDp = 2f)
+        margins = Insets(allDp = 2f)
     ),
     color = contentColorFor(MaterialTheme.colorScheme.surfaceContainer),
-    padding = dimensions(horizontal = 8.dp, vertical = 4.dp),
+    padding = insets(horizontal = 8.dp, vertical = 4.dp),
     typeface = Typeface.MONOSPACE
 )
 

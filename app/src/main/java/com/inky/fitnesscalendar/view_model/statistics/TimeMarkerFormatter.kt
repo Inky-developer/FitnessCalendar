@@ -6,11 +6,11 @@ import android.text.style.ForegroundColorSpan
 import com.inky.fitnesscalendar.data.measure.format
 import com.patrykandpatrick.vico.core.cartesian.CartesianDrawingContext
 import com.patrykandpatrick.vico.core.cartesian.marker.CartesianMarker
-import com.patrykandpatrick.vico.core.cartesian.marker.CartesianMarkerValueFormatter
+import com.patrykandpatrick.vico.core.cartesian.marker.DefaultCartesianMarker
 import com.patrykandpatrick.vico.core.cartesian.marker.LineCartesianLayerMarkerTarget
 import kotlin.time.Duration.Companion.hours
 
-class TimeMarkerFormatter : CartesianMarkerValueFormatter {
+class TimeMarkerFormatter : DefaultCartesianMarker.ValueFormatter {
     override fun format(
         context: CartesianDrawingContext,
         targets: List<CartesianMarker.Target>
