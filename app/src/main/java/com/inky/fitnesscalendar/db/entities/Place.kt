@@ -14,7 +14,8 @@ data class Place(
     @PrimaryKey val uid: Int? = null,
     @ColumnInfo(name = "name") val name: String,
     @ColumnInfo(name = "color") val color: ContentColor,
-    @ColumnInfo(name = "image_name") val imageName: ImageName? = null
+    @ColumnInfo(name = "image_name") val imageName: ImageName? = null,
+    @ColumnInfo(name = "description", defaultValue = "") val description: String = ""
 ) : Parcelable {
     override fun toString() = name
 }

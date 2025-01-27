@@ -1,5 +1,6 @@
 # Unreleased
 
+- Add a description field to places 
 - Add share button for tracks
 
 # 2025.01.1

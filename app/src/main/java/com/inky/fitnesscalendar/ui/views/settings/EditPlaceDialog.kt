@@ -36,6 +36,7 @@ import com.inky.fitnesscalendar.db.entities.Place
 import com.inky.fitnesscalendar.ui.components.ActivityImage
 import com.inky.fitnesscalendar.ui.components.BaseEditDialog
 import com.inky.fitnesscalendar.ui.components.ColorSelector
+import com.inky.fitnesscalendar.ui.components.DescriptionTextInput
 import com.inky.fitnesscalendar.ui.components.ImageViewer
 import com.inky.fitnesscalendar.ui.components.OptionGroup
 import com.inky.fitnesscalendar.ui.components.SelectImageDropdownMenuItem
@@ -81,6 +82,11 @@ private fun EditPlaceDialog(initialPlace: Place?, onDismiss: () -> Unit, onSave:
 
     var name by rememberSaveable(initialPlace) { mutableStateOf(initialPlace?.name ?: "") }
     var color by rememberSaveable(initialPlace) { mutableStateOf(initialPlace?.color) }
+    var description by rememberSaveable(initialPlace) {
+        mutableStateOf(
+            initialPlace?.description ?: ""
+        )
+    }
 
     val saveEnabled by remember {
         derivedStateOf { name.isNotBlank() && color != null }
@@ -95,7 +101,8 @@ private fun EditPlaceDialog(initialPlace: Place?, onDismiss: () -> Unit, onSave:
                     uid = initialPlace?.uid,
                     name = name,
                     color = color!!,
-                    imageName = imageName
+                    imageName = imageName,
+                    description = description
                 )
             )
         },
@@ -161,6 +168,13 @@ private fun EditPlaceDialog(initialPlace: Place?, onDismiss: () -> Unit, onSave:
                     onSelect = { color = it }
                 )
             }
+
+            DescriptionTextInput(
+                description = description,
+                onDescription = { description = it },
+                maxLines = 3,
+                modifier = Modifier.padding(vertical = 4.dp)
+            )
         }
     }
 

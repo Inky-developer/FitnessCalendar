@@ -5,28 +5,21 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImagePainter
@@ -37,11 +30,11 @@ import com.inky.fitnesscalendar.data.ImageName
 import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.ui.components.ActivityImage
 import com.inky.fitnesscalendar.ui.components.BaseEditDialog
+import com.inky.fitnesscalendar.ui.components.DescriptionTextInput
 import com.inky.fitnesscalendar.ui.components.FeelSelector
 import com.inky.fitnesscalendar.ui.components.ImageViewer
 import com.inky.fitnesscalendar.ui.components.OptionGroup
 import com.inky.fitnesscalendar.ui.components.SelectImageDropdownMenuItem
-import com.inky.fitnesscalendar.ui.components.optionGroupDefaultBackground
 import com.inky.fitnesscalendar.ui.components.rememberImagePickerLauncher
 import com.inky.fitnesscalendar.view_model.BaseViewModel
 import kotlinx.parcelize.Parcelize
@@ -129,17 +122,11 @@ fun EditDayDialog(
                 )
             }
 
-            TextField(
-                value = editState.description,
-                onValueChange = { editState = editState.copy(description = it) },
-                placeholder = { Text(stringResource(R.string.placeholder_description)) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp),
+            DescriptionTextInput(
+                description = editState.description,
+                onDescription = { editState = editState.copy(description = it) },
                 maxLines = 8,
-                keyboardOptions = remember { KeyboardOptions(capitalization = KeyboardCapitalization.Sentences) },
-                colors = TextFieldDefaults.colors(unfocusedContainerColor = optionGroupDefaultBackground()),
-                shape = MaterialTheme.shapes.small
+                modifier = Modifier.padding(vertical = 4.dp),
             )
         }
     }

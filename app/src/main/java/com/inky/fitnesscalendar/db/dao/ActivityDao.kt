@@ -44,10 +44,10 @@ abstract class ActivityDao {
                 "   (vehicle IN (:vehicles) OR :isVehiclesEmpty) AND" +
                 "   (feel IN (:feels) OR :isFeelsEmpty) AND" +
                 "   (favorite == :favorite OR :favorite IS NULL) AND" +
-                "   (description LIKE :search OR type.name LIKE :search OR place.name LIKE :search OR vehicle IN (:searchVehicles) OR :search IS NULL) AND" +
+                "   (Activity.description LIKE :search OR type.name LIKE :search OR place.name LIKE :search OR vehicle IN (:searchVehicles) OR :search IS NULL) AND" +
                 "   (end_time >= :start OR :start IS NULL) AND" +
                 "   (start_time <= :end OR :end IS NULL) AND" +
-                "   ((description != '') == :hasDescription OR :hasDescription IS NULL) AND" +
+                "   ((Activity.description != '') == :hasDescription OR :hasDescription IS NULL) AND" +
                 "   ((vehicle IS NOT NULL) == :hasVehicle OR :hasVehicle IS NULL) AND" +
                 "   ((Activity.image_name IS NOT NULL) == :hasImage OR :hasImage IS NULL) AND" +
                 "   ((place_id IS NOT NULL) == :hasPlace OR :hasPlace IS NULL) AND" +

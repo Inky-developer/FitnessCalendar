@@ -58,7 +58,6 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -77,6 +76,7 @@ import com.inky.fitnesscalendar.ui.components.ActivityImage
 import com.inky.fitnesscalendar.ui.components.ActivitySelector
 import com.inky.fitnesscalendar.ui.components.ActivitySelectorState
 import com.inky.fitnesscalendar.ui.components.DateTimePicker
+import com.inky.fitnesscalendar.ui.components.DescriptionTextInput
 import com.inky.fitnesscalendar.ui.components.FavoriteIcon
 import com.inky.fitnesscalendar.ui.components.FeelSelector
 import com.inky.fitnesscalendar.ui.components.ImageViewer
@@ -377,16 +377,11 @@ fun NewActivity(
                 }
             }
 
-            TextField(
-                value = editState.description,
-                onValueChange = { editState = editState.copy(description = it) },
-                placeholder = { Text(stringResource(R.string.placeholder_description)) },
-                keyboardOptions = remember { KeyboardOptions(capitalization = KeyboardCapitalization.Sentences) },
-                colors = TextFieldDefaults.colors(unfocusedContainerColor = optionGroupDefaultBackground()),
-                shape = MaterialTheme.shapes.small,
+            DescriptionTextInput(
+                description = editState.description,
+                onDescription = { editState = editState.copy(description = it) },
                 modifier = Modifier
                     .testTag("input-description")
-                    .fillMaxWidth()
                     .padding(vertical = 4.dp)
             )
 

@@ -36,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
@@ -136,9 +137,15 @@ private fun PlaceCard(
         Text(
             place.name,
             style = MaterialTheme.typography.displaySmall,
-            modifier = Modifier.padding(horizontal = 8.dp).padding(top = 8.dp)
+            modifier = Modifier
+                .padding(horizontal = 8.dp)
+                .padding(top = 8.dp)
         )
-        HorizontalDivider(color = colorResource(place.color.colorId), thickness = 2.dp, modifier = Modifier.padding(horizontal = 8.dp))
+        HorizontalDivider(
+            color = colorResource(place.color.colorId),
+            thickness = 2.dp,
+            modifier = Modifier.padding(horizontal = 8.dp)
+        )
         if (imageUri != null) {
             ActivityImage(
                 imageUri,
@@ -152,6 +159,16 @@ private fun PlaceCard(
             style = MaterialTheme.typography.bodyMedium,
             modifier = Modifier.padding(all = 8.dp)
         )
+
+        if (place.description.isNotBlank()) {
+            HorizontalDivider()
+            Text(
+                place.description,
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(all = 8.dp)
+            )
+        }
 
     }
 
