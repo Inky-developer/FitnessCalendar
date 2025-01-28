@@ -31,7 +31,7 @@ val MIGRATION_5_6 = object : Migration(5, 6) {
             db.execSQL(
                 "INSERT INTO ActivityType (uid, activity_category, name, emoji, color_id, has_vehicle, has_duration)" +
                         "VALUES (?, ?, ?, ?, ?, ?, ?)",
-                arrayOf(
+                arrayOf<Any>(
                     index + 1,
                     type.activityCategory,
                     type.title,
@@ -44,11 +44,11 @@ val MIGRATION_5_6 = object : Migration(5, 6) {
 
             db.execSQL(
                 "UPDATE TempActivity SET type_id = ? WHERE legacy_type_id = ?",
-                arrayOf(index + 1, type.toString())
+                arrayOf<Any>(index + 1, type.toString())
             )
             db.execSQL(
                 "UPDATE TempRecording SET type_id = ? WHERE legacy_type = ?",
-                arrayOf(index + 1, type.toString())
+                arrayOf<Any>(index + 1, type.toString())
             )
         }
 
@@ -160,7 +160,7 @@ val MIGRATION_6_7 = object : Migration(6, 7) {
         for (color in ContentColor.entries) {
             db.execSQL(
                 "UPDATE TempActivityType SET color = ? WHERE color_id = ?",
-                arrayOf(color.toString(), color.colorId)
+                arrayOf<Any>(color.toString(), color.colorId)
             )
         }
         db.execSQL(

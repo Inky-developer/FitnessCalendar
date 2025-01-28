@@ -13,7 +13,7 @@ fun loadDefaultData(db: SupportSQLiteDatabase, context: Context) {
         for (type in DefaultActivityType.entries) {
             db.execSQL(
                 "INSERT INTO ActivityType(activity_category, name, emoji, color, has_vehicle, has_duration, has_distance, has_intensity) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-                arrayOf(
+                arrayOf<Any>(
                     type.activityCategory,
                     context.getString(type.titleId),
                     type.emoji,

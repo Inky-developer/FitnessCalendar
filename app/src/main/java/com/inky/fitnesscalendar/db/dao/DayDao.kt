@@ -1,7 +1,6 @@
 package com.inky.fitnesscalendar.db.dao
 
 import androidx.room.Dao
-import androidx.room.MapColumn
 import androidx.room.Query
 import androidx.room.Upsert
 import com.inky.fitnesscalendar.data.EpochDay
@@ -15,7 +14,7 @@ interface DayDao {
     suspend fun getImages(): List<ImageName>
 
     @Query("SELECT * FROM Day")
-    fun getDays(): Flow<Map<@MapColumn(columnName = "day") EpochDay, Day>>
+    fun getDays(): Flow<List<Day>>
 
     @Query("SELECT * FROM Day WHERE day = :day")
     fun get(day: EpochDay): Flow<Day?>

@@ -144,7 +144,7 @@ class DatabaseRepository @Inject constructor(
 
     fun getFilterHistoryItems() = filterHistoryDao.getItems()
 
-    fun getDays() = dayDao.getDays()
+    fun getDays() = dayDao.getDays().map { days -> days.associateBy { it.day } }
 
     fun getDay(day: EpochDay): Flow<Day> = dayDao.get(day).map { it ?: Day(day = day) }
 
