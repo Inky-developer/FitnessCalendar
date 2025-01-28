@@ -1,7 +1,6 @@
 package com.inky.fitnesscalendar.util.gpx
 
 import android.os.Build
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import org.approvaltests.Approvals
 import org.junit.Test
@@ -11,7 +10,8 @@ import org.robolectric.annotation.Config
 import java.io.ByteArrayInputStream
 
 const val GPX = """
-<gpx>
+<gpx
+    xmlns:ns3="http://www.garmin.com/xmlschemas/TrackPointExtension/v1">
     <metadata></metadata>
     <trk>
         <name>Cool track</name>

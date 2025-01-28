@@ -20,15 +20,20 @@ import java.util.Date
 
 private const val TAG = "GpxReader"
 
-private const val TRACK_POINT_EXTENSIONS_GARMIN = "ns3:TrackPointExtension"
-private const val EXTENSION_GARMIN_TEMPERATURE = "ns3:atemp"
-private const val EXTENSION_GARMIN_HEART_RATE = "ns3:hr"
+// I cannot reach either of these URLs, but they are used by openTracks and garmin, respectively.
+private val TRACK_POINT_EXTENSIONS_GARMIN_NAMESPACE = setOf(
+    "http://www.garmin.com/xmlschemas/TrackPointExtension/v2",
+    "http://www.garmin.com/xmlschemas/TrackPointExtension/v1"
+)
+private const val EXTENSION_GARMIN_TRACK_POINT_EXTENSION = "TrackPointExtension"
+private const val EXTENSION_GARMIN_TEMPERATURE = "atemp"
+private const val EXTENSION_GARMIN_HEART_RATE = "hr"
 
 class GpxReader(val tracks: List<GpxTrack>) {
     companion object {
         fun read(inputStream: InputStream): GpxReader? {
             val parser: XmlPullParser = Xml.newPullParser()
-            parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, false)
+            parser.setFeature(XmlPullParser.FEATURE_PROCESS_NAMESPACES, true)
 
             try {
                 parser.setInput(inputStream, null)
@@ -159,11 +164,10 @@ class GpxReader(val tracks: List<GpxTrack>) {
             attributes: TrackPointAttributes
         ) {
             readTag(parser, "extensions") {
-                when (it.name) {
-                    TRACK_POINT_EXTENSIONS_GARMIN ->
-                        readTrackPointExtensionsGarmin(parser, attributes)
-
-                    else -> skipTag(parser)
+                if (TRACK_POINT_EXTENSIONS_GARMIN_NAMESPACE.contains(it.namespace) && it.name == EXTENSION_GARMIN_TRACK_POINT_EXTENSION) {
+                    readTrackPointExtensionsGarmin(parser, attributes)
+                } else {
+                    skipTag(parser)
                 }
             }
 
@@ -174,7 +178,7 @@ class GpxReader(val tracks: List<GpxTrack>) {
             parser: XmlPullParser,
             attributes: TrackPointAttributes
         ) {
-            readTag(parser, TRACK_POINT_EXTENSIONS_GARMIN) {
+            readTag(parser, EXTENSION_GARMIN_TRACK_POINT_EXTENSION) {
                 when (it.name) {
                     EXTENSION_GARMIN_TEMPERATURE -> {
                         val temperatureString = readText(parser, EXTENSION_GARMIN_TEMPERATURE)
