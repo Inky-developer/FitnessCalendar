@@ -1,0 +1,4 @@
+gpx tracks names (old and new)[0] = Cool track
+
+Was a nice track
+gpx tracks names (old and new)[1] = Sports

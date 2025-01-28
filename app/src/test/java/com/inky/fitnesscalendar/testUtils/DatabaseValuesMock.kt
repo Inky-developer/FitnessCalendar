@@ -16,22 +16,25 @@ import com.inky.fitnesscalendar.repository.DatabaseRepository
 import com.inky.fitnesscalendar.ui.util.DatabaseValues
 import com.inky.fitnesscalendar.ui.util.localDatabaseValues
 
+val SportActivityType = ActivityType(
+    uid = 1,
+    activityCategory = ActivityCategory.Sports,
+    name = "Sports",
+    emoji = "S",
+    color = ContentColor.Color1,
+    hasPlace = true,
+)
+val ProgrammingActivityType = ActivityType(
+    uid = 2,
+    activityCategory = ActivityCategory.Work,
+    name = "Programming",
+    emoji = "P",
+    color = ContentColor.Color2,
+)
+
 val mockActivityTypes = listOf(
-    ActivityType(
-        uid = 1,
-        activityCategory = ActivityCategory.Sports,
-        name = "Sports",
-        emoji = "S",
-        color = ContentColor.Color1,
-        hasPlace = true,
-    ),
-    ActivityType(
-        uid = 2,
-        activityCategory = ActivityCategory.Work,
-        name = "Programming",
-        emoji = "P",
-        color = ContentColor.Color2,
-    ),
+    SportActivityType,
+    ProgrammingActivityType
 )
 
 @Composable
