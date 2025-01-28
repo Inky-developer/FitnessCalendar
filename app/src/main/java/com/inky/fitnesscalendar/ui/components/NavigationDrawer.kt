@@ -51,7 +51,10 @@ fun NavigationDrawer(
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            ModalDrawerSheet(drawerContainerColor = MaterialTheme.colorScheme.primaryContainer) {
+            ModalDrawerSheet(
+                drawerState = drawerState,
+                drawerContainerColor = MaterialTheme.colorScheme.primaryContainer
+            ) {
                 val scrollState = rememberScrollState()
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
