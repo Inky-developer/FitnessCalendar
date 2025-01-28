@@ -21,7 +21,7 @@ class GpxWriter {
                     attribute("xmlns", "http://www.topografix.com/GPX/1/1")
                     attribute(
                         "xmlns:$TRACK_POINT_EXTENSION_NAMESPACE",
-                        "http://www.garmin.com/xmlschemas/TrackPointExtension/v1"
+                        "http://www.garmin.com/xmlschemas/TrackPointExtension/v2"
                     )
 
                     tag("trk") {
@@ -61,10 +61,12 @@ private fun TagScope.writeTrack(activity: RichActivity, track: Track) {
                     "hr" to point.heartFrequency?.bpm?.toString()
                 )
                 if (extensionAttributes.filterValues { it != null }.isNotEmpty()) {
-                    tag("$TRACK_POINT_EXTENSION_NAMESPACE:TrackPointExtension") {
-                        for ((name, value) in extensionAttributes) {
-                            if (value == null) continue
-                            tag("$TRACK_POINT_EXTENSION_NAMESPACE:$name") { text(value) }
+                    tag("extensions") {
+                        tag("$TRACK_POINT_EXTENSION_NAMESPACE:TrackPointExtension") {
+                            for ((name, value) in extensionAttributes) {
+                                if (value == null) continue
+                                tag("$TRACK_POINT_EXTENSION_NAMESPACE:$name") { text(value) }
+                            }
                         }
                     }
                 }
