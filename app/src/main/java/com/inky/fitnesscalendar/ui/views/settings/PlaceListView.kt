@@ -2,6 +2,7 @@ package com.inky.fitnesscalendar.ui.views.settings
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -97,7 +98,7 @@ private fun PlaceList(
     onEditPlace: (Place) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    LazyColumn(modifier = modifier) {
+    LazyColumn(contentPadding = PaddingValues(bottom = 128.dp), modifier = modifier) {
         items(places, key = { it.uid ?: -1 }) { place ->
             PlaceCard(
                 place,
