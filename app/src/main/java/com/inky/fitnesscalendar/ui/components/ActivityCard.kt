@@ -101,6 +101,7 @@ fun ActivityCard(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp, vertical = 4.dp)
+            .clip(CardDefaults.shape)
             .combinedClickable(
                 onClick = {
                     if (trackPreview != null) {
