@@ -7,6 +7,7 @@ data class SummaryBoxState(
     val totalActivities: String,
     val totalTime: String?,
     val averageTime: String?,
+    val maximumTime: String?,
     val totalDistance: String?,
     val averageDistance: String?,
     val averageSpeed: String?,
@@ -28,6 +29,7 @@ data class SummaryBoxState(
         totalActivities = statistics.size.toString(),
         totalTime = statistics.totalTime().takeIf { it.elapsedMs > 0L }?.format(),
         averageTime = statistics.averageTime()?.format(),
+        maximumTime = statistics.maximalTime()?.format(),
         totalDistance = statistics.totalDistance().takeIf { it.meters > 0 }
             ?.formatWithContext(context),
         averageDistance = statistics.averageDistance()?.formatWithContext(context),

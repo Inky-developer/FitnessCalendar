@@ -38,6 +38,9 @@ value class ActivityStatistics(
         return (totalTime().elapsedMs / size).ms()
     }
 
+    fun maximalTime(): Duration? =
+        activities.maxByOrNull { it.activity.duration.elapsedMs }?.activity?.duration
+
     fun totalDistance() = activities.sumOf { it.activity.distance?.meters ?: 0 }.meters()
 
     fun averageDistance(): Distance? {

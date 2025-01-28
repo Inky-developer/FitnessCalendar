@@ -320,6 +320,7 @@ private fun SummaryBox(state: SummaryBoxState) {
         SummaryItem(stringResource(R.string.summary_total_activities), state.totalActivities)
         SummaryItem(stringResource(R.string.summary_total_time), state.totalTime)
         SummaryItem(stringResource(R.string.summary_average_time), state.averageTime)
+        SummaryItem(stringResource(R.string.summary_maximal_time), state.maximumTime)
         SummaryItem(stringResource(R.string.summary_total_distance), state.totalDistance)
         SummaryItem(stringResource(R.string.summary_average_distance), state.averageDistance)
         SummaryItem(stringResource(R.string.summary_average_speed), state.averageSpeed)
@@ -461,6 +462,7 @@ fun PreviewSummaryBox() {
         totalActivities = "198",
         totalTime = "666h",
         averageTime = "1.5h",
+        maximumTime = "8h",
         totalDistance = "12.000km",
         averageDistance = "48km",
         averageSpeed = "30kmh/h",

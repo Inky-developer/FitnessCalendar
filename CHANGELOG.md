@@ -1,5 +1,6 @@
 # Unreleased
 
+- Add longest time to summary 
 - Add a description field to places 
 - Add share button for tracks
 
