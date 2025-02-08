@@ -1,5 +1,8 @@
 # Unreleased
 
+
+# 2025.02.1
+
 - Add longest time to summary 
 - Add a description field to places 
 - Add share button for tracks
