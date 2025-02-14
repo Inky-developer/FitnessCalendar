@@ -3,19 +3,20 @@ package com.inky.fitnesscalendar.data.measure
 import android.content.Context
 import android.os.Parcelable
 import com.inky.fitnesscalendar.R
-import com.inky.fitnesscalendar.ui.util.ContextFormat
 import kotlinx.parcelize.Parcelize
 import kotlin.math.roundToLong
 
 
 @Parcelize
 @JvmInline
-value class Distance internal constructor(val meters: Long) : Parcelable, ContextFormat {
+value class Distance internal constructor(val meters: Long) : Parcelable, Measure {
     override fun formatWithContext(context: Context) = if (kilometers >= 1) {
         context.getString(R.string.x_km, "%.1f".format(kilometers))
     } else {
         context.getString(R.string.x_m, meters)
     }
+
+    override fun isNothing() = meters == 0L
 
     val kilometers
         get() = meters / 1000.0

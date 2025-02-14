@@ -1,5 +1,6 @@
 # Unreleased
 
+- Don't show statistics if they are 0
 - Use dynamic y-range for heart rate graphs, so that it will not always start at 0
 
 # 2025.02.1

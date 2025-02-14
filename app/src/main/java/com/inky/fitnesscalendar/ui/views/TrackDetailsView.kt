@@ -337,8 +337,8 @@ data class DetailsState(
             val averageMovingSpeed = activity.averageMovingSpeed?.formatWithContext(context)
             val maxSpeed = stats.maxSpeed.formatWithContext(context)
 
-            val minHeight = stats.minHeight?.format(context)
-            val maxHeight = stats.maxHeight?.format(context)
+            val minHeight = stats.minHeight?.formatWithContext(context)
+            val maxHeight = stats.maxHeight?.formatWithContext(context)
             val totalAscent = stats.totalAscent?.formatWithContext(context)
             val totalDescent = stats.totalDescent?.formatWithContext(context)
 

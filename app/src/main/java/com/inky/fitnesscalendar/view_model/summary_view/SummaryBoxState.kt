@@ -2,6 +2,8 @@ package com.inky.fitnesscalendar.view_model.summary_view
 
 import android.content.Context
 import com.inky.fitnesscalendar.data.ActivityStatistics
+import com.inky.fitnesscalendar.data.measure.Measure
+import com.inky.fitnesscalendar.data.measure.takeIfNotNothing
 
 data class SummaryBoxState(
     val totalActivities: String,
@@ -27,22 +29,22 @@ data class SummaryBoxState(
 ) {
     constructor(context: Context, statistics: ActivityStatistics) : this(
         totalActivities = statistics.size.toString(),
-        totalTime = statistics.totalTime().takeIf { it.elapsedMs > 0L }?.format(),
-        averageTime = statistics.averageTime()?.format(),
-        maximumTime = statistics.maximalTime()?.format(),
-        totalDistance = statistics.totalDistance().takeIf { it.meters > 0 }
-            ?.formatWithContext(context),
-        averageDistance = statistics.averageDistance()?.formatWithContext(context),
-        averageSpeed = statistics.averageSpeed()?.formatWithContext(context),
-        averageMovingSpeed = statistics.averageMovingSpeed()?.formatWithContext(context),
-        totalAscent = statistics.totalAscent().takeIf { it.meters > 0 }
-            ?.formatWithContext(context),
-        totalDescent = statistics.totalDescent().takeIf { it.meters > 0 }
-            ?.formatWithContext(context),
-        averageAscent = statistics.averageAscent()?.formatWithContext(context),
-        averageDescent = statistics.averageDescent()?.formatWithContext(context),
-        averageHeartRate = statistics.averageHeartRate()?.formatWithContext(context),
-        maximumHeartRate = statistics.maximalHeartRate()?.formatWithContext(context),
-        averageTemperature = statistics.averageTemperature()?.formatWithContext(context),
+        totalTime = statistics.totalTime().formatIfNotNothing(context),
+        averageTime = statistics.averageTime()?.formatIfNotNothing(context),
+        maximumTime = statistics.maximalTime()?.formatIfNotNothing(context),
+        totalDistance = statistics.totalDistance().formatIfNotNothing(context),
+        averageDistance = statistics.averageDistance()?.formatIfNotNothing(context),
+        averageSpeed = statistics.averageSpeed()?.formatIfNotNothing(context),
+        averageMovingSpeed = statistics.averageMovingSpeed()?.formatIfNotNothing(context),
+        totalAscent = statistics.totalAscent().formatIfNotNothing(context),
+        totalDescent = statistics.totalDescent().formatIfNotNothing(context),
+        averageAscent = statistics.averageAscent()?.formatIfNotNothing(context),
+        averageDescent = statistics.averageDescent()?.formatIfNotNothing(context),
+        averageHeartRate = statistics.averageHeartRate()?.formatIfNotNothing(context),
+        maximumHeartRate = statistics.maximalHeartRate()?.formatIfNotNothing(context),
+        averageTemperature = statistics.averageTemperature()?.formatIfNotNothing(context),
     )
 }
+
+fun <T : Measure> T.formatIfNotNothing(context: Context) =
+    takeIfNotNothing()?.formatWithContext(context)

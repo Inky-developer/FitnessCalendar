@@ -2,16 +2,17 @@ package com.inky.fitnesscalendar.data.measure
 
 import android.content.Context
 import com.inky.fitnesscalendar.R
-import com.inky.fitnesscalendar.ui.util.ContextFormat
 import kotlinx.serialization.Serializable
 
 @Serializable
 @JvmInline
-value class Temperature(val celsius: Float) : Comparable<Temperature>, ContextFormat {
+value class Temperature(val celsius: Float) : Comparable<Temperature>, Measure {
     override fun compareTo(other: Temperature) = this.celsius.compareTo(other.celsius)
 
     override fun formatWithContext(context: Context) =
         context.getString(R.string.x_degrees_celsius, "%.1f".format(celsius))
+
+    override fun isNothing() = false
 }
 
 fun Float.celsius() = Temperature(celsius = this)

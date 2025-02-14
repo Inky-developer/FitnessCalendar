@@ -7,8 +7,11 @@ import kotlin.math.roundToInt
 
 @Serializable
 @JvmInline
-value class Elevation(val meters: Float) : Comparable<Elevation> {
+value class Elevation(val meters: Float) : Comparable<Elevation>, Measure {
     override fun compareTo(other: Elevation) = this.meters.compareTo(other.meters)
 
-    fun format(context: Context) = context.getString(R.string.x_m, meters.roundToInt())
+    override fun isNothing() = false
+
+    override fun formatWithContext(context: Context) =
+        context.getString(R.string.x_m, meters.roundToInt())
 }

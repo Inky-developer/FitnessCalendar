@@ -3,12 +3,11 @@ package com.inky.fitnesscalendar.data.measure
 import android.content.Context
 import android.os.Parcelable
 import com.inky.fitnesscalendar.R
-import com.inky.fitnesscalendar.ui.util.ContextFormat
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
 @JvmInline
-value class Speed internal constructor(val metersPerSecond: Double) : Parcelable, ContextFormat,
+value class Speed internal constructor(val metersPerSecond: Double) : Parcelable, Measure,
     Comparable<Speed> {
     val kmh get() = metersPerSecond * 3.6
 
@@ -16,6 +15,8 @@ value class Speed internal constructor(val metersPerSecond: Double) : Parcelable
         context.getString(R.string.x_kmh, "%.1f".format(kmh))
 
     override fun compareTo(other: Speed) = this.metersPerSecond.compareTo(other.metersPerSecond)
+
+    override fun isNothing() = metersPerSecond == 0.0
 
     operator fun minus(other: Speed) =
         (this.metersPerSecond - other.metersPerSecond).metersPerSecond()
