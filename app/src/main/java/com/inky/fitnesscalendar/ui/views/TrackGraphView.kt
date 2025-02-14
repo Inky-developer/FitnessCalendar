@@ -259,7 +259,8 @@ enum class TrackGraphProjection(
     }
 
     fun rangeProvider() = when (this) {
-        Elevation -> ElevationLayerRangeProvider()
+        Elevation -> ElevationLayerRangeProvider
+        HeartRate -> HeartRateLayerRangeProvider
         else -> CartesianLayerRangeProvider.auto()
     }
 
@@ -407,13 +408,16 @@ private const val ElevationGraphYStep = 100.0
  * That is not very good for elevation graphs, so instead, this class
  * provides a dynamic range based on [ElevationGraphYStep].
  */
-private class ElevationLayerRangeProvider : CartesianLayerRangeProvider {
+private class StepLayerRangeProvider(val yStep: Float) : CartesianLayerRangeProvider {
     override fun getMinY(minY: Double, maxY: Double, extraStore: ExtraStore) =
-        floor(minY / ElevationGraphYStep) * ElevationGraphYStep
+        floor(minY / yStep) * yStep
 
     override fun getMaxY(minY: Double, maxY: Double, extraStore: ExtraStore) =
-        ceil(maxY / ElevationGraphYStep) * ElevationGraphYStep
+        ceil(maxY / yStep) * yStep
 }
+
+private val ElevationLayerRangeProvider = StepLayerRangeProvider(100.0f)
+private val HeartRateLayerRangeProvider = StepLayerRangeProvider(20f)
 
 @Preview
 @Composable

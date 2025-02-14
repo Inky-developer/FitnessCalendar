@@ -1,5 +1,6 @@
 # Unreleased
 
+- Use dynamic y-range for heart rate graphs, so that it will not always start at 0
 
 # 2025.02.1
 
