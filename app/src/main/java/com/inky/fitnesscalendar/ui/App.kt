@@ -301,7 +301,11 @@ private fun AppNavigation(
                         onEditFilter = {
                             filterState = it
                             viewModel.addToFilterHistory(filterState)
-                        })
+                        },
+                        onNavigateActivity = {
+                            navController.navigate(Views.ActivityLog(it))
+                        }
+                    )
                 }
             }
 

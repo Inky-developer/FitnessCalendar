@@ -13,6 +13,7 @@ import com.inky.fitnesscalendar.data.measure.ms
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.Place
 import com.inky.fitnesscalendar.db.entities.RichActivity
+import com.inky.fitnesscalendar.util.filteredMaxByOrNull
 import com.inky.fitnesscalendar.util.toDate
 import com.inky.fitnesscalendar.util.toLocalDate
 import com.inky.fitnesscalendar.util.toLocalDateTime
@@ -37,9 +38,6 @@ value class ActivityStatistics(
         if (totalMs == 0L) return null
         return (totalTime().elapsedMs / size).ms()
     }
-
-    fun maximalTime(): Duration? =
-        activities.maxByOrNull { it.activity.duration.elapsedMs }?.activity?.duration
 
     fun totalDistance() = activities.sumOf { it.activity.distance?.meters ?: 0 }.meters()
 
@@ -74,9 +72,6 @@ value class ActivityStatistics(
         }
         return (heartRates.sum() / heartRates.size).bpm()
     }
-
-    fun maximalHeartRate(): HeartFrequency? =
-        activities.mapNotNull { it.activity.maximalHeartRate }.maxOrNull()
 
     fun averageAscent(): Distance? {
         val ascents = activities.mapNotNull { it.activity.totalAscent?.meters }
@@ -114,6 +109,20 @@ value class ActivityStatistics(
         }
         return intensities.sum().toDouble() / intensities.size
     }
+
+    fun maximalDuration(): RichActivity? = activities.maxByOrNull { it.activity.duration.elapsedMs }
+
+    fun maximalDistance(): RichActivity? =
+        activities.filteredMaxByOrNull { it.activity.distance?.meters }
+
+    fun maximalAverageMovingSpeed(): RichActivity? =
+        activities.filteredMaxByOrNull { it.activity.averageMovingSpeed }
+
+    fun maximalAscent(): RichActivity? =
+        activities.filteredMaxByOrNull { it.activity.totalAscent?.meters }
+
+    fun maximalHeartRate(): RichActivity? =
+        activities.filteredMaxByOrNull { it.activity.maximalHeartRate }
 
     fun isEmpty() = activities.isEmpty()
 

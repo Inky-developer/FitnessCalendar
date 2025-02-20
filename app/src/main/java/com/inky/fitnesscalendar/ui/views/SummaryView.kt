@@ -3,6 +3,8 @@ package com.inky.fitnesscalendar.ui.views
 import android.graphics.Typeface
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -67,6 +69,7 @@ import com.inky.fitnesscalendar.ui.components.getAppBarContainerColor
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.view_model.BaseViewModel
+import com.inky.fitnesscalendar.view_model.summary_view.RecordsBoxState
 import com.inky.fitnesscalendar.view_model.summary_view.SummaryBoxState
 import com.inky.fitnesscalendar.view_model.summary_view.SummaryState
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
@@ -95,7 +98,8 @@ fun SummaryView(
     filter: ActivityFilter,
     onBack: () -> Unit,
     onNavigateFilter: () -> Unit,
-    onEditFilter: (ActivityFilter) -> Unit
+    onEditFilter: (ActivityFilter) -> Unit,
+    onNavigateActivity: (Int) -> Unit,
 ) {
     val activities by viewModel.repository.getActivities(filter).collectAsState(initial = null)
     val context = LocalContext.current
@@ -121,7 +125,8 @@ fun SummaryView(
             state = value,
             onBack = onBack,
             onNavigateFilter = onNavigateFilter,
-            onEditFilter = onEditFilter
+            onEditFilter = onEditFilter,
+            onNavigateActivity = onNavigateActivity
         )
     }
 }
@@ -133,6 +138,7 @@ fun SummaryView(
     onBack: () -> Unit,
     onNavigateFilter: () -> Unit,
     onEditFilter: (ActivityFilter) -> Unit,
+    onNavigateActivity: (Int) -> Unit
 ) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     Scaffold(
@@ -180,7 +186,11 @@ fun SummaryView(
                 if (isEmpty) {
                     NoActivitiesInfoBox(state.filter.isEmpty(), modifier = Modifier.fillMaxSize())
                 } else {
-                    SummaryViewInner(state = state, onEditFilter = onEditFilter)
+                    SummaryViewInner(
+                        state = state,
+                        onEditFilter = onEditFilter,
+                        onNavigateActivity = onNavigateActivity
+                    )
                 }
             }
         }
@@ -188,7 +198,11 @@ fun SummaryView(
 }
 
 @Composable
-private fun SummaryViewInner(state: SummaryState, onEditFilter: (ActivityFilter) -> Unit) {
+private fun SummaryViewInner(
+    state: SummaryState,
+    onEditFilter: (ActivityFilter) -> Unit,
+    onNavigateActivity: (Int) -> Unit
+) {
     LazyColumn(
         horizontalAlignment = Alignment.CenterHorizontally,
         contentPadding = PaddingValues(bottom = 128.dp),
@@ -207,6 +221,8 @@ private fun SummaryViewInner(state: SummaryState, onEditFilter: (ActivityFilter)
         }
 
         item(key = "SummaryBox") { SummaryBox(state.summaryBoxState) }
+
+        item(key = "RecordBox") { RecordsBox(state.recordsBoxState, onNavigateActivity) }
 
         item(key = "PlaceBox") { PlaceBox(state.places) }
 
@@ -320,7 +336,6 @@ private fun SummaryBox(state: SummaryBoxState) {
         SummaryItem(stringResource(R.string.summary_total_activities), state.totalActivities)
         SummaryItem(stringResource(R.string.summary_total_time), state.totalTime)
         SummaryItem(stringResource(R.string.summary_average_time), state.averageTime)
-        SummaryItem(stringResource(R.string.summary_maximal_time), state.maximumTime)
         SummaryItem(stringResource(R.string.summary_total_distance), state.totalDistance)
         SummaryItem(stringResource(R.string.summary_average_distance), state.averageDistance)
         SummaryItem(stringResource(R.string.summary_average_speed), state.averageSpeed)
@@ -333,11 +348,21 @@ private fun SummaryBox(state: SummaryBoxState) {
         SummaryItem(stringResource(R.string.summary_average_ascent), state.averageAscent)
         SummaryItem(stringResource(R.string.summary_average_descent), state.averageDescent)
         SummaryItem(stringResource(R.string.summary_average_heart_rate), state.averageHeartRate)
-        SummaryItem(stringResource(R.string.summary_maximal_heart_rate), state.maximumHeartRate)
         SummaryItem(
             stringResource(R.string.summary_average_temperature),
             state.averageTemperature,
         )
+    }
+}
+
+@Composable
+private fun RecordsBox(state: RecordsBoxState, navigateActivity: (Int) -> Unit) {
+    InfoBox {
+        RecordItem(navigateActivity, "Longest duration:", state.maximalDuration)
+        RecordItem(navigateActivity, "Highest distance:", state.highestDistance)
+        RecordItem(navigateActivity, "Highest average speed:", state.highestAverageMovingSpeed)
+        RecordItem(navigateActivity, "Highest Ascent:", state.highestAscent)
+        RecordItem(navigateActivity, "Highest heart rate:", state.highestHeartRate)
     }
 }
 
@@ -371,6 +396,33 @@ private fun SummaryItem(label: String, value: String?, icon: @Composable () -> U
 
         AnimatedContent(value, label = "SummaryItemValue") { actualValue ->
             Text(actualValue, modifier = Modifier.weight(1f))
+        }
+    }
+}
+
+@Composable
+private fun RecordItem(
+    navigateActivity: (Int) -> Unit,
+    label: String,
+    entry: RecordsBoxState.Entry?
+) {
+    if (entry == null) return
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable { navigateActivity(entry.activityId) }) {
+        Text(label, style = MaterialTheme.typography.bodySmall, modifier = Modifier.weight(1f))
+        AnimatedContent(entry, modifier = Modifier.weight(1f)) { actualEntry ->
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(actualEntry.date)
+                Text(actualEntry.value)
+            }
         }
     }
 }
@@ -462,7 +514,6 @@ fun PreviewSummaryBox() {
         totalActivities = "198",
         totalTime = "666h",
         averageTime = "1.5h",
-        maximumTime = "8h",
         totalDistance = "12.000km",
         averageDistance = "48km",
         averageSpeed = "30kmh/h",
@@ -472,7 +523,6 @@ fun PreviewSummaryBox() {
         averageAscent = "150m",
         averageDescent = "150m",
         averageHeartRate = "150bpm",
-        maximumHeartRate = "190bpm",
         averageTemperature = "15°C"
     )
     SummaryBox(state)

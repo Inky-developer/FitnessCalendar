@@ -30,6 +30,7 @@ data class SummaryState(
     val pieChartState: PieChartState<Displayable>,
     val legendItems: List<Displayable>,
     val summaryBoxState: SummaryBoxState,
+    val recordsBoxState: RecordsBoxState,
     val mosaicState: MosaicChartState<LocalDate>,
     val places: Map<Place?, Int>,
     val feelChartState: PieChartState<Feel>,
@@ -76,6 +77,7 @@ data class SummaryState(
             val legendItems = chartStats.toList().sortedBy { (_, v) -> -v.size }.map { (k, _) -> k }
 
             val summaryBoxState = SummaryBoxState(context, statistics)
+            val recordsBoxState = RecordsBoxState(context, statistics)
 
             val mosaicState =
                 statistics.calculateMosaicState(mosaicColors.map { Color(context.getColor(it)) })
@@ -128,6 +130,7 @@ data class SummaryState(
                 pieChartState = pieChartState,
                 legendItems = legendItems,
                 summaryBoxState = summaryBoxState,
+                recordsBoxState = recordsBoxState,
                 mosaicState = mosaicState,
                 places = places,
                 feelChartState = feelChartState,
