@@ -43,7 +43,9 @@ class SummaryViewTest {
                     filter = ActivityFilter(),
                     onBack = {},
                     onNavigateFilter = {},
-                    onEditFilter = {})
+                    onEditFilter = {},
+                    onNavigateActivity = {}
+                )
             }
         }
 
