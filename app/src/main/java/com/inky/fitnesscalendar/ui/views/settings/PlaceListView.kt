@@ -1,14 +1,21 @@
 package com.inky.fitnesscalendar.ui.views.settings
 
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Add
@@ -17,6 +24,7 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -31,9 +39,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -41,14 +51,16 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
+import com.inky.fitnesscalendar.data.ContentColor
 import com.inky.fitnesscalendar.db.entities.Place
 import com.inky.fitnesscalendar.ui.components.ActivityImage
 import com.inky.fitnesscalendar.ui.components.BottomSheetButton
 import com.inky.fitnesscalendar.ui.components.ImageViewer
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
+import com.inky.fitnesscalendar.ui.components.getAppBarContainerColor
 import com.inky.fitnesscalendar.view_model.PlaceListViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun PlaceListView(
     viewModel: PlaceListViewModel = hiltViewModel(),
@@ -80,13 +92,27 @@ fun PlaceListView(
         val places by viewModel.places.collectAsState()
         val activityCounts by viewModel.placeActivityCounts.collectAsState()
 
-        PlaceList(
+        var filterColor by rememberSaveable { mutableStateOf<ContentColor?>(null) }
+        val filteredPlaces = remember(
             places,
-            activityCounts,
-            onDeletePlace = { viewModel.delete(it) },
-            onEditPlace = { onEditPlace(it) },
-            modifier = Modifier.padding(innerPadding)
-        )
+            filterColor
+        ) { places.filter { filterColor == null || it.color == filterColor } }
+
+        Column(modifier = Modifier.padding(innerPadding)) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(getAppBarContainerColor(scrollBehavior))
+            ) {
+                ColorFilter(filterColor = filterColor, onFilterColor = { filterColor = it })
+            }
+            PlaceList(
+                filteredPlaces,
+                activityCounts,
+                onDeletePlace = { viewModel.delete(it) },
+                onEditPlace = { onEditPlace(it) },
+            )
+        }
     }
 }
 
@@ -106,6 +132,33 @@ private fun PlaceList(
                 onDelete = { onDeletePlace(place) },
                 onEdit = { onEditPlace(place) },
                 modifier = Modifier.animateItem()
+            )
+        }
+    }
+}
+
+@Composable
+private fun ColorFilter(filterColor: ContentColor?, onFilterColor: (ContentColor?) -> Unit) {
+    LazyRow(
+        contentPadding = PaddingValues(horizontal = 8.dp),
+        modifier = Modifier
+            .padding(horizontal = 4.dp)
+            .fillMaxWidth()
+    ) {
+        items(ContentColor.entries) { color ->
+            FilterChip(
+                selected = filterColor == color,
+                onClick = { onFilterColor(if (filterColor == color) null else color) },
+                label = { Text(color.text()) },
+                leadingIcon = {
+                    Box(
+                        modifier = Modifier
+                            .size(16.dp)
+                            .clip(CircleShape)
+                            .background(color.color())
+                    )
+                },
+                modifier = Modifier.padding(horizontal = 4.dp)
             )
         }
     }

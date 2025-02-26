@@ -19,7 +19,6 @@ import com.inky.fitnesscalendar.data.measure.Speed
 import com.inky.fitnesscalendar.data.measure.Temperature
 import com.inky.fitnesscalendar.data.measure.metersPerSecond
 import com.inky.fitnesscalendar.util.toLocalDate
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.util.Date
 
