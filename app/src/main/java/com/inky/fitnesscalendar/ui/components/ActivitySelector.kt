@@ -5,6 +5,7 @@ import android.os.Parcelable
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
@@ -168,7 +169,9 @@ private fun PlaceSelector(
     DropdownMenu(
         expanded = showDialog,
         onDismissRequest = { showDialog = false },
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight(0.5f)
     ) {
         if (currentPlace != null) {
             DropdownMenuItem(
