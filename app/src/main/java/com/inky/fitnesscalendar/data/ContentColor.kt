@@ -23,5 +23,5 @@ enum class ContentColor(@ColorRes val colorId: Int, @StringRes val nameId: Int) 
     fun color() = colorResource(colorId)
 
     @Composable
-    fun name() = stringResource(nameId)
+    fun text() = stringResource(nameId)
 }

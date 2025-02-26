@@ -326,7 +326,7 @@ fun NewActivity(
             AnimatedVisibility(visible = editState.activitySelectorState.activityType?.hasFeel() == true) {
                 OptionGroup(
                     label = stringResource(R.string.select_feel),
-                    selectionLabel = stringResource(editState.feel.nameId)
+                    selectionLabel = editState.feel.text()
                 ) {
                     FeelSelector(
                         feel = editState.feel,
@@ -441,7 +441,7 @@ private fun DateTimeInput(
     ) {
         Text(
             stringResource(
-                id = labelId,
+                labelId,
                 dateTimeStr.first,
                 dateTimeStr.second
             )

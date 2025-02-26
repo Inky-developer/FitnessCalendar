@@ -313,7 +313,7 @@ fun Statistics(name: String, stats: ActivityStatistics, onClick: () -> Unit) {
                         .fillMaxWidth()
                 ) {
                     Text(
-                        activityCategory.emoji + stringResource(activityCategory.nameId),
+                        activityCategory.emoji + activityCategory.text(),
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.weight(1f)

@@ -111,7 +111,7 @@ fun EditDayDialog(
 
             OptionGroup(
                 label = stringResource(R.string.select_feel),
-                selectionLabel = stringResource(editState.feel.nameId)
+                selectionLabel = editState.feel.text()
             ) {
                 FeelSelector(
                     feel = editState.feel,

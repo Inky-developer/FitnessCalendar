@@ -332,7 +332,7 @@ private fun GroupingSelectButton(
 
         for (category in ActivityCategory.entries) {
             DropdownMenuItem(
-                text = { Text(category.emoji + " " + stringResource(category.nameId)) },
+                text = { Text(category.emoji + " " + category.text()) },
                 onClick = {
                     menuOpen = false
                     onGrouping(Grouping.Category(category, activityTypes))

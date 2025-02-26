@@ -286,7 +286,7 @@ private fun ActivityCardContent(activity: Activity, place: Place?) {
             ) {
                 Text(activity.vehicle.emoji, style = MaterialTheme.typography.bodyLarge)
                 Text(
-                    stringResource(activity.vehicle.nameId),
+                    activity.vehicle.text(),
                     style = MaterialTheme.typography.bodyLarge
                 )
             }

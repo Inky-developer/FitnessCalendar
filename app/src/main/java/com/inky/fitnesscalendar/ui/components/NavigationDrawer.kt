@@ -63,7 +63,7 @@ fun NavigationDrawer(
                         stringResource(R.string.app_icon)
                     )
                     Text(
-                        stringResource(id = R.string.app_name),
+                        stringResource(R.string.app_name),
                         modifier = Modifier.padding(all = 16.dp),
                         color = MaterialTheme.colorScheme.onPrimaryContainer,
                         style = TextStyle(

@@ -3,6 +3,7 @@ package com.inky.fitnesscalendar.data
 import android.content.Context
 import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
+import androidx.compose.runtime.Composable
 import com.inky.fitnesscalendar.R
 
 enum class Feel(@StringRes val nameId: Int, val emoji: String, @ColorRes val colorId: Int) :
@@ -16,6 +17,4 @@ enum class Feel(@StringRes val nameId: Int, val emoji: String, @ColorRes val col
     override fun getShortText() = emoji
 
     override fun getColor(context: Context) = context.getColor(colorId)
-
-
 }

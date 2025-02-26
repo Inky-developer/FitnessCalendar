@@ -206,7 +206,7 @@ fun EditTypeDialog(
 
             OptionGroup(
                 label = stringResource(R.string.select_category),
-                selectionLabel = if (state.category != null) stringResource(state.category!!.nameId) else null,
+                selectionLabel = state.category?.text(),
             ) {
                 ActivityCategorySelector(
                     isSelected = { state.category == it },
@@ -216,7 +216,7 @@ fun EditTypeDialog(
 
             OptionGroup(
                 label = stringResource(R.string.select_color),
-                selectionLabel = if (state.color != null) stringResource(state.color!!.nameId) else null,
+                selectionLabel = state.color?.text(),
             ) {
                 ColorSelector(
                     isSelected = { state.color == it },
@@ -232,7 +232,7 @@ fun EditTypeDialog(
             AnimatedVisibility(state.hasPlace) {
                 OptionGroup(
                     label = stringResource(R.string.limit_places_by_color),
-                    selectionLabel = state.limitPlacesByColor?.name(),
+                    selectionLabel = state.limitPlacesByColor?.text(),
                 ) {
                     ColorSelector(
                         isSelected = { state.limitPlacesByColor == it },

@@ -160,7 +160,7 @@ private fun EditPlaceDialog(initialPlace: Place?, onDismiss: () -> Unit, onSave:
 
             OptionGroup(
                 label = stringResource(R.string.select_color),
-                selectionLabel = if (color != null) stringResource(color!!.nameId) else null,
+                selectionLabel = color?.text(),
                 modifier = Modifier.padding(vertical = 4.dp)
             ) {
                 ColorSelector(
