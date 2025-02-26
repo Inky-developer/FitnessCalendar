@@ -19,6 +19,8 @@ data class ActivityType(
     @ColumnInfo(name = "emoji") val emoji: String,
     @ColumnInfo(name = "color") val color: ContentColor,
     @ColumnInfo(name = "has_place", defaultValue = "false") val hasPlace: Boolean = false,
+    // Only suggests places for this activity type that have this color
+    @ColumnInfo(name = "limit_places_by_color") val limitPlacesByColor: ContentColor? = null,
     @ColumnInfo(name = "has_vehicle") val hasVehicle: Boolean = false,
     @ColumnInfo(name = "has_duration") val hasDuration: Boolean = true,
     @ColumnInfo(name = "has_distance", defaultValue = "false") val hasDistance: Boolean = false,

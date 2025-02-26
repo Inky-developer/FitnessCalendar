@@ -29,7 +29,7 @@ import com.inky.fitnesscalendar.util.DATABASE_NAME
 private const val TAG = "Database"
 
 @Database(
-    version = 33,
+    version = 34,
     entities = [
         Activity::class,
         Recording::class,
@@ -62,6 +62,7 @@ private const val TAG = "Database"
         AutoMigration(from = 30, to = 31),
         AutoMigration(from = 31, to = 32),
         AutoMigration(from = 32, to = 33),
+        AutoMigration(from = 33, to = 34),
     ]
 )
 @TypeConverters(Converters::class)

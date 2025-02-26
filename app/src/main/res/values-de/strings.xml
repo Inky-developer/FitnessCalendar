@@ -329,4 +329,5 @@
     <string name="Hour">Stunde</string>
     <string name="share_gpx">GPX teilen</string>
     <string name="summary_maximal_time">Maximale Dauer:</string>
+    <string name="limit_places_by_color">Nur Orte dieser Farbe erlauben:</string>
 </resources>

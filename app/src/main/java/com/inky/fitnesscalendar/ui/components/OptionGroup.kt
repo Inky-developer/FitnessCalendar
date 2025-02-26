@@ -1,6 +1,9 @@
 package com.inky.fitnesscalendar.ui.components
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -30,13 +33,29 @@ fun OptionGroup(
             .fillMaxWidth()
     ) {
         Column {
-            Text(
-                selectionLabel ?: label,
-                style = MaterialTheme.typography.labelSmall,
-                color = if (selectionLabel != null) MaterialTheme.colorScheme.onSurface else MaterialTheme.colorScheme.secondary,
-                modifier = Modifier.padding(start = 4.dp)
-            )
+            Row(
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 4.dp)
+            ) {
+                LabelText(label)
+                AnimatedContent(selectionLabel) { label ->
+                    if (label != null) {
+                        LabelText(label, color = MaterialTheme.colorScheme.onSurface)
+                    }
+                }
+            }
             content()
         }
     }
+}
+
+@Composable
+private fun LabelText(text: String, color: Color = MaterialTheme.colorScheme.secondary) {
+    Text(
+        text,
+        style = MaterialTheme.typography.labelSmall,
+        color = color,
+    )
 }

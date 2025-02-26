@@ -330,4 +330,5 @@
     <string name="Hour">Hour</string>
     <string name="share_gpx">Share GPX</string>
     <string name="summary_maximal_time">Longest time:</string>
+    <string name="limit_places_by_color">Limit places to this color:</string>
 </resources>

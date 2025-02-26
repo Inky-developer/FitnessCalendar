@@ -1,5 +1,6 @@
 # Unreleased
 
+- Allow limiting suggested places for an activity type by their color
 - Add dedicated records section to the summary view
 - Don't show statistics if they are 0
 - Use dynamic y-range for heart rate graphs, so that it will not always start at 0

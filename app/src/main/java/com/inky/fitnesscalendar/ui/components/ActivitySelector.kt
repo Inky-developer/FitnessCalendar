@@ -109,7 +109,8 @@ fun ActivitySelector(
             PlaceSelector(
                 currentPlace = state.place,
                 onPlace = { onState(state.copy(place = it)) },
-                onNavigateNewPlace = onNavigateNewPlace
+                onNavigateNewPlace = onNavigateNewPlace,
+                placeFilter = { state.activityType?.limitPlacesByColor == null || state.activityType.limitPlacesByColor == it.color }
             )
         }
 
@@ -143,9 +144,11 @@ fun ActivitySelector(
 private fun PlaceSelector(
     currentPlace: Place?,
     onPlace: (Place?) -> Unit,
-    onNavigateNewPlace: (() -> Unit)? = null
+    onNavigateNewPlace: (() -> Unit)?,
+    placeFilter: (Place) -> Boolean
 ) {
-    val places = localDatabaseValues.current.places
+    val allPlaces = localDatabaseValues.current.places
+    val places = remember(placeFilter, allPlaces) { allPlaces.filter(placeFilter) }
     var showDialog by rememberSaveable { mutableStateOf(false) }
 
     TextButton(

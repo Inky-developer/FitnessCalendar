@@ -1,6 +1,7 @@
 package com.inky.fitnesscalendar.ui.views.settings
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -228,6 +229,21 @@ fun EditTypeDialog(
                 value = state.hasPlace,
                 onValue = { state = state.copy(hasPlace = it) }
             )
+            AnimatedVisibility(state.hasPlace) {
+                OptionGroup(
+                    label = stringResource(R.string.limit_places_by_color),
+                    selectionLabel = state.limitPlacesByColor?.name(),
+                ) {
+                    ColorSelector(
+                        isSelected = { state.limitPlacesByColor == it },
+                        onSelect = {
+                            state = state.copy(
+                                limitPlacesByColor = if (state.limitPlacesByColor == it) null else it
+                            )
+                        }
+                    )
+                }
+            }
             Toggle(
                 name = stringResource(R.string.has_duration),
                 value = state.hasDuration,

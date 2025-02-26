@@ -2,6 +2,9 @@ package com.inky.fitnesscalendar.data
 
 import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.stringResource
 import com.inky.fitnesscalendar.R
 
 enum class ContentColor(@ColorRes val colorId: Int, @StringRes val nameId: Int) {
@@ -14,5 +17,11 @@ enum class ContentColor(@ColorRes val colorId: Int, @StringRes val nameId: Int) 
     Color7(R.color.content_7, R.string.color_ice),
     Color8(R.color.content_8, R.string.color_red),
     Color9(R.color.content_9, R.string.color_dark_green),
-    ColorOther(R.color.content_other, R.string.color_grey),
+    ColorOther(R.color.content_other, R.string.color_grey);
+
+    @Composable
+    fun color() = colorResource(colorId)
+
+    @Composable
+    fun name() = stringResource(nameId)
 }
