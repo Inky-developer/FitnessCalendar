@@ -331,4 +331,9 @@
     <string name="share_gpx">Share GPX</string>
     <string name="summary_maximal_time">Longest time:</string>
     <string name="limit_places_by_color">Limit places to this color:</string>
+    <string name="records_longest_duration">Longest duration:</string>
+    <string name="records_highest_distance">Highest distance:</string>
+    <string name="records_highest_avg_speed">Highest average speed:</string>
+    <string name="records_highest_ascent">Highest Ascent:</string>
+    <string name="records_highest_heart_rate">Highest heart rate:</string>
 </resources>

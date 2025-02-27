@@ -330,4 +330,9 @@
     <string name="share_gpx">GPX teilen</string>
     <string name="summary_maximal_time">Maximale Dauer:</string>
     <string name="limit_places_by_color">Nur Orte dieser Farbe erlauben:</string>
+    <string name="records_longest_duration">Längste Dauer:</string>
+    <string name="records_highest_distance">Höchste Distanz:</string>
+    <string name="records_highest_avg_speed">Höchste Durchschnittsgeschwindigkeit:</string>
+    <string name="records_highest_ascent">Meiste Höhenmeter:</string>
+    <string name="records_highest_heart_rate">Höchste Herzfrequenz:</string>
 </resources>

@@ -358,11 +358,26 @@ private fun SummaryBox(state: SummaryBoxState) {
 @Composable
 private fun RecordsBox(state: RecordsBoxState, navigateActivity: (Int) -> Unit) {
     InfoBox {
-        RecordItem(navigateActivity, "Longest duration:", state.maximalDuration)
-        RecordItem(navigateActivity, "Highest distance:", state.highestDistance)
-        RecordItem(navigateActivity, "Highest average speed:", state.highestAverageMovingSpeed)
-        RecordItem(navigateActivity, "Highest Ascent:", state.highestAscent)
-        RecordItem(navigateActivity, "Highest heart rate:", state.highestHeartRate)
+        RecordItem(
+            navigateActivity,
+            stringResource(R.string.records_longest_duration), state.maximalDuration
+        )
+        RecordItem(
+            navigateActivity,
+            stringResource(R.string.records_highest_distance), state.highestDistance
+        )
+        RecordItem(
+            navigateActivity,
+            stringResource(R.string.records_highest_avg_speed), state.highestAverageMovingSpeed
+        )
+        RecordItem(
+            navigateActivity,
+            stringResource(R.string.records_highest_ascent), state.highestAscent
+        )
+        RecordItem(
+            navigateActivity,
+            stringResource(R.string.records_highest_heart_rate), state.highestHeartRate
+        )
     }
 }
 
