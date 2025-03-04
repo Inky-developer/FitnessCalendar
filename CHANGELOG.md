@@ -1,5 +1,7 @@
 # Unreleased
 
+- Let mosaic chart always end at the current date
+
 
 # 2025.02.2
 
