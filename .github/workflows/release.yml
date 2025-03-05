@@ -52,8 +52,10 @@ jobs:
         with:
           name: FitnessCalendar-${{ github.ref_name }}
           path: release_binaries
+      - name: Create Changelog file
+        run: source tools/_functions.sh; getCurrentChangelog > release_notes.md
       - name: Create release
         uses: ncipollo/release-action@v1
         with:
           artifacts: "release_binaries/*"
-          omitBody: true
+          bodyFile: "release_notes.md"

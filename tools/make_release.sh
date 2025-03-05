@@ -6,6 +6,8 @@ VERSION_FILE="app/version.properties"
 # shellcheck source=app/version.properties
 source "$VERSION_FILE"
 
+source tools/_functions.sh
+
 
 function incrementVersionCode() {
   NEW_VERSION_CODE=$((versionCode + 1))
@@ -25,10 +27,7 @@ function updateVersionName() {
 }
 
 function writeFastlaneChangelog() {
-  # Separate the changelog into chunks of double newlines and only keep the second chunk
-  # (Which contains the unreleased release notes)
-  RELEASE_NOTES=$(awk -v RS='\n\n' 'NR == 2' CHANGELOG.md)
-  echo "$RELEASE_NOTES" > "fastlane/metadata/android/en-US/changelogs/$NEW_VERSION_CODE.txt"
+  getCurrentChangelog > "fastlane/metadata/android/en-US/changelogs/$NEW_VERSION_CODE.txt"
 }
 
 # Moves all notes under the unreleased header into the new release
