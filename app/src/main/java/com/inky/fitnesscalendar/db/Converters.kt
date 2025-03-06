@@ -10,7 +10,6 @@ import com.inky.fitnesscalendar.data.measure.Duration
 import com.inky.fitnesscalendar.data.measure.meters
 import com.inky.fitnesscalendar.data.measure.ms
 import com.inky.fitnesscalendar.db.entities.Activity
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import java.util.Date
 
@@ -36,12 +35,12 @@ class Converters {
     }
 
     @TypeConverter
-    fun distanceToLong(distance: Distance): Long {
+    fun distanceToDouble(distance: Distance): Double {
         return distance.meters
     }
 
     @TypeConverter
-    fun longToDistance(value: Long): Distance {
+    fun doubleToDistance(value: Double): Distance {
         return value.meters()
     }
 

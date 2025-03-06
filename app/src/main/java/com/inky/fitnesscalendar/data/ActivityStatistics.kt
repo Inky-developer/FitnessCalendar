@@ -39,7 +39,7 @@ value class ActivityStatistics(
         return (totalTime().elapsedMs / size).ms()
     }
 
-    fun totalDistance() = activities.sumOf { it.activity.distance?.meters ?: 0 }.meters()
+    fun totalDistance() = activities.sumOf { it.activity.distance?.meters ?: 0.0 }.meters()
 
     fun averageDistance(): Distance? {
         val distances = activities.mapNotNull { it.activity.distance?.meters }
@@ -89,10 +89,11 @@ value class ActivityStatistics(
         return (descents.sum() / descents.size).meters()
     }
 
-    fun totalAscent(): Distance = activities.sumOf { it.activity.totalAscent?.meters ?: 0 }.meters()
+    fun totalAscent(): Distance =
+        activities.sumOf { it.activity.totalAscent?.meters ?: 0.0 }.meters()
 
     fun totalDescent(): Distance =
-        activities.sumOf { it.activity.totalDescent?.meters ?: 0 }.meters()
+        activities.sumOf { it.activity.totalDescent?.meters ?: 0.0 }.meters()
 
     fun averageTemperature(): Temperature? {
         val temperatures = activities.mapNotNull { it.activity.temperature?.celsius }

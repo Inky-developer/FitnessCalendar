@@ -4,27 +4,24 @@ import android.content.Context
 import android.os.Parcelable
 import com.inky.fitnesscalendar.R
 import kotlinx.parcelize.Parcelize
-import kotlin.math.roundToLong
+import kotlin.math.roundToInt
 
 
 @Parcelize
 @JvmInline
-value class Distance internal constructor(val meters: Long) : Parcelable, Measure {
+value class Distance internal constructor(val meters: Double) : Parcelable, Measure {
     override fun formatWithContext(context: Context) = if (kilometers >= 1) {
         context.getString(R.string.x_km, "%.1f".format(kilometers))
     } else {
-        context.getString(R.string.x_m, meters)
+        context.getString(R.string.x_m, meters.roundToInt())
     }
 
-    override fun isNothing() = meters == 0L
+    override fun isNothing() = meters == 0.0
 
     val kilometers
         get() = meters / 1000.0
 }
 
-fun Long.meters() = Distance(meters = this)
-fun Double.meters() = roundToLong().meters()
+fun Double.meters() = Distance(meters = this)
 
-fun Long.kilometers() = Distance(meters = this * 1000)
-fun Int.kilometers() = toLong().kilometers()
-fun Double.kilometers() = roundToLong().kilometers()
+fun Double.kilometers() = Distance(meters = 1000 * this)

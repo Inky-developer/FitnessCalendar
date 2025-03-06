@@ -37,7 +37,6 @@ import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.gpx.Coordinate
 import com.inky.fitnesscalendar.data.gpx.GpxTrackPoint
 import com.inky.fitnesscalendar.data.measure.Elevation
-import com.inky.fitnesscalendar.data.measure.kilometers
 import com.inky.fitnesscalendar.data.measure.meters
 import com.inky.fitnesscalendar.db.entities.Track
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
@@ -171,10 +170,7 @@ fun TrackGraph(track: Track, projection: TrackGraphProjection, modifier: Modifie
                 title = stringResource(R.string.legend_distance_km),
                 titleComponent = legendComponent(),
                 itemPlacer = remember {
-                    HorizontalAxis.ItemPlacer.aligned(
-                        addExtremeLabelPadding = true,
-                        spacing = { 1.kilometers().meters.toInt() }
-                    )
+                    HorizontalAxis.ItemPlacer.aligned(addExtremeLabelPadding = true)
                 },
                 valueFormatter = rememberKmValueFormatter()
             ),
@@ -239,9 +235,9 @@ enum class TrackGraphProjection(
         R.string.unit_celsius
     );
 
-    fun apply(track: Track): Map<Long, Float> {
+    fun apply(track: Track): Map<Double, Float> {
         val points = track.computedPoints()
-        val result = mutableMapOf<Long, Float>()
+        val result = mutableMapOf<Double, Float>()
 
         for (point in points) {
             mapPoint(point)?.let { result[point.cumDistance.meters] = it }
