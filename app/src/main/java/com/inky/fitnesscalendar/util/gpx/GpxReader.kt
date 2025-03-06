@@ -188,7 +188,7 @@ class GpxReader(val tracks: List<GpxTrack>) {
 
                     EXTENSION_GARMIN_HEART_RATE -> {
                         val heartRateString = readText(parser, EXTENSION_GARMIN_HEART_RATE)
-                        attributes.heartRate = heartRateString.toFloatOrNull()?.bpm()
+                        attributes.heartRate = heartRateString.toDoubleOrNull()?.bpm()
                             ?: throw XmlPullParserException("Invalid heart rate: $heartRateString")
                     }
 
