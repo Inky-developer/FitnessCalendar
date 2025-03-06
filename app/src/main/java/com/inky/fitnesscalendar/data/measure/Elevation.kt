@@ -7,7 +7,7 @@ import kotlin.math.roundToInt
 
 @Serializable
 @JvmInline
-value class Elevation(val meters: Float) : Comparable<Elevation>, Measure {
+value class Elevation(val meters: Double) : Comparable<Elevation>, Measure {
     override fun compareTo(other: Elevation) = this.meters.compareTo(other.meters)
 
     override fun isNothing() = false

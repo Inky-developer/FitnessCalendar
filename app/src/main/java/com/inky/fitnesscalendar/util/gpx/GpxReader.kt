@@ -210,7 +210,7 @@ class GpxReader(val tracks: List<GpxTrack>) {
         @Throws(XmlPullParserException::class)
         private fun readElevation(parser: XmlPullParser): Elevation {
             val elevationString = readText(parser, "ele")
-            val elevation = elevationString.toFloatOrNull()
+            val elevation = elevationString.toDoubleOrNull()
                 ?: throw XmlPullParserException("Invalid elevation: $elevationString")
             return Elevation(meters = elevation)
         }

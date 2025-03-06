@@ -235,9 +235,9 @@ enum class TrackGraphProjection(
         R.string.unit_celsius
     );
 
-    fun apply(track: Track): Map<Double, Float> {
+    fun apply(track: Track): Map<Double, Double> {
         val points = track.computedPoints()
-        val result = mutableMapOf<Double, Float>()
+        val result = mutableMapOf<Double, Double>()
 
         for (point in points) {
             mapPoint(point)?.let { result[point.cumDistance.meters] = it }
@@ -260,11 +260,11 @@ enum class TrackGraphProjection(
         else -> CartesianLayerRangeProvider.auto()
     }
 
-    private fun mapPoint(point: Track.ComputedTrackPoint): Float? = when (this) {
-        Speed -> point.speed.kmh.toFloat()
-        HeartRate -> point.point.heartFrequency?.bpm
+    private fun mapPoint(point: Track.ComputedTrackPoint): Double? = when (this) {
+        Speed -> point.speed.kmh
+        HeartRate -> point.point.heartFrequency?.bpm?.toDouble()
         Elevation -> point.point.elevation?.meters
-        Temperature -> point.point.temperature?.celsius
+        Temperature -> point.point.temperature?.celsius?.toDouble()
     }
 }
 
@@ -424,42 +424,42 @@ fun PreviewTrackGraph() {
             GpxTrackPoint(
                 Coordinate(0.0, 0.0),
                 time = trackPointTime,
-                elevation = Elevation(meters = 0f)
+                elevation = Elevation(meters = 0.0)
             ),
             GpxTrackPoint(
                 Coordinate(0.0, 0.0),
                 time = trackPointTime,
-                elevation = Elevation(meters = 10f)
+                elevation = Elevation(meters = 10.0)
             ),
             GpxTrackPoint(
                 Coordinate(0.0, 0.0),
                 time = trackPointTime,
-                elevation = Elevation(meters = 5f)
+                elevation = Elevation(meters = 5.0)
             ),
             GpxTrackPoint(
                 Coordinate(0.0, 0.0),
                 time = trackPointTime,
-                elevation = Elevation(meters = 10f)
+                elevation = Elevation(meters = 10.0)
             ),
             GpxTrackPoint(
                 Coordinate(0.0, 0.0),
                 time = trackPointTime,
-                elevation = Elevation(meters = 20f)
+                elevation = Elevation(meters = 20.0)
             ),
             GpxTrackPoint(
                 Coordinate(0.0, 0.0),
                 time = trackPointTime,
-                elevation = Elevation(meters = 17f)
+                elevation = Elevation(meters = 17.0)
             ),
             GpxTrackPoint(
                 Coordinate(0.0, 0.0),
                 time = trackPointTime,
-                elevation = Elevation(meters = 6f)
+                elevation = Elevation(meters = 6.0)
             ),
             GpxTrackPoint(
                 Coordinate(0.0, 0.0),
                 time = trackPointTime,
-                elevation = Elevation(meters = 0f)
+                elevation = Elevation(meters = 0.0)
             ),
         )
     )

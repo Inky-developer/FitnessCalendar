@@ -220,7 +220,7 @@ data class Track(
             // This is quite arbitrary, but yields somewhat decent results
             // Still, the computed totals ascent and descent can differ wildly from source data :(
             val windowSize = 6
-            var runningSum = 0f
+            var runningSum = 0.0
 
             if (data.size <= windowSize) {
                 for (point in data) {
@@ -230,15 +230,15 @@ data class Track(
             }
 
             for (point in data.subList(0, windowSize)) {
-                runningSum += point.point.elevation?.meters ?: 0f
+                runningSum += point.point.elevation?.meters ?: 0.0
                 point.computedElevation = point.point.elevation
             }
 
             for ((index, point) in data.subList(windowSize / 2, data.size - windowSize / 2)
                 .withIndex()) {
                 point.computedElevation = Elevation(meters = runningSum / windowSize)
-                runningSum -= data[index].point.elevation?.meters ?: 0f
-                runningSum += data[index + windowSize].point.elevation?.meters ?: 0f
+                runningSum -= data[index].point.elevation?.meters ?: 0.0
+                runningSum += data[index + windowSize].point.elevation?.meters ?: 0.0
             }
 
             for (point in data.subList(data.size - windowSize / 2, data.size)) {
