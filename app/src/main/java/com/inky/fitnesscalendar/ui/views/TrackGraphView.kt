@@ -84,6 +84,7 @@ import kotlin.math.floor
 import kotlin.math.log10
 import kotlin.math.pow
 import kotlin.math.roundToInt
+import kotlin.math.roundToLong
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -235,12 +236,12 @@ enum class TrackGraphProjection(
         R.string.unit_celsius
     );
 
-    fun apply(track: Track): Map<Double, Double> {
+    fun apply(track: Track): Map<Long, Double> {
         val points = track.computedPoints()
-        val result = mutableMapOf<Double, Double>()
+        val result = mutableMapOf<Long, Double>()
 
         for (point in points) {
-            mapPoint(point)?.let { result[point.cumDistance.meters] = it }
+            mapPoint(point)?.let { result[point.cumDistance.meters.roundToLong()] = it }
         }
 
         return result
