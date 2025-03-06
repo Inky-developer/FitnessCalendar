@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 @JvmInline
-value class Temperature(val celsius: Float) : Comparable<Temperature>, Measure {
+value class Temperature(val celsius: Double) : Comparable<Temperature>, Measure {
     override fun compareTo(other: Temperature) = this.celsius.compareTo(other.celsius)
 
     override fun formatWithContext(context: Context) =
@@ -15,4 +15,4 @@ value class Temperature(val celsius: Float) : Comparable<Temperature>, Measure {
     override fun isNothing() = false
 }
 
-fun Float.celsius() = Temperature(celsius = this)
+fun Double.celsius() = Temperature(celsius = this)

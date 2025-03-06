@@ -182,7 +182,7 @@ class GpxReader(val tracks: List<GpxTrack>) {
                 when (it.name) {
                     EXTENSION_GARMIN_TEMPERATURE -> {
                         val temperatureString = readText(parser, EXTENSION_GARMIN_TEMPERATURE)
-                        attributes.temperature = temperatureString.toFloatOrNull()?.celsius()
+                        attributes.temperature = temperatureString.toDoubleOrNull()?.celsius()
                             ?: throw XmlPullParserException("Invalid temperature: $temperatureString")
                     }
 
