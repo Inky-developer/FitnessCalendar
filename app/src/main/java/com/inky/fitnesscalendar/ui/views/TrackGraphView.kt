@@ -263,9 +263,9 @@ enum class TrackGraphProjection(
 
     private fun mapPoint(point: Track.ComputedTrackPoint): Double? = when (this) {
         Speed -> point.speed.kmh
-        HeartRate -> point.point.heartFrequency?.bpm?.toDouble()
+        HeartRate -> point.point.heartFrequency?.bpm
         Elevation -> point.point.elevation?.meters
-        Temperature -> point.point.temperature?.celsius?.toDouble()
+        Temperature -> point.point.temperature?.celsius
     }
 }
 
