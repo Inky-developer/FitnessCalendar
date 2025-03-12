@@ -31,6 +31,9 @@ class BackupViewModel @Inject constructor(
     private var _backupInProgress = MutableStateFlow(false)
     val backupInProgress get() = _backupInProgress.asStateFlow()
 
+    private var _restoreInProgress = MutableStateFlow(false)
+    val restoreInProgress get() = _restoreInProgress.asStateFlow()
+
     private var _lastBackup = MutableStateFlow<LocalDateTime?>(null)
     val lastBackup get() = _lastBackup.asStateFlow()
 
@@ -51,6 +54,8 @@ class BackupViewModel @Inject constructor(
     }
 
     fun doBackup() = viewModelScope.launch(Dispatchers.IO) {
+        if (_backupInProgress.value) return@launch
+
         val uri = PREF_BACKUP_URI.get(context)
         _backupInProgress.value = true
         val error = if (uri != null) {
@@ -69,6 +74,19 @@ class BackupViewModel @Inject constructor(
             message,
             duration = SnackbarDuration.Long
         )
+    }
+
+    fun doRestore(file: Uri) = viewModelScope.launch(Dispatchers.IO) {
+        if (_restoreInProgress.value) return@launch
+        _restoreInProgress.value = true
+
+
+        val error = backupRepository.restore(file)
+
+        _restoreInProgress.value = false
+
+        val message = context.getString(error.msgID)
+        snackbarHostState.showSnackbar(message, duration = SnackbarDuration.Long)
     }
 
     private fun updateLastBackup(dir: Uri?) {

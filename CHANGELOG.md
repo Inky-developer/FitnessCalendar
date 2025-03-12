@@ -1,6 +1,7 @@
 # Unreleased
 
 - Let mosaic chart always end at the current date
+- Implement backup restore functionality
 
 
 # 2025.02.2

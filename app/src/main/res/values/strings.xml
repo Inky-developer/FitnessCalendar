@@ -336,4 +336,9 @@
     <string name="records_highest_avg_speed">Highest average speed:</string>
     <string name="records_highest_ascent">Highest Ascent:</string>
     <string name="records_highest_heart_rate">Highest heart rate:</string>
+    <string name="restore_backup">Restore backup</string>
+    <string name="warning">Warning</string>
+    <string name="ask_restore_backup">Restore backup?</string>
+    <string name="this_will_overwrite_all_app_data">This action will overwrite all app data and cannot be undone!</string>
+    <string name="cannot_read_file">Cannot read the file</string>
 </resources>

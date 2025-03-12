@@ -335,4 +335,9 @@
     <string name="records_highest_avg_speed">Höchste Durchschnittsgeschwindigkeit:</string>
     <string name="records_highest_ascent">Meiste Höhenmeter:</string>
     <string name="records_highest_heart_rate">Höchste Herzfrequenz:</string>
+    <string name="restore_backup">Sicherung wiederherstellen</string>
+    <string name="warning">Warnung</string>
+    <string name="ask_restore_backup">Sicherung wiederherstellen?</string>
+    <string name="this_will_overwrite_all_app_data">Alle Daten werden mit dieser Aktion unwiederbringlich überschrieben!</string>
+    <string name="cannot_read_file">Kann die Datei nicht lesen</string>
 </resources>
