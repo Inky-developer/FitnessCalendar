@@ -38,7 +38,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.preferences.Preference.Companion.PREF_BACKUP_URI
-import com.inky.fitnesscalendar.repository.BackupRepository
+import com.inky.fitnesscalendar.repository.backup.BackupRepository
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.view_model.settings.BackupViewModel
 import java.time.LocalDateTime

@@ -1,4 +1,4 @@
-package com.inky.fitnesscalendar.repository
+package com.inky.fitnesscalendar.repository.backup
 
 import android.content.Context
 import android.net.Uri
@@ -7,15 +7,12 @@ import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
 import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
-import androidx.sqlite.db.SimpleSQLiteQuery
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.db.AppDatabase
 import com.inky.fitnesscalendar.util.BACKUP_CACHE_FILE
-import com.inky.fitnesscalendar.util.BACKUP_DB_NAME
 import com.inky.fitnesscalendar.util.SDK_MIN_VERSION_FOR_SQLITE_VACUUM
 import com.inky.fitnesscalendar.util.Zip
 import com.inky.fitnesscalendar.util.copyFile
-import com.inky.fitnesscalendar.util.getOrCreateImagesDir
 import com.inky.fitnesscalendar.util.toLocalDateTime
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
@@ -47,6 +44,9 @@ class BackupRepository @Inject constructor(
         return Date.from(Instant.ofEpochMilli(lastModified)).toLocalDateTime()
     }
 
+    /**
+     * Creates a backup file in the given directory, or returns an error
+     */
     fun backup(directory: Uri): BackupError? {
         if (!isBackupSupported()) {
             return BackupError.OldAndroidVersion
@@ -57,8 +57,9 @@ class BackupRepository @Inject constructor(
         val zipFile = File(context.cacheDir, BACKUP_CACHE_FILE)
 
         Zip(zipFile).use { zip ->
-            backupDatabase(zip)
-            backupImages(zip)
+            for (location in BACKUP_LOCATIONS) {
+                location.backup(context, database, zip)
+            }
         }
 
         context.copyFile(zipFile.toUri(), targetUri)
@@ -73,25 +74,6 @@ class BackupRepository @Inject constructor(
         val dirFile = DocumentFile.fromTreeUri(context, directory) ?: return null
         dirFile.findFile(BACKUP_NAME)?.delete()
         return dirFile.createFile("application/zip", BACKUP_NAME)?.uri
-    }
-
-    private fun backupDatabase(zip: Zip) {
-        val dbFile = File(context.cacheDir, BACKUP_DB_NAME).apply {
-            delete()
-        }
-        val query = SimpleSQLiteQuery("VACUUM INTO ?", arrayOf(dbFile.toPath().toString()))
-        database.query(query).use {
-            it.moveToFirst()
-        }
-
-        zip.addFile(dbFile)
-    }
-
-    private fun backupImages(zip: Zip) {
-        val dir = context.getOrCreateImagesDir()
-        for (file in dir.listFiles() ?: return) {
-            zip.addFile(file, BACKUP_IMAGES_PATH)
-        }
     }
 
     companion object {
