@@ -14,6 +14,7 @@ import com.inky.fitnesscalendar.util.BACKUP_CACHE_FILE
 import com.inky.fitnesscalendar.util.SDK_MIN_VERSION_FOR_SQLITE_VACUUM
 import com.inky.fitnesscalendar.util.ZipWriter
 import com.inky.fitnesscalendar.util.copyFile
+import com.inky.fitnesscalendar.util.entries
 import com.inky.fitnesscalendar.util.restartApplication
 import com.inky.fitnesscalendar.util.toLocalDateTime
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -66,7 +67,7 @@ class BackupRepository @Inject constructor(
         val zipFile = File(context.cacheDir, BACKUP_CACHE_FILE)
 
         ZipWriter(zipFile).use { zip ->
-            for (location in BACKUP_LOCATIONS) {
+            for (location in BACKUP_LOCATIONS.values) {
                 location.backup(context, database, zip)
             }
         }
@@ -83,8 +84,14 @@ class BackupRepository @Inject constructor(
         try {
             context.contentResolver.openInputStream(uri).use { inputStream ->
                 val zip = ZipInputStream(inputStream)
-                for (location in BACKUP_LOCATIONS) {
-                    location.restore(context, database, zip)
+                val restorers = BACKUP_LOCATIONS.mapValues { it.value.restore(context, database) }
+                for (entry in zip.entries()) {
+                    if (entry.isDirectory) continue
+
+                    val dir = entry.name.split("/")[0]
+                    val restorer = restorers[dir] ?: continue
+                    Log.d(TAG, "Restoring ${entry.name} with $restorer")
+                    restorer.processEntry(entry, zip::readBytes)
                 }
             }
         } catch (e: IOException) {
