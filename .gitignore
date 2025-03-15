@@ -9,3 +9,4 @@
 .cxx
 local.properties
 .approved_files.log
+.approval_tests_temp/
