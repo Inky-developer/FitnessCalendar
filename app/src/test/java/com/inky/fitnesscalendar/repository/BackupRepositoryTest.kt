@@ -1,5 +1,6 @@
 package com.inky.fitnesscalendar.repository
 
+import android.content.Context
 import android.os.Build
 import androidx.core.net.toUri
 import androidx.room.Room
@@ -10,6 +11,8 @@ import com.inky.fitnesscalendar.db.generateSampleActivities
 import com.inky.fitnesscalendar.repository.backup.BackupRepository
 import com.inky.fitnesscalendar.testUtils.mockDatabase
 import com.inky.fitnesscalendar.util.DATABASE_NAME
+import com.inky.fitnesscalendar.util.copyFileToStorage
+import com.inky.fitnesscalendar.util.getOrCreateImagesDir
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Test
@@ -29,11 +32,19 @@ class BackupRepositoryTest {
         val originalActivities = runBlocking { originalDb.activityDao().loadActivities() }
         val originalTypes = runBlocking { originalDb.activityTypeDao().loadTypes() }
 
+        createTestImages(context)
+        assertEquals(16, context.getOrCreateImagesDir().listFiles()!!.size)
+
         val backupFile = createBackupFile(BackupRepository(originalDb, context))
+
+        context.getOrCreateImagesDir().deleteRecursively()
+        assertEquals(0, context.getOrCreateImagesDir().listFiles()!!.size)
 
         val emptyDb = mockDatabase(context)
         val repo = BackupRepository(emptyDb, context)
         repo.restoreWithoutRestart(backupFile.toUri())
+
+        assertEquals(16, context.getOrCreateImagesDir().listFiles()!!.size)
 
         val restoredDbFile = context.getDatabasePath(DATABASE_NAME)
         val copyOfRestoredDb = File.createTempFile("restored-database", ".sqlite")
@@ -56,5 +67,11 @@ class BackupRepositoryTest {
         return backupFile
     }
 
-
+    private fun createTestImages(context: Context) {
+        for (i in 0..15) {
+            val sourceImageFile = File.createTempFile("image$i", ".png")
+            sourceImageFile.writeText("Very realistic image data $i")
+            context.copyFileToStorage(sourceImageFile.toUri(), context.getOrCreateImagesDir())
+        }
+    }
 }
