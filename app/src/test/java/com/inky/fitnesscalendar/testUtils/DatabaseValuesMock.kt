@@ -47,6 +47,7 @@ fun MockDatabaseValues(content: @Composable () -> Unit) {
 fun mockDatabase(context: Context): AppDatabase {
     return Room
         .inMemoryDatabaseBuilder(context, AppDatabase::class.java)
+        .allowMainThreadQueries()
         .addCallback(object : RoomDatabase.Callback() {
             override fun onCreate(db: SupportSQLiteDatabase) {
                 loadDefaultData(db, context)

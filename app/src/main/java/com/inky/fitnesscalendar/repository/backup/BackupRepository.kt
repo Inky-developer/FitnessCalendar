@@ -58,21 +58,23 @@ class BackupRepository @Inject constructor(
      * Creates a backup file in the given directory, or returns an error
      */
     fun backup(directory: Uri): BackupError? {
-        if (!isBackupSupported()) {
-            return BackupError.OldAndroidVersion
-        }
-
         val targetUri = prepareBackupFile(directory) ?: return BackupError.CannotAccessFile
-
         val zipFile = File(context.cacheDir, BACKUP_CACHE_FILE)
 
-        ZipWriter(zipFile).use { zip ->
+        backup(zipFile)
+
+        context.copyFile(zipFile.toUri(), targetUri)
+        return null
+    }
+
+    fun backup(file: File): BackupError? {
+        if (!isBackupSupported()) return BackupError.OldAndroidVersion
+
+        ZipWriter(file).use { zip ->
             for (location in BACKUP_LOCATIONS.values) {
                 location.backup(context, database, zip)
             }
         }
-
-        context.copyFile(zipFile.toUri(), targetUri)
 
         return null
     }
@@ -81,6 +83,13 @@ class BackupRepository @Inject constructor(
      * Restores a backup from the given zip file and restarts the app, or returns an error
      */
     fun restore(uri: Uri): RestoreError {
+        val error = restoreWithoutRestart(uri)
+        if (error != null) return error
+
+        restartApplication(context)
+    }
+
+    fun restoreWithoutRestart(uri: Uri): RestoreError? {
         try {
             context.contentResolver.openInputStream(uri).use { inputStream ->
                 val zip = ZipInputStream(inputStream)
@@ -99,7 +108,7 @@ class BackupRepository @Inject constructor(
             return RestoreError.IOError
         }
 
-        restartApplication(context)
+        return null
     }
 
     /**
