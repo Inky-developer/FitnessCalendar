@@ -1,6 +1,8 @@
 package com.inky.fitnesscalendar.repository
 
 import android.content.Context
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Immutable
 import androidx.room.withTransaction
 import com.inky.fitnesscalendar.data.EpochDay
@@ -26,6 +28,7 @@ import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.db.entities.Place
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.db.entities.Track
+import com.inky.fitnesscalendar.db.generateSampleActivities
 import com.inky.fitnesscalendar.di.ActivityTypeOrder
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.util.Ordering
@@ -182,4 +185,7 @@ class DatabaseRepository @Inject constructor(
     suspend fun loadTracks() = trackDao.loadAll()
 
     fun getTrackByActivity(activityId: Int) = trackDao.getByActivityId(activityId)
+
+    @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+    fun generateSampleActivitiesForTesting() = generateSampleActivities(database)
 }

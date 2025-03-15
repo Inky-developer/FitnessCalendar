@@ -1,5 +1,6 @@
 package com.inky.fitnesscalendar.ui.views.settings
 
+import android.os.Build
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -38,6 +39,7 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberMultiplePermissionsState
+import com.inky.fitnesscalendar.BuildConfig
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.preferences.Preference
 import com.inky.fitnesscalendar.repository.backup.BackupRepository
@@ -126,6 +128,15 @@ fun SettingsView(
                     title = stringResource(R.string.debug),
                     onClick = onNavigateDebug,
                 )
+
+                if (BuildConfig.DEBUG && Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+                    Setting(
+                        title = "Load sample activities",
+                        onClick = {
+                            viewModel.repository.generateSampleActivitiesForTesting()
+                        }
+                    )
+                }
             }
         }
     }
