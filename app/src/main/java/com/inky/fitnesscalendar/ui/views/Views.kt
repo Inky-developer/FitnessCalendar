@@ -60,4 +60,7 @@ sealed class Views(val nameId: Int) : Parcelable {
     data class Statistics(val primitiveInitialPeriod: String? = null) : Views(R.string.statistics) {
         val initialPeriod get() = primitiveInitialPeriod?.let { Period.valueOf(it) }
     }
+
+    @Serializable
+    data object Statistics2 : Views(R.string.statistics)
 }

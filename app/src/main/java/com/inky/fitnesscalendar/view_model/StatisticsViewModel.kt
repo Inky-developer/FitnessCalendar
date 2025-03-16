@@ -142,6 +142,7 @@ class StatisticsViewModel @Inject constructor(
             }.toMap()
         }
         modelProducer.runTransaction {
+            println("UPDATING MODEL")
             // If no data are available, use this hack to clear the graph
             if (groupedDataPoints.all { it.isEmpty() }) {
                 lineSeries { series(0) }
@@ -149,6 +150,7 @@ class StatisticsViewModel @Inject constructor(
                 lineSeries {
                     for (line in groupedDataPoints) {
                         if (line.isNotEmpty()) {
+                            println("Size: ${line.size}, keys: ${line.keys}, values: ${line.values}")
                             series(x = line.keys, y = line.values)
                         } else {
                             series(0)
@@ -156,11 +158,11 @@ class StatisticsViewModel @Inject constructor(
                     }
                 }
             }
-            extras {
-                it[xToDateKey] = dataPoints.mapValues { entry -> entry.value.entryName }
-                it[periodKey] = state.period.ordinal
-                it[groupingKey] = state.grouping
-            }
+//            extras {
+//                it[xToDateKey] = dataPoints.mapValues { entry -> entry.value.entryName }
+//                it[periodKey] = state.period.ordinal
+//                it[groupingKey] = state.grouping
+//            }
         }
     }
 

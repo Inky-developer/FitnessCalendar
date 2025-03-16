@@ -37,6 +37,7 @@ val selectableViews = listOf(
     Views.DayView(),
     Views.ActivityLog(),
     Views.Statistics(),
+    Views.Statistics2,
     Views.Settings
 )
 

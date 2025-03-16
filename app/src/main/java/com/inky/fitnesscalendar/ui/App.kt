@@ -5,17 +5,21 @@ import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -43,7 +47,17 @@ import com.inky.fitnesscalendar.ui.views.settings.SettingsViews
 import com.inky.fitnesscalendar.ui.views.settingsDestination
 import com.inky.fitnesscalendar.view_model.AppViewModel
 import com.inky.fitnesscalendar.view_model.BaseViewModel
+import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
+import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottom
+import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStart
+import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
+import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
+import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
+import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
+import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
+import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
 import kotlinx.coroutines.launch
+import kotlin.random.Random
 
 
 @Composable
@@ -333,6 +347,35 @@ private fun AppNavigation(
                         },
                     )
                 }
+            }
+            composable<Views.Statistics2> { navBackStackEntry ->
+                val route: Views.Statistics2 = navBackStackEntry.toRoute()
+                onCurrentView(route)
+
+                val modelProducer = remember {
+                    CartesianChartModelProducer()
+                }
+
+                LaunchedEffect(modelProducer) {
+                    val random = Random(10)
+                    modelProducer.runTransaction {
+                        lineSeries {
+                            for (i in 0..9) {
+                                series(List(50) { random.nextDouble(0.0, 10.0) })
+                            }
+                        }
+                    }
+                }
+
+                CartesianChartHost(
+                    modifier = Modifier.fillMaxSize(),
+                    chart = rememberCartesianChart(
+                        rememberLineCartesianLayer(),
+                        startAxis = VerticalAxis.rememberStart(),
+                        bottomAxis = HorizontalAxis.rememberBottom()
+                    ),
+                    modelProducer = modelProducer,
+                )
             }
             settingsDestination(
                 sharedContentScope = this@SharedTransitionLayout,

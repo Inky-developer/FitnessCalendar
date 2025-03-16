@@ -1,23 +1,18 @@
 package com.inky.fitnesscalendar.ui.views
 
-import android.graphics.Typeface
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Check
@@ -47,14 +42,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
-import androidx.core.graphics.toColor
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityCategory
@@ -63,10 +56,8 @@ import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.preferences.Preference
-import com.inky.fitnesscalendar.ui.components.CompactActivityCard
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
-import com.inky.fitnesscalendar.ui.util.defaultAreaFill
 import com.inky.fitnesscalendar.ui.util.localDatabaseValues
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.view_model.StatisticsViewModel
@@ -82,20 +73,14 @@ import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLa
 import com.patrykandpatrick.vico.compose.cartesian.marker.rememberDefaultCartesianMarker
 import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
-import com.patrykandpatrick.vico.compose.cartesian.rememberVicoZoomState
-import com.patrykandpatrick.vico.compose.common.component.rememberShapeComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
 import com.patrykandpatrick.vico.compose.common.fill
-import com.patrykandpatrick.vico.compose.common.insets
 import com.patrykandpatrick.vico.core.cartesian.Scroll
-import com.patrykandpatrick.vico.core.cartesian.Zoom
 import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
 import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
-import com.patrykandpatrick.vico.core.cartesian.layer.LineCartesianLayer
 import com.patrykandpatrick.vico.core.cartesian.marker.CartesianMarker
 import com.patrykandpatrick.vico.core.cartesian.marker.DefaultCartesianMarker
-import com.patrykandpatrick.vico.core.common.Fill
 import com.patrykandpatrick.vico.core.common.component.Shadow
 import com.patrykandpatrick.vico.core.common.component.ShapeComponent
 import com.patrykandpatrick.vico.core.common.shape.CorneredShape
@@ -191,83 +176,86 @@ fun StatisticsView(
                 modifier = Modifier.sharedBounds(SharedContentKey.AppBar)
             )
         },
-        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+//        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { contentPadding ->
-        LazyColumn(modifier = Modifier.padding(contentPadding)) {
-            stickyHeader(contentType = ContentType.Tabs) {
-                Row(
-                    horizontalArrangement = Arrangement.Center,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(MaterialTheme.colorScheme.surface)
-                ) {
-                    for (period in Period.entries) {
-                        DateFilterChip(
-                            selected = state.period == period,
-                            onSelect = { onPeriod(period) },
-                            label = { Text(stringResource(period.nameId)) }
-                        )
-                    }
-                }
-            }
+//        LazyColumn(modifier = Modifier.padding(contentPadding)) {
+//            stickyHeader(contentType = ContentType.Tabs) {
+//                Row(
+//                    horizontalArrangement = Arrangement.Center,
+//                    modifier = Modifier
+//                        .fillMaxWidth()
+//                        .background(MaterialTheme.colorScheme.surface)
+//                ) {
+//                    for (period in Period.entries) {
+//                        DateFilterChip(
+//                            selected = state.period == period,
+//                            onSelect = { onPeriod(period) },
+//                            label = { Text(stringResource(period.nameId)) }
+//                        )
+//                    }
+//                }
+//            }
 
-            item(contentType = ContentType.Graph) {
-                Column(modifier = Modifier.padding(all = 8.dp)) {
+//            item(contentType = ContentType.Graph) {
+        Column(modifier = Modifier
+            .padding(all = 8.dp)
+            .padding(contentPadding)) {
                     val groupingOptions = remember(state.grouping) { state.grouping.options() }
                     Text(
                         stringResource(state.projection.legendTextId),
                         style = MaterialTheme.typography.labelLarge,
                     )
+            println("RENDER")
                     Graph(
                         modelProducer,
                         state.projection,
                         state.period,
                         groupingOptions,
                         modifier = Modifier
-                            .fillParentMaxHeight(0.9f)
+                            .fillMaxHeight()
                             .fillMaxWidth()
                     )
 
-                    GraphLegend(
-                        options = groupingOptions,
-                        removedGroups = state.grouping.filteredIndexes,
-                        onToggle = { index ->
-                            onGrouping(
-                                if (state.grouping.filteredIndexes.contains(index)) {
-                                    state.grouping.withoutIndex(index)
-                                } else {
-                                    state.grouping.withIndex(index)
-                                }
-                            )
-                        }
-                    )
-                }
-            }
-
-            for ((activities, header) in state.statistics.values.reversed()) {
-                stickyHeader(contentType = ContentType.Date) {
-                    Text(
-                        header,
-                        style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier
-                            .background(MaterialTheme.colorScheme.primaryContainer)
-                            .padding(horizontal = 8.dp)
-                            .fillMaxWidth()
-                    )
-                }
-
-                items(
-                    activities.activities,
-                    contentType = { ContentType.Activity }) { typeActivity ->
-                    CompactActivityCard(
-                        richActivity = typeActivity,
-                        localizationRepository = localizationRepository,
-                        modifier = Modifier.clickable { onViewActivity(typeActivity.activity) }
-                    )
-                }
-            }
+//                    GraphLegend(
+//                        options = groupingOptions,
+//                        removedGroups = state.grouping.filteredIndexes,
+//                        onToggle = { index ->
+//                            onGrouping(
+//                                if (state.grouping.filteredIndexes.contains(index)) {
+//                                    state.grouping.withoutIndex(index)
+//                                } else {
+//                                    state.grouping.withIndex(index)
+//                                }
+//                            )
+//                        }
+//                    )
         }
     }
+
+//            for ((activities, header) in state.statistics.values.reversed()) {
+//                stickyHeader(contentType = ContentType.Date) {
+//                    Text(
+//                        header,
+//                        style = MaterialTheme.typography.titleMedium,
+//                        modifier = Modifier
+//                            .background(MaterialTheme.colorScheme.primaryContainer)
+//                            .padding(horizontal = 8.dp)
+//                            .fillMaxWidth()
+//                    )
+//                }
+//
+//                items(
+//                    activities.activities,
+//                    contentType = { ContentType.Activity }) { typeActivity ->
+//                    CompactActivityCard(
+//                        richActivity = typeActivity,
+//                        localizationRepository = localizationRepository,
+//                        modifier = Modifier.clickable { onViewActivity(typeActivity.activity) }
+//                    )
+//                }
+//            }
+//        }
+//    }
 }
 
 @Composable
@@ -375,16 +363,17 @@ private fun Graph(
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    val lines = remember(groupingOptions) {
-        groupingOptions.map { group ->
-            val color = group.getColor(context)
-            LineCartesianLayer.Line(
-                fill = LineCartesianLayer.LineFill.single(Fill(color)),
-                areaFill = defaultAreaFill(color.toColor()),
-                pointConnector = LineCartesianLayer.PointConnector.cubic()
-            )
-        }
-    }
+//    val lines = remember(groupingOptions) {
+//        println("GROUPING CHANGED")
+//        groupingOptions.map { group ->
+//            val color = group.getColor(context)
+//            LineCartesianLayer.Line(
+//                fill = LineCartesianLayer.LineFill.single(Fill(color)),
+////                areaFill = defaultAreaFill(color.toColor()),
+////                pointConnector = LineCartesianLayer.PointConnector.cubic()
+//            )
+//        }
+//    }
 
     val scrollState = rememberVicoScrollState(
         initialScroll = Scroll.Absolute.End,
@@ -396,36 +385,36 @@ private fun Graph(
         modifier = modifier,
         chart = rememberCartesianChart(
             rememberLineCartesianLayer(
-                LineCartesianLayer.LineProvider.series(lines),
+//                LineCartesianLayer.LineProvider.series(lines),
             ),
             startAxis = VerticalAxis.rememberStart(
-                itemPlacer = VerticalAxis.ItemPlacer.step({ projection.verticalStepSize }),
-                horizontalLabelPosition = VerticalAxis.HorizontalLabelPosition.Inside,
+//                itemPlacer = VerticalAxis.ItemPlacer.step({ projection.verticalStepSize }),
+//                horizontalLabelPosition = VerticalAxis.HorizontalLabelPosition.Inside,
             ),
             bottomAxis = HorizontalAxis.rememberBottom(
-                guideline = null,
-                titleComponent = rememberTextComponent(
-                    background = rememberShapeComponent(
-                        fill = fill(MaterialTheme.colorScheme.secondaryContainer),
-                        shape = CorneredShape.Pill,
-                    ),
-                    color = MaterialTheme.colorScheme.onSecondaryContainer,
-                    padding = insets(horizontal = 8.dp, vertical = 2.dp),
-                    margins = insets(top = 4.dp),
-                    typeface = Typeface.MONOSPACE
-                ),
-                title = stringResource(period.xLabelId),
-                valueFormatter = { ctx, value, _ ->
-                    ctx.model.extraStore[StatisticsViewModel.xToDateKey][value.toLong()] ?: ""
-                },
-                itemPlacer = HorizontalAxis.ItemPlacer.aligned(addExtremeLabelPadding = true),
+//                guideline = null,
+//                titleComponent = rememberTextComponent(
+//                    background = rememberShapeComponent(
+//                        fill = fill(MaterialTheme.colorScheme.secondaryContainer),
+//                        shape = CorneredShape.Pill,
+//                    ),
+//                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+//                    padding = insets(horizontal = 8.dp, vertical = 2.dp),
+//                    margins = insets(top = 4.dp),
+//                    typeface = Typeface.MONOSPACE
+//                ),
+//                title = stringResource(period.xLabelId),
+//                valueFormatter = { ctx, value, _ ->
+//                    ctx.model.extraStore[StatisticsViewModel.xToDateKey][value.toLong()] ?: ""
+//                },
+//                itemPlacer = HorizontalAxis.ItemPlacer.aligned(addExtremeLabelPadding = true),
             ),
-            marker = rememberMarker(projection),
+//            marker = rememberMarker(projection),
         ),
         modelProducer = modelProducer,
-        animateIn = true,
-        scrollState = scrollState,
-        zoomState = rememberVicoZoomState(initialZoom = remember(period) { Zoom.x(period.numVisibleDays) }),
+//        animateIn = true,
+//        scrollState = scrollState,
+//        zoomState = rememberVicoZoomState(initialZoom = remember(period) { Zoom.x(period.numVisibleDays) }),
     )
 }
 
