@@ -17,42 +17,45 @@ import kotlinx.coroutines.flow.map
  * Composition local for easier access to common database values
  */
 data class DatabaseValues(
-    val activityTypes: List<ActivityType> = emptyList(),
-    val activityTypeNames: Map<String, ActivityType> = emptyMap(),
-    val activityTypeRows: List<List<ActivityType>> = emptyList(),
-    val places: List<Place> = emptyList(),
-    val activityFilterChips: List<ActivityFilterChip> = emptyList()
+    val activityTypes: List<ActivityType>,
+    val activityTypeNames: Map<String, ActivityType>,
+    val activityTypeRows: List<List<ActivityType>>,
+    val places: List<Place>,
+    val activityFilterChips: List<ActivityFilterChip>
 )
 
-val localDatabaseValues = compositionLocalOf { DatabaseValues() }
+val localDatabaseValues =
+    compositionLocalOf<DatabaseValues> { error("Database values are not loaded yet") }
 
 @Composable
 fun ProvideDatabaseValues(repository: DatabaseRepository, content: @Composable () -> Unit) {
     val activityTypes by repository
         .getActivityTypes()
-        .collectAsState(initial = emptyList())
-    val typeNames by repository.getActivityTypeNames().collectAsState(initial = emptyMap())
+        .collectAsState(initial = null)
+    val typeNames by repository.getActivityTypeNames().collectAsState(initial = null)
     val activityTypeRows by repository
         .getActivityTypeRows()
-        .collectAsState(initial = emptyList())
+        .collectAsState(initial = null)
     val places by repository
         .getPlaces()
-        .collectAsState(initial = emptyList())
+        .collectAsState(initial = null)
     val activityFilterChips by repository.getFilterHistoryItems()
         .map { item -> item.mapNotNull { it.toActivityFilterChip() } }
-        .collectAsState(initial = emptyList())
+        .collectAsState(initial = null)
     val databaseValues =
         remember(activityTypes, activityTypeRows, places, typeNames, activityFilterChips) {
             DatabaseValues(
-                activityTypes = activityTypes,
-                activityTypeNames = typeNames,
-                activityTypeRows = activityTypeRows,
-                places = places,
-                activityFilterChips = activityFilterChips
+                activityTypes = activityTypes ?: return@remember null,
+                activityTypeNames = typeNames ?: return@remember null,
+                activityTypeRows = activityTypeRows ?: return@remember null,
+                places = places ?: return@remember null,
+                activityFilterChips = activityFilterChips ?: return@remember null
             )
         }
 
-    CompositionLocalProvider(value = localDatabaseValues provides databaseValues) {
-        content()
+    if (databaseValues != null) {
+        CompositionLocalProvider(value = localDatabaseValues provides databaseValues) {
+            content()
+        }
     }
 }

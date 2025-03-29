@@ -78,6 +78,9 @@ private fun getDatabaseValues(): DatabaseValues {
         activityTypes = mockActivityTypes,
         activityTypeRows = ActivityCategory.entries.map {
             activityTypesByCategory[it] ?: emptyList()
-        }
+        },
+        activityFilterChips = emptyList(),
+        activityTypeNames = emptyMap(),
+        places = emptyList()
     )
 }
