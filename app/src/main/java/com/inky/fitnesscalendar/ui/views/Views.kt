@@ -53,6 +53,18 @@ sealed class Views : Parcelable {
     }
 
     @Serializable
+    data class ApiNewActivity(val activityTypeId: Int?, val startTime: Long?, val endTime: Long?) :
+        Views() {
+        override val nameId get() = R.string.new_activity
+
+        fun toDeepUrl() = "$DEEP_LINK_BASE_URL/$activityTypeId/$startTime/$endTime"
+
+        companion object {
+            const val DEEP_LINK_BASE_URL = "$DEEP_LINK_BASE_PATH/api/new_activity"
+        }
+    }
+
+    @Serializable
     data class TrackDetails(val activityId: Int) : Views() {
         override val nameId get() = R.string.track_details
     }

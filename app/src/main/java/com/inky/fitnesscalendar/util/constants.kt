@@ -5,6 +5,8 @@ import com.inky.fitnesscalendar.BuildConfig
 
 const val APP_URL = BuildConfig.APPLICATION_ID
 
+const val DEEP_LINK_BASE_PATH = "https://fitnesscalendar.inky.com"
+
 const val DATABASE_NAME = "activity_db"
 
 const val NOTIFICATION_CHANNEL_RECORD = "record"

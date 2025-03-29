@@ -1,5 +1,7 @@
 package com.inky.fitnesscalendar.ui
 
+import android.app.Activity
+import android.content.Context
 import androidx.compose.animation.AnimatedContentScope
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
@@ -12,20 +14,26 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
+import com.inky.fitnesscalendar.di.DecisionTrees
 import com.inky.fitnesscalendar.ui.components.NavigationDrawer
 import com.inky.fitnesscalendar.ui.util.ProvideDatabaseValues
+import com.inky.fitnesscalendar.ui.util.localDatabaseValues
+import com.inky.fitnesscalendar.ui.views.ActivityEditState
 import com.inky.fitnesscalendar.ui.views.ActivityLog
 import com.inky.fitnesscalendar.ui.views.DayView
 import com.inky.fitnesscalendar.ui.views.EditDayDialog
@@ -44,6 +52,8 @@ import com.inky.fitnesscalendar.ui.views.settingsDestination
 import com.inky.fitnesscalendar.view_model.AppViewModel
 import com.inky.fitnesscalendar.view_model.BaseViewModel
 import kotlinx.coroutines.launch
+import java.time.LocalDateTime
+import java.time.ZoneOffset
 
 
 @Composable
@@ -215,6 +225,7 @@ private fun AppNavigation(
                     )
                 }
             }
+
             composable<Views.NewActivity>(
                 enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Up) },
                 exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Down) }
@@ -232,6 +243,51 @@ private fun AppNavigation(
                     onNavigateBack = { navController.popBackStack() },
                     onNavigateNewPlace = { navController.navigate(SettingsViews.PlaceDialog()) },
                     initialDay = route.initialStartDay
+                )
+            }
+
+            composable<Views.ApiNewActivity>(
+                deepLinks = listOf(navDeepLink<Views.ApiNewActivity>(basePath = Views.ApiNewActivity.DEEP_LINK_BASE_URL))
+            ) { backStackEntry ->
+                val route: Views.ApiNewActivity = backStackEntry.toRoute()
+
+                val context = LocalContext.current
+                val activityTypes = localDatabaseValues.current.activityTypes
+                val initialState = remember(route) {
+                    val prediction = DecisionTrees.classifyNow(context)
+                    val activityType =
+                        route.activityTypeId?.let { id -> activityTypes.find { it.uid == id } }
+                    val start =
+                        route.startTime?.let { LocalDateTime.ofEpochSecond(it, 0, ZoneOffset.UTC) }
+                    val end =
+                        route.endTime?.let { LocalDateTime.ofEpochSecond(it, 0, ZoneOffset.UTC) }
+
+                    ActivityEditState(activity = null, prediction = prediction).let { state ->
+                        val newActivitySelectorState = state.activitySelectorState.copy(
+                            activityType = activityType ?: state.activitySelectorState.activityType
+                        )
+                        state.copy(
+                            activitySelectorState = newActivitySelectorState,
+                            startDateTime = start ?: state.startDateTime,
+                            endDateTime = end ?: state.endDateTime
+                        )
+                    }
+                }
+
+                var editState by rememberSaveable { mutableStateOf(initialState) }
+                NewActivity(
+                    editState = editState,
+                    onState = { editState = it },
+                    initialState = initialState,
+                    localizationRepository = viewModel.repository.localizationRepository,
+                    onSave = {
+                        scope.launch {
+                            viewModel.repository.saveActivity(editState.toActivity(null))
+                        }
+                        context.finishOrGoBack(navController)
+                    },
+                    onNavigateBack = { context.finishOrGoBack(navController) },
+                    onNavigateNewPlace = { navController.navigate(SettingsViews.PlaceDialog()) },
                 )
             }
 
@@ -286,7 +342,8 @@ private fun AppNavigation(
                 },
                 exitTransition = {
                     slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Down)
-                }
+                },
+                deepLinks = listOf(navDeepLink<Views.SummaryView>(basePath = "https://fitnesscalendar.inky.com/home"))
             ) { backStackEntry ->
                 val route: Views.SummaryView = backStackEntry.toRoute()
                 onCurrentView(route)
@@ -371,5 +428,14 @@ fun AnimatedContentScope.ProvideSharedContent(
         )
     ) {
         content()
+    }
+}
+
+private fun Context.finishOrGoBack(navController: NavHostController) {
+    val activity = this as? Activity
+    if (activity != null) {
+        activity.finish()
+    } else {
+        navController.popBackStack()
     }
 }
