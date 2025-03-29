@@ -111,6 +111,7 @@ fun NewActivity(
         )
 
 
+
     if (activityId == null || activity.value != null) {
         NewActivity(
             richActivity = activity.value,
@@ -125,7 +126,6 @@ fun NewActivity(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 fun NewActivity(
     richActivity: RichActivity?,
@@ -136,33 +136,65 @@ fun NewActivity(
     initialDay: EpochDay? = null,
     isTest: Boolean = false
 ) {
-    var showBackDialog by rememberSaveable { mutableStateOf(false) }
-
     val context = LocalContext.current
     val activityPrediction = remember { DecisionTrees.classifyNow(context) }
-
-    val title = remember(richActivity) {
-        richActivity?.type?.let { context.getString(R.string.edit_object, it.name) }
-            ?: context.getString(R.string.new_activity)
-    }
     val initialState = remember {
-        val state = ActivityEditState(richActivity, activityPrediction)
+        var state = ActivityEditState(richActivity, activityPrediction)
         if (initialDay != null) {
             val newStartDateTime =
                 initialDay.toLocalDate().atTime(state.startDateTime.toLocalTime())
-            state.copy(
+            state = state.copy(
                 startDateTime = newStartDateTime,
                 endDateTime = newStartDateTime + Duration.between(
                     state.startDateTime,
                     state.endDateTime
                 ),
             )
-        } else {
-            state
+        }
+        state
+    }
+    var editState by rememberSaveable { mutableStateOf(initialState) }
+    NewActivity(
+        editState = editState,
+        onState = { editState = it },
+        initialState = initialState,
+        localizationRepository = localizationRepository,
+        onSave = { onSave(editState.toActivity(richActivity)) },
+        onNavigateBack = onNavigateBack,
+        onNavigateNewPlace = onNavigateNewPlace,
+        isTest = isTest
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
+@Composable
+fun NewActivity(
+    editState: ActivityEditState,
+    onState: (ActivityEditState) -> Unit,
+    initialState: ActivityEditState,
+    localizationRepository: LocalizationRepository,
+    onSave: () -> Unit,
+    onNavigateBack: () -> Unit,
+    onNavigateNewPlace: () -> Unit,
+    isTest: Boolean = false
+) {
+    var showBackDialog by rememberSaveable { mutableStateOf(false) }
+
+    val context = LocalContext.current
+
+    val title by remember(editState) {
+        derivedStateOf {
+            if (editState.activityId != null && editState.activitySelectorState.activityType != null) {
+                context.getString(
+                    R.string.edit_object,
+                    editState.activitySelectorState.activityType.name
+                )
+            } else {
+                context.getString(R.string.new_activity)
+            }
         }
     }
 
-    var editState by rememberSaveable { mutableStateOf(initialState) }
     val scrollState = rememberScrollState()
     var contextMenuOpen by rememberSaveable { mutableStateOf(false) }
     var showImageViewer by rememberSaveable { mutableStateOf(false) }
@@ -170,9 +202,13 @@ fun NewActivity(
     val isKeyboardVisible = WindowInsets.isImeVisible
     // TODO: Get rid of the `isTest` hack
     // In testing, the ime is always visible for some reason which means that the save button can never be clicked.
-    val showSaveButton by remember(isKeyboardVisible) { derivedStateOf { (!isKeyboardVisible || isTest) && (richActivity == null || editState != initialState) && editState.isValid } }
+    val showSaveButton by remember(isKeyboardVisible, editState) {
+        derivedStateOf {
+            (!isKeyboardVisible || isTest) && (editState.activityId == null || editState != initialState) && editState.isValid
+        }
+    }
     val imagePickerLauncher = rememberImagePickerLauncher(onName = {
-        editState = editState.copy(imageName = it)
+        onState(editState.copy(imageName = it))
     })
 
     BackHandler(enabled = editState != initialState) {
@@ -217,7 +253,7 @@ fun NewActivity(
                 actions = {
                     IconToggleButton(
                         checked = editState.favorite,
-                        onCheckedChange = { editState = editState.copy(favorite = it) }
+                        onCheckedChange = { onState(editState.copy(favorite = it)) }
                     ) {
                         AnimatedContent(editState.favorite, label = "Favorite") { isFavorite ->
                             FavoriteIcon(isFavorite)
@@ -242,7 +278,7 @@ fun NewActivity(
                 ExtendedFloatingActionButton(
                     onClick = {
                         if (editState.isValid) {
-                            onSave(editState.toActivity(richActivity))
+                            onSave()
                         }
                     },
                     modifier = Modifier.testTag("button-confirm")
@@ -272,9 +308,8 @@ fun NewActivity(
                 ActivityImage(
                     uri = imageUri,
                     onState = { state ->
-                        if (state is AsyncImagePainter.State.Error) {
-                            editState =
-                                editState.copy(imageName = richActivity?.activity?.imageName)
+                        if (state is AsyncImagePainter.State.Error && editState.imageName != initialState.imageName) {
+                            onState(editState.copy(imageName = initialState.imageName))
                         }
                     },
                     onClick = {
@@ -298,7 +333,7 @@ fun NewActivity(
                         dateTime = editState.startDateTime,
                         localizationRepository = localizationRepository,
                         labelId = dateLabelId,
-                        onDateTime = { editState = editState.copy(startDateTime = it) },
+                        onDateTime = { onState(editState.copy(startDateTime = it)) },
                         modifier = Modifier.weight(1f)
                     )
 
@@ -307,7 +342,7 @@ fun NewActivity(
                             dateTime = editState.endDateTime,
                             localizationRepository = localizationRepository,
                             labelId = R.string.datetime_end,
-                            onDateTime = { editState = editState.copy(endDateTime = it) },
+                            onDateTime = { onState(editState.copy(endDateTime = it)) },
                             isError = editState.isEndDateTimeError,
                             modifier = Modifier
                                 .padding(start = 8.dp)
@@ -319,7 +354,7 @@ fun NewActivity(
 
             ActivitySelector(
                 editState.activitySelectorState,
-                onState = { editState = editState.copy(activitySelectorState = it) },
+                onState = { onState(editState.copy(activitySelectorState = it)) },
                 onNavigateNewPlace = onNavigateNewPlace
             )
 
@@ -330,7 +365,7 @@ fun NewActivity(
                 ) {
                     FeelSelector(
                         feel = editState.feel,
-                        onChange = { editState = editState.copy(feel = it) },
+                        onChange = { onState(editState.copy(feel = it)) },
                         modifier = Modifier
                             .fillMaxWidth()
                             .align(Alignment.CenterHorizontally)
@@ -341,7 +376,7 @@ fun NewActivity(
             AnimatedVisibility(visible = editState.activitySelectorState.activityType?.hasDistance == true) {
                 TextField(
                     value = editState.distanceString,
-                    onValueChange = { editState = editState.copy(distanceString = it) },
+                    onValueChange = { onState(editState.copy(distanceString = it)) },
                     isError = editState.isDistanceStringError,
                     placeholder = { Text(stringResource(R.string.placeholder_distance)) },
                     suffix = { Text(stringResource(R.string.km)) },
@@ -363,12 +398,14 @@ fun NewActivity(
                     Slider(
                         value = editState.intensity?.value?.toFloat() ?: -1f,
                         onValueChange = {
-                            editState = editState.copy(
-                                intensity = if (it < 0) {
-                                    null
-                                } else {
-                                    Intensity(it.roundToInt().toByte())
-                                }
+                            onState(
+                                editState.copy(
+                                    intensity = if (it < 0) {
+                                        null
+                                    } else {
+                                        Intensity(it.roundToInt().toByte())
+                                    }
+                                )
                             )
                         },
                         steps = 10,
@@ -379,7 +416,7 @@ fun NewActivity(
 
             DescriptionTextInput(
                 description = editState.description,
-                onDescription = { editState = editState.copy(description = it) },
+                onDescription = { onState(editState.copy(description = it)) },
                 modifier = Modifier
                     .testTag("input-description")
                     .padding(vertical = 4.dp)
@@ -394,7 +431,7 @@ fun NewActivity(
                 imageUri = imageUri,
                 onDismiss = { showImageViewer = false },
                 onDelete = {
-                    editState = editState.copy(imageName = null)
+                    onState(editState.copy(imageName = null))
                     showImageViewer = false
                 },
             )
@@ -469,7 +506,7 @@ private fun kilometerStringToDistance(string: String) = if (string.isBlank()) {
 @Stable
 @Immutable
 @Parcelize
-private data class ActivityEditState(
+data class ActivityEditState(
     val activitySelectorState: ActivitySelectorState,
     val startDateTime: LocalDateTime,
     val endDateTime: LocalDateTime,
@@ -479,6 +516,8 @@ private data class ActivityEditState(
     val feel: Feel,
     val imageName: ImageName?,
     val favorite: Boolean,
+
+    val activityId: Int?,
 ) : Parcelable {
     constructor(
         activity: RichActivity?,
@@ -505,7 +544,8 @@ private data class ActivityEditState(
         intensity = activity?.activity?.intensity,
         feel = activity?.activity?.feel ?: Feel.Ok,
         imageName = activity?.activity?.imageName,
-        favorite = activity?.activity?.favorite ?: false
+        favorite = activity?.activity?.favorite ?: false,
+        activityId = activity?.activity?.uid
     )
 
     @IgnoredOnParcel
