@@ -15,6 +15,7 @@ import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.localization.LocalizationRepository
+import com.inky.fitnesscalendar.testUtils.MockDatabaseValues
 import com.inky.fitnesscalendar.util.toDate
 import com.inky.fitnesscalendar.util.toLocalDateTime
 import org.junit.Assert.assertEquals
@@ -48,6 +49,7 @@ class EditActivityViewTest {
 
         val richActivity = RichActivity(
             activity = Activity(
+                uid = 420,
                 typeId = 1,
                 startTime = start.toDate(),
                 endTime = end.toDate()
@@ -63,14 +65,16 @@ class EditActivityViewTest {
             place = null,
         )
         composeTestRule.setContent {
-            NewActivity(
-                richActivity = richActivity,
-                localizationRepository = LocalizationRepository(context),
-                onSave = { success = true },
-                onNavigateBack = {},
-                onNavigateNewPlace = {},
-                isTest = true
-            )
+            MockDatabaseValues {
+                NewActivity(
+                    richActivity = richActivity,
+                    localizationRepository = LocalizationRepository(context),
+                    onSave = { success = true },
+                    onNavigateBack = {},
+                    onNavigateNewPlace = {},
+                    isTest = true
+                )
+            }
         }
 
         // Initially, the confirm button should not exist, because no inputs have been made
@@ -96,6 +100,7 @@ class EditActivityViewTest {
 
         val richActivity = RichActivity(
             activity = Activity(
+                uid = 69,
                 typeId = 1,
                 startTime = start.toDate(),
                 endTime = end.toDate()
@@ -111,25 +116,27 @@ class EditActivityViewTest {
             place = null,
         )
         composeTestRule.setContent {
-            NewActivity(
-                richActivity = richActivity,
-                localizationRepository = LocalizationRepository(context),
-                onSave = {
-                    assertEquals(
-                        LocalDateTime.of(2024, 12, 31, 23, 30),
-                        it.activity.startTime.toLocalDateTime(),
-                    )
-                    assertEquals(
-                        LocalDateTime.of(2025, 1, 1, 0, 30),
-                        it.activity.endTime.toLocalDateTime()
-                    )
-                    hasBeenClicked = true
-                },
-                onNavigateBack = {},
-                onNavigateNewPlace = {},
-                isTest = true,
-                initialDay = EpochDay(day = LocalDate.of(2024, 12, 31).toEpochDay())
-            )
+            MockDatabaseValues {
+                NewActivity(
+                    richActivity = richActivity,
+                    localizationRepository = LocalizationRepository(context),
+                    onSave = {
+                        assertEquals(
+                            LocalDateTime.of(2024, 12, 31, 23, 30),
+                            it.activity.startTime.toLocalDateTime(),
+                        )
+                        assertEquals(
+                            LocalDateTime.of(2025, 1, 1, 0, 30),
+                            it.activity.endTime.toLocalDateTime()
+                        )
+                        hasBeenClicked = true
+                    },
+                    onNavigateBack = {},
+                    onNavigateNewPlace = {},
+                    isTest = true,
+                    initialDay = EpochDay(day = LocalDate.of(2024, 12, 31).toEpochDay())
+                )
+            }
         }
 
         // Initially, the confirm button should not exist, because no inputs have been made

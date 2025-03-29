@@ -1,11 +1,12 @@
 package com.inky.fitnesscalendar.ui.views
 
 import android.os.Build
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertTextContains
+import androidx.compose.ui.test.hasTestTag
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
-import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.core.app.ApplicationProvider
@@ -42,6 +43,7 @@ class ImportViewTest {
      * - Verify that import errors are displayed
      * - Verify that the tracks were imported
      */
+    @OptIn(ExperimentalTestApi::class)
     @Test
     fun test_can_import_activities() {
         val context = ApplicationProvider.getApplicationContext<MainApp>()
@@ -77,7 +79,7 @@ class ImportViewTest {
         ShadowLog.stream = System.out
 
         composeTestRule.apply {
-            onNodeWithTag("import_list").assertExists()
+            waitUntilExactlyOneExists(hasTestTag("import_list"))
 
             val listItems = onAllNodesWithTag("import_list_item").assertCountEquals(2)
             for ((index, _) in listItems.fetchSemanticsNodes().withIndex()) {
