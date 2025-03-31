@@ -340,4 +340,5 @@
     <string name="ask_restore_backup">Sicherung wiederherstellen?</string>
     <string name="this_will_overwrite_all_app_data">Alle Daten werden mit dieser Aktion unwiederbringlich überschrieben!</string>
     <string name="cannot_read_file">Kann die Datei nicht lesen</string>
+    <string name="api_create_activity">API: Aktivität erstellen</string>
 </resources>

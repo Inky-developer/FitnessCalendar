@@ -341,4 +341,5 @@
     <string name="ask_restore_backup">Restore backup?</string>
     <string name="this_will_overwrite_all_app_data">This action will overwrite all app data and cannot be undone!</string>
     <string name="cannot_read_file">Cannot read the file</string>
+    <string name="api_create_activity">API: Create activity</string>
 </resources>

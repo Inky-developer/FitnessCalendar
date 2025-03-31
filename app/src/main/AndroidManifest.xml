@@ -71,6 +71,7 @@
         <activity
             android:name=".publicApi.CreateActivity"
             android:exported="true"
+            android:label="@string/api_create_activity"
             android:theme="@style/Theme.AppCompat.DayNight.Dialog.Alert">
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
