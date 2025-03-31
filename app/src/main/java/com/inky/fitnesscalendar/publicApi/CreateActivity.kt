@@ -2,6 +2,7 @@ package com.inky.fitnesscalendar.publicApi
 
 import android.app.PendingIntent
 import android.content.Intent
+import android.widget.Toast
 import androidx.core.app.TaskStackBuilder
 import androidx.core.net.toUri
 import com.inky.fitnesscalendar.MainActivity
@@ -28,6 +29,11 @@ class CreateActivity : ApiActivity() {
 
         val activityTypeName = intent.getStringExtra(EXTRA_ACTIVITY_TYPE)
         val activityTypeId = activityTypes.find { it.name == activityTypeName }?.uid
+        if (activityTypeId == null && activityTypeName != null) {
+            Toast.makeText(this, "Unknown activity type: $activityTypeName", Toast.LENGTH_LONG)
+                .show()
+            return
+        }
 
         val startTime = intent.getLongExtra(EXTRA_START_TIME, -1).takeIf { it >= 0 }
         val endTime = intent.getLongExtra(EXTRA_END_TIME, -1).takeIf { it >= 0 }
