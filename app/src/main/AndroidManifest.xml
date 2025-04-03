@@ -72,7 +72,17 @@
             android:name=".publicApi.CreateActivity"
             android:exported="true"
             android:label="@string/api_create_activity"
-            android:theme="@style/Theme.AppCompat.DayNight.Dialog.Alert">
+            android:theme="@style/FullHeightDialog">
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".publicApi.CreateRecording"
+            android:exported="true"
+            android:label="@string/api_create_recording"
+            android:theme="@style/FullHeightDialog">
             <intent-filter>
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>

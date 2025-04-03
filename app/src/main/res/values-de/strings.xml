@@ -341,4 +341,5 @@
     <string name="this_will_overwrite_all_app_data">Alle Daten werden mit dieser Aktion unwiederbringlich überschrieben!</string>
     <string name="cannot_read_file">Kann die Datei nicht lesen</string>
     <string name="api_create_activity">API: Aktivität erstellen</string>
+    <string name="api_create_recording">API: Aufzeichnung starten</string>
 </resources>

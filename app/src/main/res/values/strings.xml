@@ -342,4 +342,5 @@
     <string name="this_will_overwrite_all_app_data">This action will overwrite all app data and cannot be undone!</string>
     <string name="cannot_read_file">Cannot read the file</string>
     <string name="api_create_activity">API: Create activity</string>
+    <string name="api_create_recording">API: Create recording</string>
 </resources>
