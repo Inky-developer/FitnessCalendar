@@ -1,6 +1,6 @@
 [versions]
 accompanistPermissionsVersion = "0.37.2"
-agp = "8.8.2"
+agp = "8.9.1"
 approvaltests = "24.19.0"
 coilCompose = "2.7.0"
 datastorePreferences = "1.1.4"
