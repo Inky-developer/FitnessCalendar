@@ -347,4 +347,6 @@
     <string name="api_create_activity">API: Aktivität erstellen</string>
     <string name="api_create_recording">API: Aufzeichnung starten</string>
     <string name="api_stop_recording">API: Aufzeichnung beenden</string>
+    <string name="error_no_activity_type_specified">Keine Aktivitätsart spezifiziert</string>
+    <string name="error_unknown_activity_type">Unbekannte Aktivitätsart: %1$s</string>
 </resources>

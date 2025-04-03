@@ -348,4 +348,6 @@
     <string name="api_create_activity">API: Create activity</string>
     <string name="api_create_recording">API: Create recording</string>
     <string name="api_stop_recording">API: Stop recording</string>
+    <string name="error_no_activity_type_specified">No activity type specified</string>
+    <string name="error_unknown_activity_type">Unknown activity type: %1$s</string>
 </resources>
