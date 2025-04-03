@@ -6,6 +6,7 @@ import androidx.compose.runtime.Immutable
 import com.inky.fitnesscalendar.db.dao.ActivityDao
 import com.inky.fitnesscalendar.db.dao.ActivityTypeDao
 import com.inky.fitnesscalendar.db.dao.RecordingDao
+import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.Recording
 import com.inky.fitnesscalendar.db.entities.RichRecording
 import com.inky.fitnesscalendar.preferences.Preference
@@ -51,15 +52,30 @@ class RecordingRepository @Inject constructor(
         recordingDao.delete(recording)
     }
 
-    suspend fun endRecording(recording: Recording) {
+    suspend fun endRecording(recording: Recording): Boolean {
         Log.d(TAG, "Ending recording $recording")
         recording.uid?.let { context.hideRecordingNotification(it) }
         val type = activityTypeDao.get(recording.typeId)
         if (type == null) {
             Log.e(TAG, "Could not retrieve type for activity")
-            return
+            return false
         }
         val activity = recording.toActivity(type)
         activityDao.stopRecording(recording, activity)
+        return true
+    }
+
+    suspend fun endAllRecordingsOfType(type: ActivityType): Int {
+        if (type.uid == null) return 0
+
+        var stoppedRecordings = 0
+        for (recording in recordingDao.loadRecordingsOfType(type.uid)) {
+            val success = endRecording(recording)
+            if (success) {
+                stoppedRecordings += 1
+            }
+        }
+
+        return stoppedRecordings
     }
 }

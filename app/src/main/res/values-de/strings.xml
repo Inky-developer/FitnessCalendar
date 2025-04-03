@@ -109,6 +109,10 @@
         <item quantity="one">Am %1$s: %2$s Aktivität</item>
         <item quantity="other">Am %1$s: %2$s Aktivitäten</item>
     </plurals>
+    <plurals name="success_stopped_n_recordings">
+        <item quantity="one">%1$d Aufzeichung beendet</item>
+        <item quantity="other">%1$d Aufzeichnungen beendet</item>
+    </plurals>
 
     <string name="days">Tage</string>
     <string name="weeks">Wochen</string>
@@ -342,4 +346,5 @@
     <string name="cannot_read_file">Kann die Datei nicht lesen</string>
     <string name="api_create_activity">API: Aktivität erstellen</string>
     <string name="api_create_recording">API: Aufzeichnung starten</string>
+    <string name="api_stop_recording">API: Aufzeichnung beenden</string>
 </resources>

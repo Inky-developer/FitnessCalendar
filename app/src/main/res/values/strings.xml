@@ -212,6 +212,10 @@
         <item quantity="one">On %1$s: %2$s activity</item>
         <item quantity="other">On %1$s: %2$s activities</item>
     </plurals>
+    <plurals name="success_stopped_n_recordings">
+        <item quantity="one">Stopped %1$d recording</item>
+        <item quantity="other">Stopped %1$d recordings</item>
+    </plurals>
 
     <string name="title_activity_import">Import activities</string>
     <string name="click_to_set_type">Click to set type…</string>
@@ -343,4 +347,5 @@
     <string name="cannot_read_file">Cannot read the file</string>
     <string name="api_create_activity">API: Create activity</string>
     <string name="api_create_recording">API: Create recording</string>
+    <string name="api_stop_recording">API: Stop recording</string>
 </resources>

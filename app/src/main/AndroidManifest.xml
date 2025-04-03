@@ -88,6 +88,16 @@
             </intent-filter>
         </activity>
 
+        <activity
+            android:name=".publicApi.StopRecording"
+            android:exported="true"
+            android:label="@string/api_stop_recording"
+            android:theme="@style/FullHeightDialog">
+            <intent-filter>
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
         <receiver
             android:name=".broadcast_receiver.NotificationBroadcastReceiver"
             android:exported="false" />
