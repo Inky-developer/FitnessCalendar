@@ -12,9 +12,9 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
-private const val EXTRA_ACTIVITY_TYPE = "EXTRA_ACTIVITY_TYPE"
-private const val EXTRA_START_TIME = "EXTRA_START_TIME"
-private const val EXTRA_END_TIME = "EXTRA_END_TIME"
+private const val EXTRA_ACTIVITY_TYPE = "ACTIVITY_TYPE"
+private const val EXTRA_START_TIME = "START_TIME"
+private const val EXTRA_END_TIME = "END_TIME"
 
 /**
  * Enables third party applications to create a new fitness calendar activity using intents
