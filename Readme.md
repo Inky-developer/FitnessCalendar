@@ -26,4 +26,4 @@ A private and fully offline activity tracker.
 
 ## Public API
 
-See (docs.md)[docs/docs.md]
+See [docs.md](docs/docs.md)
