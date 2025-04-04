@@ -1,5 +1,7 @@
 # Unreleased
 
+# 2025.04.1
+
 - Add a public api that allows third party apps to create activities
 
 # 2025.03.1
