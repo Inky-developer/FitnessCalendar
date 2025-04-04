@@ -109,15 +109,15 @@ fun SettingsView(
 
                 HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
-                CollectBssidPreference()
-
-                HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-
                 Text(
                     stringResource(R.string.advanced_settings),
                     style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier.padding(bottom = 8.dp)
                 )
+
+                CollectBssidPreference()
+
+                PreferenceToggle(Preference.PREF_ENABLE_PUBLIC_API)
 
                 Setting(
                     title = stringResource(R.string.recalculate_track_data),
@@ -219,10 +219,8 @@ private fun <T> PreferenceToggle(
         remember(preference) { preference.descriptionId?.let { context.getString(it) } }
 
     val onCheckedChange: (Boolean) -> Unit = {
-        if (filter != null) {
-            if (filter(it)) {
-                scope.launch { preference.set(context, it) }
-            }
+        if (filter == null || filter(it)) {
+            scope.launch { preference.set(context, it) }
         }
     }
 

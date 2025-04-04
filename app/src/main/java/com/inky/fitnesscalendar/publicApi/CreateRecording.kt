@@ -1,7 +1,5 @@
 package com.inky.fitnesscalendar.publicApi
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.rememberCoroutineScope
 import com.inky.fitnesscalendar.repository.DatabaseRepository
@@ -17,16 +15,14 @@ import javax.inject.Inject
  * Enables third party applications to show the recording dialog using intents
  */
 @AndroidEntryPoint
-class CreateRecording : ComponentActivity() {
+class CreateRecording : ApiActivity() {
     @Inject
     lateinit var databaseRepository: DatabaseRepository
 
     @Inject
     lateinit var recordingRepository: RecordingRepository
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
+    override suspend fun handleRequest() = runOnUiThread {
         setContent {
             val scope = rememberCoroutineScope()
             AppFrame {

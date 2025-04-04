@@ -30,5 +30,7 @@ class StopRecording : ApiActivity() {
                 Toast.LENGTH_LONG
             ).show()
         }
+
+        finish()
     }
 }

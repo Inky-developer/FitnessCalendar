@@ -7,6 +7,7 @@ import androidx.activity.ComponentActivity
 import androidx.lifecycle.lifecycleScope
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.db.entities.ActivityType
+import com.inky.fitnesscalendar.preferences.Preference
 import com.inky.fitnesscalendar.repository.DatabaseRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
@@ -20,8 +21,17 @@ abstract class ApiActivity : ComponentActivity() {
 
         if (savedInstanceState == null) {
             lifecycleScope.launch(Dispatchers.IO) {
-                handleRequest()
-                finish()
+                if (Preference.PREF_ENABLE_PUBLIC_API.get(this@ApiActivity)) {
+                    handleRequest()
+                } else {
+                    runOnUiThread {
+                        Toast.makeText(
+                            this@ApiActivity,
+                            getString(R.string.error_public_api_must_be_enabled_in_settings),
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
             }
         } else {
             finish()

@@ -7,6 +7,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
+import androidx.core.net.toUri
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -108,7 +109,7 @@ sealed class Preference<T, P>(
             return if (primitive.isBlank()) {
                 null
             } else {
-                Uri.parse(primitive)
+                primitive.toUri()
             }
         }
     }
@@ -120,7 +121,7 @@ sealed class Preference<T, P>(
         }
 
         override fun deserialize(primitive: Set<String>): Set<Uri> {
-            return primitive.map { Uri.parse(it) }.toSet()
+            return primitive.map { it.toUri() }.toSet()
         }
 
         suspend fun add(context: Context, value: Uri) = update(context) { it + value }
@@ -142,9 +143,14 @@ sealed class Preference<T, P>(
         val PREF_BACKUP_URI = UriPreference("PREF_BACKUP_URI")
 
         val COLLECT_BSSID = PrimitivePreference.create("PREF_COLLECT_BSSID", false).apply {
-            titleId = R.string.setting_title_store_location_information
-            descriptionId = R.string.setting_description_store_location_information
+            titleId = R.string.setting_store_location_information_title
+            descriptionId = R.string.setting_store_location_information_description
         }
+        val PREF_ENABLE_PUBLIC_API =
+            PrimitivePreference.create("PREF_ENABLE_PUBLIC_API", false).apply {
+                titleId = R.string.setting_enable_public_api_title
+                descriptionId = R.string.setting_enable_public_api_description
+            }
 
         val PREF_WATCHED_FOLDERS = UriSetPreference("PREF_WATCHED_FOLDERS")
         val PREF_WATCHED_FOLDERS_LAST_IMPORT = DatePreference("PREF_WATCHED_FOLDERS_LAST_IMPORT")
