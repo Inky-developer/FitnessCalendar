@@ -16,6 +16,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -124,13 +125,16 @@ fun <T> MosaicChart(
                     Column {
                         val xLabel = state.xLabels[index]
                         if (xLabel != null) {
+
+                            val textColor = LocalContentColor.current
                             val typography = MaterialTheme.typography
                             Canvas(modifier = Modifier.size(TILE_SIZE_DP.dp)) {
                                 drawText(
                                     textMeasurer.measure(
                                         xLabel,
                                         style = typography.labelSmall
-                                    )
+                                    ),
+                                    color = textColor,
                                 )
                             }
                         } else {
