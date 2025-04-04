@@ -13,6 +13,7 @@ A private and fully offline activity tracker.
 - Create custom activity types
 - Statistics
 - Basic diary functionality
+- Public (opt-in) api to for third party apps
 
 ## Screenshots
 
@@ -22,3 +23,7 @@ A private and fully offline activity tracker.
   <img alt="Day View" src="https://github.com/Inky-developer/FitnessCalendar/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/day_view_1727607982460.png" width="128">
   <img alt="Statistics" src="https://github.com/Inky-developer/FitnessCalendar/blob/master/fastlane/metadata/android/en-US/images/phoneScreenshots/statistics_1727607984506.png" width="128">
 </div>
+
+## Public API
+
+See (docs.md)[docs/docs.md]
