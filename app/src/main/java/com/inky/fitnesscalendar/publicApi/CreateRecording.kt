@@ -32,10 +32,10 @@ class CreateRecording : ApiActivity() {
                         onSave = {
                             scope.launch {
                                 recordingRepository.startRecording(it)
-                                finish()
+                                finishAndRemoveTask()
                             }
                         },
-                        onDismiss = { finish() }
+                        onDismiss = { finishAndRemoveTask() }
                     )
                 }
             }

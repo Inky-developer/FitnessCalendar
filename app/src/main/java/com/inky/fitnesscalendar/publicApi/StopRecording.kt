@@ -31,6 +31,6 @@ class StopRecording : ApiActivity() {
             ).show()
         }
 
-        finish()
+        finishAndRemoveTask()
     }
 }

@@ -40,6 +40,6 @@ class CreateActivity : ApiActivity() {
         }
         pendingIntent!!.send()
 
-        finish()
+        finishAndRemoveTask()
     }
 }

@@ -34,7 +34,7 @@ abstract class ApiActivity : ComponentActivity() {
                 }
             }
         } else {
-            finish()
+            finishAndRemoveTask()
         }
     }
 

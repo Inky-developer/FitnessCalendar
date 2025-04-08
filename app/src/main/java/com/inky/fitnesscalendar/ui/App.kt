@@ -434,7 +434,7 @@ fun AnimatedContentScope.ProvideSharedContent(
 private fun Context.finishOrGoBack(navController: NavHostController) {
     val activity = this as? Activity
     if (activity != null) {
-        activity.finish()
+        activity.finishAndRemoveTask()
     } else {
         navController.popBackStack()
     }
