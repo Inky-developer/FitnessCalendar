@@ -32,7 +32,6 @@ data class Recording(
     @ColumnInfo(name = "start_time") val startTime: Date,
     @ColumnInfo(name = "vehicle") val vehicle: Vehicle? = null,
     @ColumnInfo(name = "place_id") val placeId: Int? = null,
-    @ColumnInfo(name = "wifi_bssid") val wifiBssid: String? = null
 ) {
     fun toActivity(type: ActivityType, endTime: Date = Date.from(Instant.now())) = Activity(
         typeId = typeId,
@@ -40,6 +39,5 @@ data class Recording(
         endTime = endTime,
         vehicle = vehicle,
         placeId = placeId,
-        wifiBssid = wifiBssid
     ).clean(type)
 }

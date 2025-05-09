@@ -61,8 +61,6 @@ data class Activity(
     @ColumnInfo(name = "total_ascent") val totalAscent: Distance? = null,
     @ColumnInfo(name = "total_descent") val totalDescent: Distance? = null,
 
-    // The unique identifier of the wifi network the device was connected to when starting the activity
-    @ColumnInfo(name = "wifi_bssid") val wifiBssid: String? = null,
     @ColumnInfo(name = "track_preview") val trackPreview: SerializedTrackPreview? = null,
 ) {
     fun clean(type: ActivityType) = copy(

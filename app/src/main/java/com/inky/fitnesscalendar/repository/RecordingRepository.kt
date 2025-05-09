@@ -9,8 +9,6 @@ import com.inky.fitnesscalendar.db.dao.RecordingDao
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.Recording
 import com.inky.fitnesscalendar.db.entities.RichRecording
-import com.inky.fitnesscalendar.preferences.Preference
-import com.inky.fitnesscalendar.util.getCurrentBssid
 import com.inky.fitnesscalendar.util.hideRecordingNotification
 import com.inky.fitnesscalendar.util.showRecordingNotification
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -28,13 +26,7 @@ class RecordingRepository @Inject constructor(
     private val activityDao: ActivityDao
 ) {
     suspend fun startRecording(richRecording: RichRecording) {
-        val includeWifi = Preference.COLLECT_BSSID.get(context)
-        val recording = if (includeWifi) {
-            richRecording.recording.copy(wifiBssid = context.getCurrentBssid())
-        } else {
-            richRecording.recording
-        }
-        val recordingId = recordingDao.insert(recording).toInt()
+        val recordingId = recordingDao.insert(richRecording.recording).toInt()
         context.showRecordingNotification(
             recordingId,
             richRecording.type,

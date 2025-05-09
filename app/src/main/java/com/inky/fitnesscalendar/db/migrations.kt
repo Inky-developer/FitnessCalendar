@@ -1,6 +1,7 @@
 package com.inky.fitnesscalendar.db
 
 import androidx.annotation.ColorRes
+import androidx.room.DeleteColumn
 import androidx.room.RenameColumn
 import androidx.room.migration.AutoMigrationSpec
 import androidx.room.migration.Migration
@@ -258,3 +259,7 @@ val MIGRATION_27_28 = object : Migration(27, 28) {
         db.execSQL("DELETE FROM FilterHistoryItem")
     }
 }
+
+@DeleteColumn(tableName = "Activity", columnName = "wifi_bssid")
+@DeleteColumn(tableName = "Recording", columnName = "wifi_bssid")
+class Migration35To36Spec : AutoMigrationSpec

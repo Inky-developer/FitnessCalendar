@@ -142,10 +142,11 @@ sealed class Preference<T, P>(
         val PREF_STATS_PROJECTION = EnumPreference("PREF_STATS_PROJECTION", Projection::class)
         val PREF_BACKUP_URI = UriPreference("PREF_BACKUP_URI")
 
-        val COLLECT_BSSID = PrimitivePreference.create("PREF_COLLECT_BSSID", false).apply {
-            titleId = R.string.setting_store_location_information_title
-            descriptionId = R.string.setting_store_location_information_description
-        }
+        // Unused
+//        val COLLECT_BSSID = PrimitivePreference.create("PREF_COLLECT_BSSID", false).apply {
+//            titleId = R.string.setting_store_location_information_title
+//            descriptionId = R.string.setting_store_location_information_description
+//        }
         val PREF_ENABLE_PUBLIC_API =
             PrimitivePreference.create("PREF_ENABLE_PUBLIC_API", false).apply {
                 titleId = R.string.setting_enable_public_api_title
