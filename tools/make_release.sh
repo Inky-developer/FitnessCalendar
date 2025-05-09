@@ -1,10 +1,5 @@
 #!/bin/bash
 
-CHANGELOG_FILE="CHANGELOG.md"
-VERSION_FILE="app/version.properties"
-# Load the two properties
-# shellcheck source=app/version.properties
-source "$VERSION_FILE"
 
 source tools/_functions.sh
 
@@ -27,18 +22,18 @@ function updateVersionName() {
 }
 
 function writeFastlaneChangelog() {
-  getCurrentChangelog > "fastlane/metadata/android/en-US/changelogs/$NEW_VERSION_CODE.txt"
+  getUnreleasedChangelog > "fastlane/metadata/android/en-US/changelogs/$NEW_VERSION_CODE.txt"
 }
 
 # Moves all notes under the unreleased header into the new release
 function updateChangelog() {
-  sed -i "1s/.*/# Unreleased\n\n/; 2s/.*/# $NEW_VERSION_NAME\n/" $CHANGELOG_FILE
+  sed -i "1s/.*/# Unreleased\n\n/; 2s/.*/# $NEW_VERSION_NAME\n/" "$CHANGELOG_FILE"
 }
 
 echo "Incrementing the version number…"
 incrementVersionCode
 updateVersionName
-printf "versionCode=%s\nversionName=%s" "$NEW_VERSION_CODE" "$NEW_VERSION_NAME" > $VERSION_FILE
+printf "versionCode=%s\nversionName=%s" "$NEW_VERSION_CODE" "$NEW_VERSION_NAME" > "$VERSION_FILE"
 
 echo "Updating Changelog…"
 writeFastlaneChangelog
