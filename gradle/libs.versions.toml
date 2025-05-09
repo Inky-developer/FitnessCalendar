@@ -3,7 +3,9 @@ accompanistPermissionsVersion = "0.37.3"
 agp = "8.10.0"
 approvaltests = "24.21.0"
 coilCompose = "2.7.0"
-datastorePreferences = "1.1.6"
+# 1.1.5 and 1.1.6 should be yanked by google, because they break production builds (But for some reason aren't)
+# https://issuetracker.google.com/issues/413078297
+datastorePreferences = "1.1.4"
 hiltAndroid = "2.56.2"
 hiltNavigationCompose = "1.2.0"
 kotlin = "2.1.20"
