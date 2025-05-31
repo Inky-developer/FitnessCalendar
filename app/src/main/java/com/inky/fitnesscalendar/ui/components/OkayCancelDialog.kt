@@ -29,7 +29,10 @@ fun OkayCancelDialog(
 ) {
     BasicAlertDialog(
         onDismissRequest = onDismiss,
-        properties = DialogProperties(usePlatformDefaultWidth = false)
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false,
+            dismissOnClickOutside = false
+        )
     ) {
         Surface(
             shape = MaterialTheme.shapes.extraLarge,

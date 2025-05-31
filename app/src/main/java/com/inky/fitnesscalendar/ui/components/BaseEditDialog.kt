@@ -22,6 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.inky.fitnesscalendar.R
 
 @Composable
@@ -34,7 +35,10 @@ fun BaseEditDialog(
     saveText: @Composable () -> Unit = { Text(stringResource(R.string.save)) },
     content: @Composable () -> Unit,
 ) {
-    Dialog(onDismissRequest = onNavigateBack) {
+    Dialog(
+        onDismissRequest = onNavigateBack,
+        properties = DialogProperties(dismissOnClickOutside = false)
+    ) {
         Card(
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
         ) {

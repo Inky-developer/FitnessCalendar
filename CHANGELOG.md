@@ -1,6 +1,7 @@
 # Unreleased
 
 - Remove "Store location information" preference
+- Don't dismiss dialogs when on click outside
 
 # 2025.04.1
 

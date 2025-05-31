@@ -53,6 +53,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.DialogProperties
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.EpochDay
@@ -359,6 +360,7 @@ private fun DayPickerDialog(
     )
 
     DatePickerDialog(
+        properties = DialogProperties(dismissOnClickOutside = false),
         onDismissRequest = onDismiss,
         confirmButton = {
             TextButton(
