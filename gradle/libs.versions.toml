@@ -14,8 +14,8 @@ junit = "4.13.2"
 junitVersion = "1.2.1"
 robolectricVersion = "4.14.1"
 kotlinxSerializationJsonVersion = "1.8.1"
-lifecycleRuntimeKtx = "2.9.0"
-composeBom = "2025.05.01"
+lifecycleRuntimeKtx = "2.9.1"
+composeBom = "2025.06.00"
 navigationCompose = "2.9.0"
 # Room 2.7.8-alpha08 is buggy, the command `./gradlew assembleAndroidTest` fails with it
 # According to git bisect, the first bad commit is 95dda8daee20d0807647ab5b8475cac9111f5f74
