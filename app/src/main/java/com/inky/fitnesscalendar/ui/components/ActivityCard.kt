@@ -22,6 +22,7 @@ import androidx.compose.material.icons.automirrored.outlined.ArrowForward
 import androidx.compose.material.icons.outlined.DateRange
 import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.PlayArrow
+import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -73,6 +74,7 @@ fun ActivityCard(
     richActivity: RichActivity,
     onDelete: () -> Unit,
     onEdit: (Activity) -> Unit,
+    onShare: () -> Unit,
     onDetails: (Activity) -> Unit,
     localizationRepository: LocalizationRepository,
     modifier: Modifier = Modifier,
@@ -80,7 +82,7 @@ fun ActivityCard(
     onShowDay: (() -> Unit)? = null,
     onFilter: ((ActivityFilter) -> Unit)? = null,
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainer,
-    contentColor: Color = contentColorFor(MaterialTheme.colorScheme.surfaceContainer)
+    contentColor: Color = contentColorFor(containerColor)
 ) {
     var showContextMenu by rememberSaveable { mutableStateOf(false) }
     var showImageViewer by rememberSaveable { mutableStateOf(false) }
@@ -91,7 +93,6 @@ fun ActivityCard(
     }
     val imageUri = richActivity.activity.imageName?.getImageUri()
 
-    val trackColor = contentColorFor(containerColor)
     val trackPreview = remember(richActivity) { richActivity.activity.trackPreview?.toTrackSvg() }
 
     val haptics = LocalHapticFeedback.current
@@ -122,7 +123,7 @@ fun ActivityCard(
             if (trackPreview != null) {
                 TrackView(
                     track = trackPreview,
-                    color = trackColor,
+                    color = contentColor,
                     modifier = Modifier
                         .matchParentSize()
                         .padding(all = 8.dp)
@@ -164,6 +165,7 @@ fun ActivityCard(
                 showContextMenu = false
                 onDelete()
             },
+            onShare = onShare,
             onJumpTo = onJumpTo?.let {
                 {
                     showContextMenu = false
@@ -255,7 +257,7 @@ fun CompactActivityCard(
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun ActivityCardContent(activity: Activity, place: Place?) {
+fun ActivityCardContent(activity: Activity, place: Place?) {
     val timeElapsed = remember(activity) { activity.startTime until activity.endTime }
 
     if (activity.vehicle != null || timeElapsed.elapsedMs > 0) {
@@ -390,6 +392,7 @@ private fun IconStatistic(stat: ContextFormat?, icon: @Composable () -> Unit) {
 private fun ActivityCardContextMenu(
     onDismiss: () -> Unit,
     onDelete: () -> Unit,
+    onShare: () -> Unit,
     onJumpTo: (() -> Unit)?,
     onShowDay: (() -> Unit)?,
     onFilterByType: (() -> Unit)?,
@@ -413,6 +416,11 @@ private fun ActivityCardContextMenu(
             ) {
                 Text(stringResource(R.string.jump_to))
             }
+        }
+        BottomSheetButton(
+            onClick = onShare,
+            leadingIcon = { Icon(Icons.Outlined.Share, stringResource(R.string.share)) }) {
+            Text(stringResource(R.string.share))
         }
         AnimatedVisibility(visible = onShowDay != null) {
             BottomSheetButton(

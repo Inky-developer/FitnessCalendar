@@ -35,6 +35,7 @@ import com.inky.fitnesscalendar.ui.util.ProvideDatabaseValues
 import com.inky.fitnesscalendar.ui.util.localDatabaseValues
 import com.inky.fitnesscalendar.ui.views.ActivityEditState
 import com.inky.fitnesscalendar.ui.views.ActivityLog
+import com.inky.fitnesscalendar.ui.views.ActivityShareView
 import com.inky.fitnesscalendar.ui.views.DayView
 import com.inky.fitnesscalendar.ui.views.EditDayDialog
 import com.inky.fitnesscalendar.ui.views.FilterView
@@ -123,6 +124,11 @@ private fun AppNavigation(
                         onEditActivity = {
                             navController.navigate(Views.NewActivity(it.uid))
                         },
+                        onShareActivity = {
+                            if (it.activity.uid != null) {
+                                navController.navigate(Views.ShareActivity(it.activity.uid))
+                            }
+                        },
                         onEditDay = {
                             navController.navigate(Views.EditDay(it.day))
                         },
@@ -157,6 +163,11 @@ private fun AppNavigation(
                         initialEpochDay = route.epochDay,
                         onEditActivity = {
                             navController.navigate(Views.NewActivity(it.activity.uid))
+                        },
+                        onShareActivity = {
+                            if (it.activity.uid != null) {
+                                navController.navigate(Views.ShareActivity(it.activity.uid))
+                            }
                         },
                         onTrackDetails = {
                             if (it.activity.uid != null) {
@@ -198,6 +209,11 @@ private fun AppNavigation(
                         onSummary = {
                             navController.navigate(Views.SummaryView)
                         },
+                        onShareActivity = {
+                            if (it.uid != null) {
+                                navController.navigate(Views.ShareActivity(it.uid))
+                            }
+                        },
                         onEditFilter = {
                             filterState = it
                             viewModel.addToFilterHistory(filterState)
@@ -206,12 +222,8 @@ private fun AppNavigation(
                 }
             }
             composable<Views.FilterActivity>(
-                enterTransition = {
-                    slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Up)
-                },
-                exitTransition = {
-                    slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Down)
-                }
+                enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Up) },
+                exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Down) }
             ) {
                 onCurrentView(Views.FilterActivity)
                 ProvideSharedContent(sharedContentScope = this@SharedTransitionLayout) {
@@ -222,6 +234,20 @@ private fun AppNavigation(
                             viewModel.addToFilterHistory(filterState)
                         },
                         onNavigateBack = { navController.popBackStack() }
+                    )
+                }
+            }
+            composable<Views.ShareActivity>(
+                enterTransition = { slideIntoContainer(AnimatedContentTransitionScope.SlideDirection.Up) },
+                exitTransition = { slideOutOfContainer(AnimatedContentTransitionScope.SlideDirection.Down) }
+            ) {
+                onCurrentView(Views.ShareActivity(-1))
+                val route: Views.ShareActivity = it.toRoute()
+
+                ProvideSharedContent(sharedContentScope = this@SharedTransitionLayout) {
+                    ActivityShareView(
+                        activityId = route.activityId,
+                        onBack = { navController.popBackStack() }
                     )
                 }
             }

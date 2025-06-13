@@ -45,6 +45,11 @@ sealed class Views : Parcelable {
     }
 
     @Serializable
+    data class ShareActivity(val activityId: Int) : Views() {
+        override val nameId get() = R.string.share_activity
+    }
+
+    @Serializable
     data class NewActivity(val activityId: Int? = null, val rawInitialStartDay: Long? = null) :
         Views() {
         override val nameId get() = R.string.new_activity

@@ -93,6 +93,7 @@ fun Home(
     viewModel: HomeViewModel = hiltViewModel(),
     onNewActivity: () -> Unit,
     onEditActivity: (Activity) -> Unit,
+    onShareActivity: (RichActivity) -> Unit,
     onTrackDetails: (Activity) -> Unit,
     onEditDay: (EpochDay) -> Unit,
     onRecordActivity: () -> Unit,
@@ -177,6 +178,7 @@ fun Home(
                 viewModel.repository.localizationRepository,
                 onDelete = { viewModel.deleteActivity(it) },
                 onEdit = onEditActivity,
+                onShare = onShareActivity,
                 onTrackDetails = onTrackDetails,
             )
             Today(
@@ -536,6 +538,7 @@ fun RecentActivityOrNull(
     localizationRepository: LocalizationRepository,
     onDelete: (RichActivity) -> Unit,
     onEdit: (Activity) -> Unit,
+    onShare: (RichActivity) -> Unit,
     onTrackDetails: (Activity) -> Unit
 ) {
     AnimatedContent(
@@ -544,11 +547,12 @@ fun RecentActivityOrNull(
     ) { actualActivity ->
         if (actualActivity != null) {
             RecentActivity(
-                actualActivity,
-                localizationRepository,
-                { onDelete(actualActivity) },
-                { onEdit(actualActivity.activity) },
-                { onTrackDetails(actualActivity.activity) }
+                richActivity = actualActivity,
+                localizationRepository = localizationRepository,
+                onShare = { onShare(actualActivity) },
+                onDelete = { onDelete(actualActivity) },
+                onEdit = { onEdit(actualActivity.activity) },
+                onTrackDetails = { onTrackDetails(actualActivity.activity) }
             )
         }
     }
@@ -560,6 +564,7 @@ fun RecentActivity(
     localizationRepository: LocalizationRepository,
     onDelete: () -> Unit,
     onEdit: (Activity) -> Unit,
+    onShare: () -> Unit,
     onTrackDetails: (Activity) -> Unit,
 ) {
     ActivityCard(
@@ -567,6 +572,7 @@ fun RecentActivity(
         localizationRepository = localizationRepository,
         onDelete = onDelete,
         onEdit = onEdit,
+        onShare = onShare,
         onDetails = onTrackDetails,
         containerColor = MaterialTheme.colorScheme.tertiaryContainer,
         contentColor = contentColorFor(MaterialTheme.colorScheme.tertiaryContainer),

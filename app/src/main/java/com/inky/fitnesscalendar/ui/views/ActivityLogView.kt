@@ -78,6 +78,7 @@ fun ActivityLog(
     onOpenDrawer: () -> Unit,
     onNewActivity: () -> Unit,
     onEditActivity: (Activity) -> Unit,
+    onShareActivity: (Activity) -> Unit,
     onTrackDetails: (Activity) -> Unit,
     onShowDay: (EpochDay) -> Unit,
     onFilter: () -> Unit,
@@ -194,7 +195,8 @@ fun ActivityLog(
                         onEditFilter = onEditFilter,
                         onEditActivity = onEditActivity,
                         onTrackDetails = onTrackDetails,
-                        onDeleteActivity = { viewModel.deleteActivity(it) }
+                        onDeleteActivity = { viewModel.deleteActivity(it) },
+                        onShareActivity = onShareActivity
                     )
                 }
             }
@@ -212,7 +214,8 @@ private fun ActivityList(
     onEditFilter: (ActivityFilter) -> Unit,
     onEditActivity: (Activity) -> Unit,
     onTrackDetails: (Activity) -> Unit,
-    onDeleteActivity: (RichActivity) -> Unit
+    onDeleteActivity: (RichActivity) -> Unit,
+    onShareActivity: (Activity) -> Unit,
 ) {
     val numActivities = remember(state) { state.activities.size }
     val listItems = remember(state) { state.items }
@@ -277,6 +280,7 @@ private fun ActivityList(
                         onFilter = if (filter.isEmpty()) {
                             onEditFilter
                         } else null,
+                        onShare = { onShareActivity(item.richActivity.activity) },
                         onJumpTo = if (!filter.isEmpty()) {
                             { onJumpToActivity(item.richActivity.activity) }
                         } else null,

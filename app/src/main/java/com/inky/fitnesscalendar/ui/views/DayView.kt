@@ -82,6 +82,7 @@ fun DayView(
     viewModel: BaseViewModel = hiltViewModel(),
     initialEpochDay: EpochDay,
     onEditActivity: (RichActivity) -> Unit,
+    onShareActivity: (RichActivity) -> Unit,
     onTrackDetails: (RichActivity) -> Unit,
     onJumpToActivity: (RichActivity) -> Unit,
     onNewActivity: (EpochDay) -> Unit,
@@ -175,6 +176,7 @@ fun DayView(
                         activities = activities!!,
                         localizationRepository = viewModel.repository.localizationRepository,
                         onDeleteActivity = { viewModel.deleteActivity(it) },
+                        onShare = onShareActivity,
                         onEditActivity = onEditActivity,
                         onTrackDetails = onTrackDetails,
                         onJumpToActivity = onJumpToActivity,
@@ -216,6 +218,7 @@ fun DayViewInner(
     onEditActivity: (RichActivity) -> Unit,
     onTrackDetails: (RichActivity) -> Unit,
     onJumpToActivity: (RichActivity) -> Unit,
+    onShare: (RichActivity) -> Unit,
     onEditDay: () -> Unit,
     sharedElement: @Composable Modifier.(SharedContentKey) -> Modifier,
 ) {
@@ -305,6 +308,7 @@ fun DayViewInner(
                         onEdit = { onEditActivity(richActivity) },
                         onDetails = { onTrackDetails(richActivity) },
                         onJumpTo = { onJumpToActivity(richActivity) },
+                        onShare = { onShare(richActivity) },
                         localizationRepository = localizationRepository,
                         modifier = Modifier.sharedBounds(
                             SharedContentKey.ActivityCard(
