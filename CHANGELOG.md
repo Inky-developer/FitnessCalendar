@@ -1,10 +1,11 @@
 # Unreleased
 
+- Round vertical ascend to meters, but not kilometers
 
 # 2025.05.1
 
 - Remove "Store location information" preference
-- Don't dismiss dialogs when on click outside
+- Don't dismiss dialogs on click outside
 
 # 2025.04.1
 

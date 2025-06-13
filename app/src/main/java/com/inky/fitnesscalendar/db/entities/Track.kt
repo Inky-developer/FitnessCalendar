@@ -12,6 +12,7 @@ import com.inky.fitnesscalendar.data.measure.Distance
 import com.inky.fitnesscalendar.data.measure.Duration
 import com.inky.fitnesscalendar.data.measure.Duration.Companion.until
 import com.inky.fitnesscalendar.data.measure.Elevation
+import com.inky.fitnesscalendar.data.measure.VerticalDistance
 import com.inky.fitnesscalendar.data.measure.bpm
 import com.inky.fitnesscalendar.data.measure.celsius
 import com.inky.fitnesscalendar.data.measure.kmh
@@ -121,8 +122,8 @@ data class Track(
         val minHeight = points.mapNotNull { it.elevation }.minByOrNull { it }
         val maxHeight = points.mapNotNull { it.elevation }.maxByOrNull { it }
 
-        var totalAscent: Distance? = null
-        var totalDescent: Distance? = null
+        var totalAscent: VerticalDistance? = null
+        var totalDescent: VerticalDistance? = null
         if (minHeight != null) {
             var ascent = 0.0
             var descent = 0.0
@@ -137,8 +138,8 @@ data class Track(
                     ascent += currEle.meters - prevEle.meters
                 }
             }
-            totalAscent = ascent.meters()
-            totalDescent = descent.meters()
+            totalAscent = VerticalDistance(meters = ascent)
+            totalDescent = VerticalDistance(meters = descent)
         }
 
         GpxTrackStats(

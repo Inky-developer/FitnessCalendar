@@ -6,6 +6,7 @@ import com.inky.fitnesscalendar.data.measure.Elevation
 import com.inky.fitnesscalendar.data.measure.HeartFrequency
 import com.inky.fitnesscalendar.data.measure.Speed
 import com.inky.fitnesscalendar.data.measure.Temperature
+import com.inky.fitnesscalendar.data.measure.VerticalDistance
 
 data class GpxTrackStats(
     val totalDistance: Distance,
@@ -19,6 +20,6 @@ data class GpxTrackStats(
     val maxTemperature: Temperature?,
     val minHeight: Elevation?,
     val maxHeight: Elevation?,
-    val totalAscent: Distance?,
-    val totalDescent: Distance?
+    val totalAscent: VerticalDistance?,
+    val totalDescent: VerticalDistance?
 )

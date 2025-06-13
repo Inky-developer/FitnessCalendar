@@ -17,6 +17,7 @@ import com.inky.fitnesscalendar.data.measure.Duration.Companion.until
 import com.inky.fitnesscalendar.data.measure.HeartFrequency
 import com.inky.fitnesscalendar.data.measure.Speed
 import com.inky.fitnesscalendar.data.measure.Temperature
+import com.inky.fitnesscalendar.data.measure.VerticalDistance
 import com.inky.fitnesscalendar.data.measure.metersPerSecond
 import com.inky.fitnesscalendar.util.toLocalDate
 import kotlinx.serialization.json.Json
@@ -58,8 +59,8 @@ data class Activity(
     @ColumnInfo(name = "temperature") val temperature: Temperature? = null,
     @ColumnInfo(name = "average_heart_rate") val averageHeartRate: HeartFrequency? = null,
     @ColumnInfo(name = "maximal_heart_rate") val maximalHeartRate: HeartFrequency? = null,
-    @ColumnInfo(name = "total_ascent") val totalAscent: Distance? = null,
-    @ColumnInfo(name = "total_descent") val totalDescent: Distance? = null,
+    @ColumnInfo(name = "total_ascent") val totalAscent: VerticalDistance? = null,
+    @ColumnInfo(name = "total_descent") val totalDescent: VerticalDistance? = null,
 
     @ColumnInfo(name = "track_preview") val trackPreview: SerializedTrackPreview? = null,
 ) {
