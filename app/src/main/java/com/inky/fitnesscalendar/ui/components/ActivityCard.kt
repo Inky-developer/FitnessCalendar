@@ -56,7 +56,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.Feel
-import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.data.gpx.Coordinate
 import com.inky.fitnesscalendar.data.gpx.TrackSvg
 import com.inky.fitnesscalendar.data.measure.Duration.Companion.until
@@ -72,15 +71,9 @@ import com.inky.fitnesscalendar.util.gpx.simplify
 @Composable
 fun ActivityCard(
     richActivity: RichActivity,
-    onDelete: () -> Unit,
-    onEdit: (Activity) -> Unit,
-    onShare: () -> Unit,
-    onDetails: (Activity) -> Unit,
+    callbacks: ActivityCardCallbacks,
     localizationRepository: LocalizationRepository,
     modifier: Modifier = Modifier,
-    onJumpTo: (() -> Unit)? = null,
-    onShowDay: (() -> Unit)? = null,
-    onFilter: ((ActivityFilter) -> Unit)? = null,
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainer,
     contentColor: Color = contentColorFor(containerColor)
 ) {
@@ -106,9 +99,9 @@ fun ActivityCard(
             .combinedClickable(
                 onClick = {
                     if (trackPreview != null) {
-                        onDetails(richActivity.activity)
+                        callbacks.onDetails(richActivity)
                     } else {
-                        onEdit(richActivity.activity)
+                        callbacks.onEdit(richActivity)
                     }
                 },
                 onLongClick = {
@@ -160,30 +153,9 @@ fun ActivityCard(
 
     if (showContextMenu) {
         ActivityCardContextMenu(
+            richActivity = richActivity,
             onDismiss = { showContextMenu = false },
-            onDelete = {
-                showContextMenu = false
-                onDelete()
-            },
-            onShare = onShare,
-            onJumpTo = onJumpTo?.let {
-                {
-                    showContextMenu = false
-                    it()
-                }
-            },
-            onShowDay = onShowDay?.let {
-                {
-                    showContextMenu = false
-                    it()
-                }
-            },
-            onFilterByType = onFilter?.let {
-                {
-                    showContextMenu = false
-                    it(ActivityFilter(types = listOf(richActivity.type)))
-                }
-            }
+            callbacks = callbacks,
         )
     }
 
@@ -374,6 +346,16 @@ fun ActivityCardContent(activity: Activity, place: Place?) {
     }
 }
 
+data class ActivityCardCallbacks(
+    val onDetails: (RichActivity) -> Unit,
+    val onEdit: (RichActivity) -> Unit,
+    val onDelete: (RichActivity) -> Unit,
+    val onShare: (RichActivity) -> Unit,
+    val onJumpTo: ((RichActivity) -> Unit)?,
+    val onShowDay: ((RichActivity) -> Unit)?,
+    val onFilterByType: ((RichActivity) -> Unit)?,
+)
+
 @Composable
 private fun IconStatistic(stat: ContextFormat?, icon: @Composable () -> Unit) {
     if (stat != null) {
@@ -390,12 +372,9 @@ private fun IconStatistic(stat: ContextFormat?, icon: @Composable () -> Unit) {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun ActivityCardContextMenu(
+    richActivity: RichActivity,
     onDismiss: () -> Unit,
-    onDelete: () -> Unit,
-    onShare: () -> Unit,
-    onJumpTo: (() -> Unit)?,
-    onShowDay: (() -> Unit)?,
-    onFilterByType: (() -> Unit)?,
+    callbacks: ActivityCardCallbacks,
 ) {
     var showDialog by rememberSaveable { mutableStateOf(false) }
 
@@ -407,9 +386,12 @@ private fun ActivityCardContextMenu(
         )
         HorizontalDivider(modifier = Modifier.padding(all = 8.dp))
 
-        AnimatedVisibility(visible = onJumpTo != null) {
+        AnimatedVisibility(visible = callbacks.onJumpTo != null) {
             BottomSheetButton(
-                onClick = { onJumpTo?.let { it() } },
+                onClick = {
+                    callbacks.onJumpTo?.let { it(richActivity) }
+                    onDismiss()
+                },
                 leadingIcon = {
                     Icon(Icons.Outlined.PlayArrow, stringResource(R.string.jump_to))
                 },
@@ -420,14 +402,18 @@ private fun ActivityCardContextMenu(
         BottomSheetButton(
             onClick = {
                 onDismiss()
-                onShare()
+                callbacks.onShare(richActivity)
             },
-            leadingIcon = { Icon(Icons.Outlined.Share, stringResource(R.string.share)) }) {
+            leadingIcon = { Icon(Icons.Outlined.Share, stringResource(R.string.share)) }
+        ) {
             Text(stringResource(R.string.share))
         }
-        AnimatedVisibility(visible = onShowDay != null) {
+        AnimatedVisibility(visible = callbacks.onShowDay != null) {
             BottomSheetButton(
-                onClick = { onShowDay?.let { it() } },
+                onClick = {
+                    onDismiss()
+                    callbacks.onShowDay?.let { it(richActivity) }
+                },
                 leadingIcon = {
                     Icon(Icons.Outlined.DateRange, stringResource(R.string.show_day))
                 },
@@ -435,9 +421,12 @@ private fun ActivityCardContextMenu(
                 Text(stringResource(R.string.show_day))
             }
         }
-        AnimatedVisibility(visible = onFilterByType != null) {
+        AnimatedVisibility(visible = callbacks.onFilterByType != null) {
             BottomSheetButton(
-                onClick = { onFilterByType?.let { it() } },
+                onClick = {
+                    onDismiss()
+                    callbacks.onFilterByType?.let { it(richActivity) }
+                },
                 leadingIcon = {
                     Icon(
                         painterResource(R.drawable.outline_filter_24),
@@ -471,7 +460,7 @@ private fun ActivityCardContextMenu(
             title = { Text(stringResource(R.string.ask_delete_activity)) },
             onDismissRequest = { showDialog = false },
             confirmButton = {
-                TextButton(onClick = onDelete) {
+                TextButton(onClick = { callbacks.onDelete(richActivity) }) {
                     Text(stringResource(R.string.confirm))
                 }
             },

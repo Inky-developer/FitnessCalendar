@@ -63,13 +63,13 @@ import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityStatistics
 import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.data.Feel
-import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.db.entities.Recording
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.db.entities.RichRecording
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivityCard
+import com.inky.fitnesscalendar.ui.components.ActivityCardCallbacks
 import com.inky.fitnesscalendar.ui.components.ActivityImage
 import com.inky.fitnesscalendar.ui.components.CompactActivityCard
 import com.inky.fitnesscalendar.ui.components.FeelSelector
@@ -91,10 +91,8 @@ private const val TAG = "HOME"
 @Composable
 fun Home(
     viewModel: HomeViewModel = hiltViewModel(),
+    activityCardCallbacks: ActivityCardCallbacks,
     onNewActivity: () -> Unit,
-    onEditActivity: (Activity) -> Unit,
-    onShareActivity: (RichActivity) -> Unit,
-    onTrackDetails: (Activity) -> Unit,
     onEditDay: (EpochDay) -> Unit,
     onRecordActivity: () -> Unit,
     onNavigateToday: () -> Unit,
@@ -175,11 +173,8 @@ fun Home(
 
             RecentActivityOrNull(
                 recentActivity,
+                callbacks = activityCardCallbacks.copy(onFilterByType = null),
                 viewModel.repository.localizationRepository,
-                onDelete = { viewModel.deleteActivity(it) },
-                onEdit = onEditActivity,
-                onShare = onShareActivity,
-                onTrackDetails = onTrackDetails,
             )
             Today(
                 richActivities = activitiesToday ?: emptyList(),
@@ -535,11 +530,8 @@ fun CompactFeelSelector(feel: Feel, onFeel: (Feel) -> Unit, modifier: Modifier =
 @Composable
 fun RecentActivityOrNull(
     richActivity: RichActivity?,
+    callbacks: ActivityCardCallbacks,
     localizationRepository: LocalizationRepository,
-    onDelete: (RichActivity) -> Unit,
-    onEdit: (Activity) -> Unit,
-    onShare: (RichActivity) -> Unit,
-    onTrackDetails: (Activity) -> Unit
 ) {
     AnimatedContent(
         targetState = richActivity,
@@ -548,11 +540,8 @@ fun RecentActivityOrNull(
         if (actualActivity != null) {
             RecentActivity(
                 richActivity = actualActivity,
+                callbacks = callbacks,
                 localizationRepository = localizationRepository,
-                onShare = { onShare(actualActivity) },
-                onDelete = { onDelete(actualActivity) },
-                onEdit = { onEdit(actualActivity.activity) },
-                onTrackDetails = { onTrackDetails(actualActivity.activity) }
             )
         }
     }
@@ -561,19 +550,13 @@ fun RecentActivityOrNull(
 @Composable
 fun RecentActivity(
     richActivity: RichActivity,
+    callbacks: ActivityCardCallbacks,
     localizationRepository: LocalizationRepository,
-    onDelete: () -> Unit,
-    onEdit: (Activity) -> Unit,
-    onShare: () -> Unit,
-    onTrackDetails: (Activity) -> Unit,
 ) {
     ActivityCard(
         richActivity = richActivity,
+        callbacks = callbacks,
         localizationRepository = localizationRepository,
-        onDelete = onDelete,
-        onEdit = onEdit,
-        onShare = onShare,
-        onDetails = onTrackDetails,
         containerColor = MaterialTheme.colorScheme.tertiaryContainer,
         contentColor = contentColorFor(MaterialTheme.colorScheme.tertiaryContainer),
     )

@@ -21,6 +21,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -30,6 +31,7 @@ import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.di.DecisionTrees
+import com.inky.fitnesscalendar.ui.components.ActivityCardCallbacks
 import com.inky.fitnesscalendar.ui.components.NavigationDrawer
 import com.inky.fitnesscalendar.ui.util.ProvideDatabaseValues
 import com.inky.fitnesscalendar.ui.util.localDatabaseValues
@@ -109,6 +111,13 @@ private fun AppNavigation(
 ) {
     var filterState by rememberSaveable { mutableStateOf(ActivityFilter()) }
 
+    val activityCardCallbacks = rememberActivityCardCallbacks(
+        onFilter = {
+            filterState = it
+            viewModel.addToFilterHistory(filterState)
+        },
+        navController = navController
+    )
     val scope = rememberCoroutineScope()
 
     SharedTransitionLayout {
@@ -120,22 +129,10 @@ private fun AppNavigation(
                 onCurrentView(Views.Home)
                 ProvideSharedContent(sharedContentScope = this@SharedTransitionLayout) {
                     Home(
+                        activityCardCallbacks = activityCardCallbacks,
                         onNewActivity = { navController.navigate(Views.NewActivity()) },
-                        onEditActivity = {
-                            navController.navigate(Views.NewActivity(it.uid))
-                        },
-                        onShareActivity = {
-                            if (it.activity.uid != null) {
-                                navController.navigate(Views.ShareActivity(it.activity.uid))
-                            }
-                        },
                         onEditDay = {
                             navController.navigate(Views.EditDay(it.day))
-                        },
-                        onTrackDetails = {
-                            if (it.uid != null) {
-                                navController.navigate(Views.TrackDetails(it.uid))
-                            }
                         },
                         onRecordActivity = { navController.navigate(Views.RecordActivity) },
                         onNavigateToday = { navController.navigate(Views.DayView()) },
@@ -161,22 +158,7 @@ private fun AppNavigation(
                 ProvideSharedContent(sharedContentScope = this@SharedTransitionLayout) {
                     DayView(
                         initialEpochDay = route.epochDay,
-                        onEditActivity = {
-                            navController.navigate(Views.NewActivity(it.activity.uid))
-                        },
-                        onShareActivity = {
-                            if (it.activity.uid != null) {
-                                navController.navigate(Views.ShareActivity(it.activity.uid))
-                            }
-                        },
-                        onTrackDetails = {
-                            if (it.activity.uid != null) {
-                                navController.navigate(Views.TrackDetails(it.activity.uid))
-                            }
-                        },
-                        onJumpToActivity = {
-                            navController.navigate(Views.ActivityLog(it.activity.uid))
-                        },
+                        activityCardCallbacks = activityCardCallbacks,
                         onNewActivity = {
                             navController.navigate(Views.NewActivity(rawInitialStartDay = it.day))
                         },
@@ -192,27 +174,15 @@ private fun AppNavigation(
                     ActivityLog(
                         initialSelectedActivityId = route.activityId,
                         filter = filterState,
+                        activityCardCallbacks = activityCardCallbacks,
                         onOpenDrawer = openDrawer,
                         onNewActivity = { navController.navigate(Views.NewActivity()) },
-                        onEditActivity = {
-                            navController.navigate(Views.NewActivity(it.uid))
-                        },
-                        onTrackDetails = {
-                            if (it.uid != null) {
-                                navController.navigate(Views.TrackDetails(it.uid))
-                            }
-                        },
                         onShowDay = { navController.navigate(Views.DayView(it.day)) },
                         onFilter = {
                             navController.navigate(Views.FilterActivity)
                         },
                         onSummary = {
                             navController.navigate(Views.SummaryView)
-                        },
-                        onShareActivity = {
-                            if (it.uid != null) {
-                                navController.navigate(Views.ShareActivity(it.uid))
-                            }
                         },
                         onEditFilter = {
                             filterState = it
@@ -427,6 +397,37 @@ private fun AppNavigation(
         }
     }
 }
+
+@Composable
+private fun rememberActivityCardCallbacks(
+    viewModel: BaseViewModel = hiltViewModel(),
+    onFilter: (ActivityFilter) -> Unit,
+    navController: NavController
+) = remember(onFilter, navController) {
+    ActivityCardCallbacks(
+        onDetails = { activity ->
+            activity.activity.uid?.let {
+                navController.navigate(Views.TrackDetails(it))
+            }
+        },
+        onEdit = { navController.navigate(Views.NewActivity(it.activity.uid)) },
+        onDelete = { viewModel.deleteActivity(it) },
+        onShare = { activity ->
+            activity.activity.uid?.let { navController.navigate(Views.ShareActivity(it)) }
+        },
+        onJumpTo = {
+            navController.navigate(Views.ActivityLog(it.activity.uid))
+            onFilter(ActivityFilter())
+        },
+        onShowDay = {
+            navController.navigate(Views.DayView(it.activity.epochDay.day))
+        },
+        onFilterByType = {
+            onFilter(ActivityFilter(types = listOf(it.type)))
+        }
+    )
+}
+
 
 @OptIn(ExperimentalSharedTransitionApi::class)
 @Immutable

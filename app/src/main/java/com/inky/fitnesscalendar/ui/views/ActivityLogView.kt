@@ -52,10 +52,9 @@ import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.data.Feel
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
-import com.inky.fitnesscalendar.db.entities.Activity
-import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivityCard
+import com.inky.fitnesscalendar.ui.components.ActivityCardCallbacks
 import com.inky.fitnesscalendar.ui.components.FilterInformation
 import com.inky.fitnesscalendar.ui.components.NewActivityFAB
 import com.inky.fitnesscalendar.ui.components.NoActivitiesInfoBox
@@ -74,12 +73,10 @@ import kotlinx.coroutines.launch
 fun ActivityLog(
     viewModel: ActivityLogViewModel = hiltViewModel(),
     filter: ActivityFilter,
+    activityCardCallbacks: ActivityCardCallbacks,
     onEditFilter: (ActivityFilter) -> Unit,
     onOpenDrawer: () -> Unit,
     onNewActivity: () -> Unit,
-    onEditActivity: (Activity) -> Unit,
-    onShareActivity: (Activity) -> Unit,
-    onTrackDetails: (Activity) -> Unit,
     onShowDay: (EpochDay) -> Unit,
     onFilter: () -> Unit,
     onSummary: () -> Unit,
@@ -186,17 +183,9 @@ fun ActivityLog(
                 } else {
                     ActivityList(
                         state = activityListState,
+                        activityCardCallbacks = activityCardCallbacks.copy(onJumpTo = null),
                         localizationRepository = viewModel.repository.localizationRepository,
-                        onJumpToActivity = { activity ->
-                            nextScrollTarget = activity.uid
-                            onEditFilter(ActivityFilter())
-                        },
                         onShowDay = onShowDay,
-                        onEditFilter = onEditFilter,
-                        onEditActivity = onEditActivity,
-                        onTrackDetails = onTrackDetails,
-                        onDeleteActivity = { viewModel.deleteActivity(it) },
-                        onShareActivity = onShareActivity
                     )
                 }
             }
@@ -208,19 +197,13 @@ fun ActivityLog(
 @Composable
 private fun ActivityList(
     state: ActivityListState,
+    activityCardCallbacks: ActivityCardCallbacks,
     localizationRepository: LocalizationRepository,
-    onJumpToActivity: (Activity) -> Unit,
     onShowDay: (EpochDay) -> Unit,
-    onEditFilter: (ActivityFilter) -> Unit,
-    onEditActivity: (Activity) -> Unit,
-    onTrackDetails: (Activity) -> Unit,
-    onDeleteActivity: (RichActivity) -> Unit,
-    onShareActivity: (Activity) -> Unit,
 ) {
     val numActivities = remember(state) { state.activities.size }
     val listItems = remember(state) { state.items }
     val days = remember(state) { state.days }
-    val filter = remember(state) { state.filter }
     val listState = remember(state) { state.listState }
 
     LazyColumn(
@@ -274,19 +257,7 @@ private fun ActivityList(
                 ) {
                     ActivityCard(
                         item.richActivity,
-                        onDelete = {
-                            onDeleteActivity(item.richActivity)
-                        },
-                        onFilter = if (filter.isEmpty()) {
-                            onEditFilter
-                        } else null,
-                        onShare = { onShareActivity(item.richActivity.activity) },
-                        onJumpTo = if (!filter.isEmpty()) {
-                            { onJumpToActivity(item.richActivity.activity) }
-                        } else null,
-                        onShowDay = { onShowDay(item.richActivity.activity.epochDay) },
-                        onEdit = onEditActivity,
-                        onDetails = onTrackDetails,
+                        callbacks = activityCardCallbacks,
                         localizationRepository = localizationRepository,
                         modifier = Modifier
                             .animateItem()

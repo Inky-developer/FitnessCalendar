@@ -61,6 +61,7 @@ import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivityCard
+import com.inky.fitnesscalendar.ui.components.ActivityCardCallbacks
 import com.inky.fitnesscalendar.ui.components.ActivityImage
 import com.inky.fitnesscalendar.ui.components.ImageViewer
 import com.inky.fitnesscalendar.ui.components.NewActivityFAB
@@ -81,10 +82,7 @@ import java.util.Date
 fun DayView(
     viewModel: BaseViewModel = hiltViewModel(),
     initialEpochDay: EpochDay,
-    onEditActivity: (RichActivity) -> Unit,
-    onShareActivity: (RichActivity) -> Unit,
-    onTrackDetails: (RichActivity) -> Unit,
-    onJumpToActivity: (RichActivity) -> Unit,
+    activityCardCallbacks: ActivityCardCallbacks,
     onNewActivity: (EpochDay) -> Unit,
     onEditDay: (EpochDay) -> Unit,
     onOpenDrawer: () -> Unit
@@ -175,11 +173,7 @@ fun DayView(
                         day = day!!,
                         activities = activities!!,
                         localizationRepository = viewModel.repository.localizationRepository,
-                        onDeleteActivity = { viewModel.deleteActivity(it) },
-                        onShare = onShareActivity,
-                        onEditActivity = onEditActivity,
-                        onTrackDetails = onTrackDetails,
-                        onJumpToActivity = onJumpToActivity,
+                        activityCardCallbacks = activityCardCallbacks.copy(onFilterByType = null),
                         onEditDay = { onEditDay(actualEpochDay) },
                         // Kind of hacky. The problem is that Horizontal Pager instantiates
                         // multiple [DayViewInner]s, but only one of them should have the shared
@@ -214,11 +208,7 @@ fun DayViewInner(
     day: Day,
     activities: List<RichActivity>,
     localizationRepository: LocalizationRepository,
-    onDeleteActivity: (RichActivity) -> Unit,
-    onEditActivity: (RichActivity) -> Unit,
-    onTrackDetails: (RichActivity) -> Unit,
-    onJumpToActivity: (RichActivity) -> Unit,
-    onShare: (RichActivity) -> Unit,
+    activityCardCallbacks: ActivityCardCallbacks,
     onEditDay: () -> Unit,
     sharedElement: @Composable Modifier.(SharedContentKey) -> Modifier,
 ) {
@@ -304,11 +294,7 @@ fun DayViewInner(
                 for (richActivity in activities) {
                     ActivityCard(
                         richActivity = richActivity,
-                        onDelete = { onDeleteActivity(richActivity) },
-                        onEdit = { onEditActivity(richActivity) },
-                        onDetails = { onTrackDetails(richActivity) },
-                        onJumpTo = { onJumpToActivity(richActivity) },
-                        onShare = { onShare(richActivity) },
+                        callbacks = activityCardCallbacks,
                         localizationRepository = localizationRepository,
                         modifier = Modifier.sharedBounds(
                             SharedContentKey.ActivityCard(
