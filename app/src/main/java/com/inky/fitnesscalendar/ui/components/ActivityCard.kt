@@ -418,7 +418,10 @@ private fun ActivityCardContextMenu(
             }
         }
         BottomSheetButton(
-            onClick = onShare,
+            onClick = {
+                onDismiss()
+                onShare()
+            },
             leadingIcon = { Icon(Icons.Outlined.Share, stringResource(R.string.share)) }) {
             Text(stringResource(R.string.share))
         }
