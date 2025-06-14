@@ -353,4 +353,5 @@
     <string name="setting_enable_public_api_description"><![CDATA[Die API erlaubt es anderen Apps, Aktivitäten und Aufzeichnungen zu erstellen]]></string>
     <string name="error_public_api_must_be_enabled_in_settings">Die API muss in den Einstellungen aktiviert werden</string>
     <string name="share_activity">Aktivität teilen</string>
+    <string name="activity_summary">Zusammenfassung der Aktivität</string>
 </resources>

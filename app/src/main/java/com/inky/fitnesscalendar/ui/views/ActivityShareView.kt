@@ -210,7 +210,7 @@ private fun ScreenShotBox(graphicsLayer: GraphicsLayer, content: @Composable Box
 
 private fun Context.shareImageBitmap(image: ImageBitmap) {
     val cache = getOrCreateSharedMediaCache()
-    val file = File(cache, "Track summary (TODO change this).png")
+    val file = File(cache, getString(R.string.activity_summary) + ".png")
     file.delete()
     file.deleteOnExit()
 
