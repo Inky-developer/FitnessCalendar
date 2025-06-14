@@ -229,7 +229,7 @@ fun CompactActivityCard(
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun ActivityCardContent(activity: Activity, place: Place?) {
+fun ActivityCardContent(activity: Activity, place: Place?, showDescription: Boolean = true) {
     val timeElapsed = remember(activity) { activity.startTime until activity.endTime }
 
     if (activity.vehicle != null || timeElapsed.elapsedMs > 0) {
@@ -335,7 +335,7 @@ fun ActivityCardContent(activity: Activity, place: Place?) {
         )
     }
 
-    if (activity.description.isNotEmpty()) {
+    AnimatedVisibility(activity.description.isNotEmpty() && showDescription) {
         HorizontalDivider()
         Text(
             activity.description,

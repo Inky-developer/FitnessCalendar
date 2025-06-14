@@ -354,4 +354,7 @@
     <string name="error_public_api_must_be_enabled_in_settings">Die API muss in den Einstellungen aktiviert werden</string>
     <string name="share_activity">Aktivität teilen</string>
     <string name="activity_summary">Zusammenfassung der Aktivität</string>
+    <string name="show_image">Bild anzeigen</string>
+    <string name="show_description">Beschreibung anzeigen</string>
+    <string name="show_track">Track anzeigen</string>
 </resources>
