@@ -386,6 +386,15 @@ private fun ActivityCardContextMenu(
         )
         HorizontalDivider(modifier = Modifier.padding(all = 8.dp))
 
+        BottomSheetButton(
+            onClick = {
+                onDismiss()
+                callbacks.onShare(richActivity)
+            },
+            leadingIcon = { Icon(Icons.Outlined.Share, stringResource(R.string.share)) }
+        ) {
+            Text(stringResource(R.string.share))
+        }
         AnimatedVisibility(visible = callbacks.onJumpTo != null) {
             BottomSheetButton(
                 onClick = {
@@ -398,15 +407,6 @@ private fun ActivityCardContextMenu(
             ) {
                 Text(stringResource(R.string.jump_to))
             }
-        }
-        BottomSheetButton(
-            onClick = {
-                onDismiss()
-                callbacks.onShare(richActivity)
-            },
-            leadingIcon = { Icon(Icons.Outlined.Share, stringResource(R.string.share)) }
-        ) {
-            Text(stringResource(R.string.share))
         }
         AnimatedVisibility(visible = callbacks.onShowDay != null) {
             BottomSheetButton(
