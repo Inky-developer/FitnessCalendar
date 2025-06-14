@@ -1,0 +1,1 @@
+SummaryBoxState(totalActivities=2, totalTime=1h 23m, averageTime=41m, totalDistance=25.0 km, averageDistance=12.5 km, averageSpeed=18.0 km/h, averageMovingSpeed=18.0 km/h, totalAscent=1250 m, totalDescent=null, averageAscent=625 m, averageDescent=null, averageHeartRate=163 bpm, averageTemperature=20.0°C)

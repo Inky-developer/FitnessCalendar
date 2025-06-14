@@ -5,6 +5,7 @@ import com.inky.fitnesscalendar.data.measure.Duration
 import com.inky.fitnesscalendar.data.measure.HeartFrequency
 import com.inky.fitnesscalendar.data.measure.Speed
 import com.inky.fitnesscalendar.data.measure.Temperature
+import com.inky.fitnesscalendar.data.measure.VerticalDistance
 import com.inky.fitnesscalendar.data.measure.bpm
 import com.inky.fitnesscalendar.data.measure.celsius
 import com.inky.fitnesscalendar.data.measure.meters
@@ -73,27 +74,27 @@ value class ActivityStatistics(
         return (heartRates.sum() / heartRates.size).bpm()
     }
 
-    fun averageAscent(): Distance? {
+    fun averageAscent(): VerticalDistance? {
         val ascents = activities.mapNotNull { it.activity.totalAscent?.meters }
         if (ascents.isEmpty()) {
             return null
         }
-        return (ascents.sum() / ascents.size).meters()
+        return VerticalDistance(meters = ascents.sum() / ascents.size)
     }
 
-    fun averageDescent(): Distance? {
+    fun averageDescent(): VerticalDistance? {
         val descents = activities.mapNotNull { it.activity.totalDescent?.meters }
         if (descents.isEmpty()) {
             return null
         }
-        return (descents.sum() / descents.size).meters()
+        return VerticalDistance(meters = descents.sum() / descents.size)
     }
 
-    fun totalAscent(): Distance =
-        activities.sumOf { it.activity.totalAscent?.meters ?: 0.0 }.meters()
+    fun totalAscent(): VerticalDistance =
+        VerticalDistance(meters = activities.sumOf { it.activity.totalAscent?.meters ?: 0.0 })
 
-    fun totalDescent(): Distance =
-        activities.sumOf { it.activity.totalDescent?.meters ?: 0.0 }.meters()
+    fun totalDescent(): VerticalDistance =
+        VerticalDistance(meters = activities.sumOf { it.activity.totalDescent?.meters ?: 0.0 })
 
     fun averageTemperature(): Temperature? {
         val temperatures = activities.mapNotNull { it.activity.temperature?.celsius }
