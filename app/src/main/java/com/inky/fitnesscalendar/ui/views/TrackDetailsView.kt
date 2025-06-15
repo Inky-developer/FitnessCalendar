@@ -1,7 +1,6 @@
 package com.inky.fitnesscalendar.ui.views
 
 import android.content.Context
-import android.content.Intent
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -43,26 +42,19 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.core.content.FileProvider
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.inky.fitnesscalendar.BuildConfig
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.gpx.GpxTrackStats
 import com.inky.fitnesscalendar.data.gpx.TrackSvg
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.RichActivity
-import com.inky.fitnesscalendar.db.entities.Track
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.TrackView
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.sharedBounds
-import com.inky.fitnesscalendar.util.getOrCreateSharedTracksCache
-import com.inky.fitnesscalendar.util.gpx.GpxWriter
 import com.inky.fitnesscalendar.util.toLocalDate
 import com.inky.fitnesscalendar.view_model.BaseViewModel
-import java.io.File
-import java.io.FileWriter
 
 @Composable
 fun TrackDetailsView(
@@ -70,6 +62,7 @@ fun TrackDetailsView(
     activityId: Int,
     onEdit: () -> Unit,
     onBack: () -> Unit,
+    onShare: () -> Unit,
     onNavigateMap: (Int) -> Unit,
     onNavigateGraph: (Int, TrackGraphProjection) -> Unit,
 ) {
@@ -99,7 +92,7 @@ fun TrackDetailsView(
         TrackDetailsView(
             preview = preview,
             state = state,
-            onShare = { track?.let { t -> activity?.let { a -> context.shareTrack(a, t) } } },
+            onShare = onShare,
             onEdit = onEdit,
             onBack = onBack,
             onNavigateMap = {
@@ -370,31 +363,4 @@ data class DetailsState(
             )
         }
     }
-}
-
-private fun Context.shareTrack(richActivity: RichActivity, track: Track) {
-    val cache = getOrCreateSharedTracksCache()
-    val file = File(cache, getSharedTrackTitle(richActivity))
-    file.delete()
-    file.deleteOnExit()
-    FileWriter(file).use { writer ->
-        GpxWriter.write(richActivity, track, this, writer)
-    }
-
-    val shareableUri =
-        FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".fileprovider", file)
-    val intent = Intent().apply {
-        action = Intent.ACTION_SEND
-        type = "application/gpx+xml"
-        putExtra(Intent.EXTRA_STREAM, shareableUri)
-        flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
-    }
-    startActivity(Intent.createChooser(intent, getString(R.string.share_gpx)))
-}
-
-private fun getSharedTrackTitle(richActivity: RichActivity): String {
-    val time =
-        LocalizationRepository.localDateFormatter.format(richActivity.activity.startTime.toLocalDate())
-    val name = richActivity.type.name
-    return "$name $time.gpx"
 }

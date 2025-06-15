@@ -15,13 +15,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Check
-import androidx.compose.material.icons.outlined.Done
+import androidx.compose.material.icons.outlined.Share
+import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FabPosition
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -29,6 +31,7 @@ import androidx.compose.material3.InputChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -64,6 +67,7 @@ import com.inky.fitnesscalendar.data.measure.kilometers
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.RichActivity
+import com.inky.fitnesscalendar.db.entities.Track
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivityCardContent
 import com.inky.fitnesscalendar.ui.components.ActivityImage
@@ -72,10 +76,14 @@ import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.util.getOrCreateSharedMediaCache
+import com.inky.fitnesscalendar.util.getOrCreateSharedTracksCache
+import com.inky.fitnesscalendar.util.gpx.GpxWriter
+import com.inky.fitnesscalendar.util.toLocalDate
 import com.inky.fitnesscalendar.view_model.BaseViewModel
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import java.io.File
+import java.io.FileWriter
 import java.time.Instant
 import java.util.Date
 
@@ -85,14 +93,18 @@ fun ActivityShareView(
     activityId: Int,
     onBack: () -> Unit
 ) {
-    val richActivity by remember { viewModel.repository.getActivity(activityId) }.collectAsState(
-        initial = null
-    )
+    val richActivity by remember {
+        viewModel.repository.getActivity(activityId)
+    }.collectAsState(initial = null)
+    val track by remember {
+        viewModel.repository.getTrackByActivity(activityId)
+    }.collectAsState(initial = null)
 
     when (val activity = richActivity) {
         null -> CircularProgressIndicator()
         else -> ActivityShareView(
             richActivity = activity,
+            track = track,
             localizationRepository = viewModel.repository.localizationRepository,
             onBack = onBack
         )
@@ -103,6 +115,7 @@ fun ActivityShareView(
 @Composable
 private fun ActivityShareView(
     richActivity: RichActivity,
+    track: Track?,
     localizationRepository: LocalizationRepository,
     onBack: () -> Unit
 ) {
@@ -129,17 +142,31 @@ private fun ActivityShareView(
             )
         },
         floatingActionButton = {
-            FloatingActionButton(
+            ExtendedFloatingActionButton(
                 onClick = {
                     scope.launch {
                         val bitmap = shareGraphicsLayer.toImageBitmap()
-                        context.shareImageBitmap(bitmap)
+                        context.shareImageBitmap(richActivity, bitmap)
+                    }
+                },
+                text = { Text(stringResource(R.string.share_activity_as_image)) },
+                icon = {
+                    Icon(Icons.Outlined.Share, stringResource(R.string.share))
+                }
+            )
+        },
+        floatingActionButtonPosition = FabPosition.EndOverlay,
+        bottomBar = {
+            BottomAppBar {
+                if (track != null) {
+                    TextButton(
+                        onClick = { context.shareGpxTrack(richActivity, track) }
+                    ) {
+                        Text(stringResource(R.string.share_gpx))
                     }
                 }
-            ) {
-                Icon(Icons.Outlined.Done, stringResource(R.string.share))
             }
-        },
+        }
     ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
             ShareSettings(
@@ -302,9 +329,9 @@ private fun ScreenShotBox(graphicsLayer: GraphicsLayer, content: @Composable Box
     )
 }
 
-private fun Context.shareImageBitmap(image: ImageBitmap) {
+private fun Context.shareImageBitmap(richActivity: RichActivity, image: ImageBitmap) {
     val cache = getOrCreateSharedMediaCache()
-    val file = File(cache, getString(R.string.activity_summary) + ".png")
+    val file = File(cache, getSharedActivityTitle(richActivity, "png"))
     file.delete()
     file.deleteOnExit()
 
@@ -322,6 +349,33 @@ private fun Context.shareImageBitmap(image: ImageBitmap) {
         flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
     }
     startActivity(Intent.createChooser(intent, getString(R.string.share_activity)))
+}
+
+private fun Context.shareGpxTrack(richActivity: RichActivity, track: Track) {
+    val cache = getOrCreateSharedTracksCache()
+    val file = File(cache, getSharedActivityTitle(richActivity, "gpx"))
+    file.delete()
+    file.deleteOnExit()
+    FileWriter(file).use { writer ->
+        GpxWriter.write(richActivity, track, this, writer)
+    }
+
+    val shareableUri =
+        FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".fileprovider", file)
+    val intent = Intent().apply {
+        action = Intent.ACTION_SEND
+        type = "application/gpx+xml"
+        putExtra(Intent.EXTRA_STREAM, shareableUri)
+        flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+    }
+    startActivity(Intent.createChooser(intent, getString(R.string.share_gpx)))
+}
+
+private fun getSharedActivityTitle(richActivity: RichActivity, extension: String): String {
+    val time =
+        LocalizationRepository.localDateFormatter.format(richActivity.activity.startTime.toLocalDate())
+    val name = richActivity.type.name
+    return "$name $time.$extension"
 }
 
 @Preview

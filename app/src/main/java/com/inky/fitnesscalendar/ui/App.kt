@@ -299,6 +299,7 @@ private fun AppNavigation(
                         activityId = route.activityId,
                         onEdit = { navController.navigate(Views.NewActivity(route.activityId)) },
                         onBack = { navController.popBackStack() },
+                        onShare = { navController.navigate(Views.ShareActivity(route.activityId)) },
                         onNavigateMap = { navController.navigate(Views.Map(it)) },
                         onNavigateGraph = { id, projection ->
                             navController.navigate(Views.TrackGraph(id, projection))
