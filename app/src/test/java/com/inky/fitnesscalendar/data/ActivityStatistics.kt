@@ -18,7 +18,7 @@ import org.robolectric.annotation.Config
 @RunWith(RobolectricTestRunner::class)
 class ActivityStatisticsTest {
     @Test
-    fun `activity statistics smoke test`() {
+    fun smokeTest() {
         val context = ApplicationProvider.getApplicationContext<MainApp>()
 
         val activities = listOf(
