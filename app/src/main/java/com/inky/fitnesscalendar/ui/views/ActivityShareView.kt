@@ -6,12 +6,15 @@ import android.graphics.Bitmap
 import android.os.Parcelable
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material.icons.outlined.Check
@@ -168,7 +171,11 @@ private fun ActivityShareView(
             }
         }
     ) { paddingValues ->
-        Column(modifier = Modifier.padding(paddingValues)) {
+        Column(
+            modifier = Modifier
+                .padding(paddingValues)
+                .verticalScroll(rememberScrollState())
+        ) {
             ShareSettings(
                 activity = richActivity,
                 config = shareCardConfig,
@@ -199,9 +206,9 @@ private fun ShareSettings(
     config: ShareCardConfig,
     setConfig: (ShareCardConfig) -> Unit
 ) {
-    FlowRow(
+    Row(
         modifier = Modifier
-            .fillMaxWidth()
+            .horizontalScroll(rememberScrollState())
             .padding(all = 8.dp)
     ) {
         if (activity.activity.imageName != null) {
