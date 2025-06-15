@@ -243,7 +243,7 @@ private fun ActivityShareCard(
             .padding(horizontal = 8.dp, vertical = 4.dp)
     ) {
         Box {
-            AnimatedContent(config.showTrack) { showTrack ->
+            AnimatedContent(config.showTrack, modifier = Modifier.matchParentSize()) { showTrack ->
                 if (trackPreview != null && showTrack) {
                     TrackView(
                         track = trackPreview,
