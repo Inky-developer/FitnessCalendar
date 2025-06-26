@@ -81,8 +81,8 @@ android {
     }
     kotlinOptions {
         jvmTarget = "17"
+        freeCompilerArgs = listOf("-XXLanguage:+PropertyParamAnnotationDefaultTargetMode")
     }
-    @Suppress("UnstableApiUsage")
     testOptions {
         unitTests {
             isIncludeAndroidResources = true
