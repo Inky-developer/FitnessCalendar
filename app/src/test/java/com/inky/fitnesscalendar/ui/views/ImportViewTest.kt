@@ -1,6 +1,7 @@
 package com.inky.fitnesscalendar.ui.views
 
 import android.os.Build
+import android.os.Looper
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertTextContains
@@ -26,6 +27,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import org.robolectric.Shadows
 import org.robolectric.annotation.Config
 import org.robolectric.shadows.ShadowLog
 
@@ -94,6 +96,8 @@ class ImportViewTest {
                 if (testFileNames[index].isError) {
                     node.assertTextContains("An error occurred.", substring = true)
                 } else {
+                    // This executes pending tasks
+                    Shadows.shadowOf(Looper.getMainLooper()).idle()
                     node.assertTextContains("🚴", substring = true)
                 }
             }
