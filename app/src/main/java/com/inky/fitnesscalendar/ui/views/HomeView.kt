@@ -337,7 +337,10 @@ fun Statistics(name: String, stats: ActivityStatistics, onClick: () -> Unit) {
         } else {
             Row(modifier = Modifier.padding(all = 8.dp)) {
                 Icon(Icons.Outlined.Info, stringResource(R.string.info))
-                Text("No activities in this period", modifier = Modifier.padding(start = 4.dp))
+                Text(
+                    stringResource(R.string.no_activities_in_this_period),
+                    modifier = Modifier.padding(start = 4.dp)
+                )
             }
         }
     }

@@ -358,4 +358,5 @@
     <string name="show_description">Beschreibung anzeigen</string>
     <string name="show_track">Track anzeigen</string>
     <string name="share_activity_as_image">Aktivität als Bild teilen</string>
+    <string name="no_activities_in_this_period">Keine Aktivitäten in diesem Zeitraum</string>
 </resources>
