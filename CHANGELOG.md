@@ -1,5 +1,7 @@
 # Unreleased
 
+# 2025.07.1
+
 - Feature: Share activity summary as image
 - Round vertical ascend to meters, but not kilometers
 
