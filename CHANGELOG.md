@@ -1,5 +1,6 @@
 # Unreleased
 
+- Allow overlaying graphs in the track view
 - Add color scheme toggle to the share view
 
 # 2025.07.1

@@ -3,6 +3,7 @@ package com.inky.fitnesscalendar.ui.views
 import android.content.Context
 import android.graphics.RectF
 import android.graphics.Typeface
+import android.text.SpannableStringBuilder
 import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedContent
@@ -13,18 +14,25 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
@@ -47,9 +55,9 @@ import com.inky.fitnesscalendar.view_model.BaseViewModel
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberAxisGuidelineComponent
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottom
+import com.patrykandpatrick.vico.compose.cartesian.axis.rememberEnd
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStart
 import com.patrykandpatrick.vico.compose.cartesian.layer.continuous
-import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLine
 import com.patrykandpatrick.vico.compose.cartesian.marker.rememberDefaultCartesianMarker
 import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoZoomState
@@ -59,6 +67,7 @@ import com.patrykandpatrick.vico.compose.common.fill
 import com.patrykandpatrick.vico.compose.common.insets
 import com.patrykandpatrick.vico.core.cartesian.CartesianDrawingContext
 import com.patrykandpatrick.vico.core.cartesian.Zoom
+import com.patrykandpatrick.vico.core.cartesian.axis.Axis
 import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
 import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
@@ -69,6 +78,7 @@ import com.patrykandpatrick.vico.core.cartesian.data.LineCartesianLayerDrawingMo
 import com.patrykandpatrick.vico.core.cartesian.data.LineCartesianLayerModel
 import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
 import com.patrykandpatrick.vico.core.cartesian.layer.LineCartesianLayer
+import com.patrykandpatrick.vico.core.cartesian.marker.CartesianMarker
 import com.patrykandpatrick.vico.core.cartesian.marker.DefaultCartesianMarker
 import com.patrykandpatrick.vico.core.common.Fill
 import com.patrykandpatrick.vico.core.common.Insets
@@ -97,6 +107,7 @@ fun TrackGraphView(
 ) {
     val track by remember(activityId) { viewModel.repository.getTrackByActivity(activityId) }
         .collectAsState(null)
+    var overlayProjection by rememberSaveable { mutableStateOf<TrackGraphProjection?>(null) }
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     Scaffold(
@@ -112,6 +123,13 @@ fun TrackGraphView(
                         )
                     }
                 },
+                actions = {
+                    OverlaySelectButton(
+                        baseProjection = projection,
+                        overlay = overlayProjection,
+                        onOverlay = { overlayProjection = it }
+                    )
+                },
                 scrollBehavior = scrollBehavior,
                 modifier = Modifier.sharedBounds(SharedContentKey.AppBar)
             )
@@ -122,7 +140,12 @@ fun TrackGraphView(
             AnimatedContent(track, label = "TrackGraphOrLoadingIndicator") { actualTrack ->
                 when (actualTrack) {
                     null -> CircularProgressIndicator()
-                    else -> TrackGraph(actualTrack, projection, modifier = Modifier.fillMaxSize())
+                    else -> TrackGraph(
+                        actualTrack,
+                        projection,
+                        overlayProjection,
+                        modifier = Modifier.fillMaxSize()
+                    )
                 }
             }
         }
@@ -130,13 +153,61 @@ fun TrackGraphView(
 }
 
 @Composable
-fun TrackGraph(track: Track, projection: TrackGraphProjection, modifier: Modifier = Modifier) {
+private fun OverlaySelectButton(
+    baseProjection: TrackGraphProjection,
+    overlay: TrackGraphProjection?,
+    onOverlay: (TrackGraphProjection?) -> Unit
+) {
+    var menuOpen by rememberSaveable { mutableStateOf(false) }
+    TextButton(onClick = { menuOpen = true }) {
+        Text(if (overlay == null) stringResource(R.string.no_overlay) else stringResource(overlay.shortName))
+    }
+
+    DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
+        DropdownMenuItem(
+            text = { Text(stringResource(R.string.no_overlay)) },
+            onClick = {
+                menuOpen = false
+                onOverlay(null)
+            }
+        )
+
+        HorizontalDivider()
+
+        for (projection in TrackGraphProjection.entries) {
+            if (projection == baseProjection) continue
+
+            DropdownMenuItem(
+                text = { Text(stringResource(projection.shortName)) },
+                onClick = {
+                    menuOpen = false
+                    onOverlay(projection)
+                }
+            )
+        }
+    }
+}
+
+@Composable
+fun TrackGraph(
+    track: Track,
+    projection: TrackGraphProjection,
+    overlay: TrackGraphProjection?,
+    modifier: Modifier = Modifier
+) {
     val modelProducer = remember { CartesianChartModelProducer() }
 
-    LaunchedEffect(track) {
+    LaunchedEffect(track, overlay) {
         withContext(Dispatchers.Default) {
             val values = projection.apply(track)
+            val overlayValues = overlay?.apply(track)
+
             modelProducer.runTransaction {
+                if (overlayValues != null) {
+                    lineSeries {
+                        series(x = overlayValues.keys, y = overlayValues.values)
+                    }
+                }
                 lineSeries {
                     series(values.keys, values.values)
                 }
@@ -146,26 +217,37 @@ fun TrackGraph(track: Track, projection: TrackGraphProjection, modifier: Modifie
 
     val context = LocalContext.current
 
+    val layers = remember(projection, overlay) {
+        val mainLayer = LODLineCartesianLayer(
+            lineProvider = LineCartesianLayer.LineProvider.series(projection.line(context)),
+            rangeProvider = projection.rangeProvider(),
+            verticalAxisPosition = Axis.Position.Vertical.Start
+        )
+        val overlayLayer = overlay?.let {
+            LODLineCartesianLayer(
+                lineProvider = LineCartesianLayer.LineProvider.series(it.line(context)),
+                rangeProvider = it.rangeProvider(),
+                verticalAxisPosition = Axis.Position.Vertical.End
+            )
+        }
+        listOfNotNull(overlayLayer, mainLayer).toTypedArray()
+    }
+
     CartesianChartHost(
         chart = rememberCartesianChart(
-            rememberLODLineCartesianLayer(
-                lineProvider = LineCartesianLayer.LineProvider.series(
-                    LineCartesianLayer.rememberLine(
-                        fill = remember(projection) {
-                            LineCartesianLayer.LineFill.single(Fill(context.getColor(projection.color)))
-                        },
-                        areaFill = remember(projection) {
-                            defaultAreaFill(context.getColor(projection.color).toColor())
-                        },
-                        stroke = remember { LineCartesianLayer.LineStroke.continuous(thickness = 1.dp) },
-                    )
-                ),
-                rangeProvider = remember(projection) { projection.rangeProvider() }
-            ),
+            *layers,
             startAxis = VerticalAxis.rememberStart(
                 title = stringResource(projection.verticalAxisLabel),
-                titleComponent = legendComponent()
+                titleComponent = legendComponent(),
+                horizontalLabelPosition = VerticalAxis.HorizontalLabelPosition.Inside
             ),
+            endAxis = overlay?.let {
+                VerticalAxis.rememberEnd(
+                    title = stringResource(it.verticalAxisLabel),
+                    titleComponent = legendComponent(),
+                    horizontalLabelPosition = VerticalAxis.HorizontalLabelPosition.Inside
+                )
+            },
             bottomAxis = HorizontalAxis.rememberBottom(
                 guideline = null,
                 title = stringResource(R.string.legend_distance_km),
@@ -180,7 +262,7 @@ fun TrackGraph(track: Track, projection: TrackGraphProjection, modifier: Modifie
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 ),
                 guideline = rememberAxisGuidelineComponent(),
-                valueFormatter = rememberMarkerFormatter(projection)
+                valueFormatter = rememberMarkerFormatter(projection, overlay)
             )
         ),
         modelProducer = modelProducer,
@@ -202,10 +284,19 @@ private fun legendComponent() = rememberTextComponent(
 )
 
 @Composable
-private fun rememberMarkerFormatter(projection: TrackGraphProjection): DefaultCartesianMarker.ValueFormatter {
+private fun rememberMarkerFormatter(
+    projection: TrackGraphProjection,
+    overlay: TrackGraphProjection?
+): DefaultCartesianMarker.ValueFormatter {
     val context = LocalContext.current
-    return remember(projection) {
-        DefaultCartesianMarker.ValueFormatter.default(decimalFormat = projection.format(context))
+    return remember(projection, overlay) {
+        val formatters = listOfNotNull(
+            overlay?.let {
+                DefaultCartesianMarker.ValueFormatter.default(decimalFormat = it.format(context))
+            },
+            DefaultCartesianMarker.ValueFormatter.default(decimalFormat = projection.format(context)),
+        )
+        MultiMarkerFormatter(formatters)
     }
 }
 
@@ -219,19 +310,38 @@ private fun rememberKmValueFormatter(): CartesianValueFormatter {
     }
 }
 
+private fun TrackGraphProjection.line(context: Context): LineCartesianLayer.Line =
+    LineCartesianLayer.Line(
+        fill = LineCartesianLayer.LineFill.single(Fill(context.getColor(color))),
+        areaFill = defaultAreaFill(context.getColor(color).toColor()),
+        stroke = LineCartesianLayer.LineStroke.continuous(thickness = 1.dp),
+    )
+
 // This annotation is needed as long as [TrackGraphProjection] is used as a NavArg
 // See https://issuetracker.google.com/issues/358687142
 @androidx.annotation.Keep
 enum class TrackGraphProjection(
     @ColorRes val color: Int,
+    @StringRes val shortName: Int,
     @StringRes val verticalAxisLabel: Int,
     @StringRes val unit: Int
 ) {
-    Speed(R.color.graph_speed, R.string.legend_speed_kmh, R.string.unit_kmh),
-    HeartRate(R.color.graph_heart_rate, R.string.legend_heart_rate_bpm, R.string.unit_bpm),
-    Elevation(R.color.graph_elevation, R.string.legend_elevation_m, R.string.unit_m),
+    Speed(R.color.graph_speed, R.string.speed, R.string.legend_speed_kmh, R.string.unit_kmh),
+    HeartRate(
+        R.color.graph_heart_rate,
+        R.string.heart_rate,
+        R.string.legend_heart_rate_bpm,
+        R.string.unit_bpm
+    ),
+    Elevation(
+        R.color.graph_elevation,
+        R.string.Elevation,
+        R.string.legend_elevation_m,
+        R.string.unit_m
+    ),
     Temperature(
         R.color.graph_temperature,
+        R.string.temperature,
         R.string.legend_temperature_celsius,
         R.string.unit_celsius
     );
@@ -269,15 +379,6 @@ enum class TrackGraphProjection(
     }
 }
 
-@Composable
-private fun rememberLODLineCartesianLayer(
-    lineProvider: LineCartesianLayer.LineProvider,
-    rangeProvider: CartesianLayerRangeProvider
-) =
-    remember(lineProvider) {
-        LODLineCartesianLayer(lineProvider = lineProvider, rangeProvider = rangeProvider)
-    }
-
 /**
  * A very hacky overwrite over [LineCartesianLayer], which supports Level of detail.
  * When zoomed out, it groups nearby points together and shows the average only,
@@ -288,10 +389,12 @@ private fun rememberLODLineCartesianLayer(
  */
 private class LODLineCartesianLayer(
     lineProvider: LineProvider,
-    rangeProvider: CartesianLayerRangeProvider
+    rangeProvider: CartesianLayerRangeProvider,
+    verticalAxisPosition: Axis.Position.Vertical
 ) : LineCartesianLayer(
     lineProvider,
-    rangeProvider = rangeProvider
+    rangeProvider = rangeProvider,
+    verticalAxisPosition = verticalAxisPosition
 ) {
     private fun RectF.getStart(isLtr: Boolean): Float = if (isLtr) left else right
 
@@ -397,13 +500,10 @@ private class LODLineCartesianLayer(
     }
 }
 
-// The resolution for the min y and max y values on the vertical graph axis
-private const val ElevationGraphYStep = 100.0
-
 /**
  * Alternative to the auto range provider, which usually starts at y-0.
  * That is not very good for elevation graphs, so instead, this class
- * provides a dynamic range based on [ElevationGraphYStep].
+ * provides a dynamic range.
  */
 private class StepLayerRangeProvider(val yStep: Float) : CartesianLayerRangeProvider {
     override fun getMinY(minY: Double, maxY: Double, extraStore: ExtraStore) =
@@ -415,6 +515,32 @@ private class StepLayerRangeProvider(val yStep: Float) : CartesianLayerRangeProv
 
 private val ElevationLayerRangeProvider = StepLayerRangeProvider(100.0f)
 private val HeartRateLayerRangeProvider = StepLayerRangeProvider(20f)
+
+
+class MultiMarkerFormatter(val formatters: List<DefaultCartesianMarker.ValueFormatter>) :
+    DefaultCartesianMarker.ValueFormatter {
+
+    override fun format(
+        context: CartesianDrawingContext,
+        targets: List<CartesianMarker.Target>
+    ): CharSequence {
+        // FIXME: This assert is not guaranteed. It should also work with less targets.
+        assert(targets.size == formatters.size) { "MultiMarkerFormatter requires one formatter per target" }
+
+        val values = targets.zip(formatters).map { (target, formatter) ->
+            formatter.format(context, listOf(target))
+        }
+
+        val buf = SpannableStringBuilder()
+        for ((index, value) in values.withIndex()) {
+            buf.append(value)
+            if (index < values.lastIndex) {
+                buf.append(", ")
+            }
+        }
+        return buf
+    }
+}
 
 @Preview
 @Composable
@@ -465,5 +591,5 @@ fun PreviewTrackGraph() {
         )
     )
 
-    TrackGraph(track, TrackGraphProjection.Elevation, modifier = Modifier.fillMaxSize())
+    TrackGraph(track, TrackGraphProjection.Elevation, null, modifier = Modifier.fillMaxSize())
 }
