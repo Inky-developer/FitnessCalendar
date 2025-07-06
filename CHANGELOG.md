@@ -1,5 +1,7 @@
 # Unreleased
 
+- Add color scheme toggle to the share view
+
 # 2025.07.1
 
 - Feature: Share activity summary as image

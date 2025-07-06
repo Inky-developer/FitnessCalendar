@@ -183,7 +183,11 @@ private fun ActivityShareView(
                 setConfig = { shareCardConfig = it }
             )
 
-            FitnessCalendarTheme(runSideEffects = false, darkTheme = false, dynamicColor = false) {
+            FitnessCalendarTheme(
+                runSideEffects = false,
+                darkTheme = !shareCardConfig.isLightMode,
+                dynamicColor = false
+            ) {
                 ScreenShotBox(shareGraphicsLayer) {
                     ActivityShareCard(
                         richActivity = richActivity,
@@ -201,6 +205,7 @@ private data class ShareCardConfig(
     val showImage: Boolean = true,
     val showDescription: Boolean = true,
     val showTrack: Boolean = true,
+    val isLightMode: Boolean = true,
 ) : Parcelable
 
 @Composable
@@ -235,6 +240,11 @@ private fun ShareSettings(
                 label = stringResource(R.string.show_track)
             )
         }
+        SettingsChip(
+            selected = config.isLightMode,
+            onToggle = { setConfig(config.copy(isLightMode = !config.isLightMode)) },
+            label = stringResource(R.string.light_mode)
+        )
     }
 }
 

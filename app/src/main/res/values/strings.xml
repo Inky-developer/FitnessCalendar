@@ -360,4 +360,5 @@
     <string name="show_track">Show track</string>
     <string name="share_activity_as_image">Share activity as image</string>
     <string name="no_activities_in_this_period">No activities in this period</string>
+    <string name="light_mode">Light mode</string>
 </resources>
