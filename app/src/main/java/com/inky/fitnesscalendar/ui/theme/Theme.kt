@@ -95,6 +95,7 @@ fun FitnessCalendarTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
+    runSideEffects: Boolean = !LocalView.current.isInEditMode,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
@@ -106,8 +107,8 @@ fun FitnessCalendarTheme(
         darkTheme -> darkScheme
         else -> lightScheme
     }
-    val view = LocalView.current
-    if (!view.isInEditMode) {
+    if (runSideEffects) {
+        val view = LocalView.current
         SideEffect {
             if (view.context is Activity) {
                 val window = (view.context as Activity).window

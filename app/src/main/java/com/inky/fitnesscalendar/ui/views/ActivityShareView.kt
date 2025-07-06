@@ -76,6 +76,7 @@ import com.inky.fitnesscalendar.ui.components.ActivityCardContent
 import com.inky.fitnesscalendar.ui.components.ActivityImage
 import com.inky.fitnesscalendar.ui.components.TrackView
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
+import com.inky.fitnesscalendar.ui.theme.FitnessCalendarTheme
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.util.getOrCreateSharedMediaCache
@@ -182,12 +183,14 @@ private fun ActivityShareView(
                 setConfig = { shareCardConfig = it }
             )
 
-            ScreenShotBox(shareGraphicsLayer) {
-                ActivityShareCard(
-                    richActivity = richActivity,
-                    config = shareCardConfig,
-                    localizationRepository = localizationRepository
-                )
+            FitnessCalendarTheme(runSideEffects = false, darkTheme = false, dynamicColor = false) {
+                ScreenShotBox(shareGraphicsLayer) {
+                    ActivityShareCard(
+                        richActivity = richActivity,
+                        config = shareCardConfig,
+                        localizationRepository = localizationRepository
+                    )
+                }
             }
         }
     }
