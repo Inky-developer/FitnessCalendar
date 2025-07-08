@@ -2,6 +2,7 @@ package com.inky.fitnesscalendar.ui.views
 
 import android.os.Build
 import android.os.Looper
+import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertTextContains
@@ -98,6 +99,10 @@ class ImportViewTest {
                 } else {
                     // This executes pending tasks
                     Shadows.shadowOf(Looper.getMainLooper()).idle()
+                    waitUntil {
+                        node.fetchSemanticsNode().config.get(SemanticsProperties.Text)
+                            .any { it.contains("🚴") }
+                    }
                     node.assertTextContains("🚴", substring = true)
                 }
             }
