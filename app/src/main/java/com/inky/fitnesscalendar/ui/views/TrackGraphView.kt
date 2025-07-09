@@ -524,8 +524,10 @@ class MultiMarkerFormatter(val formatters: List<DefaultCartesianMarker.ValueForm
         context: CartesianDrawingContext,
         targets: List<CartesianMarker.Target>
     ): CharSequence {
-        // FIXME: This assert is not guaranteed. It should also work with less targets.
-        assert(targets.size == formatters.size) { "MultiMarkerFormatter requires one formatter per target" }
+        if (targets.size != formatters.size) {
+            // FIXME: Figure out which formatting needs to be applied to which targets
+            return ""
+        }
 
         val values = targets.zip(formatters).map { (target, formatter) ->
             formatter.format(context, listOf(target))
