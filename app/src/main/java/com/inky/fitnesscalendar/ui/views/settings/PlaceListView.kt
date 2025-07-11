@@ -58,6 +58,7 @@ import com.inky.fitnesscalendar.ui.components.BottomSheetButton
 import com.inky.fitnesscalendar.ui.components.ImageViewer
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.components.getAppBarContainerColor
+import com.inky.fitnesscalendar.ui.util.localDatabaseValues
 import com.inky.fitnesscalendar.view_model.PlaceListViewModel
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
@@ -139,13 +140,16 @@ private fun PlaceList(
 
 @Composable
 private fun ColorFilter(filterColor: ContentColor?, onFilterColor: (ContentColor?) -> Unit) {
+    val usedColors = localDatabaseValues.current.places.map { it.color }.toSet()
+    val contentColors = ContentColor.entries.filter { usedColors.contains(it) }
+
     LazyRow(
         contentPadding = PaddingValues(horizontal = 8.dp),
         modifier = Modifier
             .padding(horizontal = 4.dp)
             .fillMaxWidth()
     ) {
-        items(ContentColor.entries) { color ->
+        items(contentColors) { color ->
             FilterChip(
                 selected = filterColor == color,
                 onClick = { onFilterColor(if (filterColor == color) null else color) },

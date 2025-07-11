@@ -2,6 +2,7 @@
 
 - Allow overlaying graphs in the track view
 - Add color scheme toggle to the share view
+- PlaceListView: Only suggest used colors for filtering
 
 # 2025.07.1
 
