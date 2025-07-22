@@ -223,7 +223,7 @@ private fun ProjectionSelect() {
         }
     }
 
-    DropdownMenu(expanded = showModal, onDismissRequest = { showModal = true }) {
+    DropdownMenu(expanded = showModal, onDismissRequest = { showModal = false }) {
         for (projection in Projection.entries) {
             DropdownMenuItem(
                 text = { Text(stringResource(projection.labelTextId)) },
