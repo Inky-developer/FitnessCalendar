@@ -1,6 +1,7 @@
 package com.inky.fitnesscalendar.ui.views.settings
 
 import android.os.Build
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,6 +12,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -20,11 +23,15 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -40,6 +47,7 @@ import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.view_model.SettingsViewModel
+import com.inky.fitnesscalendar.view_model.statistics.Projection
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -79,6 +87,7 @@ fun SettingsView(
                 .padding(all = 8.dp)
         ) {
             item {
+                ProjectionSelect()
                 Setting(
                     title = stringResource(R.string.configure_activity_types),
                     onClick = onNavigateTypes
@@ -178,5 +187,51 @@ private fun <T> PreferenceToggle(
             onCheckedChange = onCheckedChange,
             modifier = Modifier.padding(start = 8.dp)
         )
+    }
+}
+
+@Composable
+private fun ProjectionSelect() {
+    val preference = Preference.PREF_STATS_PROJECTION
+    var showModal by rememberSaveable { mutableStateOf(false) }
+    val selectedValue by preference.collectAsState()
+
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+    ) {
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                stringResource(R.string.statistics),
+                style = MaterialTheme.typography.titleMedium,
+                maxLines = 1
+            )
+            Text(
+                stringResource(R.string.setting_default_statistic),
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
+        TextButton(onClick = { showModal = true }) {
+            AnimatedContent(selectedValue.labelTextId) { textId ->
+                Text(stringResource(textId))
+            }
+        }
+    }
+
+    DropdownMenu(expanded = showModal, onDismissRequest = { showModal = true }) {
+        for (projection in Projection.entries) {
+            DropdownMenuItem(
+                text = { Text(stringResource(projection.labelTextId)) },
+                onClick = {
+                    showModal = false
+                    scope.launch { preference.set(context, projection) }
+                }
+            )
+        }
     }
 }

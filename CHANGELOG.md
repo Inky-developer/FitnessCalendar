@@ -1,5 +1,6 @@
 # Unreleased
 
+- Add setting for initial statistic
 - Allow overlaying graphs in the track view
 - Add color scheme toggle to the share view
 - PlaceListView: Only suggest used colors for filtering

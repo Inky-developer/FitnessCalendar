@@ -361,4 +361,5 @@
     <string name="no_activities_in_this_period">Keine Aktivitäten in diesem Zeitraum</string>
     <string name="light_mode">Helles Design</string>
     <string name="no_overlay">Keine Überlagerung</string>
+    <string name="setting_default_statistic">Initiale Statistik</string>
 </resources>

@@ -11,6 +11,7 @@ import com.inky.fitnesscalendar.repository.DatabaseRepository
 import com.inky.fitnesscalendar.view_model.statistics.GraphState
 import com.inky.fitnesscalendar.view_model.statistics.Grouping
 import com.inky.fitnesscalendar.view_model.statistics.Period
+import com.inky.fitnesscalendar.view_model.statistics.Projection
 import com.patrykandpatrick.vico.core.cartesian.AutoScrollCondition
 import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
@@ -22,8 +23,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -54,13 +53,13 @@ class StatisticsViewModel @Inject constructor(
 
             refreshActivities()
         }
+    }
 
-        Preference.PREF_STATS_PROJECTION.flow(context).onEach { projection ->
-            val state = graphState.value
-            if (state != null && state.projection != projection) {
-                updateState(state.copy(projection = projection))
-            }
-        }.launchIn(viewModelScope)
+    fun setProjection(projection: Projection) {
+        val state = graphState.value
+        if (state != null && state.projection != projection) {
+            updateState(state.copy(projection = projection))
+        }
     }
 
     fun setPeriod(period: Period) {

@@ -362,4 +362,5 @@
     <string name="no_activities_in_this_period">No activities in this period</string>
     <string name="light_mode">Light mode</string>
     <string name="no_overlay">No overlay</string>
+    <string name="setting_default_statistic">Default statistic</string>
 </resources>

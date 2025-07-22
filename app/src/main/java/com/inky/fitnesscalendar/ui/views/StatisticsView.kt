@@ -41,7 +41,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -62,7 +61,6 @@ import com.inky.fitnesscalendar.data.Displayable
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.localization.LocalizationRepository
-import com.inky.fitnesscalendar.preferences.Preference
 import com.inky.fitnesscalendar.ui.components.CompactActivityCard
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
@@ -99,7 +97,6 @@ import com.patrykandpatrick.vico.core.common.Fill
 import com.patrykandpatrick.vico.core.common.component.Shadow
 import com.patrykandpatrick.vico.core.common.component.ShapeComponent
 import com.patrykandpatrick.vico.core.common.shape.CorneredShape
-import kotlinx.coroutines.launch
 
 @Composable
 fun StatisticsView(
@@ -126,6 +123,7 @@ fun StatisticsView(
             state = graphState!!,
             modelProducer = viewModel.modelProducer,
             localizationRepository = viewModel.databaseRepository.localizationRepository,
+            onProjection = viewModel::setProjection,
             onGrouping = viewModel::setGrouping,
             onPeriod = viewModel::setPeriod,
             onOpenDrawer = onOpenDrawer,
@@ -154,6 +152,7 @@ fun StatisticsView(
     modelProducer: CartesianChartModelProducer,
     localizationRepository: LocalizationRepository,
     onGrouping: (Grouping) -> Unit,
+    onProjection: (Projection) -> Unit,
     onPeriod: (Period) -> Unit,
     onOpenDrawer: () -> Unit,
     onViewActivity: (Activity) -> Unit,
@@ -185,7 +184,7 @@ fun StatisticsView(
                         }
                         Icon(painterResource(icon), stringResource(R.string.filter))
                     }
-                    ProjectionSelectButton(state.projection)
+                    ProjectionSelectButton(state.projection, onProjection = onProjection)
                 },
                 scrollBehavior = scrollBehavior,
                 modifier = Modifier.sharedBounds(SharedContentKey.AppBar)
@@ -271,10 +270,8 @@ fun StatisticsView(
 }
 
 @Composable
-private fun ProjectionSelectButton(projection: Projection) {
+private fun ProjectionSelectButton(projection: Projection, onProjection: (Projection) -> Unit) {
     var menuOpen by rememberSaveable { mutableStateOf(false) }
-    val scope = rememberCoroutineScope()
-    val context = LocalContext.current
 
     IconButton(onClick = { menuOpen = true }) {
         Icon(
@@ -295,9 +292,7 @@ private fun ProjectionSelectButton(projection: Projection) {
                     )
                 },
                 onClick = {
-                    scope.launch {
-                        Preference.PREF_STATS_PROJECTION.set(context, projectionEntry)
-                    }
+                    onProjection(projectionEntry)
                     menuOpen = false
                 }
             )
