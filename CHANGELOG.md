@@ -1,5 +1,7 @@
 # Unreleased
 
+# 2025.07.2
+
 - Add setting for initial statistic
 - Allow overlaying graphs in the track view
 - Add color scheme toggle to the share view
