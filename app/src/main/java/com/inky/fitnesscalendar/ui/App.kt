@@ -250,7 +250,7 @@ private fun AppNavigation(
                 val context = LocalContext.current
                 val activityTypes = localDatabaseValues.current.activityTypes
                 val initialState = remember(route) {
-                    val prediction = DecisionTrees.classifyNow(context)
+                    val prediction = DecisionTrees.classifyNow()
                     val activityType =
                         route.activityTypeId?.let { id -> activityTypes.find { it.uid == id } }
                     val start =
@@ -258,7 +258,7 @@ private fun AppNavigation(
                     val end =
                         route.endTime?.let { LocalDateTime.ofEpochSecond(it, 0, ZoneOffset.UTC) }
 
-                    ActivityEditState(activity = null, prediction = prediction).let { state ->
+                    ActivityEditState(activity = null, predictionResult = prediction).let { state ->
                         val newActivitySelectorState = state.activitySelectorState.copy(
                             activityType = activityType ?: state.activitySelectorState.activityType
                         )

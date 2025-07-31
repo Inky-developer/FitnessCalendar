@@ -10,7 +10,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.inky.fitnesscalendar.util.decision_tree.DecisionTree
+import com.inky.fitnesscalendar.util.prediction.decision_tree.DecisionTree
 import com.inky.fitnesscalendar.util.removedAt
 
 @Composable

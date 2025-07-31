@@ -1,4 +1,4 @@
-package com.inky.fitnesscalendar.util.decision_tree
+package com.inky.fitnesscalendar.util.prediction.decision_tree
 
 import com.inky.fitnesscalendar.util.removedAt
 

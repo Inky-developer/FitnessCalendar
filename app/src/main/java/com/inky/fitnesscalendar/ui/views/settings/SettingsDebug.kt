@@ -16,25 +16,22 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import com.inky.fitnesscalendar.di.DecisionTrees
 import com.inky.fitnesscalendar.ui.components.debug.DecisionTreeVisualization
-import com.inky.fitnesscalendar.util.decision_tree.DecisionTree
+import com.inky.fitnesscalendar.util.prediction.decision_tree.DecisionTree
 import java.time.DayOfWeek
 import java.time.format.TextStyle
 import java.util.Locale
 
 @Composable
 fun SettingsDebug() {
-    val context = LocalContext.current
-
-    var classification by rememberSaveable { mutableStateOf<DecisionTrees.Prediction?>(null) }
+    var classification by rememberSaveable { mutableStateOf<DecisionTrees.PredictionResult?>(null) }
     var selectedKindIndex by rememberSaveable { mutableIntStateOf(0) }
 
     Scaffold { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
             TextButton(
-                onClick = { classification = DecisionTrees.classifyNow(context) }
+                onClick = { classification = DecisionTrees.classifyNow() }
             ) {
                 Text("Classify")
             }
@@ -74,7 +71,6 @@ fun SettingsDebug() {
                                         Locale.getDefault()
                                     )
                                 },
-                                "Wifi ID" to { it: Any? -> it?.toString() ?: "<No Wifi>" }
                             )
                         }
                     )
@@ -90,8 +86,8 @@ private enum class TreeKind {
     Place;
 
     fun getTree(): DecisionTree<out Any>? = when (this) {
-        ActivityType -> DecisionTrees.activityType
-        Vehicle -> DecisionTrees.vehicle
-        Place -> DecisionTrees.place
+        ActivityType -> DecisionTrees.activityTypePredictor.tree
+        Vehicle -> DecisionTrees.vehiclePredictor.tree
+        Place -> DecisionTrees.placePredictor.tree
     }
 }

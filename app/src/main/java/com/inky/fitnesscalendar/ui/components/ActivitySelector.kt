@@ -1,6 +1,5 @@
 package com.inky.fitnesscalendar.ui.components
 
-import android.content.Context
 import android.os.Parcelable
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
@@ -67,11 +66,8 @@ data class ActivitySelectorState(
     }
 
     companion object {
-        fun fromPrediction(
-            context: Context,
-            requireTypeHasDuration: Boolean
-        ): ActivitySelectorState {
-            val prediction = DecisionTrees.classifyNow(context)
+        fun fromPrediction(requireTypeHasDuration: Boolean): ActivitySelectorState {
+            val prediction = DecisionTrees.classifyNow()
             return ActivitySelectorState(
                 activityType = prediction.activityType?.takeIf { !requireTypeHasDuration || it.hasDuration },
                 vehicle = prediction.vehicle,

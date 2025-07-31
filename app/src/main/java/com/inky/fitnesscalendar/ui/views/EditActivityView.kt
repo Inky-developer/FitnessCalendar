@@ -136,8 +136,7 @@ fun NewActivity(
     initialDay: EpochDay? = null,
     isTest: Boolean = false
 ) {
-    val context = LocalContext.current
-    val activityPrediction = remember { DecisionTrees.classifyNow(context) }
+    val activityPrediction = remember { DecisionTrees.classifyNow() }
     val initialState = remember {
         var state = ActivityEditState(richActivity, activityPrediction)
         if (initialDay != null) {
@@ -521,20 +520,20 @@ data class ActivityEditState(
 ) : Parcelable {
     constructor(
         activity: RichActivity?,
-        prediction: DecisionTrees.Prediction,
+        predictionResult: DecisionTrees.PredictionResult,
         now: LocalDateTime = LocalDateTime.now()
     ) : this(
         activitySelectorState = ActivitySelectorState(
-            activityType = activity?.type ?: prediction.activityType,
+            activityType = activity?.type ?: predictionResult.activityType,
             vehicle = if (activity != null) {
                 activity.activity.vehicle
             } else {
-                prediction.vehicle
+                predictionResult.vehicle
             },
             place = if (activity != null) {
                 activity.place
             } else {
-                prediction.place
+                predictionResult.place
             }
         ),
         startDateTime = activity?.activity?.startTime?.toLocalDateTime() ?: now,
