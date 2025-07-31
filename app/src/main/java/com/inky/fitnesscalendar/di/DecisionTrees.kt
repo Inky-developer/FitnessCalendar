@@ -43,6 +43,18 @@ object DecisionTrees {
         }
     }
 
+    data class ActivityTypeInputs(
+        val defaultInputs: DefaultInputs,
+        val activityType: ActivityType?
+    ) : Predictor.Inputs {
+        override fun asList() = defaultInputs.asList() + activityType
+
+        companion object {
+            fun fromLocalDateTime(date: LocalDateTime, activityType: ActivityType) =
+                ActivityTypeInputs(DefaultInputs.fromLocalDateTime(date), activityType)
+        }
+    }
+
     class ActivityTypePredictor(val tree: DecisionTree<ActivityType>) :
         Predictor<DefaultInputs, ActivityType?> {
         override fun predict(inputs: DefaultInputs) = tree.classify(inputs.asList())
@@ -60,14 +72,17 @@ object DecisionTrees {
         }
     }
 
-    class VehiclePredictor(val tree: DecisionTree<Vehicle>) : Predictor<DefaultInputs, Vehicle?> {
-        override fun predict(inputs: DefaultInputs) = tree.classify(inputs.asList())
+    class VehiclePredictor(val tree: DecisionTree<Vehicle>) :
+        Predictor<ActivityTypeInputs, Vehicle?> {
+        override fun predict(inputs: ActivityTypeInputs) = tree.classify(inputs.asList())
 
         companion object {
             fun learn(activities: List<RichActivity>): VehiclePredictor {
                 val examples = Examples(activities.map {
-                    val attributes =
-                        DefaultInputs.fromLocalDateTime(it.activity.startTime.toLocalDateTime())
+                    val attributes = ActivityTypeInputs.fromLocalDateTime(
+                        it.activity.startTime.toLocalDateTime(),
+                        it.type
+                    )
                     Example(it.activity.vehicle, attributes.asList())
                 })
 
@@ -76,14 +91,16 @@ object DecisionTrees {
         }
     }
 
-    class PlacePredictor(val tree: DecisionTree<Place>) : Predictor<DefaultInputs, Place?> {
-        override fun predict(inputs: DefaultInputs) = tree.classify(inputs.asList())
+    class PlacePredictor(val tree: DecisionTree<Place>) : Predictor<ActivityTypeInputs, Place?> {
+        override fun predict(inputs: ActivityTypeInputs) = tree.classify(inputs.asList())
 
         companion object {
             fun learn(activities: List<RichActivity>): PlacePredictor {
                 val examples = Examples(activities.map {
-                    val attributes =
-                        DefaultInputs.fromLocalDateTime(it.activity.startTime.toLocalDateTime())
+                    val attributes = ActivityTypeInputs.fromLocalDateTime(
+                        it.activity.startTime.toLocalDateTime(),
+                        it.type
+                    )
                     Example(it.place, attributes.asList())
                 })
 
@@ -102,12 +119,15 @@ object DecisionTrees {
         placePredictor = PlacePredictor.learn(activities)
     }
 
-    fun classifyNow(): PredictionResult {
-        val inputs = DefaultInputs.fromLocalDateTime(LocalDateTime.now())
+    fun classifyNow(selectedActivityType: ActivityType?): PredictionResult {
+        val defaultInputs = DefaultInputs.fromLocalDateTime(LocalDateTime.now())
+        val predictedActivityType = activityTypePredictor.predict(defaultInputs)
+        val activityTypeForPrediction = selectedActivityType ?: predictedActivityType
+        val activityTypeInputs = ActivityTypeInputs(defaultInputs, activityTypeForPrediction)
         return PredictionResult(
-            activityType = activityTypePredictor.predict(inputs),
-            vehicle = vehiclePredictor.predict(inputs),
-            place = placePredictor.predict(inputs),
+            activityType = predictedActivityType,
+            vehicle = vehiclePredictor.predict(activityTypeInputs),
+            place = placePredictor.predict(activityTypeInputs),
         )
     }
 }

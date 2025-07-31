@@ -1,5 +1,8 @@
 # Unreleased
 
+- Slightly improve predictions for vehicle and place when starting a recording or adding a new
+  activity
+
 # 2025.07.2
 
 - Add setting for initial statistic

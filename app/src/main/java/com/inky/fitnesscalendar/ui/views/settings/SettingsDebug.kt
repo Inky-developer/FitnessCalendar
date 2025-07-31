@@ -16,6 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.di.DecisionTrees
 import com.inky.fitnesscalendar.ui.components.debug.DecisionTreeVisualization
 import com.inky.fitnesscalendar.util.prediction.decision_tree.DecisionTree
@@ -31,7 +32,9 @@ fun SettingsDebug() {
     Scaffold { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
             TextButton(
-                onClick = { classification = DecisionTrees.classifyNow() }
+                onClick = {
+                    classification = DecisionTrees.classifyNow(selectedActivityType = null)
+                }
             ) {
                 Text("Classify")
             }
@@ -71,6 +74,9 @@ fun SettingsDebug() {
                                         Locale.getDefault()
                                     )
                                 },
+                                "Activity Type" to { it: Any? ->
+                                    (it as ActivityType?)?.name ?: "<null>"
+                                }
                             )
                         }
                     )

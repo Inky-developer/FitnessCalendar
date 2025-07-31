@@ -66,8 +66,11 @@ data class ActivitySelectorState(
     }
 
     companion object {
-        fun fromPrediction(requireTypeHasDuration: Boolean): ActivitySelectorState {
-            val prediction = DecisionTrees.classifyNow()
+        fun fromPrediction(
+            requireTypeHasDuration: Boolean,
+            selectedActivityType: ActivityType?
+        ): ActivitySelectorState {
+            val prediction = DecisionTrees.classifyNow(selectedActivityType)
             return ActivitySelectorState(
                 activityType = prediction.activityType?.takeIf { !requireTypeHasDuration || it.hasDuration },
                 vehicle = prediction.vehicle,
@@ -87,6 +90,8 @@ fun ActivitySelector(
     onNavigateNewPlace: (() -> Unit)? = null,
 ) {
     val vehicles = remember { Vehicle.entries.toList() }
+
+    // TODO: Update place prediction and vehicle prediction if the activity type changed
 
     Column(modifier = modifier) {
         OptionGroup(

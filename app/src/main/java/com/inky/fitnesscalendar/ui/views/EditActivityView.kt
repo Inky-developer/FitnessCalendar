@@ -111,7 +111,6 @@ fun NewActivity(
         )
 
 
-
     if (activityId == null || activity.value != null) {
         NewActivity(
             richActivity = activity.value,
@@ -136,7 +135,7 @@ fun NewActivity(
     initialDay: EpochDay? = null,
     isTest: Boolean = false
 ) {
-    val activityPrediction = remember { DecisionTrees.classifyNow() }
+    val activityPrediction = remember { DecisionTrees.classifyNow(null) }
     val initialState = remember {
         var state = ActivityEditState(richActivity, activityPrediction)
         if (initialDay != null) {

@@ -250,7 +250,7 @@ private fun AppNavigation(
                 val context = LocalContext.current
                 val activityTypes = localDatabaseValues.current.activityTypes
                 val initialState = remember(route) {
-                    val prediction = DecisionTrees.classifyNow()
+                    val prediction = DecisionTrees.classifyNow(null)
                     val activityType =
                         route.activityTypeId?.let { id -> activityTypes.find { it.uid == id } }
                     val start =

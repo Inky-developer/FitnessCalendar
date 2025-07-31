@@ -11,7 +11,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.R
@@ -31,9 +30,8 @@ fun QsTileRecordActivityDialog(
     onDismiss: () -> Unit,
     onSave: (RichRecording) -> Unit
 ) {
-    val context = LocalContext.current
     var state by rememberSaveable {
-        mutableStateOf(RecordActivityState.fromPrediction(context))
+        mutableStateOf(RecordActivityState.fromPrediction())
     }
     val typeRows = localDatabaseValues.current.activityTypeRows
     val filteredTypeRows =
