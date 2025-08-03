@@ -70,7 +70,6 @@ import com.inky.fitnesscalendar.data.Intensity
 import com.inky.fitnesscalendar.data.measure.kilometers
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.RichActivity
-import com.inky.fitnesscalendar.di.DecisionTrees
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivityImage
 import com.inky.fitnesscalendar.ui.components.ActivitySelector
@@ -135,9 +134,8 @@ fun NewActivity(
     initialDay: EpochDay? = null,
     isTest: Boolean = false
 ) {
-    val activityPrediction = remember { DecisionTrees.classifyNow(null) }
     val initialState = remember {
-        var state = ActivityEditState(richActivity, activityPrediction)
+        var state = ActivityEditState(richActivity)
         if (initialDay != null) {
             val newStartDateTime =
                 initialDay.toLocalDate().atTime(state.startDateTime.toLocalTime())
@@ -517,23 +515,11 @@ data class ActivityEditState(
 
     val activityId: Int?,
 ) : Parcelable {
-    constructor(
-        activity: RichActivity?,
-        predictionResult: DecisionTrees.PredictionResult,
-        now: LocalDateTime = LocalDateTime.now()
-    ) : this(
+    constructor(activity: RichActivity?, now: LocalDateTime = LocalDateTime.now()) : this(
         activitySelectorState = ActivitySelectorState(
-            activityType = activity?.type ?: predictionResult.activityType,
-            vehicle = if (activity != null) {
-                activity.activity.vehicle
-            } else {
-                predictionResult.vehicle
-            },
-            place = if (activity != null) {
-                activity.place
-            } else {
-                predictionResult.place
-            }
+            selectedActivityType = activity?.type,
+            selectedVehicle = activity?.activity?.vehicle,
+            selectedPlace = activity?.place
         ),
         startDateTime = activity?.activity?.startTime?.toLocalDateTime() ?: now,
         endDateTime = activity?.activity?.endTime?.toLocalDateTime() ?: now.plusHours(1),

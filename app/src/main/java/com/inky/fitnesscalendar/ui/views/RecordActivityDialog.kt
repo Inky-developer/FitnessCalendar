@@ -9,21 +9,18 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.R
-import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.RichRecording
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivitySelector
 import com.inky.fitnesscalendar.ui.components.ActivitySelectorState
 import com.inky.fitnesscalendar.ui.components.BaseEditDialog
 import com.inky.fitnesscalendar.ui.components.DateTimePicker
-import com.inky.fitnesscalendar.ui.util.localDatabaseValues
 import com.inky.fitnesscalendar.util.toDate
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
@@ -35,13 +32,7 @@ fun RecordActivity(
     localizationRepository: LocalizationRepository,
     onNavigateBack: () -> Unit
 ) {
-    var state by rememberSaveable {
-        mutableStateOf(RecordActivityState.fromPrediction())
-    }
-
-    val typeRows = localDatabaseValues.current.activityTypeRows
-    val relevantTypeRows =
-        remember(typeRows) { typeRows.map { row -> row.filter { it.hasDuration } } }
+    var state by rememberSaveable { mutableStateOf(RecordActivityState()) }
 
     BaseEditDialog(
         title = state.title,
@@ -53,7 +44,6 @@ fun RecordActivity(
     ) {
         RecordActivityInner(
             state = state,
-            typeRows = relevantTypeRows,
             localizationRepository = localizationRepository,
             onState = { state = it },
             includeTimePicker = true,
@@ -65,7 +55,6 @@ fun RecordActivity(
 @Composable
 fun RecordActivityInner(
     state: RecordActivityState,
-    typeRows: List<List<ActivityType>>,
     localizationRepository: LocalizationRepository,
     onState: (RecordActivityState) -> Unit,
     includeTimePicker: Boolean,
@@ -74,7 +63,6 @@ fun RecordActivityInner(
     Column(modifier = modifier) {
         ActivitySelector(
             state = state.activitySelectorState,
-            typeRows = typeRows,
             onState = { onState(state.copy(activitySelectorState = it)) }
         )
 
@@ -123,8 +111,8 @@ private fun DateTimeInput(
 
 @Parcelize
 data class RecordActivityState(
-    val activitySelectorState: ActivitySelectorState,
-    val customStart: LocalDateTime?,
+    val activitySelectorState: ActivitySelectorState = ActivitySelectorState(activityTypeFilter = ActivitySelectorState.ActivityTypeFilter.RequireDuration),
+    val customStart: LocalDateTime? = null,
 ) : Parcelable {
     @IgnoredOnParcel
     val title: String
@@ -143,15 +131,5 @@ data class RecordActivityState(
         } else {
             rawRecording
         }
-    }
-
-    companion object {
-        fun fromPrediction() = RecordActivityState(
-            activitySelectorState = ActivitySelectorState.fromPrediction(
-                requireTypeHasDuration = true,
-                selectedActivityType = null
-            ),
-            customStart = null
-        )
     }
 }

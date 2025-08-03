@@ -7,7 +7,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -18,7 +17,6 @@ import com.inky.fitnesscalendar.db.entities.RichRecording
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.OkayCancelRow
 import com.inky.fitnesscalendar.ui.components.optionGroupDefaultBackground
-import com.inky.fitnesscalendar.ui.util.localDatabaseValues
 
 
 /**
@@ -30,12 +28,7 @@ fun QsTileRecordActivityDialog(
     onDismiss: () -> Unit,
     onSave: (RichRecording) -> Unit
 ) {
-    var state by rememberSaveable {
-        mutableStateOf(RecordActivityState.fromPrediction())
-    }
-    val typeRows = localDatabaseValues.current.activityTypeRows
-    val filteredTypeRows =
-        remember(typeRows) { typeRows.map { row -> row.filter { it.hasDuration } } }
+    var state by rememberSaveable { mutableStateOf(RecordActivityState()) }
 
     Column(
         modifier = Modifier
@@ -44,7 +37,6 @@ fun QsTileRecordActivityDialog(
     ) {
         RecordActivityInner(
             state = state,
-            typeRows = filteredTypeRows,
             localizationRepository = localizationRepository,
             onState = { state = it },
             includeTimePicker = false,

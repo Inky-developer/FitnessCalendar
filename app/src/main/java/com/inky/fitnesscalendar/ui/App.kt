@@ -30,8 +30,8 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
-import com.inky.fitnesscalendar.di.DecisionTrees
 import com.inky.fitnesscalendar.ui.components.ActivityCardCallbacks
+import com.inky.fitnesscalendar.ui.components.ActivitySelectorState
 import com.inky.fitnesscalendar.ui.components.NavigationDrawer
 import com.inky.fitnesscalendar.ui.util.ProvideDatabaseValues
 import com.inky.fitnesscalendar.ui.util.localDatabaseValues
@@ -250,7 +250,6 @@ private fun AppNavigation(
                 val context = LocalContext.current
                 val activityTypes = localDatabaseValues.current.activityTypes
                 val initialState = remember(route) {
-                    val prediction = DecisionTrees.classifyNow(null)
                     val activityType =
                         route.activityTypeId?.let { id -> activityTypes.find { it.uid == id } }
                     val start =
@@ -258,14 +257,11 @@ private fun AppNavigation(
                     val end =
                         route.endTime?.let { LocalDateTime.ofEpochSecond(it, 0, ZoneOffset.UTC) }
 
-                    ActivityEditState(activity = null, predictionResult = prediction).let { state ->
-                        val newActivitySelectorState = state.activitySelectorState.copy(
-                            activityType = activityType ?: state.activitySelectorState.activityType
-                        )
-                        state.copy(
-                            activitySelectorState = newActivitySelectorState,
-                            startDateTime = start ?: state.startDateTime,
-                            endDateTime = end ?: state.endDateTime
+                    ActivityEditState(activity = null).run {
+                        copy(
+                            activitySelectorState = ActivitySelectorState(selectedActivityType = activityType),
+                            startDateTime = start ?: startDateTime,
+                            endDateTime = end ?: endDateTime
                         )
                     }
                 }

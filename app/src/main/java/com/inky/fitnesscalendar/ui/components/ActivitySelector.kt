@@ -45,10 +45,38 @@ import java.util.Date
 
 @Parcelize
 data class ActivitySelectorState(
-    val activityType: ActivityType?,
-    val vehicle: Vehicle?,
-    val place: Place?
+    val selectedActivityType: ActivityType? = null,
+    val selectedVehicle: Vehicle? = null,
+    val selectedPlace: Place? = null,
+    val activityTypeFilter: ActivityTypeFilter = ActivityTypeFilter.None
 ) : Parcelable {
+    enum class ActivityTypeFilter {
+        None,
+        RequireDuration;
+
+        fun filter(activityType: ActivityType?) = when (this) {
+            None -> activityType
+            RequireDuration -> activityType?.takeIf { it.hasDuration }
+        }
+
+        @Composable
+        fun typeRows() = localDatabaseValues.current.activityTypeRows.map { row ->
+            row.mapNotNull { filter(it) }
+        }
+    }
+
+    @IgnoredOnParcel
+    val prediction = DecisionTrees.classifyNow(selectedActivityType)
+
+    @IgnoredOnParcel
+    val activityType = activityTypeFilter.filter(selectedActivityType ?: prediction.activityType)
+
+    @IgnoredOnParcel
+    val vehicle = selectedVehicle ?: prediction.vehicle
+
+    @IgnoredOnParcel
+    val place = selectedPlace ?: prediction.place
+
     @IgnoredOnParcel
     val isValid get() = activityType != null && (!activityType.hasVehicle || vehicle != null)
 
@@ -64,20 +92,6 @@ data class ActivitySelectorState(
             place = place
         )
     }
-
-    companion object {
-        fun fromPrediction(
-            requireTypeHasDuration: Boolean,
-            selectedActivityType: ActivityType?
-        ): ActivitySelectorState {
-            val prediction = DecisionTrees.classifyNow(selectedActivityType)
-            return ActivitySelectorState(
-                activityType = prediction.activityType?.takeIf { !requireTypeHasDuration || it.hasDuration },
-                vehicle = prediction.vehicle,
-                place = prediction.place
-            )
-        }
-    }
 }
 
 @Composable
@@ -85,13 +99,11 @@ fun ActivitySelector(
     state: ActivitySelectorState,
     modifier: Modifier = Modifier,
     background: Color = optionGroupDefaultBackground(),
-    typeRows: List<List<ActivityType>> = localDatabaseValues.current.activityTypeRows,
     onState: (ActivitySelectorState) -> Unit,
     onNavigateNewPlace: (() -> Unit)? = null,
 ) {
     val vehicles = remember { Vehicle.entries.toList() }
-
-    // TODO: Update place prediction and vehicle prediction if the activity type changed
+    val typeRows = state.activityTypeFilter.typeRows()
 
     Column(modifier = modifier) {
         OptionGroup(
@@ -102,14 +114,14 @@ fun ActivitySelector(
             ActivityTypeSelector(
                 typeRows = typeRows,
                 isSelected = { it == state.activityType },
-                onSelect = { onState(state.copy(activityType = it)) }
+                onSelect = { onState(state.copy(selectedActivityType = it)) }
             )
         }
 
         AnimatedVisibility(visible = state.activityType?.hasPlace == true && localDatabaseValues.current.places.isNotEmpty()) {
             PlaceSelector(
                 currentPlace = state.place,
-                onPlace = { onState(state.copy(place = it)) },
+                onPlace = { onState(state.copy(selectedPlace = it)) },
                 onNavigateNewPlace = onNavigateNewPlace,
                 placeFilter = { state.activityType?.limitPlacesByColor == null || state.activityType.limitPlacesByColor == it.color }
             )
@@ -125,7 +137,7 @@ fun ActivitySelector(
                     items(vehicles) {
                         FilterChip(
                             selected = state.vehicle == it,
-                            onClick = { onState(state.copy(vehicle = it)) },
+                            onClick = { onState(state.copy(selectedVehicle = it)) },
                             label = {
                                 Text(
                                     it.emoji,
