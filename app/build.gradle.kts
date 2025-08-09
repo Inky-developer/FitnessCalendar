@@ -107,6 +107,11 @@ android {
     hilt {
         enableAggregatingTask = true
     }
+    lint {
+        checkAllWarnings = true
+        warningsAsErrors = true
+        checkDependencies = true
+    }
 }
 
 dependencies {
