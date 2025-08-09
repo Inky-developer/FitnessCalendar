@@ -2,7 +2,6 @@ package com.inky.fitnesscalendar.ui.views.settings
 
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -21,6 +20,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import com.inky.fitnesscalendar.BuildConfig
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
@@ -64,6 +64,6 @@ fun AboutView(onBack: () -> Unit, onNavigateOpenSourceLicenses: () -> Unit) {
 
 private fun openGithubRepo(context: Context) {
     val repoUrl = context.getString(R.string.github_url)
-    val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(repoUrl))
+    val browserIntent = Intent(Intent.ACTION_VIEW, repoUrl.toUri())
     context.startActivity(browserIntent)
 }

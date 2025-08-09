@@ -19,7 +19,7 @@ room {
 
 android {
     namespace = "com.inky.fitnesscalendar"
-    compileSdk = 35
+    compileSdk = 36
 
     androidResources {
         @Suppress("UnstableApiUsage")
@@ -32,7 +32,7 @@ android {
 
         applicationId = "com.inky.fitnesscalendar"
         minSdk = 27
-        targetSdk = 35
+        targetSdk = 36
         versionCode = properties.getProperty("versionCode").toInt()
         versionName = properties.getProperty("versionName").toString()
 
@@ -111,6 +111,12 @@ android {
         checkAllWarnings = true
         warningsAsErrors = true
         checkDependencies = true
+
+        disable += "ComposableLambdaParameterNaming"
+        disable += "ComposableLambdaParameterPosition"
+        disable += "LogConditional" // Logging in release mode is fine for this app
+        disable += "SyntheticAccessor" // Not a issue in this app
+        disable += "DuplicateStrings" // I don't care
     }
 }
 

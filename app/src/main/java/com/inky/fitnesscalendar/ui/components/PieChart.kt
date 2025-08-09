@@ -69,10 +69,10 @@ data class PieChartEntry<T>(val value: Double, val label: String, val color: Col
 @Composable
 fun <T> PieChart(
     state: PieChartState<T>,
+    modifier: Modifier = Modifier,
     fontSize: TextUnit = TextUnit.Unspecified,
     style: TextStyle = LocalTextStyle.current,
     onClick: (T) -> Unit = {},
-    modifier: Modifier = Modifier,
     animate: Boolean = true,
 ) {
     val angleAnimation = remember(state) { Animatable(if (animate) 0f else 1f) }
@@ -93,7 +93,8 @@ fun <T> PieChart(
                 detectTapGestures { offset ->
                     val offsetFromCenter =
                         offset - Offset(canvasSize.width / 2, canvasSize.height / 2)
-                    val distanceFromCenter = sqrt(offsetFromCenter.x * offsetFromCenter.x + offsetFromCenter.y * offsetFromCenter.y)
+                    val distanceFromCenter =
+                        sqrt(offsetFromCenter.x * offsetFromCenter.x + offsetFromCenter.y * offsetFromCenter.y)
                     if (distanceFromCenter > canvasSize.width / 2) {
                         return@detectTapGestures
                     }

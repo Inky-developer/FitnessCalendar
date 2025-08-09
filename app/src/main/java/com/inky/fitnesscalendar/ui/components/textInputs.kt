@@ -17,8 +17,8 @@ import com.inky.fitnesscalendar.R
 fun DescriptionTextInput(
     description: String,
     onDescription: (String) -> Unit,
-    maxLines: Int = Int.MAX_VALUE,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    maxLines: Int = Int.MAX_VALUE
 ) {
     TextField(
         value = description,

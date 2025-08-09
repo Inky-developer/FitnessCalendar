@@ -5,7 +5,6 @@
     <string name="Menu">Menu</string>
     <string name="settings">Settings</string>
     <string name="today">Today</string>
-    <string name="activity_bouldering">Bouldering</string>
     <string name="action_new_activity">Add new activity</string>
     <string name="activity_cycling">Cycling</string>
     <string name="activity_running">Running</string>
@@ -22,7 +21,6 @@
     <string name="delete_activity">Delete activity</string>
     <string name="info">Info</string>
     <string name="no_activities_yet">No activities yet</string>
-    <string name="activity_kung_fu">Kung Fu</string>
     <string name="activity_commute_home_to_work">Home → Work</string>
     <string name="activity_commute_work_to_home">Work → Home</string>
     <string name="placeholder_description">Description…</string>
@@ -40,34 +38,25 @@
     <string name="search_for_activity">Search for activity</string>
     <string name="no_activities_with_filter">No activities that match the filter</string>
     <string name="reset_filters">Reset filters</string>
-    <string name="import_export"><![CDATA[Import & Export]]></string>
-    <string name="export_activities">Export activities</string>
     <string name="import_activities">Import activities</string>
     <string name="activity_log">Activity Log</string>
-    <string name="this_week">This Week</string>
     <string name="last_seven_days">7 Days</string>
     <string name="sports">Sports</string>
     <string name="travel">Travel</string>
     <string name="other">Other</string>
-    <string name="this_month">This Month</string>
     <string name="work">Work</string>
     <string name="gaming">Gaming</string>
     <string name="action_record">Record</string>
     <string name="record_activity">Record Activity</string>
     <string name="record_activity_type">Record %1s</string>
-    <string name="recording_activity_type">Recording %1s</string>
     <string name="recording">Recording</string>
     <string name="abort">Abort</string>
-    <string name="enter_import_data">Enter import data…</string>
     <string name="recordings">Recordings</string>
-    <string name="activity_commute_home_to_university">Home → Uni</string>
-    <string name="activity_commute_university_to_home">Uni → Home</string>
     <string name="clear">Clear</string>
     <string name="text">Text</string>
     <string name="select_category">Select category…</string>
     <string name="select_date">Select date…</string>
     <string name="yesterday">Yesterday</string>
-    <string name="last_thirty_days">30 Days</string>
     <string name="year">Year</string>
     <string name="last_week">Last Week</string>
     <string name="last_month">Last Month</string>
@@ -81,7 +70,6 @@
     <string name="month">Month</string>
     <string name="statistics">Statistics</string>
     <string name="number_of_activities">Number of activities</string>
-    <string name="all_time">All time</string>
     <string name="day">Day</string>
     <string name="time_period">Time period</string>
     <string name="by_total_activities">Total Activities</string>
@@ -135,7 +123,6 @@
     <string name="new_type">New Type</string>
     <string name="deleted_activity">Deleted activity</string>
     <string name="deleted_activity_type">Deleted activity type</string>
-    <string name="color">Color</string>
     <string name="color_orange">Orange</string>
     <string name="color_green">Green</string>
     <string name="color_turquoise">Turquoise</string>
@@ -144,8 +131,6 @@
     <string name="color_grey">Grey</string>
     <string name="emoji">Emoji</string>
     <string name="recent">Recent</string>
-    <string name="note_exporting_does_not_include_images">Note: Exporting does not include images!</string>
-    <string name="these_activities_will_be_imported">These activities will be imported:</string>
     <string name="scroll_to_top">Scroll to top</string>
     <string name="four_weeks">4 Weeks</string>
     <string name="edit_day">Edit Day</string>
@@ -183,16 +168,10 @@
     <string name="place">Place</string>
     <string name="select_place">Select Place…</string>
     <string name="filter_by_places">Filter by places…</string>
-    <string name="setting_store_location_information_title">Store location information</string>
-    <string name="setting_store_location_information_description">If active, saves the current wifi network when starting a recording. This will be used automatically predict places.</string>
-    <string name="action_continue">Continue</string>
-    <string name="wifi_information_permission_help_title">This action requires location permission</string>
-    <string name="wifi_information_permission_help_description">In order to access wifi information, this app needs to have location permission.</string>
     <string name="undo">Undo</string>
     <string name="recent_activity">Recent activity</string>
     <string name="no_place">No place</string>
     <string name="no_notes_for_day">No notes on that day</string>
-    <string name="no_activities_on_day">No activities on that day</string>
     <string name="number_of_activities_n">Number of activities: %1s</string>
     <string name="show_day">Show day</string>
 
@@ -225,12 +204,10 @@
     <string name="track">Track</string>
     <string name="filter_by_vehicles">Filter by vehicles…</string>
     <string name="filter_by_feels">Filter by feels…</string>
-    <string name="select_emoji">Select emoji…</string>
     <string name="configure_backup">Backup…</string>
     <string name="backup_directory">Backup directory:</string>
     <string name="create_backup">Create backup</string>
     <string name="backup_successful">Backup successful</string>
-    <string name="could_not_read_path">Could not read path</string>
     <string name="your_android_version_is_too_old_for_backup">Backup functionality is only supported on android 11+</string>
     <string name="tap_to_set_backup_dir">Tap to setup the backup directory…</string>
     <string name="last_backup">Last backup:</string>
@@ -273,7 +250,6 @@
     <string name="color_purple">Purple</string>
     <string name="color_ice">Ice</string>
     <string name="color_red">Red</string>
-    <string name="color_black">Black</string>
     <string name="legend_heart_rate_bpm">Heart Rate (bpm)</string>
     <string name="legend_elevation_m">Elevation (m)</string>
     <string name="legend_temperature_celsius">Temperature (Celsius)</string>
@@ -320,7 +296,6 @@
     <string name="summary_total_ascent">Total ascent:</string>
     <string name="summary_total_descent">Total descent:</string>
     <string name="summary_average_heart_rate">Average heart rate:</string>
-    <string name="summary_maximal_heart_rate">Maximal heart rate:</string>
     <string name="summary_average_temperature">Average temperature:</string>
     <string name="summary_activities_with_place">Activities with place:</string>
     <string name="summary_activities_without_place">Activities without place:</string>
@@ -333,7 +308,6 @@
     <string name="Activities_by_time_of_day">Activities by time of day</string>
     <string name="Hour">Hour</string>
     <string name="share_gpx">Share GPX</string>
-    <string name="summary_maximal_time">Longest time:</string>
     <string name="limit_places_by_color">Limit places to this color:</string>
     <string name="records_longest_duration">Longest duration:</string>
     <string name="records_highest_distance">Highest distance:</string>
@@ -354,7 +328,6 @@
     <string name="setting_enable_public_api_description"><![CDATA[The public API enables third party apps to create activities & recordings]]></string>
     <string name="error_public_api_must_be_enabled_in_settings">Public API must be enabled in settings</string>
     <string name="share_activity">Share activity</string>
-    <string name="activity_summary">Activity summary</string>
     <string name="show_image">Show image</string>
     <string name="show_description">Show description</string>
     <string name="show_track">Show track</string>
