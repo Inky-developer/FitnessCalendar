@@ -38,6 +38,8 @@ import com.inky.fitnesscalendar.db.entities.Recording
 import com.inky.fitnesscalendar.db.entities.RichRecording
 import com.inky.fitnesscalendar.di.DecisionTrees
 import com.inky.fitnesscalendar.ui.util.localDatabaseValues
+import com.inky.fitnesscalendar.util.Option
+import com.inky.fitnesscalendar.util.some
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import java.time.Instant
@@ -47,7 +49,7 @@ import java.util.Date
 data class ActivitySelectorState(
     val selectedActivityType: ActivityType? = null,
     val selectedVehicle: Vehicle? = null,
-    val selectedPlace: Place? = null,
+    val selectedPlace: Option<Place?> = Option.None,
     val activityTypeFilter: ActivityTypeFilter = ActivityTypeFilter.None
 ) : Parcelable {
     enum class ActivityTypeFilter {
@@ -75,7 +77,7 @@ data class ActivitySelectorState(
     val vehicle = selectedVehicle ?: prediction.vehicle
 
     @IgnoredOnParcel
-    val place = selectedPlace ?: prediction.place
+    val place = selectedPlace.or { prediction.place }
 
     @IgnoredOnParcel
     val isValid get() = activityType != null && (!activityType.hasVehicle || vehicle != null)
@@ -121,7 +123,7 @@ fun ActivitySelector(
         AnimatedVisibility(visible = state.activityType?.hasPlace == true && localDatabaseValues.current.places.isNotEmpty()) {
             PlaceSelector(
                 currentPlace = state.place,
-                onPlace = { onState(state.copy(selectedPlace = it)) },
+                onPlace = { onState(state.copy(selectedPlace = it.some())) },
                 onNavigateNewPlace = onNavigateNewPlace,
                 placeFilter = { state.activityType?.limitPlacesByColor == null || state.activityType.limitPlacesByColor == it.color }
             )

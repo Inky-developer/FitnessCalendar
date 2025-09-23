@@ -85,6 +85,7 @@ import com.inky.fitnesscalendar.ui.components.SelectImageDropdownMenuItem
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.components.optionGroupDefaultBackground
 import com.inky.fitnesscalendar.ui.components.rememberImagePickerLauncher
+import com.inky.fitnesscalendar.util.someOrNone
 import com.inky.fitnesscalendar.util.toDate
 import com.inky.fitnesscalendar.util.toLocalDateTime
 import com.inky.fitnesscalendar.view_model.NewActivityViewModel
@@ -260,7 +261,8 @@ fun NewActivity(
                     }
                     DropdownMenu(
                         expanded = contextMenuOpen,
-                        onDismissRequest = { contextMenuOpen = false }) {
+                        onDismissRequest = { contextMenuOpen = false }
+                    ) {
                         SelectImageDropdownMenuItem(
                             imagePickerLauncher = imagePickerLauncher,
                             onDismissMenu = { contextMenuOpen = false },
@@ -519,7 +521,7 @@ data class ActivityEditState(
         activitySelectorState = ActivitySelectorState(
             selectedActivityType = activity?.type,
             selectedVehicle = activity?.activity?.vehicle,
-            selectedPlace = activity?.place
+            selectedPlace = activity?.place.someOrNone()
         ),
         startDateTime = activity?.activity?.startTime?.toLocalDateTime() ?: now,
         endDateTime = activity?.activity?.endTime?.toLocalDateTime() ?: now.plusHours(1),
