@@ -1,5 +1,7 @@
 # Unreleased
 
+# 2025.11.1
+
 - Fix bug where setting the place to none was not possible
 - Slightly improve predictions for vehicle and place when starting a recording or adding a new
   activity
