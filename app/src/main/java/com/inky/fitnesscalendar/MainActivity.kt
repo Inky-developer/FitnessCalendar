@@ -49,11 +49,7 @@ class MainActivity : ComponentActivity() {
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             val locationPermissionRequest =
-                registerForActivityResult(ActivityResultContracts.RequestPermission()) { result ->
-                    if (!result) {
-                        Toast.makeText(this, "You suck", Toast.LENGTH_LONG).show()
-                    }
-                }
+                registerForActivityResult(ActivityResultContracts.RequestPermission()) { }
 
             locationPermissionRequest.launch(Manifest.permission.POST_NOTIFICATIONS)
         }
