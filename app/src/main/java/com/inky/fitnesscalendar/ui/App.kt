@@ -33,7 +33,7 @@ import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.ui.components.ActivityCardCallbacks
 import com.inky.fitnesscalendar.ui.components.ActivitySelectorState
 import com.inky.fitnesscalendar.ui.components.NavigationDrawer
-import com.inky.fitnesscalendar.ui.util.ProvideDatabaseValues
+import com.inky.fitnesscalendar.ui.util.AppContextProviders
 import com.inky.fitnesscalendar.ui.util.localDatabaseValues
 import com.inky.fitnesscalendar.ui.views.ActivityEditState
 import com.inky.fitnesscalendar.ui.views.ActivityLog
@@ -77,7 +77,7 @@ fun App(viewModel: BaseViewModel = hiltViewModel()) {
     }
     var currentView by rememberSaveable { mutableStateOf<Views?>(null) }
 
-    ProvideDatabaseValues(repository = viewModel.repository) {
+    AppContextProviders(repository = viewModel.repository) {
         NavigationDrawer(
             drawerState = navigationDrawerState,
             currentView = currentView,

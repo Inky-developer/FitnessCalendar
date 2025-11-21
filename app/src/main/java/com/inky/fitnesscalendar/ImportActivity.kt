@@ -11,7 +11,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import com.inky.fitnesscalendar.ui.ImportView
 import com.inky.fitnesscalendar.ui.components.AppFrame
-import com.inky.fitnesscalendar.ui.util.ProvideDatabaseValues
+import com.inky.fitnesscalendar.ui.util.AppContextProviders
 import com.inky.fitnesscalendar.view_model.ImportViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.io.FileNotFoundException
@@ -58,7 +58,7 @@ class ImportActivity : ComponentActivity() {
 
         setContent {
             AppFrame {
-                ProvideDatabaseValues(repository = viewModel.dbRepository) {
+                AppContextProviders(repository = viewModel.dbRepository) {
                     ImportView(viewModel)
                 }
             }

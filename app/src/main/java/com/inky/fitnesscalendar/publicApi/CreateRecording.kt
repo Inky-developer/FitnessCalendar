@@ -5,7 +5,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import com.inky.fitnesscalendar.repository.DatabaseRepository
 import com.inky.fitnesscalendar.repository.RecordingRepository
 import com.inky.fitnesscalendar.ui.components.AppFrame
-import com.inky.fitnesscalendar.ui.util.ProvideDatabaseValues
+import com.inky.fitnesscalendar.ui.util.AppContextProviders
 import com.inky.fitnesscalendar.ui.views.QsTileRecordActivityDialog
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -26,7 +26,7 @@ class CreateRecording : ApiActivity() {
         setContent {
             val scope = rememberCoroutineScope()
             AppFrame {
-                ProvideDatabaseValues(repository = databaseRepository) {
+                AppContextProviders(repository = databaseRepository) {
                     QsTileRecordActivityDialog(
                         localizationRepository = databaseRepository.localizationRepository,
                         onSave = {

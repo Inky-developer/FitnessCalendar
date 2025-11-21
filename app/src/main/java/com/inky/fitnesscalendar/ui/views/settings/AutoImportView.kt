@@ -22,20 +22,17 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
-import com.inky.fitnesscalendar.preferences.Preference.Companion.PREF_WATCHED_FOLDERS
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.util.Icons
+import com.inky.fitnesscalendar.ui.util.localPreferences
 import com.inky.fitnesscalendar.view_model.settings.AutoImportViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -86,7 +83,7 @@ fun AutoImportView(viewModel: AutoImportViewModel = hiltViewModel(), onBack: () 
 
 @Composable
 fun AutoImportList(onNewDir: (Uri) -> Unit, onRemoveDir: (Uri) -> Unit) {
-    val dirs by PREF_WATCHED_FOLDERS.flow(LocalContext.current).collectAsState(emptySet())
+    val dirs = localPreferences.current.watchedFolders
 
     Surface(
         color = MaterialTheme.colorScheme.surfaceContainer,
