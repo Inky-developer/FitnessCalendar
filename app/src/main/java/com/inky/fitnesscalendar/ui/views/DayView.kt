@@ -13,13 +13,6 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.automirrored.outlined.ArrowForward
-import androidx.compose.material.icons.outlined.DateRange
-import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -29,7 +22,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -66,6 +58,7 @@ import com.inky.fitnesscalendar.ui.components.ActivityImage
 import com.inky.fitnesscalendar.ui.components.ImageViewer
 import com.inky.fitnesscalendar.ui.components.NewActivityFAB
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
+import com.inky.fitnesscalendar.ui.util.Icons
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.ui.util.sharedElement
@@ -122,18 +115,15 @@ fun DayView(
                 colors = defaultTopAppBarColors(),
                 navigationIcon = {
                     IconButton(onClick = onOpenDrawer) {
-                        Icon(
-                            imageVector = Icons.Outlined.Menu,
-                            contentDescription = stringResource(R.string.Menu),
-                        )
+                        Icons.Menu(stringResource(R.string.Menu))
                     }
                 },
                 actions = {
                     IconButton(onClick = { onEditDay(epochDay) }) {
-                        Icon(Icons.Outlined.Edit, stringResource(R.string.edit_day))
+                        Icons.Edit(stringResource(R.string.edit_day))
                     }
                     IconButton(onClick = { showDatePicker = true }) {
-                        Icon(Icons.Outlined.DateRange, stringResource(R.string.select_date))
+                        Icons.DateRange(stringResource(R.string.select_date))
                     }
                 },
                 scrollBehavior = scrollBehavior,
@@ -271,8 +261,7 @@ fun DayViewInner(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(all = 8.dp)
                     ) {
-                        Icon(
-                            Icons.Outlined.Info,
+                        Icons.Info(
                             stringResource(R.string.info),
                             tint = MaterialTheme.colorScheme.secondary,
                             modifier = Modifier.padding(end = 4.dp)
@@ -325,14 +314,14 @@ private fun RowScope.PrevAndNextDaySelector(
             .weight(1f)
             .padding(end = 4.dp)
     ) {
-        Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.back))
+        Icons.ArrowBack(stringResource(R.string.back))
     }
     Button(
         onClick = onNext, enabled = day < today, modifier = Modifier
             .weight(1f)
             .padding(start = 4.dp)
     ) {
-        Icon(Icons.AutoMirrored.Outlined.ArrowForward, stringResource(R.string.forward))
+        Icons.ArrowForward(stringResource(R.string.forward))
     }
 }
 

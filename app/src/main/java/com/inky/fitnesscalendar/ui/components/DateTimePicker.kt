@@ -5,14 +5,10 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowLeft
-import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -35,6 +31,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.Wallpapers
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.localization.LocalizationRepository
+import com.inky.fitnesscalendar.ui.util.Icons
 import com.inky.fitnesscalendar.ui.util.horizontalOrderedTransitionSpec
 import com.inky.fitnesscalendar.util.toDate
 import java.time.Instant
@@ -98,7 +95,7 @@ fun DaySelector(date: LocalDate, onDate: (LocalDate) -> Unit) {
         modifier = Modifier.fillMaxWidth()
     ) {
         IconButton(onClick = { onDate(date.minusDays(1)) }) {
-            Icon(Icons.AutoMirrored.Outlined.KeyboardArrowLeft, stringResource(R.string.back))
+            Icons.KeyboardArrowLeft(stringResource(R.string.back))
         }
 
         AnimatedContent(
@@ -117,7 +114,7 @@ fun DaySelector(date: LocalDate, onDate: (LocalDate) -> Unit) {
         }
 
         IconButton(onClick = { onDate(date.plusDays(1)) }) {
-            Icon(Icons.AutoMirrored.Outlined.KeyboardArrowRight, stringResource(R.string.forward))
+            Icons.KeyboardArrowRight(stringResource(R.string.forward))
         }
     }
 

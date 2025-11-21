@@ -11,16 +11,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -47,6 +43,7 @@ import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.preferences.Preference.Companion.PREF_BACKUP_URI
 import com.inky.fitnesscalendar.repository.backup.BackupRepository
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
+import com.inky.fitnesscalendar.ui.util.Icons
 import com.inky.fitnesscalendar.view_model.settings.BackupViewModel
 import java.time.LocalDateTime
 
@@ -61,7 +58,7 @@ fun BackupView(viewModel: BackupViewModel = hiltViewModel(), onBack: () -> Unit)
                 colors = defaultTopAppBarColors(),
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.back))
+                        Icons.ArrowBack(stringResource(R.string.back))
                     }
                 },
                 scrollBehavior = scrollBehavior,
@@ -123,8 +120,7 @@ private fun RestoreButton(restoreInProgress: Boolean, onRestore: (Uri) -> Unit) 
     if (restoreFileUri != null) {
         AlertDialog(
             icon = {
-                Icon(
-                    Icons.Outlined.Warning,
+                Icons.Warning(
                     stringResource(R.string.warning),
                     tint = MaterialTheme.colorScheme.primary
                 )

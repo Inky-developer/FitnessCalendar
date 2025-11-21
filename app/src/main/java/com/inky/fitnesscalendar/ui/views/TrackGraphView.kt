@@ -10,15 +10,12 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -48,6 +45,7 @@ import com.inky.fitnesscalendar.data.measure.Elevation
 import com.inky.fitnesscalendar.data.measure.meters
 import com.inky.fitnesscalendar.db.entities.Track
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
+import com.inky.fitnesscalendar.ui.util.Icons
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.defaultAreaFill
 import com.inky.fitnesscalendar.ui.util.sharedBounds
@@ -117,10 +115,7 @@ fun TrackGraphView(
                 colors = defaultTopAppBarColors(),
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                            contentDescription = stringResource(R.string.back),
-                        )
+                        Icons.ArrowBack(stringResource(R.string.back))
                     }
                 },
                 actions = {

@@ -16,10 +16,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.KeyboardArrowUp
-import androidx.compose.material.icons.outlined.Menu
-import androidx.compose.material.icons.outlined.Search
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -60,6 +56,7 @@ import com.inky.fitnesscalendar.ui.components.NewActivityFAB
 import com.inky.fitnesscalendar.ui.components.NoActivitiesInfoBox
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.components.getAppBarContainerColor
+import com.inky.fitnesscalendar.ui.util.Icons
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.ui.util.sharedElement
@@ -118,10 +115,7 @@ fun ActivityLog(
                 colors = defaultTopAppBarColors(),
                 navigationIcon = {
                     IconButton(onClick = onOpenDrawer) {
-                        Icon(
-                            imageVector = Icons.Outlined.Menu,
-                            contentDescription = stringResource(R.string.Menu),
-                        )
+                        Icons.Menu(contentDescription = stringResource(R.string.Menu))
                     }
                 },
                 actions = {
@@ -132,7 +126,7 @@ fun ActivityLog(
                         )
                     }
                     IconButton(onClick = onFilter) {
-                        Icon(Icons.Outlined.Search, stringResource(R.string.filter))
+                        Icons.Search(stringResource(R.string.filter))
                     }
                 },
                 scrollBehavior = scrollBehavior,
@@ -153,10 +147,7 @@ fun ActivityLog(
                             scrollBehavior.state.heightOffset = 0f
                         }
                     }) {
-                        Icon(
-                            Icons.Outlined.KeyboardArrowUp,
-                            stringResource(R.string.scroll_to_top)
-                        )
+                        Icons.KeyboardArrowUp(stringResource(R.string.scroll_to_top))
                     }
                 }
                 NewActivityFAB(onClick = { onNewActivity() })

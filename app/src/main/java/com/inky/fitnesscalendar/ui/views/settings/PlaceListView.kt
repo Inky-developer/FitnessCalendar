@@ -16,17 +16,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -58,6 +53,7 @@ import com.inky.fitnesscalendar.ui.components.BottomSheetButton
 import com.inky.fitnesscalendar.ui.components.ImageViewer
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.components.getAppBarContainerColor
+import com.inky.fitnesscalendar.ui.util.Icons
 import com.inky.fitnesscalendar.ui.util.localDatabaseValues
 import com.inky.fitnesscalendar.view_model.PlaceListViewModel
 
@@ -76,12 +72,12 @@ fun PlaceListView(
                 colors = defaultTopAppBarColors(),
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.back))
+                        Icons.ArrowBack(stringResource(R.string.back))
                     }
                 },
                 actions = {
                     IconButton(onClick = { onEditPlace(null) }) {
-                        Icon(Icons.Outlined.Add, stringResource(R.string.new_place))
+                        Icons.Add(stringResource(R.string.new_place))
                     }
                 },
                 scrollBehavior = scrollBehavior,
@@ -244,7 +240,7 @@ private fun PlaceCard(
                     showContextMenu = false
                     showDeleteDialog = true
                 },
-                leadingIcon = { Icon(Icons.Outlined.Delete, stringResource(R.string.delete)) },
+                leadingIcon = { Icons.Delete(stringResource(R.string.delete)) },
             ) {
                 Text(stringResource(R.string.delete_place))
             }
@@ -256,8 +252,7 @@ private fun PlaceCard(
     if (showDeleteDialog) {
         AlertDialog(
             icon = {
-                Icon(
-                    Icons.Outlined.Delete,
+                Icons.Delete(
                     stringResource(R.string.delete),
                     tint = MaterialTheme.colorScheme.error
                 )

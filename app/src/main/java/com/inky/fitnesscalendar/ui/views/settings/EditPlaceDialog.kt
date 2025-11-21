@@ -7,12 +7,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -42,6 +38,7 @@ import com.inky.fitnesscalendar.ui.components.OptionGroup
 import com.inky.fitnesscalendar.ui.components.SelectImageDropdownMenuItem
 import com.inky.fitnesscalendar.ui.components.optionGroupDefaultBackground
 import com.inky.fitnesscalendar.ui.components.rememberImagePickerLauncher
+import com.inky.fitnesscalendar.ui.util.Icons
 import com.inky.fitnesscalendar.view_model.PlaceListViewModel
 import kotlinx.coroutines.flow.flowOf
 
@@ -110,7 +107,7 @@ private fun EditPlaceDialog(initialPlace: Place?, onDismiss: () -> Unit, onSave:
         actions = {
             var showMenu by rememberSaveable { mutableStateOf(false) }
             IconButton(onClick = { showMenu = true }) {
-                Icon(Icons.Outlined.Menu, stringResource(R.string.Menu))
+                Icons.Menu(stringResource(R.string.Menu))
             }
 
             DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
@@ -148,7 +145,7 @@ private fun EditPlaceDialog(initialPlace: Place?, onDismiss: () -> Unit, onSave:
             TextField(
                 value = name,
                 onValueChange = { name = it },
-                leadingIcon = { Icon(Icons.Outlined.Edit, stringResource(R.string.type_name)) },
+                leadingIcon = { Icons.Edit(stringResource(R.string.type_name)) },
                 placeholder = { Text(stringResource(R.string.name_of_place)) },
                 singleLine = true,
                 keyboardOptions = remember { KeyboardOptions(capitalization = KeyboardCapitalization.Words) },

@@ -17,12 +17,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowForward
-import androidx.compose.material.icons.outlined.DateRange
-import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material.icons.outlined.PlayArrow
-import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -64,6 +58,7 @@ import com.inky.fitnesscalendar.db.entities.Place
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.util.ContextFormat
+import com.inky.fitnesscalendar.ui.util.Icons
 import com.inky.fitnesscalendar.ui.util.skipToLookaheadSize
 import com.inky.fitnesscalendar.util.gpx.simplify
 
@@ -283,10 +278,7 @@ fun ActivityCardContent(activity: Activity, place: Place?, showDescription: Bool
             )
         }
         IconStatistic(activity.distance) {
-            Icon(
-                Icons.AutoMirrored.Outlined.ArrowForward,
-                stringResource(R.string.distance)
-            )
+            Icons.ArrowForward(stringResource(R.string.distance))
         }
         IconStatistic(activity.averageMovingSpeed) {
             Icon(
@@ -391,7 +383,7 @@ private fun ActivityCardContextMenu(
                 onDismiss()
                 callbacks.onShare(richActivity)
             },
-            leadingIcon = { Icon(Icons.Outlined.Share, stringResource(R.string.share)) }
+            leadingIcon = { Icons.Share(stringResource(R.string.share)) }
         ) {
             Text(stringResource(R.string.share))
         }
@@ -402,7 +394,7 @@ private fun ActivityCardContextMenu(
                     onDismiss()
                 },
                 leadingIcon = {
-                    Icon(Icons.Outlined.PlayArrow, stringResource(R.string.jump_to))
+                    Icons.PlayArrow(stringResource(R.string.jump_to))
                 },
             ) {
                 Text(stringResource(R.string.jump_to))
@@ -415,7 +407,7 @@ private fun ActivityCardContextMenu(
                     callbacks.onShowDay?.let { it(richActivity) }
                 },
                 leadingIcon = {
-                    Icon(Icons.Outlined.DateRange, stringResource(R.string.show_day))
+                    Icons.DateRange(stringResource(R.string.show_day))
                 },
             ) {
                 Text(stringResource(R.string.show_day))
@@ -440,7 +432,7 @@ private fun ActivityCardContextMenu(
 
         BottomSheetButton(
             onClick = { showDialog = true },
-            leadingIcon = { Icon(Icons.Outlined.Delete, stringResource(R.string.delete)) },
+            leadingIcon = { Icons.Delete(stringResource(R.string.delete)) },
         ) {
             Text(stringResource(R.string.delete_activity))
         }
@@ -451,8 +443,7 @@ private fun ActivityCardContextMenu(
     if (showDialog) {
         AlertDialog(
             icon = {
-                Icon(
-                    Icons.Outlined.Delete,
+                Icons.Delete(
                     stringResource(R.string.delete),
                     tint = MaterialTheme.colorScheme.error
                 )

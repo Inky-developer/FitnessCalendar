@@ -12,8 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -21,7 +19,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -51,6 +48,7 @@ import com.inky.fitnesscalendar.ui.components.BaseEditDialog
 import com.inky.fitnesscalendar.ui.components.CompactActivityCard
 import com.inky.fitnesscalendar.ui.components.OptionGroup
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
+import com.inky.fitnesscalendar.ui.util.Icons
 import com.inky.fitnesscalendar.ui.util.localDatabaseValues
 import com.inky.fitnesscalendar.util.result.isOk
 import com.inky.fitnesscalendar.view_model.ImportViewModel
@@ -115,7 +113,7 @@ fun ImportView(
                     },
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Outlined.Add, stringResource(R.string.confirm_import))
+                        Icons.Add(stringResource(R.string.confirm_import))
                         Text(
                             stringResource(R.string.confirm_import),
                             style = MaterialTheme.typography.titleMedium,
@@ -165,9 +163,10 @@ fun TrackView(
         return@remember result.ok() to result.err()
     }
 
-    Box(modifier = Modifier
-        .clickable { dialogOpen = true }
-        .testTag("import_list_item")) {
+    Box(
+        modifier = Modifier
+            .clickable { dialogOpen = true }
+            .testTag("import_list_item")) {
         if (richActivity != null) {
             CompactActivityCard(
                 richActivity = richActivity,

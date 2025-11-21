@@ -20,6 +20,7 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TooltipAnchorPosition
 import androidx.compose.material3.TooltipBox
 import androidx.compose.material3.TooltipDefaults
 import androidx.compose.material3.rememberTooltipState
@@ -154,7 +155,8 @@ fun <T> MosaicChart(
 @Composable
 private fun MosaicTile(color: Color, message: String) {
     val state = rememberTooltipState()
-    val positionProvider = TooltipDefaults.rememberPlainTooltipPositionProvider()
+    val positionProvider =
+        TooltipDefaults.rememberTooltipPositionProvider(TooltipAnchorPosition.Above)
     TooltipBox(
         state = state,
         positionProvider = positionProvider,

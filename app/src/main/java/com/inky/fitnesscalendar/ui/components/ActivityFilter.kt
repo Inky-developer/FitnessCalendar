@@ -6,10 +6,6 @@ import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Clear
-import androidx.compose.material.icons.outlined.DateRange
-import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.Icon
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.InputChipDefaults
@@ -27,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilterChip
+import com.inky.fitnesscalendar.ui.util.Icons
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.localDatabaseValues
 import com.inky.fitnesscalendar.ui.util.sharedElement
@@ -88,15 +85,9 @@ private fun FilterChipIcon(chip: ActivityFilterChip) {
             style = MaterialTheme.typography.titleLarge
         )
 
-        is ActivityFilterChip.DateFilterChip -> Icon(
-            Icons.Outlined.DateRange,
-            stringResource(R.string.date_range)
-        )
+        is ActivityFilterChip.DateFilterChip -> Icons.DateRange(stringResource(R.string.date_range))
 
-        is ActivityFilterChip.TextFilterChip -> Icon(
-            Icons.Outlined.Edit,
-            stringResource(R.string.text)
-        )
+        is ActivityFilterChip.TextFilterChip -> Icons.Edit(stringResource(R.string.text))
 
         is ActivityFilterChip.TypeFilterChip -> Text(
             chip.type.emoji,
@@ -130,7 +121,7 @@ private fun LazyItemScope.FilterChip(
         onClick = onClick,
         label = label,
         leadingIcon = leadingIcon,
-        trailingIcon = { Icon(Icons.Outlined.Clear, stringResource(R.string.clear)) },
+        trailingIcon = { Icons.Close(stringResource(R.string.clear)) },
         colors = InputChipDefaults.inputChipColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer),
         modifier = Modifier
             .padding(horizontal = 4.dp)

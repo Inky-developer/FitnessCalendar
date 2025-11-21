@@ -15,10 +15,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.Check
-import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -28,7 +24,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
 import androidx.compose.material3.HorizontalDivider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.MaterialTheme
@@ -77,6 +72,7 @@ import com.inky.fitnesscalendar.ui.components.ActivityImage
 import com.inky.fitnesscalendar.ui.components.TrackView
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.theme.FitnessCalendarTheme
+import com.inky.fitnesscalendar.ui.util.Icons
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.util.getOrCreateSharedMediaCache
@@ -136,10 +132,7 @@ private fun ActivityShareView(
                 colors = defaultTopAppBarColors(),
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                            contentDescription = stringResource(R.string.back),
-                        )
+                        Icons.ArrowBack(contentDescription = stringResource(R.string.back))
                     }
                 },
                 modifier = Modifier.sharedBounds(SharedContentKey.AppBar)
@@ -155,7 +148,7 @@ private fun ActivityShareView(
                 },
                 text = { Text(stringResource(R.string.share_activity_as_image)) },
                 icon = {
-                    Icon(Icons.Outlined.Share, stringResource(R.string.share))
+                    Icons.Share(stringResource(R.string.share))
                 }
             )
         },
@@ -256,7 +249,7 @@ private fun SettingsChip(selected: Boolean, onToggle: () -> Unit, label: String)
         label = { Text(label) },
         leadingIcon = {
             AnimatedVisibility(selected) {
-                Icon(Icons.Outlined.Check, label)
+                Icons.Check(label)
             }
         },
         modifier = Modifier.padding(all = 4.dp)

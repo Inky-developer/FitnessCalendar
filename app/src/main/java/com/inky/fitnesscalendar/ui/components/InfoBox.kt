@@ -5,9 +5,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -16,6 +13,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.R
+import com.inky.fitnesscalendar.ui.util.Icons
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.sharedElement
 
@@ -25,8 +23,7 @@ fun InfoBox(message: String, modifier: Modifier = Modifier) {
         horizontalArrangement = Arrangement.Center,
         modifier = modifier.padding(vertical = 8.dp)
     ) {
-        Icon(
-            Icons.Outlined.Info,
+        Icons.Info(
             stringResource(R.string.info),
             tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier

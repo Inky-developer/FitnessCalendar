@@ -9,14 +9,10 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FilterChip
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -37,6 +33,7 @@ import com.inky.fitnesscalendar.db.entities.Place
 import com.inky.fitnesscalendar.db.entities.Recording
 import com.inky.fitnesscalendar.db.entities.RichRecording
 import com.inky.fitnesscalendar.di.DecisionTrees
+import com.inky.fitnesscalendar.ui.util.Icons
 import com.inky.fitnesscalendar.ui.util.localDatabaseValues
 import com.inky.fitnesscalendar.util.Option
 import com.inky.fitnesscalendar.util.some
@@ -194,7 +191,7 @@ private fun PlaceSelector(
         if (currentPlace != null) {
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.no_place)) },
-                leadingIcon = { Icon(Icons.Outlined.Clear, stringResource(R.string.no_place)) },
+                leadingIcon = { Icons.Close(stringResource(R.string.no_place)) },
                 onClick = {
                     showDialog = false
                     onPlace(null)
@@ -203,7 +200,7 @@ private fun PlaceSelector(
         } else if (onNavigateNewPlace != null) {
             DropdownMenuItem(
                 text = { Text(stringResource(R.string.new_place)) },
-                leadingIcon = { Icon(Icons.Outlined.Add, stringResource(R.string.new_place)) },
+                leadingIcon = { Icons.Add(stringResource(R.string.new_place)) },
                 onClick = onNavigateNewPlace,
             )
         }

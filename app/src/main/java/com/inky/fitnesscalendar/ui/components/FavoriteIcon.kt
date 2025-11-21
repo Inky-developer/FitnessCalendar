@@ -1,27 +1,22 @@
 package com.inky.fitnesscalendar.ui.components
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.outlined.FavoriteBorder
-import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import com.inky.fitnesscalendar.R
+import com.inky.fitnesscalendar.ui.util.Icons
 
 @Composable
 fun FavoriteIcon(isFavorite: Boolean, modifier: Modifier = Modifier) {
     if (isFavorite) {
-        Icon(
-            Icons.Filled.Favorite,
+        Icons.FavoriteFilled(
             stringResource(R.string.favorite),
             tint = colorResource(R.color.favorite),
             modifier = modifier
         )
     } else {
-        Icon(
-            Icons.Outlined.FavoriteBorder,
+        Icons.FavoriteOutlined(
             stringResource(R.string.favorite),
             modifier = modifier
         )

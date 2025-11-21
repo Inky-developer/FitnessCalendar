@@ -14,10 +14,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.Share
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -51,6 +47,7 @@ import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.TrackView
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
+import com.inky.fitnesscalendar.ui.util.Icons
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.util.toLocalDate
@@ -123,18 +120,15 @@ fun TrackDetailsView(
                 colors = defaultTopAppBarColors(),
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Outlined.ArrowBack,
-                            contentDescription = stringResource(R.string.back),
-                        )
+                        Icons.ArrowBack(stringResource(R.string.back))
                     }
                 },
                 actions = {
                     IconButton(onClick = onShare) {
-                        Icon(Icons.Outlined.Share, stringResource(R.string.share))
+                        Icons.Share(stringResource(R.string.share))
                     }
                     IconButton(onClick = onEdit) {
-                        Icon(Icons.Outlined.Edit, stringResource(R.string.Edit))
+                        Icons.Edit(stringResource(R.string.Edit))
                     }
                 },
                 scrollBehavior = scrollBehavior,

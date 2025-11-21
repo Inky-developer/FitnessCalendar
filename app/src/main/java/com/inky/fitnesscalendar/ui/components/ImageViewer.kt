@@ -13,11 +13,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Close
-import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material.icons.outlined.Share
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
@@ -42,6 +37,7 @@ import androidx.core.net.toFile
 import coil.compose.AsyncImage
 import com.inky.fitnesscalendar.BuildConfig
 import com.inky.fitnesscalendar.R
+import com.inky.fitnesscalendar.ui.util.Icons
 import com.inky.fitnesscalendar.util.copyFileToStorage
 import com.inky.fitnesscalendar.util.getOrCreateSharedMediaCache
 import kotlin.math.max
@@ -82,16 +78,16 @@ fun ImageViewer(
             ) {
                 if (onDelete != null) {
                     IconButton(onClick = onDelete) {
-                        Icon(Icons.Outlined.Delete, stringResource(R.string.delete))
+                        Icons.Delete(stringResource(R.string.delete))
                     }
                 }
 
                 IconButton(onClick = { context.shareImage(imageUri) }) {
-                    Icon(Icons.Outlined.Share, stringResource(R.string.share))
+                    Icons.Share(stringResource(R.string.share))
                 }
 
                 IconButton(onClick = onDismiss) {
-                    Icon(Icons.Outlined.Close, stringResource(R.string.close))
+                    Icons.Close(stringResource(R.string.close))
                 }
             }
 

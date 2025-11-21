@@ -2,9 +2,6 @@ package com.inky.fitnesscalendar.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Place
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -15,6 +12,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.db.entities.Place
+import com.inky.fitnesscalendar.ui.util.Icons
 
 @Composable
 fun PlaceInfo(place: Place, modifier: Modifier = Modifier) {
@@ -35,9 +33,5 @@ fun PlaceInfo(place: Place, modifier: Modifier = Modifier) {
 
 @Composable
 fun PlaceIcon(place: Place) {
-    Icon(
-        Icons.Outlined.Place,
-        stringResource(R.string.place),
-        tint = colorResource(place.color.colorId)
-    )
+    Icons.Location(stringResource(R.string.place), tint = colorResource(place.color.colorId))
 }

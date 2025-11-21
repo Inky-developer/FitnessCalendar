@@ -16,11 +16,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.Info
-import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -77,6 +72,7 @@ import com.inky.fitnesscalendar.ui.components.ImageViewer
 import com.inky.fitnesscalendar.ui.components.NewActivityFAB
 import com.inky.fitnesscalendar.ui.components.Timer
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
+import com.inky.fitnesscalendar.ui.util.Icons
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.horizontalOrderedTransitionSpec
 import com.inky.fitnesscalendar.ui.util.sharedBounds
@@ -130,10 +126,7 @@ fun Home(
                 colors = defaultTopAppBarColors(),
                 navigationIcon = {
                     IconButton(onClick = onOpenDrawer) {
-                        Icon(
-                            imageVector = Icons.Outlined.Menu,
-                            contentDescription = stringResource(R.string.Menu),
-                        )
+                        Icons.Menu(contentDescription = stringResource(R.string.Menu))
                     }
                 },
                 actions = {
@@ -144,7 +137,7 @@ fun Home(
                             contentColor = contentColorFor(MaterialTheme.colorScheme.primary)
                         )
                     ) {
-                        Icon(Icons.Filled.PlayArrow, stringResource(R.string.action_record))
+                        Icons.PlayArrowFilled(stringResource(R.string.action_record))
                     }
                 },
                 scrollBehavior = scrollBehavior,
@@ -336,7 +329,7 @@ fun Statistics(name: String, stats: ActivityStatistics, onClick: () -> Unit) {
             }
         } else {
             Row(modifier = Modifier.padding(all = 8.dp)) {
-                Icon(Icons.Outlined.Info, stringResource(R.string.info))
+                Icons.Info(stringResource(R.string.info))
                 Text(
                     stringResource(R.string.no_activities_in_this_period),
                     modifier = Modifier.padding(start = 4.dp)
@@ -391,7 +384,7 @@ fun Today(
                 onClick = { onEditDay(day.day) },
                 modifier = Modifier.padding(horizontal = 4.dp)
             ) {
-                Icon(Icons.Outlined.Edit, stringResource(R.string.edit_day))
+                Icons.Edit(stringResource(R.string.edit_day))
             }
         }
 
@@ -444,8 +437,7 @@ fun Today(
                             .fillMaxWidth()
                             .padding(all = 8.dp)
                     ) {
-                        Icon(
-                            Icons.Outlined.Info,
+                        Icons.Info(
                             stringResource(R.string.info),
                             modifier = Modifier.padding(end = 8.dp),
                             tint = MaterialTheme.colorScheme.secondary

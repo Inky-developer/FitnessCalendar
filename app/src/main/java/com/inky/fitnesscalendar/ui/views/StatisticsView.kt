@@ -19,9 +19,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Check
-import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -63,6 +60,7 @@ import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.CompactActivityCard
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
+import com.inky.fitnesscalendar.ui.util.Icons
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.defaultAreaFill
 import com.inky.fitnesscalendar.ui.util.localDatabaseValues
@@ -166,10 +164,7 @@ fun StatisticsView(
                 colors = defaultTopAppBarColors(),
                 navigationIcon = {
                     IconButton(onClick = onOpenDrawer) {
-                        Icon(
-                            imageVector = Icons.Outlined.Menu,
-                            contentDescription = stringResource(R.string.Menu),
-                        )
+                        Icons.Menu(contentDescription = stringResource(R.string.Menu))
                     }
                 },
                 actions = {
@@ -352,7 +347,7 @@ private fun DateFilterChip(selected: Boolean, onSelect: () -> Unit, label: @Comp
         label = label,
         leadingIcon = {
             AnimatedVisibility(visible = selected) {
-                Icon(Icons.Outlined.Check, stringResource(R.string.time_period))
+                Icons.Check(stringResource(R.string.time_period))
             }
         },
         modifier = Modifier

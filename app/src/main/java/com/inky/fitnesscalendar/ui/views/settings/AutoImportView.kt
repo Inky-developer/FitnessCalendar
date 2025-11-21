@@ -11,13 +11,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledTonalButton
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -39,6 +35,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.preferences.Preference.Companion.PREF_WATCHED_FOLDERS
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
+import com.inky.fitnesscalendar.ui.util.Icons
 import com.inky.fitnesscalendar.view_model.settings.AutoImportViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -52,7 +49,7 @@ fun AutoImportView(viewModel: AutoImportViewModel = hiltViewModel(), onBack: () 
                 colors = defaultTopAppBarColors(),
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.back))
+                        Icons.ArrowBack(stringResource(R.string.back))
                     }
                 },
                 scrollBehavior = scrollBehavior,
@@ -118,8 +115,7 @@ fun AutoImportList(onNewDir: (Uri) -> Unit, onRemoveDir: (Uri) -> Unit) {
                                 modifier = Modifier.weight(1f)
                             )
                             IconButton(onClick = { onRemoveDir(folder) }) {
-                                Icon(
-                                    Icons.Outlined.Delete,
+                                Icons.Delete(
                                     stringResource(R.string.delete),
                                     tint = MaterialTheme.colorScheme.error
                                 )

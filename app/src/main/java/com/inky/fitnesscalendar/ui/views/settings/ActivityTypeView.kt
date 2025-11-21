@@ -13,18 +13,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.Add
-import androidx.compose.material.icons.outlined.Delete
-import androidx.compose.material.icons.outlined.Edit
-import androidx.compose.material.icons.outlined.Face
-import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
@@ -58,6 +50,7 @@ import com.inky.fitnesscalendar.ui.components.EmojiPickerDialog
 import com.inky.fitnesscalendar.ui.components.OptionGroup
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.components.optionGroupDefaultBackground
+import com.inky.fitnesscalendar.ui.util.Icons
 import com.inky.fitnesscalendar.view_model.settings.ActivityTypeEditState
 import com.inky.fitnesscalendar.view_model.settings.ActivityTypeViewModel
 
@@ -78,7 +71,7 @@ fun ActivityTypeView(viewModel: ActivityTypeViewModel = hiltViewModel(), onBack:
                 colors = defaultTopAppBarColors(),
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.back))
+                        Icons.ArrowBack(stringResource(R.string.back))
                     }
                 },
                 actions = {
@@ -88,7 +81,7 @@ fun ActivityTypeView(viewModel: ActivityTypeViewModel = hiltViewModel(), onBack:
                             showEditDialog = true
                         }
                     ) {
-                        Icon(Icons.Outlined.Add, stringResource(R.string.add_activity_type))
+                        Icons.Add(stringResource(R.string.add_activity_type))
                     }
                 }
             )
@@ -183,7 +176,7 @@ fun EditTypeDialog(
                 ) {
                     AnimatedContent(targetState = state.emoji, label = "emoji") { emoji ->
                         if (emoji.isBlank()) {
-                            Icon(Icons.Outlined.Face, stringResource(R.string.emoji))
+                            Icons.Face(stringResource(R.string.emoji))
                         } else {
                             Text(state.emoji, style = MaterialTheme.typography.displaySmall)
                         }
@@ -193,7 +186,7 @@ fun EditTypeDialog(
                 TextField(
                     value = state.name,
                     onValueChange = { state = state.copy(name = it) },
-                    leadingIcon = { Icon(Icons.Outlined.Edit, stringResource(R.string.type_name)) },
+                    leadingIcon = { Icons.Edit(stringResource(R.string.type_name)) },
                     placeholder = { Text(stringResource(R.string.name_of_type)) },
                     singleLine = true,
                     keyboardOptions = remember { KeyboardOptions(capitalization = KeyboardCapitalization.Words) },
@@ -283,13 +276,13 @@ fun EditTypeDialogMenu(onDeleteType: () -> Unit) {
     var showMenu by remember { mutableStateOf(false) }
 
     IconButton(onClick = { showMenu = true }) {
-        Icon(Icons.Outlined.Menu, stringResource(R.string.Menu))
+        Icons.Menu(stringResource(R.string.Menu))
     }
 
     DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
         DropdownMenuItem(
             text = { Text(stringResource(R.string.delete_activity_type)) },
-            leadingIcon = { Icon(Icons.Outlined.Delete, stringResource(R.string.delete)) },
+            leadingIcon = { Icons.Delete(stringResource(R.string.delete)) },
             onClick = onDeleteType
         )
     }

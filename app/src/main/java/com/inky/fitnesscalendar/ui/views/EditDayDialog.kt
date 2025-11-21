@@ -5,11 +5,8 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -36,6 +33,7 @@ import com.inky.fitnesscalendar.ui.components.ImageViewer
 import com.inky.fitnesscalendar.ui.components.OptionGroup
 import com.inky.fitnesscalendar.ui.components.SelectImageDropdownMenuItem
 import com.inky.fitnesscalendar.ui.components.rememberImagePickerLauncher
+import com.inky.fitnesscalendar.ui.util.Icons
 import com.inky.fitnesscalendar.view_model.BaseViewModel
 import kotlinx.parcelize.Parcelize
 
@@ -79,7 +77,7 @@ fun EditDayDialog(
         actions = {
             var showMenu by rememberSaveable { mutableStateOf(false) }
             IconButton(onClick = { showMenu = true }) {
-                Icon(Icons.Outlined.Menu, stringResource(R.string.Menu))
+                Icons.Menu(stringResource(R.string.Menu))
             }
 
             DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {

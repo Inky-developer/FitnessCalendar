@@ -19,10 +19,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.Done
-import androidx.compose.material.icons.outlined.Menu
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
@@ -30,7 +26,6 @@ import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FabPosition
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.IconToggleButton
 import androidx.compose.material3.MaterialTheme
@@ -85,6 +80,7 @@ import com.inky.fitnesscalendar.ui.components.SelectImageDropdownMenuItem
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.components.optionGroupDefaultBackground
 import com.inky.fitnesscalendar.ui.components.rememberImagePickerLauncher
+import com.inky.fitnesscalendar.ui.util.Icons
 import com.inky.fitnesscalendar.util.someOrNone
 import com.inky.fitnesscalendar.util.toDate
 import com.inky.fitnesscalendar.util.toLocalDateTime
@@ -244,7 +240,7 @@ fun NewActivity(
                 scrollBehavior = scrollBehavior,
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Outlined.ArrowBack, stringResource(R.string.back))
+                        Icons.ArrowBack(stringResource(R.string.back))
                     }
                 },
                 actions = {
@@ -257,7 +253,7 @@ fun NewActivity(
                         }
                     }
                     IconButton(onClick = { contextMenuOpen = true }) {
-                        Icon(Icons.Outlined.Menu, stringResource(R.string.open_context_menu))
+                        Icons.Menu(stringResource(R.string.open_context_menu))
                     }
                     DropdownMenu(
                         expanded = contextMenuOpen,
@@ -282,7 +278,7 @@ fun NewActivity(
                     modifier = Modifier.testTag("button-confirm")
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Outlined.Done, stringResource(R.string.save))
+                        Icons.Check(stringResource(R.string.save))
                         Text(
                             stringResource(R.string.save),
                             style = MaterialTheme.typography.titleMedium,

@@ -11,13 +11,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.outlined.ArrowBack
-import androidx.compose.material.icons.outlined.Clear
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.FilterChipDefaults
-import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -50,6 +46,7 @@ import com.inky.fitnesscalendar.ui.components.ActivityTypeSelector
 import com.inky.fitnesscalendar.ui.components.FavoriteIcon
 import com.inky.fitnesscalendar.ui.components.OptionGroup
 import com.inky.fitnesscalendar.ui.components.PlaceIcon
+import com.inky.fitnesscalendar.ui.util.Icons
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.localDatabaseValues
 import com.inky.fitnesscalendar.ui.util.sharedBounds
@@ -98,17 +95,14 @@ fun FilterView(
             },
             navigationIcon = {
                 IconButton(onClick = { onBack() }) {
-                    Icon(
-                        Icons.AutoMirrored.Outlined.ArrowBack,
-                        stringResource(R.string.back),
-                    )
+                    Icons.ArrowBack(stringResource(R.string.back))
                 }
             },
             actions = {
                 IconButton(
                     onClick = { filter = ActivityFilter() }, enabled = !filter.isEmpty()
                 ) {
-                    Icon(Icons.Outlined.Clear, stringResource(R.string.reset_filters))
+                    Icons.Close(stringResource(R.string.reset_filters))
                 }
             },
             modifier = Modifier.sharedBounds(SharedContentKey.AppBar)
