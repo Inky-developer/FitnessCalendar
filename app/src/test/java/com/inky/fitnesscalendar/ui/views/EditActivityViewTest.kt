@@ -63,6 +63,7 @@ class EditActivityViewTest {
                 color = ContentColor.Color1
             ),
             place = null,
+            images = emptyList()
         )
         composeTestRule.setContent {
             MockDatabaseValues {
@@ -114,6 +115,7 @@ class EditActivityViewTest {
                 color = ContentColor.Color1
             ),
             place = null,
+            images = emptyList()
         )
         composeTestRule.setContent {
             MockDatabaseValues {
