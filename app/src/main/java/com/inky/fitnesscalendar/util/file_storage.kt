@@ -2,11 +2,13 @@ package com.inky.fitnesscalendar.util
 
 import android.content.ContentResolver
 import android.content.Context
+import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
 import androidx.core.net.toUri
 import java.io.File
 import java.io.FileNotFoundException
+import java.io.FileOutputStream
 import java.time.temporal.ChronoUnit
 import java.util.UUID
 
@@ -20,6 +22,21 @@ fun Context.copyFileToStorage(input: Uri, targetDir: File): InternalFile? {
     val result = copyFile(contentResolver, input, file.toUri())
     return if (result != null) {
         InternalFile(name = filename, uri = result)
+    } else {
+        null
+    }
+}
+
+fun Context.writeBitmapToStorage(bitmap: Bitmap): InternalFile? {
+    val filename = UUID.randomUUID().toString()
+    val file = File(cacheDir, filename)
+
+    val success = FileOutputStream(file).use {
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
+    }
+
+    return if (success) {
+        InternalFile(name = filename, uri = file.toUri())
     } else {
         null
     }

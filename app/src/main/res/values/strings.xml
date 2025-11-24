@@ -337,4 +337,6 @@
     <string name="no_overlay">No overlay</string>
     <string name="setting_default_statistic">Default statistic</string>
     <string name="add_images">Add images</string>
+    <string name="select_frame_of_video">Select video frame</string>
+    <string name="next_video">Next video</string>
 </resources>

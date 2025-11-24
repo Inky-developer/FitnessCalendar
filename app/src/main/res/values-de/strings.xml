@@ -336,4 +336,6 @@
     <string name="no_overlay">Keine Überlagerung</string>
     <string name="setting_default_statistic">Initiale Statistik</string>
     <string name="add_images">Bilder hinzufügen</string>
+    <string name="select_frame_of_video">Videobild auswählen</string>
+    <string name="next_video">Nächstes Video</string>
 </resources>

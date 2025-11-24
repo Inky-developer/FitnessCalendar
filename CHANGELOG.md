@@ -1,6 +1,7 @@
 # Unreleased
 
 - Allow adding multiple images to an activity
+- Allow selecting a single video frame as image for an activity
 
 # 2025.11.1
 
