@@ -22,6 +22,6 @@ import kotlinx.parcelize.Parcelize
     indices = [Index("activity_id")]
 )
 data class ActivityImage(
-    @ColumnInfo(name = "activity_id") val activityId: Int?,
+    @ColumnInfo(name = "activity_id") val activityId: Int,
     @PrimaryKey @ColumnInfo(name = "image_name") val imageName: ImageName
 ) : Parcelable

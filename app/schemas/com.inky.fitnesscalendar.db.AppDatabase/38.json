@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 38,
-    "identityHash": "8c52dc13699de39291d0c7b7a40010f8",
+    "identityHash": "a5a53460c102c4cd12f2417c4fb0234d",
     "entities": [
       {
         "tableName": "Activity",
@@ -251,12 +251,13 @@
       },
       {
         "tableName": "ActivityImage",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`activity_id` INTEGER, `image_name` TEXT NOT NULL, PRIMARY KEY(`image_name`), FOREIGN KEY(`activity_id`) REFERENCES `Activity`(`uid`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`activity_id` INTEGER NOT NULL, `image_name` TEXT NOT NULL, PRIMARY KEY(`image_name`), FOREIGN KEY(`activity_id`) REFERENCES `Activity`(`uid`) ON UPDATE NO ACTION ON DELETE CASCADE )",
         "fields": [
           {
             "fieldPath": "activityId",
             "columnName": "activity_id",
-            "affinity": "INTEGER"
+            "affinity": "INTEGER",
+            "notNull": true
           },
           {
             "fieldPath": "imageName",
@@ -697,7 +698,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8c52dc13699de39291d0c7b7a40010f8')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a5a53460c102c4cd12f2417c4fb0234d')"
     ]
   }
 }
