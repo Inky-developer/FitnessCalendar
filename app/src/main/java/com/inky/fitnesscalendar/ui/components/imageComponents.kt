@@ -30,6 +30,7 @@ import coil.compose.AsyncImagePainter
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ImageName
 import com.inky.fitnesscalendar.util.NonEmptyList
+import com.inky.fitnesscalendar.util.asNonEmptyOrNull
 import com.inky.fitnesscalendar.util.copyFileToStorage
 import com.inky.fitnesscalendar.util.getOrCreateImagesDir
 
@@ -84,7 +85,7 @@ fun ActivityImage(
  */
 @Composable
 fun SelectImageDropdownMenuItem(
-    imagePickerLauncher: ManagedActivityResultLauncher<PickVisualMediaRequest, Uri?>,
+    imagePickerLauncher: ManagedActivityResultLauncher<PickVisualMediaRequest, *>,
     onDismissMenu: () -> Unit,
 ) {
     DropdownMenuItem(
@@ -105,13 +106,22 @@ fun SelectImageDropdownMenuItem(
 }
 
 @Composable
+fun rememberMultipleImagePickerLauncher(
+    onImages: (NonEmptyList<ImageName>) -> Unit,
+    context: Context = LocalContext.current
+) = rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia()) { uris ->
+    val imageDir = context.getOrCreateImagesDir()
+    val imageNames =
+        uris.mapNotNull { context.copyFileToStorage(it, imageDir)?.name?.let { ImageName(it) } }
+    imageNames.asNonEmptyOrNull()?.let { onImages(it) }
+}
+
+@Composable
 fun rememberImagePickerLauncher(
     onName: (ImageName) -> Unit,
     context: Context = LocalContext.current
 ) =
-    rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickVisualMedia()
-    ) { uri ->
+    rememberLauncherForActivityResult(ActivityResultContracts.PickVisualMedia()) { uri ->
         if (uri != null) {
             val name = context.copyFileToStorage(uri, context.getOrCreateImagesDir())?.name
             if (name != null) {
