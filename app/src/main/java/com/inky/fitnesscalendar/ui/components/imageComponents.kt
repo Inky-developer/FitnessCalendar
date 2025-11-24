@@ -2,7 +2,6 @@ package com.inky.fitnesscalendar.ui.components
 
 import android.content.Context
 import android.net.Uri
-import androidx.activity.compose.ManagedActivityResultLauncher
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
@@ -18,6 +17,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateListOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
@@ -78,18 +80,49 @@ fun ActivityImage(
     )
 }
 
+enum class ImageLimit {
+    Single,
+    Multiple
+}
+
 /**
  * A menu button that displays an image picker.
- * @param imagePickerLauncher: The launcher to run when the item is clicked. This launcher should be initialized unconditionally with [rememberImagePickerLauncher]
+ * @param imageLimit: Whether multiple images or just one image can be picked
+ * @param onImages: Callback for when images have been picked
  * @param onDismissMenu: Callback for when the menu should get dismissed
  */
 @Composable
 fun SelectImageDropdownMenuItem(
-    imagePickerLauncher: ManagedActivityResultLauncher<PickVisualMediaRequest, *>,
+    imageLimit: ImageLimit,
+    onImages: (NonEmptyList<ImageName>) -> Unit,
     onDismissMenu: () -> Unit,
 ) {
+    val selectedImages = rememberSaveable { mutableStateListOf<ImageName>() }
+
+    LaunchedEffect(selectedImages.size) {
+        selectedImages.asNonEmptyOrNull()?.let {
+            onImages(it)
+            onDismissMenu()
+        }
+    }
+
+    val launcher = when (imageLimit) {
+        ImageLimit.Single -> rememberImagePickerLauncher(onName = {
+            selectedImages.add(it)
+        })
+
+        ImageLimit.Multiple -> rememberMultipleImagePickerLauncher(onImages = {
+            selectedImages.addAll(it)
+        })
+    }
+
+    val itemLabel = when (imageLimit) {
+        ImageLimit.Single -> R.string.add_image
+        ImageLimit.Multiple -> R.string.add_images
+    }
+
     DropdownMenuItem(
-        text = { Text(stringResource(R.string.add_image)) },
+        text = { Text(stringResource(itemLabel)) },
         leadingIcon = {
             Icon(
                 painterResource(R.drawable.outline_add_image_24),
@@ -97,16 +130,15 @@ fun SelectImageDropdownMenuItem(
             )
         },
         onClick = {
-            imagePickerLauncher.launch(
+            launcher.launch(
                 PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
             )
-            onDismissMenu()
         }
     )
 }
 
 @Composable
-fun rememberMultipleImagePickerLauncher(
+private fun rememberMultipleImagePickerLauncher(
     onImages: (NonEmptyList<ImageName>) -> Unit,
     context: Context = LocalContext.current
 ) = rememberLauncherForActivityResult(ActivityResultContracts.PickMultipleVisualMedia()) { uris ->
@@ -117,7 +149,7 @@ fun rememberMultipleImagePickerLauncher(
 }
 
 @Composable
-fun rememberImagePickerLauncher(
+private fun rememberImagePickerLauncher(
     onName: (ImageName) -> Unit,
     context: Context = LocalContext.current
 ) =

@@ -29,10 +29,10 @@ import com.inky.fitnesscalendar.ui.components.ActivityImage
 import com.inky.fitnesscalendar.ui.components.BaseEditDialog
 import com.inky.fitnesscalendar.ui.components.DescriptionTextInput
 import com.inky.fitnesscalendar.ui.components.FeelSelector
+import com.inky.fitnesscalendar.ui.components.ImageLimit
 import com.inky.fitnesscalendar.ui.components.ImageViewer
 import com.inky.fitnesscalendar.ui.components.OptionGroup
 import com.inky.fitnesscalendar.ui.components.SelectImageDropdownMenuItem
-import com.inky.fitnesscalendar.ui.components.rememberImagePickerLauncher
 import com.inky.fitnesscalendar.ui.util.Icons
 import com.inky.fitnesscalendar.view_model.BaseViewModel
 import kotlinx.parcelize.Parcelize
@@ -64,9 +64,6 @@ fun EditDayDialog(
     var editState by rememberSaveable(day) { mutableStateOf(EditDayState(day)) }
     var showImageViewer by rememberSaveable { mutableStateOf(false) }
 
-    val imagePickerLauncher =
-        rememberImagePickerLauncher(onName = { editState = editState.copy(imageName = it) })
-
     BaseEditDialog(
         title = stringResource(R.string.edit_day),
         onNavigateBack = onNavigateBack,
@@ -82,7 +79,8 @@ fun EditDayDialog(
 
             DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
                 SelectImageDropdownMenuItem(
-                    imagePickerLauncher = imagePickerLauncher,
+                    imageLimit = ImageLimit.Single,
+                    onImages = { images -> editState = editState.copy(imageName = images.first()) },
                     onDismissMenu = { showMenu = false },
                 )
             }

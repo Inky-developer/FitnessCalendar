@@ -73,13 +73,13 @@ import com.inky.fitnesscalendar.ui.components.DateTimePicker
 import com.inky.fitnesscalendar.ui.components.DescriptionTextInput
 import com.inky.fitnesscalendar.ui.components.FavoriteIcon
 import com.inky.fitnesscalendar.ui.components.FeelSelector
+import com.inky.fitnesscalendar.ui.components.ImageLimit
 import com.inky.fitnesscalendar.ui.components.ImageViewer
 import com.inky.fitnesscalendar.ui.components.OkayCancelDialog
 import com.inky.fitnesscalendar.ui.components.OptionGroup
 import com.inky.fitnesscalendar.ui.components.SelectImageDropdownMenuItem
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.components.optionGroupDefaultBackground
-import com.inky.fitnesscalendar.ui.components.rememberMultipleImagePickerLauncher
 import com.inky.fitnesscalendar.ui.util.Icons
 import com.inky.fitnesscalendar.util.asNonEmptyOrNull
 import com.inky.fitnesscalendar.util.someOrNone
@@ -201,11 +201,6 @@ fun NewActivity(
             (!isKeyboardVisible || isTest) && (editState.activityId == null || editState != initialState) && editState.isValid
         }
     }
-    val imagePickerLauncher = rememberMultipleImagePickerLauncher(onImages = { images ->
-        onState(editState.copy(images = editState.images + images.map {
-            ActivityEditState.ImageState(it)
-        }))
-    })
 
     BackHandler(enabled = editState != initialState) {
         showBackDialog = true
@@ -263,7 +258,12 @@ fun NewActivity(
                         onDismissRequest = { contextMenuOpen = false }
                     ) {
                         SelectImageDropdownMenuItem(
-                            imagePickerLauncher = imagePickerLauncher,
+                            imageLimit = ImageLimit.Multiple,
+                            onImages = { images ->
+                                onState(editState.copy(images = editState.images + images.map {
+                                    ActivityEditState.ImageState(it)
+                                }))
+                            },
                             onDismissMenu = { contextMenuOpen = false },
                         )
                     }

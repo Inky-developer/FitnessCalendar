@@ -33,11 +33,11 @@ import com.inky.fitnesscalendar.ui.components.ActivityImage
 import com.inky.fitnesscalendar.ui.components.BaseEditDialog
 import com.inky.fitnesscalendar.ui.components.ColorSelector
 import com.inky.fitnesscalendar.ui.components.DescriptionTextInput
+import com.inky.fitnesscalendar.ui.components.ImageLimit
 import com.inky.fitnesscalendar.ui.components.ImageViewer
 import com.inky.fitnesscalendar.ui.components.OptionGroup
 import com.inky.fitnesscalendar.ui.components.SelectImageDropdownMenuItem
 import com.inky.fitnesscalendar.ui.components.optionGroupDefaultBackground
-import com.inky.fitnesscalendar.ui.components.rememberImagePickerLauncher
 import com.inky.fitnesscalendar.ui.util.Icons
 import com.inky.fitnesscalendar.view_model.PlaceListViewModel
 import kotlinx.coroutines.flow.flowOf
@@ -74,8 +74,6 @@ private fun EditPlaceDialog(initialPlace: Place?, onDismiss: () -> Unit, onSave:
 
     var imageName by rememberSaveable(initialPlace) { mutableStateOf(initialPlace?.imageName) }
     var showImageViewer by rememberSaveable { mutableStateOf(false) }
-    val imagePickerLauncher =
-        rememberImagePickerLauncher(onName = { imageName = it })
 
     var name by rememberSaveable(initialPlace) { mutableStateOf(initialPlace?.name ?: "") }
     var color by rememberSaveable(initialPlace) { mutableStateOf(initialPlace?.color) }
@@ -112,7 +110,8 @@ private fun EditPlaceDialog(initialPlace: Place?, onDismiss: () -> Unit, onSave:
 
             DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {
                 SelectImageDropdownMenuItem(
-                    imagePickerLauncher = imagePickerLauncher,
+                    imageLimit = ImageLimit.Single,
+                    onImages = { imageName = it.first() },
                     onDismissMenu = { showMenu = false },
                 )
             }
