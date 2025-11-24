@@ -31,7 +31,7 @@ android {
         }
 
         applicationId = "com.inky.fitnesscalendar"
-        minSdk = 27
+        minSdk = 28
         targetSdk = 36
         versionCode = properties.getProperty("versionCode").toInt()
         versionName = properties.getProperty("versionName").toString()
