@@ -2,6 +2,7 @@ package com.inky.fitnesscalendar.db.entities
 
 import androidx.room.Embedded
 import androidx.room.Relation
+import com.inky.fitnesscalendar.data.ImageName
 
 data class RichActivity(
     @Embedded val activity: Activity,
@@ -9,6 +10,13 @@ data class RichActivity(
     val type: ActivityType,
     @Relation(parentColumn = "place_id", entityColumn = "uid")
     val place: Place?,
+    @Relation(
+        parentColumn = "uid",
+        entityColumn = "activity_id",
+        entity = ActivityImage::class,
+        projection = ["image_name"]
+    )
+    val images: List<ImageName>
 ) {
     init {
         assert(activity.typeId == type.uid) { "Inconsistent RichActivity: type is $type, but id is ${activity.typeId}" }

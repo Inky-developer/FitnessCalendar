@@ -263,3 +263,14 @@ val MIGRATION_27_28 = object : Migration(27, 28) {
 @DeleteColumn(tableName = "Activity", columnName = "wifi_bssid")
 @DeleteColumn(tableName = "Recording", columnName = "wifi_bssid")
 class Migration35To36Spec : AutoMigrationSpec
+
+val MIGRATION_36_37 = object : Migration(36, 37) {
+    override fun migrate(db: SupportSQLiteDatabase) {
+        db.execSQL("CREATE TABLE ActivityImage (activity_id INTEGER NOT NULL, image_name TEXT NOT NULL PRIMARY KEY, FOREIGN KEY (activity_id) REFERENCES Activity (uid) ON DELETE CASCADE)")
+        db.execSQL("CREATE INDEX index_ActivityImage_activity_id ON ActivityImage (activity_id)")
+        db.execSQL("INSERT INTO ActivityImage (activity_id, image_name) SELECT uid, image_name FROM Activity WHERE image_name IS NOT NULL")
+    }
+}
+
+@DeleteColumn(tableName = "Activity", columnName = "image_name")
+class Migration37To38Spec : AutoMigrationSpec

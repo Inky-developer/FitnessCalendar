@@ -66,7 +66,7 @@ import com.inky.fitnesscalendar.data.measure.kilometers
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.localization.LocalizationRepository
-import com.inky.fitnesscalendar.ui.components.ActivityImage
+import com.inky.fitnesscalendar.ui.components.ActivityImages
 import com.inky.fitnesscalendar.ui.components.ActivitySelector
 import com.inky.fitnesscalendar.ui.components.ActivitySelectorState
 import com.inky.fitnesscalendar.ui.components.DateTimePicker
@@ -152,7 +152,7 @@ fun NewActivity(
         onState = { editState = it },
         initialState = initialState,
         localizationRepository = localizationRepository,
-        onSave = { onSave(editState.toActivity(richActivity)) },
+        onSave = { onSave(editState.toRichActivity(initialActivity = richActivity)) },
         onNavigateBack = onNavigateBack,
         onNavigateNewPlace = onNavigateNewPlace,
         isTest = isTest
@@ -190,7 +190,7 @@ fun NewActivity(
 
     val scrollState = rememberScrollState()
     var contextMenuOpen by rememberSaveable { mutableStateOf(false) }
-    var showImageViewer by rememberSaveable { mutableStateOf(false) }
+    var imageViewerImage by rememberSaveable { mutableStateOf<ImageName?>(null) }
 
     val isKeyboardVisible = WindowInsets.isImeVisible
     // TODO: Get rid of the `isTest` hack
@@ -201,7 +201,7 @@ fun NewActivity(
         }
     }
     val imagePickerLauncher = rememberImagePickerLauncher(onName = {
-        onState(editState.copy(imageName = it))
+        onState(editState.copy(images = editState.images + ActivityEditState.ImageState(it)))
     })
 
     BackHandler(enabled = editState != initialState) {
@@ -297,18 +297,17 @@ fun NewActivity(
                 .padding(horizontal = 8.dp)
                 .verticalScroll(scrollState)
         ) {
-            val imageUri = editState.imageName?.getImageUri()
-            if (imageUri != null) {
-                ActivityImage(
-                    uri = imageUri,
+            val imageNames = editState.images.map { it.imageName }
+            if (imageNames.isNotEmpty()) {
+                ActivityImages(
+                    images = imageNames,
                     onState = { state ->
-                        if (state is AsyncImagePainter.State.Error && editState.imageName != initialState.imageName) {
-                            onState(editState.copy(imageName = initialState.imageName))
+                        // FIXME: only remove the bad image, instead of all new images
+                        if (state is AsyncImagePainter.State.Error && editState.images != initialState.images) {
+                            onState(editState.copy(images = initialState.images))
                         }
                     },
-                    onClick = {
-                        showImageViewer = true
-                    },
+                    onClick = { imageViewerImage = it },
                     modifier = Modifier.padding(vertical = 4.dp)
                 )
             }
@@ -419,14 +418,13 @@ fun NewActivity(
             Spacer(modifier = Modifier.height(128.dp))
         }
 
-        val imageUri = editState.imageName?.getImageUri()
-        if (showImageViewer && imageUri != null) {
+        imageViewerImage?.let { image ->
             ImageViewer(
-                imageUri = imageUri,
-                onDismiss = { showImageViewer = false },
+                imageUri = image.getImageUri(),
+                onDismiss = { imageViewerImage = null },
                 onDelete = {
-                    onState(editState.copy(imageName = null))
-                    showImageViewer = false
+                    onState(editState.copy(images = editState.images.filter { it.imageName != image }))
+                    imageViewerImage = null
                 },
             )
         }
@@ -508,7 +506,7 @@ data class ActivityEditState(
     val distanceString: String,
     val intensity: Intensity?,
     val feel: Feel,
-    val imageName: ImageName?,
+    val images: List<ImageState>,
     val favorite: Boolean,
 
     val activityId: Int?,
@@ -525,7 +523,7 @@ data class ActivityEditState(
         distanceString = activity?.activity?.distance?.kilometers?.toString() ?: "",
         intensity = activity?.activity?.intensity,
         feel = activity?.activity?.feel ?: Feel.Ok,
-        imageName = activity?.activity?.imageName,
+        images = activity?.images?.map { ImageState(it) } ?: emptyList(),
         favorite = activity?.activity?.favorite ?: false,
         activityId = activity?.activity?.uid
     )
@@ -546,7 +544,7 @@ data class ActivityEditState(
     /**
      * Converts this state into an activity. Panics if the state does not represent a valid activity
      */
-    fun toActivity(initialActivity: RichActivity?): RichActivity {
+    fun toRichActivity(initialActivity: RichActivity?): RichActivity {
         val oldActivity = when (initialActivity) {
             null -> Activity(typeId = 0, startTime = startDateTime.toDate())
             else -> initialActivity.activity
@@ -559,7 +557,6 @@ data class ActivityEditState(
             description = description,
             startTime = startDateTime.toDate(),
             endTime = endDateTime.toDate(),
-            imageName = imageName,
             feel = feel,
             distance = kilometerStringToDistance(distanceString),
             intensity = intensity,
@@ -570,6 +567,15 @@ data class ActivityEditState(
             activity = newActivity,
             place = activitySelectorState.place,
             type = activitySelectorState.activityType,
+            images = images.map { it.imageName }
         )
+    }
+
+    @Parcelize
+    data class ImageState(
+        val activityId: Int?,
+        val imageName: ImageName
+    ) : Parcelable {
+        constructor(imageName: ImageName) : this(null, imageName)
     }
 }

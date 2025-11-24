@@ -1,5 +1,6 @@
 package com.inky.fitnesscalendar.ui.components
 
+import android.net.Uri
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -40,6 +41,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.colorResource
@@ -73,17 +75,18 @@ fun ActivityCard(
     contentColor: Color = contentColorFor(containerColor)
 ) {
     var showContextMenu by rememberSaveable { mutableStateOf(false) }
-    var showImageViewer by rememberSaveable { mutableStateOf(false) }
+    var imageViewerUri by rememberSaveable { mutableStateOf<Uri?>(null) }
 
     val title = remember(richActivity) { "${richActivity.type.emoji} ${richActivity.type.name}" }
     val time = remember(richActivity) {
         localizationRepository.timeFormatter.format(richActivity.activity.startTime)
     }
-    val imageUri = richActivity.activity.imageName?.getImageUri()
+    val images = richActivity.images
 
     val trackPreview = remember(richActivity) { richActivity.activity.trackPreview?.toTrackSvg() }
 
     val haptics = LocalHapticFeedback.current
+    val context = LocalContext.current
 
     Card(
         colors = CardDefaults.cardColors(containerColor = containerColor),
@@ -136,11 +139,11 @@ fun ActivityCard(
             }
         }
 
-        if (imageUri != null) {
+        if (images.isNotEmpty()) {
             HorizontalDivider()
-            ActivityImage(
-                uri = imageUri,
-                onClick = { showImageViewer = true },
+            ActivityImages(
+                images = images,
+                onClick = { imageViewerUri = it.getImageUri(context) },
                 modifier = Modifier.padding(all = 8.dp)
             )
         }
@@ -154,10 +157,10 @@ fun ActivityCard(
         )
     }
 
-    if (showImageViewer && imageUri != null) {
+    imageViewerUri?.let {
         ImageViewer(
-            imageUri = imageUri,
-            onDismiss = { showImageViewer = false })
+            imageUri = it,
+            onDismiss = { imageViewerUri = null })
     }
 }
 

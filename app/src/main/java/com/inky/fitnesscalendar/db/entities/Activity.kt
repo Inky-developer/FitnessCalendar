@@ -7,7 +7,6 @@ import androidx.room.Index
 import androidx.room.PrimaryKey
 import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.data.Feel
-import com.inky.fitnesscalendar.data.ImageName
 import com.inky.fitnesscalendar.data.Intensity
 import com.inky.fitnesscalendar.data.Vehicle
 import com.inky.fitnesscalendar.data.gpx.TrackSvg
@@ -48,7 +47,6 @@ data class Activity(
     @ColumnInfo(name = "description") val description: String = "",
     @ColumnInfo(name = "favorite", defaultValue = "false") val favorite: Boolean = false,
 
-    @ColumnInfo(name = "image_name") val imageName: ImageName? = null,
     @ColumnInfo(name = "feel") val feel: Feel = Feel.Ok,
     @ColumnInfo(name = "intensity") val intensity: Intensity? = null,
 

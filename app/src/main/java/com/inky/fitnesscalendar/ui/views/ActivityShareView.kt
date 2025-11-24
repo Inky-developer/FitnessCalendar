@@ -68,7 +68,7 @@ import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.db.entities.Track
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivityCardContent
-import com.inky.fitnesscalendar.ui.components.ActivityImage
+import com.inky.fitnesscalendar.ui.components.ActivityImages
 import com.inky.fitnesscalendar.ui.components.TrackView
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.theme.FitnessCalendarTheme
@@ -212,7 +212,7 @@ private fun ShareSettings(
             .horizontalScroll(rememberScrollState())
             .padding(all = 8.dp)
     ) {
-        if (activity.activity.imageName != null) {
+        if (activity.images.isNotEmpty()) {
             SettingsChip(
                 selected = config.showImage,
                 onToggle = { setConfig(config.copy(showImage = !config.showImage)) },
@@ -270,7 +270,7 @@ private fun ActivityShareCard(
                 " " +
                 localizationRepository.timeFormatter.format(richActivity.activity.startTime)
     }
-    val imageUri = richActivity.activity.imageName?.getImageUri()
+    val images = richActivity.images
 
     val trackColor = contentColorFor(containerColor)
     val trackPreview = remember(richActivity) { richActivity.activity.trackPreview?.toTrackSvg() }
@@ -318,10 +318,10 @@ private fun ActivityShareCard(
         }
 
         AnimatedVisibility(config.showImage) {
-            if (imageUri != null) {
+            if (images.isNotEmpty()) {
                 HorizontalDivider()
-                ActivityImage(
-                    uri = imageUri,
+                ActivityImages(
+                    images = images,
                     modifier = Modifier.padding(all = 8.dp)
                 )
             }
@@ -412,7 +412,8 @@ fun ActivityShareCardPreview() {
             emoji = "🚴‍♂️",
             color = ContentColor.Color1,
         ),
-        place = null
+        place = null,
+        images = emptyList()
     )
     ActivityShareCard(richActivity, ShareCardConfig(), LocalizationRepository(LocalContext.current))
 }

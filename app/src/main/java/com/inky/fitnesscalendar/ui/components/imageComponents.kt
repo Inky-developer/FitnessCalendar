@@ -30,6 +30,23 @@ import com.inky.fitnesscalendar.util.getOrCreateImagesDir
 const val IMAGE_ASPECT_RATIO: Float = 4 / 3f
 
 @Composable
+fun ActivityImages(
+    images: List<ImageName>,
+    modifier: Modifier = Modifier,
+    onClick: (ImageName) -> Unit = {},
+    onState: ((AsyncImagePainter.State) -> Unit)? = null,
+) {
+    // TODO: Draw multiple images
+    val uri = images.map { it.getImageUri() }.first()
+    ActivityImage(
+        uri = uri,
+        modifier = modifier,
+        onClick = { onClick(images.first()) },
+        onState = onState
+    )
+}
+
+@Composable
 fun ActivityImage(
     uri: Uri,
     modifier: Modifier = Modifier,

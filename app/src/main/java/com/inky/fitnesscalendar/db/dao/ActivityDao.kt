@@ -9,6 +9,7 @@ import com.inky.fitnesscalendar.data.Feel
 import com.inky.fitnesscalendar.data.ImageName
 import com.inky.fitnesscalendar.data.Vehicle
 import com.inky.fitnesscalendar.db.entities.Activity
+import com.inky.fitnesscalendar.db.entities.ActivityImage
 import com.inky.fitnesscalendar.db.entities.Recording
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import kotlinx.coroutines.flow.Flow
@@ -49,7 +50,7 @@ abstract class ActivityDao {
                 "   (start_time <= :end OR :end IS NULL) AND" +
                 "   ((Activity.description != '') == :hasDescription OR :hasDescription IS NULL) AND" +
                 "   ((vehicle IS NOT NULL) == :hasVehicle OR :hasVehicle IS NULL) AND" +
-                "   ((Activity.image_name IS NOT NULL) == :hasImage OR :hasImage IS NULL) AND" +
+                "   (EXISTS (SELECT 1 FROM ActivityImage WHERE ActivityImage.activity_id = Activity.uid) == :hasImage OR :hasImage IS NULL) AND" +
                 "   ((place_id IS NOT NULL) == :hasPlace OR :hasPlace IS NULL) AND" +
                 "   ((track_preview IS NOT NULL) == :hasTrack OR :hasTrack IS NULL)" +
                 "ORDER BY " +
@@ -88,7 +89,19 @@ abstract class ActivityDao {
     @Query("SELECT * FROM ACTIVITY WHERE uid=(:id)")
     abstract suspend fun load(id: Int): RichActivity
 
-    @Query("SELECT image_name FROM ACTIVITY WHERE image_name IS NOT NULL")
+    @Query("DELETE FROM ActivityImage WHERE activity_id=(:id)")
+    abstract suspend fun deleteActivityImages(id: Int)
+
+    @Upsert
+    abstract suspend fun addActivityImages(images: List<ActivityImage>)
+
+    @Transaction
+    open suspend fun setActivityImages(id: Int, images: List<ImageName>) {
+        deleteActivityImages(id)
+        addActivityImages(images.map { ActivityImage(id, it) })
+    }
+
+    @Query("SELECT image_name FROM ActivityImage")
     abstract suspend fun getImages(): List<ImageName>
 
     @Upsert

@@ -104,7 +104,9 @@ class DatabaseRepository @Inject constructor(
     fun getMostRecentActivity() = activityDao.getMostRecentActivity()
 
     suspend fun saveActivity(activity: RichActivity): Int {
-        return activityDao.save(activity.clean().activity).toInt()
+        val activityId = activityDao.save(activity.clean().activity).toInt()
+        activityDao.setActivityImages(activityId, activity.images)
+        return activityId
     }
 
     suspend fun deleteActivity(activity: Activity) {

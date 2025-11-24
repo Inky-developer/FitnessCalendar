@@ -274,7 +274,7 @@ private fun AppNavigation(
                     localizationRepository = viewModel.repository.localizationRepository,
                     onSave = {
                         scope.launch {
-                            viewModel.repository.saveActivity(editState.toActivity(null))
+                            viewModel.repository.saveActivity(editState.toRichActivity(null))
                         }
                         context.finishOrGoBack(navController)
                     },

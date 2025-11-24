@@ -128,6 +128,7 @@ class ImportRepository @Inject constructor(private val dbRepository: DatabaseRep
                 activity = activity,
                 type = type,
                 place = null,
+                images = emptyList()
             )
         }
     }

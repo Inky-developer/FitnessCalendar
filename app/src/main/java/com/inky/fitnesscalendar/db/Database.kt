@@ -17,6 +17,7 @@ import com.inky.fitnesscalendar.db.dao.PlaceDao
 import com.inky.fitnesscalendar.db.dao.RecordingDao
 import com.inky.fitnesscalendar.db.dao.TrackDao
 import com.inky.fitnesscalendar.db.entities.Activity
+import com.inky.fitnesscalendar.db.entities.ActivityImage
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.ActivityTypeName
 import com.inky.fitnesscalendar.db.entities.Day
@@ -29,10 +30,11 @@ import com.inky.fitnesscalendar.util.DATABASE_NAME
 private const val TAG = "Database"
 
 @Database(
-    version = 36,
+    version = 38,
     entities = [
         Activity::class,
         Recording::class,
+        ActivityImage::class,
         ActivityType::class,
         FilterHistoryItem::class,
         Day::class,
@@ -65,6 +67,7 @@ private const val TAG = "Database"
         AutoMigration(from = 33, to = 34),
         AutoMigration(from = 34, to = 35),
         AutoMigration(from = 35, to = 36, spec = Migration35To36Spec::class),
+        AutoMigration(from = 37, to = 38, spec = Migration37To38Spec::class),
     ]
 )
 @TypeConverters(Converters::class)
@@ -110,6 +113,7 @@ abstract class AppDatabase : RoomDatabase() {
                     MIGRATION_24_25,
                     MIGRATION_26_27,
                     MIGRATION_27_28,
+                    MIGRATION_36_37
                 )
                 .addCallback(object : Callback() {
                     override fun onCreate(db: SupportSQLiteDatabase) {
