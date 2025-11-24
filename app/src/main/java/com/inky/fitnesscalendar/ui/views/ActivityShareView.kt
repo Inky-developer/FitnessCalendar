@@ -75,6 +75,7 @@ import com.inky.fitnesscalendar.ui.theme.FitnessCalendarTheme
 import com.inky.fitnesscalendar.ui.util.Icons
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.sharedBounds
+import com.inky.fitnesscalendar.util.asNonEmptyOrNull
 import com.inky.fitnesscalendar.util.getOrCreateSharedMediaCache
 import com.inky.fitnesscalendar.util.getOrCreateSharedTracksCache
 import com.inky.fitnesscalendar.util.gpx.GpxWriter
@@ -318,7 +319,7 @@ private fun ActivityShareCard(
         }
 
         AnimatedVisibility(config.showImage) {
-            if (images.isNotEmpty()) {
+            images.asNonEmptyOrNull()?.let { images ->
                 HorizontalDivider()
                 ActivityImages(
                     images = images,

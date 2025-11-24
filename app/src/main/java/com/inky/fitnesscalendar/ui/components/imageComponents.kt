@@ -7,8 +7,12 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -20,10 +24,12 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ImageName
+import com.inky.fitnesscalendar.util.NonEmptyList
 import com.inky.fitnesscalendar.util.copyFileToStorage
 import com.inky.fitnesscalendar.util.getOrCreateImagesDir
 
@@ -31,19 +37,25 @@ const val IMAGE_ASPECT_RATIO: Float = 4 / 3f
 
 @Composable
 fun ActivityImages(
-    images: List<ImageName>,
+    images: NonEmptyList<ImageName>,
     modifier: Modifier = Modifier,
     onClick: (ImageName) -> Unit = {},
-    onState: ((AsyncImagePainter.State) -> Unit)? = null,
+    onState: ((ImageName, AsyncImagePainter.State) -> Unit)? = null,
 ) {
-    // TODO: Draw multiple images
-    val uri = images.map { it.getImageUri() }.first()
-    ActivityImage(
-        uri = uri,
-        modifier = modifier,
-        onClick = { onClick(images.first()) },
-        onState = onState
-    )
+    val imageScale = if (images.size == 1) 1f else 0.9f
+    BoxWithConstraints(modifier = modifier) {
+        val imageWidth = this.maxWidth * imageScale
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+            items(images) { image ->
+                ActivityImage(
+                    uri = image.getImageUri(),
+                    modifier = Modifier.width(imageWidth),
+                    onClick = { onClick(image) },
+                    onState = { state -> onState?.let { it(image, state) } }
+                )
+            }
+        }
+    }
 }
 
 @Composable
@@ -59,7 +71,6 @@ fun ActivityImage(
         onState = onState,
         contentScale = ContentScale.Crop,
         modifier = modifier
-            .fillMaxWidth()
             .aspectRatio(IMAGE_ASPECT_RATIO)
             .clip(MaterialTheme.shapes.large)
             .clickable { onClick() }

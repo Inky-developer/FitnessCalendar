@@ -81,6 +81,7 @@ import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.components.optionGroupDefaultBackground
 import com.inky.fitnesscalendar.ui.components.rememberImagePickerLauncher
 import com.inky.fitnesscalendar.ui.util.Icons
+import com.inky.fitnesscalendar.util.asNonEmptyOrNull
 import com.inky.fitnesscalendar.util.someOrNone
 import com.inky.fitnesscalendar.util.toDate
 import com.inky.fitnesscalendar.util.toLocalDateTime
@@ -297,14 +298,13 @@ fun NewActivity(
                 .padding(horizontal = 8.dp)
                 .verticalScroll(scrollState)
         ) {
-            val imageNames = editState.images.map { it.imageName }
-            if (imageNames.isNotEmpty()) {
+            val imageNames = editState.images.map { it.imageName }.asNonEmptyOrNull()
+            if (imageNames != null) {
                 ActivityImages(
                     images = imageNames,
-                    onState = { state ->
-                        // FIXME: only remove the bad image, instead of all new images
-                        if (state is AsyncImagePainter.State.Error && editState.images != initialState.images) {
-                            onState(editState.copy(images = initialState.images))
+                    onState = { image, state ->
+                        if (state is AsyncImagePainter.State.Error && !initialState.images.any { it.imageName == image }) {
+                            onState(editState.copy(images = editState.images.filter { it.imageName != image }))
                         }
                     },
                     onClick = { imageViewerImage = it },

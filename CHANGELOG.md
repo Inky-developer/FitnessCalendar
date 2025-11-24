@@ -1,5 +1,7 @@
 # Unreleased
 
+- Allow adding multiple images to an activity
+
 # 2025.11.1
 
 - Fix bug where setting the place to none was not possible

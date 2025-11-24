@@ -62,6 +62,7 @@ import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.util.ContextFormat
 import com.inky.fitnesscalendar.ui.util.Icons
 import com.inky.fitnesscalendar.ui.util.skipToLookaheadSize
+import com.inky.fitnesscalendar.util.asNonEmptyOrNull
 import com.inky.fitnesscalendar.util.gpx.simplify
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -139,7 +140,7 @@ fun ActivityCard(
             }
         }
 
-        if (images.isNotEmpty()) {
+        images.asNonEmptyOrNull()?.let { images ->
             HorizontalDivider()
             ActivityImages(
                 images = images,
