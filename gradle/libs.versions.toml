@@ -2,7 +2,7 @@
 accompanistPermissions = "0.37.3"
 agp = "8.13.1"
 androidx-test = "1.7.0"
-approvaltests = "25.7.0"
+approvaltests = "25.8.0"
 coilCompose = "2.7.0"
 composeBom = "2025.11.01"
 coreKtx = "1.17.0"
