@@ -260,7 +260,7 @@ private fun ExtractImageFromVideoPopup(
     var loadingFrame by rememberSaveable(videoUri) { mutableStateOf(true) }
     var frameBitmap by rememberSaveable(videoUri) { mutableStateOf<Bitmap?>(null) }
 
-    LaunchedEffect(frameIndex, videoUri) {
+    LaunchedEffect(Unit) {
         snapshotFlow { frameIndex }.debounce(75).collectLatest { frameIndex ->
             loadingFrame = true
             try {
