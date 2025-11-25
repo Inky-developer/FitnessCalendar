@@ -354,19 +354,20 @@ fun TrackDetailsData(
     }
 }
 
-val StatsEntryModifier
-    @Composable
-    get() = Modifier
-        .padding(all = 8.dp)
-        .clip(MaterialTheme.shapes.medium)
-        .background(MaterialTheme.colorScheme.surfaceContainer)
-        .fillMaxWidth()
-        .padding(all = 4.dp)
+@Composable
+private fun Modifier.statsEntry() = this
+    .padding(all = 8.dp)
+    .clip(MaterialTheme.shapes.medium)
+    .background(MaterialTheme.colorScheme.surfaceContainer)
+    .fillMaxWidth()
+    .padding(all = 4.dp)
 
 @Composable
 private fun ActivityDescription(description: String, onDescription: (String) -> Unit) {
     var showDialog by rememberSaveable { mutableStateOf(false) }
-    val modifier = StatsEntryModifier.clickable { showDialog = true }
+    val modifier = Modifier
+        .statsEntry()
+        .clickable { showDialog = true }
 
     AnimatedContent(description.isBlank()) { isBlank ->
         if (isBlank) {
@@ -393,7 +394,11 @@ private fun StatsColumn(
     onClick: (() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit
 ) {
-    Column(modifier = StatsEntryModifier.clickable { onClick?.let { it() } }) {
+    Column(
+        modifier = Modifier
+            .statsEntry()
+            .clickable { onClick?.let { it() } }
+    ) {
         Row(modifier = Modifier.padding(all = 4.dp)) {
             CompositionLocalProvider(LocalTextStyle provides MaterialTheme.typography.titleLarge) {
                 title()
