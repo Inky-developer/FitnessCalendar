@@ -8,6 +8,8 @@ import com.inky.fitnesscalendar.ui.localSharedTransition
 sealed class SharedContentKey {
     data class ActivityCard(val id: Int?) : SharedContentKey()
 
+    data object ActivityImage : SharedContentKey()
+
     data object NewActivityFAB : SharedContentKey()
 
     data object AppBar : SharedContentKey()

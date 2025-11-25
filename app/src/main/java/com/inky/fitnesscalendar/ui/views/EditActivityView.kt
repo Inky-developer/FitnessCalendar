@@ -251,7 +251,7 @@ fun NewActivity(
                         }
                     }
                     IconButton(onClick = { contextMenuOpen = true }) {
-                        Icons.Menu(stringResource(R.string.open_context_menu))
+                        Icons.MoreOptions(stringResource(R.string.open_context_menu))
                     }
                     DropdownMenu(
                         expanded = contextMenuOpen,

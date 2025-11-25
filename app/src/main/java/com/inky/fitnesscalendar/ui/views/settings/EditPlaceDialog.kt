@@ -105,7 +105,7 @@ private fun EditPlaceDialog(initialPlace: Place?, onDismiss: () -> Unit, onSave:
         actions = {
             var showMenu by rememberSaveable { mutableStateOf(false) }
             IconButton(onClick = { showMenu = true }) {
-                Icons.Menu(stringResource(R.string.Menu))
+                Icons.MoreOptions(stringResource(R.string.open_context_menu))
             }
 
             DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {

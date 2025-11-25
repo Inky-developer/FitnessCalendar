@@ -276,7 +276,7 @@ fun EditTypeDialogMenu(onDeleteType: () -> Unit) {
     var showMenu by remember { mutableStateOf(false) }
 
     IconButton(onClick = { showMenu = true }) {
-        Icons.Menu(stringResource(R.string.Menu))
+        Icons.MoreOptions(stringResource(R.string.open_context_menu))
     }
 
     DropdownMenu(expanded = showMenu, onDismissRequest = { showMenu = false }) {

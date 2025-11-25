@@ -293,7 +293,6 @@ private fun AppNavigation(
                 ProvideSharedContent(sharedContentScope = this@SharedTransitionLayout) {
                     TrackDetailsView(
                         activityId = route.activityId,
-                        onEdit = { navController.navigate(Views.NewActivity(route.activityId)) },
                         onBack = { navController.popBackStack() },
                         onShare = { navController.navigate(Views.ShareActivity(route.activityId)) },
                         onNavigateMap = { navController.navigate(Views.Map(it)) },

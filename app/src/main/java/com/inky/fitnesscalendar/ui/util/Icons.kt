@@ -44,6 +44,7 @@ object Icons {
     val KeyboardArrowUp = Icon(R.drawable.keyboard_arrow_up_24px)
     val Location = Icon(R.drawable.location_on_24px)
     val Menu = Icon(R.drawable.menu_24px)
+    val MoreOptions = Icon(R.drawable.more_vert_24px)
     val PlayArrow = Icon(R.drawable.play_arrow_24px)
     val PlayArrowFilled = Icon(R.drawable.play_arrow_filled_24px)
     val Search = Icon(R.drawable.search_24px)
