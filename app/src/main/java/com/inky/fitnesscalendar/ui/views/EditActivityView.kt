@@ -81,6 +81,9 @@ import com.inky.fitnesscalendar.ui.components.SelectImageDropdownMenuItem
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.components.optionGroupDefaultBackground
 import com.inky.fitnesscalendar.ui.util.Icons
+import com.inky.fitnesscalendar.ui.util.SharedContentKey
+import com.inky.fitnesscalendar.ui.util.applyIf
+import com.inky.fitnesscalendar.ui.util.sharedElement
 import com.inky.fitnesscalendar.util.Option
 import com.inky.fitnesscalendar.util.asNonEmptyOrNull
 import com.inky.fitnesscalendar.util.toDate
@@ -310,7 +313,11 @@ fun NewActivity(
                         }
                     },
                     onClick = { imageViewerImage = it },
-                    modifier = Modifier.padding(vertical = 4.dp)
+                    modifier = Modifier
+                        .padding(vertical = 4.dp)
+                        .applyIf(editState.activityId != null) {
+                            sharedElement(SharedContentKey.ActivityImage(editState.activityId!!))
+                        }
                 )
             }
 

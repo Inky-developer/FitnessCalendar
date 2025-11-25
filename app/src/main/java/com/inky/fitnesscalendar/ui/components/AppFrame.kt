@@ -9,6 +9,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import com.inky.fitnesscalendar.ui.theme.FitnessCalendarTheme
+import com.inky.fitnesscalendar.ui.util.applyIf
 
 @Composable
 fun AppFrame(modifier: Modifier = Modifier, app: @Composable () -> Unit) {
@@ -16,14 +17,10 @@ fun AppFrame(modifier: Modifier = Modifier, app: @Composable () -> Unit) {
         // In landscape mode, use the more conservative `safeDrawingPadding`, which looks
         // uglier but makes sure that no content is obstructed
         val orientation = LocalConfiguration.current.orientation
-        val baseModifier = modifier.imePadding()
-        val surfaceModifier = when (orientation) {
-            Configuration.ORIENTATION_LANDSCAPE -> baseModifier.safeDrawingPadding()
-            else -> baseModifier
-        }
-
         Surface(
-            modifier = surfaceModifier,
+            modifier = modifier
+                .imePadding()
+                .applyIf(orientation == Configuration.ORIENTATION_LANDSCAPE) { safeDrawingPadding() },
             color = MaterialTheme.colorScheme.background
         ) {
             app()

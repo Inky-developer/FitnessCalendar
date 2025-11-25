@@ -62,6 +62,7 @@ import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.util.ContextFormat
 import com.inky.fitnesscalendar.ui.util.Icons
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
+import com.inky.fitnesscalendar.ui.util.applyIf
 import com.inky.fitnesscalendar.ui.util.sharedElement
 import com.inky.fitnesscalendar.ui.util.skipToLookaheadSize
 import com.inky.fitnesscalendar.util.asNonEmptyOrNull
@@ -149,7 +150,11 @@ fun ActivityCard(
                 onClick = { imageViewerUri = it.getImageUri(context) },
                 modifier = Modifier
                     .padding(all = 8.dp)
-                    .sharedElement(SharedContentKey.ActivityImage)
+                    .applyIf(richActivity.activity.uid != null) {
+                        sharedElement(
+                            SharedContentKey.ActivityImage(richActivity.activity.uid!!)
+                        )
+                    }
             )
         }
     }

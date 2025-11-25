@@ -257,7 +257,7 @@ fun TrackDetailsData(
             onClick = { imagePopup = it },
             modifier = Modifier
                 .padding(all = 8.dp)
-                .sharedElement(SharedContentKey.ActivityImage)
+                .sharedElement(SharedContentKey.ActivityImage(state.initialActivity.activity.uid!!))
         )
     }
 

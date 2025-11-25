@@ -228,18 +228,21 @@ private fun AppNavigation(
             ) { backStackEntry ->
                 val route: Views.NewActivity = backStackEntry.toRoute()
                 onCurrentView(route)
-                NewActivity(
-                    route.activityId,
-                    onSave = {
-                        scope.launch {
-                            viewModel.repository.saveActivity(it)
-                        }
-                        navController.popBackStack()
-                    },
-                    onNavigateBack = { navController.popBackStack() },
-                    onNavigateNewPlace = { navController.navigate(SettingsViews.PlaceDialog()) },
-                    initialDay = route.initialStartDay
-                )
+
+                ProvideSharedContent(sharedContentScope = this@SharedTransitionLayout) {
+                    NewActivity(
+                        route.activityId,
+                        onSave = {
+                            scope.launch {
+                                viewModel.repository.saveActivity(it)
+                            }
+                            navController.popBackStack()
+                        },
+                        onNavigateBack = { navController.popBackStack() },
+                        onNavigateNewPlace = { navController.navigate(SettingsViews.PlaceDialog()) },
+                        initialDay = route.initialStartDay
+                    )
+                }
             }
 
             composable<Views.ApiNewActivity>(
