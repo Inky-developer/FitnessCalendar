@@ -10,6 +10,7 @@
     <string name="back">Zurück</string>
     <string name="datetime_date">Datum: %1$s %2$s</string>
     <string name="datetime_start">Start: %1$s %2$s</string>
+    <string name="duration">Dauer: %1$s</string>
     <string name="start_time">Startzeit: %1$s</string>
     <string name="datetime_end">Ende: %1$s %2$s</string>
     <string name="edit_object">%1$s bearbeiten</string>
@@ -338,4 +339,6 @@
     <string name="select_frame_of_video">Videobild auswählen</string>
     <string name="next_video">Nächstes Video</string>
     <string name="tap_to_add_description">Tippen, um eine Beschreibung hinzuzufügen</string>
+    <string name="switch_to_duration_input">Zur Eingabe der Dauer wechseln</string>
+    <string name="switch_to_date_input">Zur Eingabe des Datums wechseln</string>
 </resources>

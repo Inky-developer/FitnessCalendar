@@ -48,5 +48,7 @@ fun kotlin.time.Duration.format(): String {
     return inWholeMilliseconds.ms().format()
 }
 
+fun java.time.Duration.format() = Duration(elapsedMs = this.toMillis()).format()
+
 fun Long.ms() = Duration(elapsedMs = this)
 fun Int.ms() = toLong().ms()

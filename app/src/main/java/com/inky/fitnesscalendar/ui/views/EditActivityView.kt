@@ -9,9 +9,12 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.isImeVisible
@@ -62,6 +65,7 @@ import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.data.Feel
 import com.inky.fitnesscalendar.data.ImageName
 import com.inky.fitnesscalendar.data.Intensity
+import com.inky.fitnesscalendar.data.measure.format
 import com.inky.fitnesscalendar.data.measure.kilometers
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.RichActivity
@@ -71,6 +75,7 @@ import com.inky.fitnesscalendar.ui.components.ActivitySelector
 import com.inky.fitnesscalendar.ui.components.ActivitySelectorState
 import com.inky.fitnesscalendar.ui.components.DateTimePicker
 import com.inky.fitnesscalendar.ui.components.DescriptionTextInput
+import com.inky.fitnesscalendar.ui.components.DurationPicker
 import com.inky.fitnesscalendar.ui.components.FavoriteIcon
 import com.inky.fitnesscalendar.ui.components.FeelSelector
 import com.inky.fitnesscalendar.ui.components.ImageLimit
@@ -325,7 +330,11 @@ fun NewActivity(
                 targetState = editState.activitySelectorState.activityType?.hasDuration == true,
                 label = stringResource(R.string.select_date)
             ) { hasDuration ->
-                Row(modifier = Modifier.fillMaxWidth()) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(IntrinsicSize.Min)
+                ) {
                     val dateLabelId = if (hasDuration) {
                         R.string.datetime_start
                     } else {
@@ -336,19 +345,16 @@ fun NewActivity(
                         localizationRepository = localizationRepository,
                         labelId = dateLabelId,
                         onDateTime = { onState(editState.copy(startDateTime = it)) },
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier
+                            .weight(1f)
+                            .fillMaxHeight()
                     )
 
                     if (hasDuration) {
-                        DateTimeInput(
-                            dateTime = editState.endDateTime,
-                            localizationRepository = localizationRepository,
-                            labelId = R.string.datetime_end,
-                            onDateTime = { onState(editState.copy(endDateTime = it)) },
-                            isError = editState.isEndDateTimeError,
-                            modifier = Modifier
-                                .padding(start = 8.dp)
-                                .weight(1f)
+                        DateAndDurationInput(
+                            editState = editState,
+                            onEnd = { onState(editState.copy(endDateTime = it)) },
+                            localizationRepository = localizationRepository
                         )
                     }
                 }
@@ -441,22 +447,14 @@ fun NewActivity(
 }
 
 @Composable
-private fun DateTimeInput(
-    dateTime: LocalDateTime,
-    localizationRepository: LocalizationRepository,
-    labelId: Int,
-    onDateTime: (LocalDateTime) -> Unit,
+private fun DateTimeInputButton(
+    onClick: () -> Unit,
+    isError: Boolean,
     modifier: Modifier = Modifier,
-    isError: Boolean = false,
+    content: @Composable () -> Unit
 ) {
-    val dateTimeStr = remember(dateTime) {
-        val date = dateTime.toDate()
-        val startDateStr = localizationRepository.dateFormatter.format(date.time)
-        val startTimeStr = localizationRepository.timeFormatter.format(date)
-
-        startDateStr to startTimeStr
-    }
     val errorColor = MaterialTheme.colorScheme.error
+
     val border = remember(isError) {
         if (isError) {
             BorderStroke(width = 1.dp, color = errorColor)
@@ -465,10 +463,8 @@ private fun DateTimeInput(
         }
     }
 
-    var showPicker by rememberSaveable { mutableStateOf(false) }
-
     TextButton(
-        onClick = { showPicker = true },
+        onClick = onClick,
         colors = ButtonDefaults.textButtonColors(
             containerColor = optionGroupDefaultBackground(),
             contentColor = contentColorFor(optionGroupDefaultBackground())
@@ -476,7 +472,31 @@ private fun DateTimeInput(
         border = border,
         shape = MaterialTheme.shapes.small,
         modifier = modifier
-    ) {
+    ) { content() }
+}
+
+@Composable
+private fun DateTimeInput(
+    dateTime: LocalDateTime,
+    localizationRepository: LocalizationRepository,
+    labelId: Int,
+    onDateTime: (LocalDateTime) -> Unit,
+    showDate: Boolean = true,
+    modifier: Modifier = Modifier,
+    isError: Boolean = false,
+) {
+    val dateTimeStr = remember(dateTime, showDate) {
+        val date = dateTime.toDate()
+        val startDateStr =
+            if (showDate) localizationRepository.dateFormatter.format(date.time) else ""
+        val startTimeStr = localizationRepository.timeFormatter.format(date)
+
+        startDateStr to startTimeStr
+    }
+
+    var showPicker by rememberSaveable { mutableStateOf(false) }
+
+    DateTimeInputButton(onClick = { showPicker = true }, isError = isError, modifier = modifier) {
         Text(
             stringResource(
                 labelId,
@@ -495,6 +515,71 @@ private fun DateTimeInput(
                 onDateTime(it)
             }
         )
+    }
+}
+
+@Composable
+private fun DurationInput(duration: Duration, onDuration: (Duration) -> Unit, isError: Boolean) {
+    var showPicker by rememberSaveable { mutableStateOf(false) }
+
+    DateTimeInputButton(onClick = { showPicker = true }, isError = isError) {
+        Text(stringResource(R.string.duration, duration.format()))
+    }
+
+    if (showPicker) {
+        DurationPicker(
+            duration,
+            onConfirm = {
+                onDuration(it)
+                showPicker = false
+            },
+            onDismiss = { showPicker = false }
+        )
+    }
+}
+
+@Composable
+private fun RowScope.DateAndDurationInput(
+    editState: ActivityEditState,
+    onEnd: (LocalDateTime) -> Unit,
+    localizationRepository: LocalizationRepository
+) {
+    var showDateInput by rememberSaveable { mutableStateOf(true) }
+
+    AnimatedContent(
+        showDateInput,
+        modifier = Modifier
+            .padding(start = 8.dp)
+            .weight(1f)
+            .fillMaxHeight()
+    ) { showDateInput ->
+        if (showDateInput) {
+            DateTimeInput(
+                dateTime = editState.endDateTime,
+                showDate = editState.startDateTime.toLocalDate() != editState.endDateTime.toLocalDate(),
+                localizationRepository = localizationRepository,
+                labelId = R.string.datetime_end,
+                onDateTime = onEnd,
+                isError = editState.isEndDateTimeError,
+            )
+        } else {
+            DurationInput(
+                duration = Duration.between(editState.startDateTime, editState.endDateTime),
+                onDuration = { onEnd(editState.startDateTime + it) },
+                isError = editState.isEndDateTimeError
+            )
+        }
+
+    }
+
+    IconButton(onClick = { showDateInput = !showDateInput }) {
+        AnimatedContent(showDateInput) { showDateInput ->
+            if (showDateInput) {
+                Icons.CalendarToday(stringResource(R.string.switch_to_duration_input))
+            } else {
+                Icons.Timer(stringResource(R.string.switch_to_date_input))
+            }
+        }
     }
 }
 
