@@ -155,5 +155,7 @@ sealed class Preference<T, P>(
 
         val PREF_WATCHED_FOLDERS = UriSetPreference("PREF_WATCHED_FOLDERS")
         val PREF_WATCHED_FOLDERS_LAST_IMPORT = DatePreference("PREF_WATCHED_FOLDERS_LAST_IMPORT")
+        val PREF_PREFER_END_DATE_AS_DURATION =
+            PrimitivePreference.create("PREF_PREFER_END_DATE_AS_DURATION", false)
     }
 }

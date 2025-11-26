@@ -48,6 +48,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -70,6 +71,7 @@ import com.inky.fitnesscalendar.data.measure.kilometers
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.localization.LocalizationRepository
+import com.inky.fitnesscalendar.preferences.Preference
 import com.inky.fitnesscalendar.ui.components.ActivityImages
 import com.inky.fitnesscalendar.ui.components.ActivitySelector
 import com.inky.fitnesscalendar.ui.components.ActivitySelectorState
@@ -88,6 +90,7 @@ import com.inky.fitnesscalendar.ui.components.optionGroupDefaultBackground
 import com.inky.fitnesscalendar.ui.util.Icons
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.applyIf
+import com.inky.fitnesscalendar.ui.util.localPreferences
 import com.inky.fitnesscalendar.ui.util.sharedElement
 import com.inky.fitnesscalendar.util.Option
 import com.inky.fitnesscalendar.util.asNonEmptyOrNull
@@ -95,6 +98,7 @@ import com.inky.fitnesscalendar.util.toDate
 import com.inky.fitnesscalendar.util.toLocalDateTime
 import com.inky.fitnesscalendar.view_model.NewActivityViewModel
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import java.time.Duration
@@ -544,16 +548,24 @@ private fun RowScope.DateAndDurationInput(
     onEnd: (LocalDateTime) -> Unit,
     localizationRepository: LocalizationRepository
 ) {
-    var showDateInput by rememberSaveable { mutableStateOf(true) }
+    val preferDuration = localPreferences.current.preferEndDateAsDuration
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     AnimatedContent(
-        showDateInput,
+        preferDuration,
         modifier = Modifier
             .padding(start = 8.dp)
             .weight(1f)
             .fillMaxHeight()
-    ) { showDateInput ->
-        if (showDateInput) {
+    ) { preferDuration ->
+        if (preferDuration) {
+            DurationInput(
+                duration = Duration.between(editState.startDateTime, editState.endDateTime),
+                onDuration = { onEnd(editState.startDateTime + it) },
+                isError = editState.isEndDateTimeError
+            )
+        } else {
             DateTimeInput(
                 dateTime = editState.endDateTime,
                 showDate = editState.startDateTime.toLocalDate() != editState.endDateTime.toLocalDate(),
@@ -562,22 +574,20 @@ private fun RowScope.DateAndDurationInput(
                 onDateTime = onEnd,
                 isError = editState.isEndDateTimeError,
             )
-        } else {
-            DurationInput(
-                duration = Duration.between(editState.startDateTime, editState.endDateTime),
-                onDuration = { onEnd(editState.startDateTime + it) },
-                isError = editState.isEndDateTimeError
-            )
         }
 
     }
 
-    IconButton(onClick = { showDateInput = !showDateInput }) {
-        AnimatedContent(showDateInput) { showDateInput ->
-            if (showDateInput) {
-                Icons.CalendarToday(stringResource(R.string.switch_to_duration_input))
-            } else {
+    IconButton(onClick = {
+        scope.launch {
+            Preference.PREF_PREFER_END_DATE_AS_DURATION.set(context, !preferDuration)
+        }
+    }) {
+        AnimatedContent(preferDuration) { preferDuration ->
+            if (preferDuration) {
                 Icons.Timer(stringResource(R.string.switch_to_date_input))
+            } else {
+                Icons.CalendarToday(stringResource(R.string.switch_to_duration_input))
             }
         }
     }
