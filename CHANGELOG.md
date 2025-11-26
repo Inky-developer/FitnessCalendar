@@ -4,6 +4,7 @@
 - Allow selecting a single video frame as image for an activity
 - The minimum supported android sdk version is now 28
 - Rework the view of activities with a track
+- Allow inputting the duration of an activity
 
 # 2025.11.1
 
