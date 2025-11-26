@@ -338,6 +338,7 @@ fun NewActivity(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(IntrinsicSize.Min)
+                        .padding(vertical = 4.dp)
                 ) {
                     val dateLabelId = if (hasDuration) {
                         R.string.datetime_start
