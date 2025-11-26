@@ -485,8 +485,8 @@ private fun DateTimeInput(
     localizationRepository: LocalizationRepository,
     labelId: Int,
     onDateTime: (LocalDateTime) -> Unit,
-    showDate: Boolean = true,
     modifier: Modifier = Modifier,
+    showDate: Boolean = true,
     isError: Boolean = false,
 ) {
     val dateTimeStr = remember(dateTime, showDate) {

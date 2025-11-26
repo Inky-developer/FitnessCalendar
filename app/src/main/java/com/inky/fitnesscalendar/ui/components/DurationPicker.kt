@@ -12,8 +12,12 @@ import java.time.LocalTime
 fun DurationPicker(duration: Duration, onConfirm: (Duration) -> Unit, onDismiss: () -> Unit) {
     // Prevent durations longer than 24 hours since they are not supported by the material time picker.
     // Maybe switch to a custom implementation later if we need longer input
-    val asTime =
-        LocalTime.ofSecondOfDay(minOf(duration.toSeconds(), Duration.ofDays(1).toSeconds() - 1))
+    val asTime = LocalTime.ofSecondOfDay(
+        minOf(
+            duration.toMillis() / 1000,
+            Duration.ofDays(1).toMillis() / 1000 - 1
+        )
+    )
     val timePickerState =
         rememberTimePickerState(initialHour = asTime.hour, initialMinute = asTime.minute)
 
