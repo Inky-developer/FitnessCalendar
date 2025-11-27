@@ -218,7 +218,7 @@ fun NewActivity(
         showBackDialog = true
     }
 
-    val onBack = remember {
+    val onBack = remember(editState, initialState) {
         {
             if (editState != initialState) {
                 showBackDialog = true
