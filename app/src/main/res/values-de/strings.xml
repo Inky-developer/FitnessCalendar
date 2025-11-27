@@ -341,4 +341,6 @@
     <string name="tap_to_add_description">Tippen, um eine Beschreibung hinzuzufügen</string>
     <string name="switch_to_duration_input">Zur Eingabe der Dauer wechseln</string>
     <string name="switch_to_date_input">Zur Eingabe des Datums wechseln</string>
+    <string name="previous_frame">Vorheriges Bild</string>
+    <string name="next_frame">Nächstes Bild</string>
 </resources>

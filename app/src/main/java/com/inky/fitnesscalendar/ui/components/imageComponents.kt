@@ -30,6 +30,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
@@ -317,7 +318,22 @@ private fun ExtractImageFromVideoPopup(
                         }
                     },
                     actions = {
-
+                        IconButton(
+                            enabled = frameIndex > 0,
+                            onClick = {
+                                frameIndex = (frameIndex - 1).coerceIn(0, lastFrameIndex)
+                            }
+                        ) {
+                            Icons.KeyboardArrowLeft(stringResource(R.string.previous_frame))
+                        }
+                        IconButton(
+                            enabled = frameIndex < lastFrameIndex,
+                            onClick = {
+                                frameIndex = (frameIndex + 1).coerceIn(0, lastFrameIndex)
+                            }
+                        ) {
+                            Icons.KeyboardArrowRight(stringResource(R.string.next_frame))
+                        }
                     }
                 )
             }
