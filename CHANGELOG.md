@@ -1,5 +1,7 @@
 # Unreleased
 
+# 2025.11.2
+
 - Allow adding multiple images to an activity
 - Allow selecting a single video frame as image for an activity
 - The minimum supported android sdk version is now 28
