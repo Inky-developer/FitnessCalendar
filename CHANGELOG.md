@@ -1,5 +1,7 @@
 # Unreleased
 
+- Add Russian translation
+
 # 2025.11.2
 
 - Allow adding multiple images to an activity
