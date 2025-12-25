@@ -27,3 +27,10 @@ A private and fully offline activity tracker.
 ## Public API
 
 See [docs.md](docs/docs.md)
+
+## Translation
+Please help to translate on the [Weblate](https://toolate.othing.xyz/projects/fitnesscalendar).
+
+<a href="https://toolate.othing.xyz/projects/fitnesscalendar">
+<img src="https://toolate.othing.xyz/widget/fitnesscalendar/multi-auto.svg" alt="Translation status" />
+</a>
