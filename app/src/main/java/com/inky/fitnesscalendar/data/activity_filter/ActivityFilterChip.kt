@@ -1,6 +1,6 @@
 package com.inky.fitnesscalendar.data.activity_filter
 
-import android.content.Context
+import android.content.res.Resources
 import android.os.Parcelable
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityCategory
@@ -121,7 +121,7 @@ sealed class ActivityFilterChip : Parcelable {
         is FavoriteFilterChip -> filter.copy(favorite = favorite)
     }
 
-    fun displayText(context: Context) = when (this) {
+    fun displayText(context: Resources) = when (this) {
         is AttributeFilterChip -> attribute.getString(context, state)
         is CategoryFilterChip -> context.getString(category.nameId)
         is DateFilterChip -> option.getText(context)

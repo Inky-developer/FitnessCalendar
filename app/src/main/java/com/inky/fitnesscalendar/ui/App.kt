@@ -200,7 +200,7 @@ private fun AppNavigation(
                     FilterView(
                         initialFilter = filterState,
                         onFilterChange = {
-                            filterState = it
+                            filterState = it.normalize()
                             viewModel.addToFilterHistory(filterState)
                         },
                         onNavigateBack = { navController.popBackStack() }

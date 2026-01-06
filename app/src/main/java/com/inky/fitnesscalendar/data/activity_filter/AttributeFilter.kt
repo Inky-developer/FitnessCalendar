@@ -1,6 +1,6 @@
 package com.inky.fitnesscalendar.data.activity_filter
 
-import android.content.Context
+import android.content.res.Resources
 import android.os.Parcelable
 import androidx.annotation.StringRes
 import com.inky.fitnesscalendar.R
@@ -42,7 +42,7 @@ data class AttributeFilter(
         Place(R.string.place),
         Track(R.string.track);
 
-        fun getString(context: Context, state: Boolean): String {
+        fun getString(context: Resources, state: Boolean): String {
             val filterStringId = if (state) {
                 R.string.with_attribute
             } else {

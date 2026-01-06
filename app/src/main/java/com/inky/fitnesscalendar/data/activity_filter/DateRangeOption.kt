@@ -1,6 +1,6 @@
 package com.inky.fitnesscalendar.data.activity_filter
 
-import android.content.Context
+import android.content.res.Resources
 import android.os.Parcelable
 import androidx.annotation.StringRes
 import com.inky.fitnesscalendar.R
@@ -9,7 +9,8 @@ import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class DateRangeOption(val range: DateRange, val name: DateRangeName? = null) : Parcelable {
-    fun getText(context: Context) = name?.nameId?.let { context.getString(it) } ?: range.toString()
+    fun getText(context: Resources) =
+        name?.nameId?.let { context.getString(it) } ?: range.toString()
 
     enum class DateRangeName(@StringRes val nameId: Int) {
         Today(R.string.today),

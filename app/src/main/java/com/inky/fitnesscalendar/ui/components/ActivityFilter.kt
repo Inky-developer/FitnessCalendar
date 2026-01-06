@@ -16,7 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -33,7 +33,7 @@ fun FilterInformation(
     filter: ActivityFilter,
     onChange: (ActivityFilter) -> Unit
 ) {
-    val context = LocalContext.current
+    val context = LocalResources.current
     val listState = rememberLazyListState()
     val filterItems = remember(filter) { filter.items() }
     val historyItems = localDatabaseValues.current.activityFilterChips
