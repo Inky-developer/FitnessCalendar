@@ -32,7 +32,6 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -66,6 +65,7 @@ import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.repository.DatabaseRepository
 import com.inky.fitnesscalendar.ui.components.ActivityImages
+import com.inky.fitnesscalendar.ui.components.DescriptionTextInput
 import com.inky.fitnesscalendar.ui.components.FavoriteIcon
 import com.inky.fitnesscalendar.ui.components.ImageLimit
 import com.inky.fitnesscalendar.ui.components.ImageViewer
@@ -383,7 +383,7 @@ private fun ActivityDescription(description: String, onDescription: (String) -> 
 
     if (showDialog) {
         Dialog(onDismissRequest = { showDialog = false }) {
-            TextField(value = description, onValueChange = onDescription)
+            DescriptionTextInput(description = description, onDescription = onDescription)
         }
     }
 }
