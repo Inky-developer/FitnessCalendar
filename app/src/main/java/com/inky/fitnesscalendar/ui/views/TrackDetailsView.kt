@@ -1,6 +1,7 @@
 package com.inky.fitnesscalendar.ui.views
 
 import android.content.Context
+import android.os.Parcelable
 import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedContent
@@ -82,6 +83,7 @@ import com.inky.fitnesscalendar.util.asNonEmptyOrNull
 import com.inky.fitnesscalendar.util.toLocalDate
 import com.inky.fitnesscalendar.view_model.BaseViewModel
 import kotlinx.coroutines.launch
+import kotlinx.parcelize.Parcelize
 
 @Composable
 fun TrackDetailsView(
@@ -454,13 +456,21 @@ private fun rememberDetailsState(
     val stats = remember(track) { track?.computeStatistics()?.ok() }
 
     return whenNonNull(activity, track, preview, stats) { activity, track, preview, stats ->
+        val editState =
+            rememberSaveable(activity, track) { mutableStateOf(DetailsEditState(activity)) }
+
         remember(activity, track) {
             DetailsState(
-                activity,
-                stats,
-                preview,
-                repository.localizationRepository,
-                context
+                initialEditState = DetailsEditState(activity),
+                internalEditState = editState,
+                initialActivity = activity,
+                data = DetailsData.initialize(
+                    activity,
+                    stats,
+                    preview,
+                    repository.localizationRepository,
+                    context
+                )
             )
         }
     }
@@ -481,25 +491,12 @@ private inline fun <A, B, C, D, T> whenNonNull(
 
 
 class DetailsState(
-    editStateImpl: MutableState<DetailsEditState>,
+    val internalEditState: MutableState<DetailsEditState>,
     val initialEditState: DetailsEditState,
     val initialActivity: RichActivity,
     val data: DetailsData
 ) {
-    constructor(
-        richActivity: RichActivity,
-        stats: GpxTrackStats,
-        preview: TrackSvg,
-        localizationRepository: LocalizationRepository,
-        context: Context
-    ) : this(
-        initialEditState = DetailsEditState(richActivity),
-        initialActivity = richActivity,
-        editStateImpl = mutableStateOf(DetailsEditState(richActivity)),
-        data = DetailsData.initialize(richActivity, stats, preview, localizationRepository, context)
-    )
-
-    var editState by editStateImpl
+    var editState by internalEditState
 
     val hasChanged = derivedStateOf { editState != initialEditState }
 
@@ -518,11 +515,12 @@ class DetailsState(
     fun getUpdatedActivity() = editState.getActivity(initialActivity)
 }
 
+@Parcelize
 data class DetailsEditState(
     val images: List<ImageName>,
     val description: String,
     val isFavorite: Boolean
-) {
+) : Parcelable {
     constructor(richActivity: RichActivity) : this(
         images = richActivity.images,
         description = richActivity.activity.description,
