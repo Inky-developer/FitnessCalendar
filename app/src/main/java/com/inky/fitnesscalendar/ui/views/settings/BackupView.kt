@@ -34,7 +34,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -208,11 +208,11 @@ private fun BackupDirectoryButton(onUri: (Uri?) -> Unit) {
 
 @Composable
 private fun LastBackupInfo(lastBackupDate: LocalDateTime? = null) {
-    val context = LocalContext.current
+    val resources = LocalResources.current
     val lastBackupText = remember(lastBackupDate) {
         lastBackupDate
             ?.let { LocalizationRepository.localDateFormatter.format(lastBackupDate) }
-            ?: context.getString(R.string.never)
+            ?: resources.getString(R.string.never)
     }
 
     Column(modifier = Modifier.padding(vertical = 4.dp)) {

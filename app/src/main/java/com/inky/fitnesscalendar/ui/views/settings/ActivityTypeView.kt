@@ -35,7 +35,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
@@ -130,7 +130,7 @@ fun EditTypeDialog(
     onSave: (ActivityType) -> Unit,
     onDelete: () -> Unit,
 ) {
-    val context = LocalContext.current
+    val resources = LocalResources.current
 
     var state by rememberSaveable { mutableStateOf(initialState) }
     var showEmojiPicker by rememberSaveable { mutableStateOf(false) }
@@ -138,9 +138,9 @@ fun EditTypeDialog(
     val type = remember(state) { state.toActivityType() }
     val title = remember(state) {
         if (state.isNewType) {
-            context.getString(R.string.new_type)
+            resources.getString(R.string.new_type)
         } else {
-            context.getString(R.string.edit_type, state.name)
+            resources.getString(R.string.edit_type, state.name)
         }
     }
 
