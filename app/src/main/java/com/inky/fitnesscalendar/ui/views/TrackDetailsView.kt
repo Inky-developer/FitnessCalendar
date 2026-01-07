@@ -1,6 +1,7 @@
 package com.inky.fitnesscalendar.ui.views
 
 import android.content.Context
+import android.os.Parcelable
 import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedContent
@@ -32,7 +33,6 @@ import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -66,6 +66,7 @@ import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.repository.DatabaseRepository
 import com.inky.fitnesscalendar.ui.components.ActivityImages
+import com.inky.fitnesscalendar.ui.components.DescriptionTextInput
 import com.inky.fitnesscalendar.ui.components.FavoriteIcon
 import com.inky.fitnesscalendar.ui.components.ImageLimit
 import com.inky.fitnesscalendar.ui.components.ImageViewer
@@ -82,6 +83,7 @@ import com.inky.fitnesscalendar.util.asNonEmptyOrNull
 import com.inky.fitnesscalendar.util.toLocalDate
 import com.inky.fitnesscalendar.view_model.BaseViewModel
 import kotlinx.coroutines.launch
+import kotlinx.parcelize.Parcelize
 
 @Composable
 fun TrackDetailsView(
@@ -383,7 +385,7 @@ private fun ActivityDescription(description: String, onDescription: (String) -> 
 
     if (showDialog) {
         Dialog(onDismissRequest = { showDialog = false }) {
-            TextField(value = description, onValueChange = onDescription)
+            DescriptionTextInput(description = description, onDescription = onDescription)
         }
     }
 }
@@ -454,13 +456,21 @@ private fun rememberDetailsState(
     val stats = remember(track) { track?.computeStatistics()?.ok() }
 
     return whenNonNull(activity, track, preview, stats) { activity, track, preview, stats ->
+        val editState =
+            rememberSaveable(activity, track) { mutableStateOf(DetailsEditState(activity)) }
+
         remember(activity, track) {
             DetailsState(
-                activity,
-                stats,
-                preview,
-                repository.localizationRepository,
-                context
+                initialEditState = DetailsEditState(activity),
+                internalEditState = editState,
+                initialActivity = activity,
+                data = DetailsData.initialize(
+                    activity,
+                    stats,
+                    preview,
+                    repository.localizationRepository,
+                    context
+                )
             )
         }
     }
@@ -481,25 +491,12 @@ private inline fun <A, B, C, D, T> whenNonNull(
 
 
 class DetailsState(
-    editStateImpl: MutableState<DetailsEditState>,
+    val internalEditState: MutableState<DetailsEditState>,
     val initialEditState: DetailsEditState,
     val initialActivity: RichActivity,
     val data: DetailsData
 ) {
-    constructor(
-        richActivity: RichActivity,
-        stats: GpxTrackStats,
-        preview: TrackSvg,
-        localizationRepository: LocalizationRepository,
-        context: Context
-    ) : this(
-        initialEditState = DetailsEditState(richActivity),
-        initialActivity = richActivity,
-        editStateImpl = mutableStateOf(DetailsEditState(richActivity)),
-        data = DetailsData.initialize(richActivity, stats, preview, localizationRepository, context)
-    )
-
-    var editState by editStateImpl
+    var editState by internalEditState
 
     val hasChanged = derivedStateOf { editState != initialEditState }
 
@@ -518,11 +515,12 @@ class DetailsState(
     fun getUpdatedActivity() = editState.getActivity(initialActivity)
 }
 
+@Parcelize
 data class DetailsEditState(
     val images: List<ImageName>,
     val description: String,
     val isFavorite: Boolean
-) {
+) : Parcelable {
     constructor(richActivity: RichActivity) : this(
         images = richActivity.images,
         description = richActivity.activity.description,

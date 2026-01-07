@@ -33,6 +33,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -156,12 +157,13 @@ private fun <T> PreferenceToggle(
     filter: ((Boolean) -> Boolean)? = null
 ) {
     val scope = rememberCoroutineScope()
+    val resources = LocalResources.current
     val context = LocalContext.current
     val checked by preference.collectAsState()
 
-    val title = remember(preference) { preference.titleId?.let { context.getString(it) } }
+    val title = remember(preference) { preference.titleId?.let { resources.getString(it) } }
     val description =
-        remember(preference) { preference.descriptionId?.let { context.getString(it) } }
+        remember(preference) { preference.descriptionId?.let { resources.getString(it) } }
 
     val onCheckedChange: (Boolean) -> Unit = {
         if (filter == null || filter(it)) {

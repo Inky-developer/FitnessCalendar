@@ -2,6 +2,7 @@ package com.inky.fitnesscalendar.ui.views
 
 import androidx.activity.compose.BackHandler
 import androidx.annotation.StringRes
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -29,7 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.ImeAction
@@ -53,7 +54,6 @@ import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.util.toggled
 
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilterView(
     initialFilter: ActivityFilter,
@@ -70,6 +70,16 @@ fun FilterView(
         onBack()
     }
 
+    FilterViewInner(filter = filter, onFilter = { filter = it.normalize() }, onBack = onBack)
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FilterViewInner(
+    filter: ActivityFilter,
+    onFilter: (ActivityFilter) -> Unit,
+    onBack: () -> Unit,
+) {
     val appBar = @Composable {
         TopAppBar(
             colors = TopAppBarDefaults.topAppBarColors(
@@ -80,7 +90,7 @@ fun FilterView(
                 TextField(
                     filter.text ?: "",
                     onValueChange = {
-                        filter = filter.copy(text = it)
+                        onFilter(filter.copy(text = it))
                     },
                     placeholder = { Text(stringResource(R.string.search_for_activity)) },
                     colors = TextFieldDefaults.colors(
@@ -100,7 +110,7 @@ fun FilterView(
             },
             actions = {
                 IconButton(
-                    onClick = { filter = ActivityFilter() }, enabled = !filter.isEmpty()
+                    onClick = { onFilter(ActivityFilter()) }, enabled = !filter.isEmpty()
                 ) {
                     Icons.Close(stringResource(R.string.reset_filters))
                 }
@@ -113,7 +123,7 @@ fun FilterView(
     ) { paddingValues ->
         FilterViewInner(
             filter = filter,
-            onFilter = { filter = it },
+            onFilter = onFilter,
             hideActivitiesAndCategories = false,
             modifier = Modifier.padding(paddingValues)
         )
@@ -128,13 +138,13 @@ fun FilterViewInner(
     hideActivitiesAndCategories: Boolean
 ) {
     Column(modifier = modifier.verticalScroll(rememberScrollState())) {
-        val context = LocalContext.current
+        val resources = LocalResources.current
         val selectionLabel = remember(filter) {
             if (filter.types.isEmpty()) null else filter.types.joinToString(", ") { it.name }
         }
         val categorySelectionLabel = remember(filter) {
             if (filter.categories.isEmpty()) null else filter.categories.joinToString(", ") {
-                context.getString(it.nameId)
+                resources.getString(it.nameId)
             }
         }
         val placeSelectionLabel = remember(filter) {
@@ -144,7 +154,7 @@ fun FilterViewInner(
             val entries = filter.attributes.entries()
                 .filter { (_, state) -> state != AttributeFilter.TriState.Undefined }
             if (entries.isEmpty()) null else entries.joinToString(", ") { (attribute, state) ->
-                attribute.getString(context, state.toBooleanOrNull() == true)
+                attribute.getString(resources, state.toBooleanOrNull() == true)
             }
         }
 
@@ -178,13 +188,19 @@ fun FilterViewInner(
             }
         }
 
-        if (localDatabaseValues.current.places.isNotEmpty()) {
+        var places = localDatabaseValues.current.places
+        if (filter.types.isNotEmpty()) {
+            val validColors = filter.types.mapNotNull { it.limitPlacesByColor }.toSet()
+            places = places.filter { validColors.contains(it.color) }
+        }
+        AnimatedVisibility(places.isNotEmpty()) {
             OptionGroup(
                 label = stringResource(R.string.filter_by_places),
                 selectionLabel = placeSelectionLabel,
                 modifier = Modifier.padding(all = 8.dp)
             ) {
                 PlacesSelector(
+                    places = places,
                     isSelected = { filter.places.contains(it) },
                     onSelect = { place ->
                         onFilter(filter.copy(places = filter.places.toggled(place)))
@@ -195,7 +211,7 @@ fun FilterViewInner(
 
         OptionGroup(
             label = stringResource(R.string.filter_by_date),
-            selectionLabel = filter.range?.getText(context),
+            selectionLabel = filter.range?.getText(resources),
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
         ) {
             LazyRow {
@@ -212,7 +228,7 @@ fun FilterViewInner(
                         },
                         label = {
                             Text(
-                                range.toOption().getText(context),
+                                range.toOption().getText(resources),
                                 style = MaterialTheme.typography.titleMedium
                             )
                         },
@@ -224,7 +240,7 @@ fun FilterViewInner(
 
         FilterSelectionGroup(
             label = stringResource(R.string.filter_by_vehicles),
-            text = { context.getString(it.nameId) },
+            text = { resources.getString(it.nameId) },
             selection = filter.vehicles,
             options = Vehicle.entries,
             onSelection = { onFilter(filter.copy(vehicles = it)) }
@@ -234,7 +250,7 @@ fun FilterViewInner(
 
         FilterSelectionGroup(
             label = stringResource(R.string.filter_by_feels),
-            text = { context.getString(it.nameId) },
+            text = { resources.getString(it.nameId) },
             selection = filter.feels,
             options = Feel.entries,
             onSelection = { onFilter(filter.copy(feels = it)) }
@@ -245,7 +261,7 @@ fun FilterViewInner(
         val currentFavoriteOption = filter.favorite?.let { FavoriteOption.fromBoolean(it) }
         OptionGroup(
             label = stringResource(R.string.filter_by_favorites),
-            selectionLabel = currentFavoriteOption?.let { context.getString(it.nameId) },
+            selectionLabel = currentFavoriteOption?.let { stringResource(it.nameId) },
             modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
         ) {
             LazyRow {
@@ -308,10 +324,13 @@ fun FilterViewInner(
 }
 
 @Composable
-private fun PlacesSelector(isSelected: (Place) -> Boolean, onSelect: (Place) -> Unit) {
-    val places = localDatabaseValues.current.places
+private fun PlacesSelector(
+    places: List<Place>,
+    isSelected: (Place) -> Boolean,
+    onSelect: (Place) -> Unit
+) {
     LazyRow {
-        items(places) { place ->
+        items(places, key = { it.uid!! }) { place ->
             FilterChip(
                 selected = isSelected(place),
                 onClick = { onSelect(place) },
@@ -327,7 +346,9 @@ private fun PlacesSelector(isSelected: (Place) -> Boolean, onSelect: (Place) -> 
                     selected = isSelected(place),
                     borderColor = colorResource(place.color.colorId)
                 ),
-                modifier = Modifier.padding(all = 4.dp)
+                modifier = Modifier
+                    .padding(all = 4.dp)
+                    .animateItem()
             )
         }
     }

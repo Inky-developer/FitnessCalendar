@@ -55,6 +55,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -186,17 +187,17 @@ fun NewActivity(
 ) {
     var showBackDialog by rememberSaveable { mutableStateOf(false) }
 
-    val context = LocalContext.current
+    val resources = LocalResources.current
 
     val title by remember(editState) {
         derivedStateOf {
             if (editState.activityId != null && editState.activitySelectorState.activityType != null) {
-                context.getString(
+                resources.getString(
                     R.string.edit_object,
                     editState.activitySelectorState.activityType.name
                 )
             } else {
-                context.getString(R.string.new_activity)
+                resources.getString(R.string.new_activity)
             }
         }
     }

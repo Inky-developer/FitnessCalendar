@@ -33,7 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -213,8 +213,8 @@ private fun ActivityCardWithoutType(
     val time = remember(track) {
         track.startTime?.let { localizationRepository.formatRelativeDate(it) } ?: ""
     }
-    val context = LocalContext.current
-    val errorMessage = remember(error) { error?.let { context.getString(error.messageId) } }
+    val resources = LocalResources.current
+    val errorMessage = remember(error) { error?.let { resources.getString(error.messageId) } }
 
     Card(
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),

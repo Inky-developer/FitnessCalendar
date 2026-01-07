@@ -47,7 +47,7 @@ value class ActivityStatistics(
         if (distances.isEmpty()) {
             return null
         }
-        return (distances.sum().toDouble() / distances.size).meters()
+        return (distances.sum() / distances.size).meters()
     }
 
     fun averageMovingSpeed(): Speed? {

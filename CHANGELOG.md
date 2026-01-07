@@ -1,6 +1,7 @@
 # Unreleased
 
 - Add Russian translation
+- Some bug & crash fixes
 
 # 2025.11.2
 

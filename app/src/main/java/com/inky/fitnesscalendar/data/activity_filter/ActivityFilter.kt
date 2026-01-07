@@ -22,6 +22,15 @@ data class ActivityFilter(
     val range: DateRangeOption? = null,
     val attributes: AttributeFilter = AttributeFilter(),
 ) : Parcelable {
+    fun normalize(): ActivityFilter {
+        if (types.isEmpty()) {
+            return this
+        }
+        val validPlaceColors = types.mapNotNull { it.limitPlacesByColor }.toSet()
+        println(validPlaceColors)
+        return copy(places = places.filter { validPlaceColors.contains(it.color) })
+    }
+
     fun isEmpty() = this == ActivityFilter()
 
     fun withCategory(newCategory: ActivityCategory) =

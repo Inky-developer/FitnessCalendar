@@ -37,6 +37,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -477,7 +478,12 @@ fun Today(
 
 @Composable
 fun CompactFeelSelector(feel: Feel, onFeel: (Feel) -> Unit, modifier: Modifier = Modifier) {
-    val expanded = remember { MutableTransitionState(false) }
+    val expanded =
+        rememberSaveable(
+            saver = listSaver(
+                save = { listOf(it.targetState) },
+                restore = { MutableTransitionState(it[0]) })
+        ) { MutableTransitionState(false) }
 
     Column(modifier = modifier) {
         AnimatedContent(
