@@ -25,12 +25,21 @@ import java.time.temporal.WeekFields
 import java.util.Date
 import java.util.Locale
 
-@JvmInline
-value class ActivityStatistics(
+/**
+ * Class for calculating various statistics about activities.
+ *
+ * This class can contain synthetic activities which are only counted for some statistics, like
+ * total time and average values, but not for other statistics like total distance and other totals.
+ *
+ * This is because when e.g. calculating statistics per day, a single activity may span multiple days.
+ * In this case it is split into multiple synthetic activities, one for each day.
+ */
+data class ActivityStatistics(
     val activities: List<RichActivity>,
 ) {
-    val size
-        get() = activities.count { !it.isSynthetic }
+    val realActivities by lazy { activities.filter { !it.isSynthetic } }
+
+    val size get() = realActivities.size
 
     fun totalTime() = activities.sumOf { it.activity.duration.elapsedMs }.ms()
 
@@ -40,7 +49,7 @@ value class ActivityStatistics(
         return (totalTime().elapsedMs / size).ms()
     }
 
-    fun totalDistance() = activities.sumOf { it.activity.distance?.meters ?: 0.0 }.meters()
+    fun totalDistance() = realActivities.sumOf { it.activity.distance?.meters ?: 0.0 }.meters()
 
     fun averageDistance(): Distance? {
         val distances = activities.mapNotNull { it.activity.distance?.meters }
@@ -91,10 +100,10 @@ value class ActivityStatistics(
     }
 
     fun totalAscent(): VerticalDistance =
-        VerticalDistance(meters = activities.sumOf { it.activity.totalAscent?.meters ?: 0.0 })
+        VerticalDistance(meters = realActivities.sumOf { it.activity.totalAscent?.meters ?: 0.0 })
 
     fun totalDescent(): VerticalDistance =
-        VerticalDistance(meters = activities.sumOf { it.activity.totalDescent?.meters ?: 0.0 })
+        VerticalDistance(meters = realActivities.sumOf { it.activity.totalDescent?.meters ?: 0.0 })
 
     fun averageTemperature(): Temperature? {
         val temperatures = activities.mapNotNull { it.activity.temperature?.celsius }
