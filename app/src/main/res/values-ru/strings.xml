@@ -199,9 +199,7 @@
     <string name="advanced_settings">Расширенные настройки</string>
     <string name="recalculate_track_data">Пересчитать данные пути</string>
     <string name="about">О приложении</string>
-    <string name="open_source_licenses">Лицензии с открытого исходного кода</string>
     <string name="star_on_github">Начать Github</string>
-    <string name="show_open_source_licenses">Показать лицензии с открытым исходным кодом</string>
     <string name="heart_rate">Частота пульса</string>
     <string name="temperature">Температура</string>
     <string name="track_details">Подробности пути</string>

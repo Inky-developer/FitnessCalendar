@@ -222,9 +222,7 @@
     <string name="advanced_settings">Advanced</string>
     <string name="recalculate_track_data">Recalculate track data</string>
     <string name="about">About</string>
-    <string name="open_source_licenses">Open source licenses</string>
     <string name="star_on_github">Star on Github</string>
-    <string name="show_open_source_licenses">Show open source licenses</string>
     <string name="heart_rate">Heart rate</string>
     <string name="temperature">Temperature</string>
     <string name="track_details">Track details</string>
