@@ -2,6 +2,7 @@ package com.inky.fitnesscalendar.view_model.statistics
 
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityStatistics
+import com.inky.fitnesscalendar.data.LocalDateRange
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.FormatStyle
@@ -34,17 +35,25 @@ enum class Period(
         val today = LocalDate.now()
 
         val result = mutableMapOf<Long, StatisticsEntry>()
-        val activityMap = groupStats(statistics)
-        // Subtract 1 unit to make sure there are at least two data points
+        val activityMap = groupStats(statistics).toSortedMap(LocalDateRange.COMPARATOR)
+        // Make sure there are at least two data points
         // Otherwise, the graph might not render correctly
-        var day = (activityMap.keys.minOrNull() ?: today).minus(1, temporalUnit)
+        val currentRange = rangeOf(today)
+        val prevRange = rangeOf(today.minus(1, temporalUnit))
+        activityMap.putIfAbsent(currentRange, ActivityStatistics(emptyList()))
+        activityMap.putIfAbsent(prevRange, ActivityStatistics(emptyList()))
+
         var index = 0L
-        while (!day.isAfter(today)) {
+        for ((range, stats) in activityMap) {
+            val start = range.start
+            if (start.toLocalDate().isAfter(today)) {
+                break
+            }
             result[index] = StatisticsEntry(
-                statistics = activityMap[day] ?: ActivityStatistics(emptyList()),
-                entryName = format(day, today)
+                statistics = stats,
+                entryName = format(start.toLocalDate(), today)
             )
-            day = day.plus(1, temporalUnit)
+
             index += 1
         }
 
@@ -52,10 +61,17 @@ enum class Period(
     }
 
     private fun groupStats(statistics: ActivityStatistics) = when (this) {
-        Day -> statistics.activitiesByDay
-        Week -> statistics.activitiesByWeek
-        Month -> statistics.activitiesByMonth
-        Year -> statistics.activitiesByYear
+        Day -> statistics.activitiesByDay()
+        Week -> statistics.activitiesByWeek()
+        Month -> statistics.activitiesByMonth()
+        Year -> statistics.activitiesByYear()
+    }
+
+    private fun rangeOf(date: LocalDate) = when (this) {
+        Day -> LocalDateRange.dayOf(date)
+        Week -> LocalDateRange.weekOf(date)
+        Month -> LocalDateRange.monthOf(date)
+        Year -> LocalDateRange.yearOf(date)
     }
 
     private fun format(date: LocalDate, today: LocalDate) = when (this) {
