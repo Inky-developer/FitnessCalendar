@@ -1,20 +1,30 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.io.FileInputStream
 import java.util.Properties
 
 plugins {
     alias(libs.plugins.androidApplication)
-    alias(libs.plugins.jetbrainsKotlinAndroid)
     alias(libs.plugins.hilt)
     id("kotlin-parcelize")
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.room)
     alias(libs.plugins.ksp)
     kotlin("plugin.serialization") version "2.0.0"
-    id("com.jaredsburrows.license") version "0.9.8"
 }
 
 room {
     schemaDirectory("$projectDir/schemas")
+}
+
+hilt {
+    enableAggregatingTask = true
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_17)
+        freeCompilerArgs.add("-XXLanguage:+PropertyParamAnnotationDefaultTargetMode")
+    }
 }
 
 android {
@@ -79,10 +89,6 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
-        freeCompilerArgs = listOf("-XXLanguage:+PropertyParamAnnotationDefaultTargetMode")
-    }
     testOptions {
         unitTests {
             isIncludeAndroidResources = true
@@ -104,9 +110,7 @@ android {
         includeInApk = false
         includeInBundle = false
     }
-    hilt {
-        enableAggregatingTask = true
-    }
+
     lint {
         checkAllWarnings = true
         warningsAsErrors = true

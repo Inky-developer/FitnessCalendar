@@ -228,6 +228,20 @@ fun TrackGraph(
         listOfNotNull(overlayLayer, mainLayer).toTypedArray()
     }
 
+    // Vico has a bug where it crashes with Zoom.Content when the overlay gets added.
+    // As an ugly workaround, we make sure here to recalculate Zoom.Content when the overlay changes
+    val contentZoom = remember(overlay) {
+        Zoom { context, layerDimensions, bounds ->
+            val scalableContentWidth = layerDimensions.getScalableContentWidth(context)
+            if (scalableContentWidth == 0f) {
+                1f
+            } else {
+                (bounds.width() - layerDimensions.unscalablePadding) / scalableContentWidth
+            }
+        }
+    }
+    val zoomState = rememberVicoZoomState(initialZoom = contentZoom)
+
     CartesianChartHost(
         chart = rememberCartesianChart(
             *layers,
@@ -261,7 +275,7 @@ fun TrackGraph(
             )
         ),
         modelProducer = modelProducer,
-        zoomState = rememberVicoZoomState(initialZoom = Zoom.Content),
+        zoomState = zoomState,
         modifier = modifier
     )
 }

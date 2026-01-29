@@ -27,7 +27,7 @@ import com.inky.fitnesscalendar.ui.util.Icons
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AboutView(onBack: () -> Unit, onNavigateOpenSourceLicenses: () -> Unit) {
+fun AboutView(onBack: () -> Unit) {
     Scaffold(
         topBar = {
             CenterAlignedTopAppBar(
@@ -54,9 +54,6 @@ fun AboutView(onBack: () -> Unit, onNavigateOpenSourceLicenses: () -> Unit) {
             Text(nameVersionText, modifier = Modifier.padding(all = 8.dp))
             Button(onClick = { openGithubRepo(context) }, modifier = Modifier.fillMaxWidth()) {
                 Text(stringResource(R.string.star_on_github))
-            }
-            Button(onClick = onNavigateOpenSourceLicenses, modifier = Modifier.fillMaxWidth()) {
-                Text(stringResource(R.string.show_open_source_licenses))
             }
         }
     }

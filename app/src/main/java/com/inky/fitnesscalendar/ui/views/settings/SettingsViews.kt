@@ -11,9 +11,6 @@ sealed interface SettingsViews {
     object About
 
     @Serializable
-    object OpenSourceLicences
-
-    @Serializable
     object Debug
 
     @Serializable

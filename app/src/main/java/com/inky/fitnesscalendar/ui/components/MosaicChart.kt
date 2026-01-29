@@ -34,6 +34,7 @@ import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.data.ActivityStatistics
+import com.inky.fitnesscalendar.data.LocalDateRange
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.TextStyle
@@ -71,7 +72,7 @@ fun ActivityStatistics.calculateMosaicState(colors: List<Color>): MosaicChartSta
     val firstDay = lastDay.minusYears(1).with(dayOfWeekField, 1)
     val locale = Locale.getDefault()
 
-    val activityData = activitiesByDay
+    val activityData = activitiesByDay()
 
     val days = mutableListOf<MosaicEntry<LocalDate>>()
     val xLabels = mutableMapOf<Int, String>()
@@ -79,7 +80,8 @@ fun ActivityStatistics.calculateMosaicState(colors: List<Color>): MosaicChartSta
     var day = firstDay
     var index = 0
     while (!day.isAfter(lastDay)) {
-        days.add(MosaicEntry(count = activityData[day]?.size ?: 0, data = day))
+        val range = LocalDateRange.dayOf(day)
+        days.add(MosaicEntry(count = activityData[range]?.size ?: 0, data = day))
         val nextDay = day.plusDays(1)
         if (day.month != nextDay.month) {
             xLabels[(index + 1) / 7] = nextDay.month.getDisplayName(TextStyle.SHORT, locale)

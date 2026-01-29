@@ -25,12 +25,21 @@ import java.time.temporal.WeekFields
 import java.util.Date
 import java.util.Locale
 
-@JvmInline
-value class ActivityStatistics(
+/**
+ * Class for calculating various statistics about activities.
+ *
+ * This class can contain synthetic activities which are only counted for some statistics, like
+ * total time and average values, but not for other statistics like total distance and other totals.
+ *
+ * This is because when e.g. calculating statistics per day, a single activity may span multiple days.
+ * In this case it is split into multiple synthetic activities, one for each day.
+ */
+data class ActivityStatistics(
     val activities: List<RichActivity>,
 ) {
-    val size
-        get() = activities.size
+    val realActivities by lazy { activities.filter { !it.isSynthetic } }
+
+    val size get() = realActivities.size
 
     fun totalTime() = activities.sumOf { it.activity.duration.elapsedMs }.ms()
 
@@ -40,7 +49,7 @@ value class ActivityStatistics(
         return (totalTime().elapsedMs / size).ms()
     }
 
-    fun totalDistance() = activities.sumOf { it.activity.distance?.meters ?: 0.0 }.meters()
+    fun totalDistance() = realActivities.sumOf { it.activity.distance?.meters ?: 0.0 }.meters()
 
     fun averageDistance(): Distance? {
         val distances = activities.mapNotNull { it.activity.distance?.meters }
@@ -91,10 +100,10 @@ value class ActivityStatistics(
     }
 
     fun totalAscent(): VerticalDistance =
-        VerticalDistance(meters = activities.sumOf { it.activity.totalAscent?.meters ?: 0.0 })
+        VerticalDistance(meters = realActivities.sumOf { it.activity.totalAscent?.meters ?: 0.0 })
 
     fun totalDescent(): VerticalDistance =
-        VerticalDistance(meters = activities.sumOf { it.activity.totalDescent?.meters ?: 0.0 })
+        VerticalDistance(meters = realActivities.sumOf { it.activity.totalDescent?.meters ?: 0.0 })
 
     fun averageTemperature(): Temperature? {
         val temperatures = activities.mapNotNull { it.activity.temperature?.celsius }
@@ -161,30 +170,29 @@ value class ActivityStatistics(
             .mapValues { ActivityStatistics(it.value) }
 
 
-    val activitiesByDay: Map<LocalDate, ActivityStatistics>
-        get() = keepNewerThanOneYear().groupByLocalDate { it }
+    fun activitiesByDay(): Map<LocalDateRange, ActivityStatistics> =
+        keepNewerThanOneYear().groupByDateRange { LocalDateRange.dayOf(it) }
 
-    val activitiesByWeek: Map<LocalDate, ActivityStatistics>
-        get() {
-            val dayOfWeekField = WeekFields.of(Locale.getDefault()).dayOfWeek()
-            val firstDateToInclude =
-                LocalDate.now().minusYears(1).plusWeeks(1).with(dayOfWeekField, 1).atStartOfDay()
-            return keepNewer(firstDateToInclude.toDate()).groupByLocalDate {
-                it.with(dayOfWeekField, 1)
-            }
+    fun activitiesByWeek(): Map<LocalDateRange, ActivityStatistics> {
+        val dayOfWeekField = WeekFields.of(Locale.getDefault()).dayOfWeek()
+        val firstDateToInclude =
+            LocalDate.now().minusYears(1).plusWeeks(1).with(dayOfWeekField, 1).atStartOfDay()
+        return keepNewer(firstDateToInclude.toDate()).groupByDateRange {
+            LocalDateRange.weekOf(it)
         }
+    }
 
-    val activitiesByMonth: Map<LocalDate, ActivityStatistics>
-        get() {
-            val today = LocalDate.now()
-            val firstDateToInclude =
-                today.minusYears(1).withDayOfMonth(1).plusMonths(1).atStartOfDay()
-            return keepNewer(firstDateToInclude.toDate())
-                .groupByLocalDate { it.withDayOfMonth(1) }
-        }
+    fun activitiesByMonth(): Map<LocalDateRange, ActivityStatistics> {
+        val today = LocalDate.now()
+        val firstDateToInclude =
+            today.minusYears(1).withDayOfMonth(1).plusMonths(1).atStartOfDay()
+        return keepNewer(firstDateToInclude.toDate())
+            .groupByDateRange { LocalDateRange.monthOf(it) }
+    }
 
-    val activitiesByYear: Map<LocalDate, ActivityStatistics>
-        get() = groupByLocalDate { it.withDayOfYear(1) }
+    fun activitiesByYear(): Map<LocalDateRange, ActivityStatistics> =
+        groupByDateRange { LocalDateRange.yearOf(it) }
+
 
     val activitiesByWeekday: Map<DayOfWeek, ActivityStatistics>
         get() {
@@ -198,9 +206,57 @@ value class ActivityStatistics(
             return groupBy { it.activity.startTime.toLocalDateTime(zoneId).hour }
         }
 
-    private inline fun groupByLocalDate(func: (LocalDate) -> LocalDate): Map<LocalDate, ActivityStatistics> {
+    private inline fun groupByDateRange(func: (LocalDate) -> LocalDateRange): Map<LocalDateRange, ActivityStatistics> {
         val zoneId = ZoneId.systemDefault()
-        return groupBy { func(it.activity.startTime.toLocalDate(zoneId)) }
+
+        val ranges = mutableMapOf<LocalDateRange, MutableList<RichActivity>>()
+        for (activity in activities) {
+            val startTimeRange = func(activity.activity.startTime.toLocalDate(zoneId))
+            val stopTimeRange = func(activity.activity.endTime.toLocalDate(zoneId))
+            if (startTimeRange == stopTimeRange) {
+                ranges.getOrPut(startTimeRange) { mutableListOf() }.add(activity)
+            } else {
+                splitActivity(
+                    activity,
+                    zoneId,
+                    func,
+                ) { range, activity ->
+                    ranges.getOrPut(range) { mutableListOf() }.add(activity)
+                }
+            }
+        }
+
+        return ranges.mapValues { ActivityStatistics(it.value) }
+    }
+
+    /**
+     * Splits an activity across the given interval. All generated activities but the first will be
+     * marked as synthetic (Which means that will not contribute to the total number of activities)
+     */
+    private inline fun splitActivity(
+        activity: RichActivity,
+        zoneId: ZoneId,
+        getRange: (LocalDate) -> LocalDateRange,
+        onSplit: (LocalDateRange, RichActivity) -> Unit
+    ) {
+        val endTime = activity.activity.endTime.toLocalDateTime(zoneId)
+        var currentRange = getRange(activity.activity.startTime.toLocalDate(zoneId))
+        var currentActivity =
+            activity.activity.copy(endTime = currentRange.endExclusive.toDate(zoneId))
+        onSplit(currentRange, activity.copy(activity = currentActivity))
+
+        while (currentRange.endExclusive.isBefore(endTime)) {
+            currentRange = getRange(currentRange.endExclusive.toLocalDate())
+            val nextEndTime =
+                minOf(currentRange.endExclusive.toDate(zoneId), activity.activity.endTime)
+            currentActivity = currentActivity.copy(
+                startTime = currentActivity.endTime,
+                endTime = nextEndTime
+            )
+            onSplit(
+                currentRange,
+                activity.copy(activity = currentActivity).apply { isSynthetic = true })
+        }
     }
 
     private inline fun <T> groupBy(func: (RichActivity) -> T): Map<T, ActivityStatistics> =
