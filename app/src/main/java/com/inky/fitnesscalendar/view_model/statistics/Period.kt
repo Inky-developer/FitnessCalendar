@@ -36,6 +36,7 @@ enum class Period(
 
         val result = mutableMapOf<Long, StatisticsEntry>()
         val activityMap = groupStats(statistics).toSortedMap(LocalDateRange.COMPARATOR)
+        val lastRange = activityMap.lastKey()
         // Make sure there are at least two data points
         // Otherwise, the graph might not render correctly
         val currentRange = rangeOf(today)
@@ -53,8 +54,19 @@ enum class Period(
                 statistics = stats,
                 entryName = format(start.toLocalDate(), today)
             )
-
             index += 1
+
+            if (LocalDateRange.COMPARATOR.compare(range, lastRange) < 0) {
+                var nextRange = rangeOf(range.endExclusive.toLocalDate())
+                while (!activityMap.contains(nextRange)) {
+                    result[index] = StatisticsEntry(
+                        statistics = ActivityStatistics(emptyList()),
+                        entryName = format(nextRange.start.toLocalDate(), today)
+                    )
+                    index += 1
+                    nextRange = rangeOf(nextRange.endExclusive.toLocalDate())
+                }
+            }
         }
 
         return result
