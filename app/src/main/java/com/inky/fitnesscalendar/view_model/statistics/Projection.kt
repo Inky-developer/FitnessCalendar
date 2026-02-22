@@ -5,6 +5,7 @@ import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityStatistics
+import com.patrykandpatrick.vico.compose.cartesian.marker.DefaultCartesianMarker
 
 /**
  * A Projection of [ActivityStatistics] to a value that can be displayed in the statistics view
@@ -98,11 +99,14 @@ enum class Projection(
 
     fun markerFormatter(context: Context) = when (this) {
         ByTotalTime, ByAverageTime -> TimeMarkerFormatter()
-        ByTotalActivities, ByAverageIntensity -> UnitMarkerFormatter()
-        ByTotalDistance, ByAverageDistance -> UnitMarkerFormatter(context.getString(R.string.unit_km))
-        ByAverageSpeed -> UnitMarkerFormatter(context.getString(R.string.unit_kmh))
-        ByMaximumHeartRate, ByAverageHeartRate -> UnitMarkerFormatter(context.getString(R.string.unit_bpm))
-        ByTotalAscent, ByAverageAscent -> UnitMarkerFormatter(context.getString(R.string.unit_m))
+        ByTotalActivities, ByAverageIntensity -> DefaultCartesianMarker.ValueFormatter.default(
+            decimalCount = 0
+        )
+
+        ByTotalDistance, ByAverageDistance -> unitFormatter(context.getString(R.string.unit_km))
+        ByAverageSpeed -> unitFormatter(context.getString(R.string.unit_kmh))
+        ByMaximumHeartRate, ByAverageHeartRate -> unitFormatter(context.getString(R.string.unit_bpm))
+        ByTotalAscent, ByAverageAscent -> unitFormatter(context.getString(R.string.unit_m))
     }
 
     /**
@@ -112,5 +116,11 @@ enum class Projection(
     fun getDefault(): Double? = when (this) {
         ByTotalTime, ByTotalActivities, ByTotalDistance, ByAverageTime, ByAverageDistance, ByTotalAscent, ByAverageAscent -> 0.0
         ByAverageSpeed, ByAverageHeartRate, ByMaximumHeartRate, ByAverageIntensity -> null
+    }
+
+    companion object {
+        fun unitFormatter(unit: String) =
+            DefaultCartesianMarker.ValueFormatter.default(decimalCount = 1, suffix = unit)
+
     }
 }

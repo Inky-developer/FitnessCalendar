@@ -1,5 +1,7 @@
 # Unreleased
 
+- Improve performance of the statistics graphs
+
 # 2026.02.1
 
 - Correctly distribute actity duration in statistics (#68)

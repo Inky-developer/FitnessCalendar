@@ -1,6 +1,5 @@
 package com.inky.fitnesscalendar.ui.views
 
-import android.graphics.Typeface
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -19,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -42,15 +42,17 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
-import androidx.core.graphics.toColor
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityCategory
@@ -71,30 +73,25 @@ import com.inky.fitnesscalendar.view_model.statistics.Grouping
 import com.inky.fitnesscalendar.view_model.statistics.Period
 import com.inky.fitnesscalendar.view_model.statistics.Projection
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
+import com.patrykandpatrick.vico.compose.cartesian.Scroll
+import com.patrykandpatrick.vico.compose.cartesian.Zoom
+import com.patrykandpatrick.vico.compose.cartesian.axis.HorizontalAxis
+import com.patrykandpatrick.vico.compose.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberAxisGuidelineComponent
-import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottom
-import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStart
+import com.patrykandpatrick.vico.compose.cartesian.data.CartesianChartModelProducer
+import com.patrykandpatrick.vico.compose.cartesian.layer.LineCartesianLayer
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberLineCartesianLayer
+import com.patrykandpatrick.vico.compose.cartesian.marker.CartesianMarker
+import com.patrykandpatrick.vico.compose.cartesian.marker.DefaultCartesianMarker
 import com.patrykandpatrick.vico.compose.cartesian.marker.rememberDefaultCartesianMarker
 import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoZoomState
+import com.patrykandpatrick.vico.compose.common.Fill
+import com.patrykandpatrick.vico.compose.common.Insets
+import com.patrykandpatrick.vico.compose.common.component.ShapeComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberShapeComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
-import com.patrykandpatrick.vico.compose.common.fill
-import com.patrykandpatrick.vico.compose.common.insets
-import com.patrykandpatrick.vico.core.cartesian.Scroll
-import com.patrykandpatrick.vico.core.cartesian.Zoom
-import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
-import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
-import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
-import com.patrykandpatrick.vico.core.cartesian.layer.LineCartesianLayer
-import com.patrykandpatrick.vico.core.cartesian.marker.CartesianMarker
-import com.patrykandpatrick.vico.core.cartesian.marker.DefaultCartesianMarker
-import com.patrykandpatrick.vico.core.common.Fill
-import com.patrykandpatrick.vico.core.common.component.Shadow
-import com.patrykandpatrick.vico.core.common.component.ShapeComponent
-import com.patrykandpatrick.vico.core.common.shape.CorneredShape
 
 @Composable
 fun StatisticsView(
@@ -367,10 +364,10 @@ private fun Graph(
     val context = LocalContext.current
     val lines = remember(groupingOptions) {
         groupingOptions.map { group ->
-            val color = group.getColor(context)
+            val color = Color(group.getColor(context))
             LineCartesianLayer.Line(
                 fill = LineCartesianLayer.LineFill.single(Fill(color)),
-                areaFill = defaultAreaFill(color.toColor()),
+                areaFill = defaultAreaFill(color),
                 pointConnector = LineCartesianLayer.PointConnector.cubic()
             )
         }
@@ -382,6 +379,7 @@ private fun Graph(
         autoScrollCondition = StatisticsViewModel.autoScrollCondition
     )
 
+    val xLabelTitle = stringResource(period.xLabelId)
     CartesianChartHost(
         modifier = modifier,
         chart = rememberCartesianChart(
@@ -395,16 +393,18 @@ private fun Graph(
             bottomAxis = HorizontalAxis.rememberBottom(
                 guideline = null,
                 titleComponent = rememberTextComponent(
-                    background = rememberShapeComponent(
-                        fill = fill(MaterialTheme.colorScheme.secondaryContainer),
-                        shape = CorneredShape.Pill,
+                    style = TextStyle(
+                        color = MaterialTheme.colorScheme.onSecondaryContainer,
+                        fontFamily = FontFamily.Monospace
                     ),
-                    color = MaterialTheme.colorScheme.onSecondaryContainer,
-                    padding = insets(horizontal = 8.dp, vertical = 2.dp),
-                    margins = insets(top = 4.dp),
-                    typeface = Typeface.MONOSPACE
+                    background = rememberShapeComponent(
+                        fill = Fill(MaterialTheme.colorScheme.secondaryContainer),
+                        shape = RoundedCornerShape(percent = 33),
+                    ),
+                    padding = Insets(horizontal = 8.dp, vertical = 2.dp),
+                    margins = Insets(top = 4.dp),
                 ),
-                title = stringResource(period.xLabelId),
+                title = { xLabelTitle },
                 valueFormatter = { ctx, value, _ ->
                     ctx.model.extraStore[StatisticsViewModel.xToDateKey][value.toLong()] ?: ""
                 },
@@ -453,16 +453,16 @@ private fun rememberMarker(projection: Projection): CartesianMarker {
     val context = LocalContext.current
     return rememberDefaultCartesianMarker(
         label = rememberTextComponent(
-            color = MaterialTheme.colorScheme.onPrimaryContainer
+            style = TextStyle(color = MaterialTheme.colorScheme.onPrimaryContainer),
         ),
         labelPosition = DefaultCartesianMarker.LabelPosition.Top,
         valueFormatter = remember(projection) { projection.markerFormatter(context) },
         guideline = rememberAxisGuidelineComponent(),
         indicator = { color ->
             ShapeComponent(
-                fill = fill(color),
-                shape = CorneredShape.Pill,
-                shadow = Shadow(radiusDp = 12f, color = color.toArgb()),
+                fill = Fill(color),
+                shape = RoundedCornerShape(percent = 33),
+                shadows = listOf(Shadow(radius = 12.dp, color = color)),
             )
         }
     )

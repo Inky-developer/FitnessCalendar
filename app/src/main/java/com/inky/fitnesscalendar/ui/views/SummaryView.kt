@@ -1,6 +1,5 @@
 package com.inky.fitnesscalendar.ui.views
 
-import android.graphics.Typeface
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -20,6 +19,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -49,6 +49,8 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -72,24 +74,20 @@ import com.inky.fitnesscalendar.view_model.summary_view.RecordsBoxState
 import com.inky.fitnesscalendar.view_model.summary_view.SummaryBoxState
 import com.inky.fitnesscalendar.view_model.summary_view.SummaryState
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
-import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottom
-import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStart
+import com.patrykandpatrick.vico.compose.cartesian.Zoom
+import com.patrykandpatrick.vico.compose.cartesian.axis.HorizontalAxis
+import com.patrykandpatrick.vico.compose.cartesian.axis.VerticalAxis
+import com.patrykandpatrick.vico.compose.cartesian.data.CartesianChartModelProducer
+import com.patrykandpatrick.vico.compose.cartesian.layer.ColumnCartesianLayer
 import com.patrykandpatrick.vico.compose.cartesian.layer.rememberColumnCartesianLayer
 import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoScrollState
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoZoomState
+import com.patrykandpatrick.vico.compose.common.Fill
+import com.patrykandpatrick.vico.compose.common.Insets
 import com.patrykandpatrick.vico.compose.common.component.rememberLineComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberShapeComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
-import com.patrykandpatrick.vico.compose.common.fill
-import com.patrykandpatrick.vico.compose.common.insets
-import com.patrykandpatrick.vico.core.cartesian.Zoom
-import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
-import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
-import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
-import com.patrykandpatrick.vico.core.cartesian.layer.ColumnCartesianLayer
-import com.patrykandpatrick.vico.core.common.Insets
-import com.patrykandpatrick.vico.core.common.shape.CorneredShape
 
 @Composable
 fun SummaryView(
@@ -471,6 +469,7 @@ private fun Histogram(
     title: String,
     xAxisLabel: String
 ) {
+    val numberOfActivitiesLabel = stringResource(R.string.number_of_activities)
     Column(modifier = Modifier.padding(vertical = 8.dp)) {
         Text(title, style = MaterialTheme.typography.titleLarge)
         CartesianChartHost(
@@ -478,20 +477,20 @@ private fun Histogram(
                 rememberColumnCartesianLayer(
                     columnProvider = ColumnCartesianLayer.ColumnProvider.series(
                         rememberLineComponent(
-                            fill = fill(colorResource(R.color.graph_default)),
+                            fill = Fill(colorResource(R.color.graph_default)),
                             thickness = 32.dp
                         ),
                     ),
                 ),
                 startAxis = VerticalAxis.rememberStart(
-                    title = stringResource(R.string.number_of_activities),
+                    title = { numberOfActivitiesLabel },
                     titleComponent = graphTextComponent(),
                     itemPlacer = VerticalAxis.ItemPlacer.step({ 1.0 }),
                     horizontalLabelPosition = VerticalAxis.HorizontalLabelPosition.Inside
                 ),
                 bottomAxis = HorizontalAxis.rememberBottom(
                     guideline = null,
-                    title = xAxisLabel,
+                    title = { xAxisLabel },
                     titleComponent = graphTextComponent(),
                     valueFormatter = { ctx, value, _ ->
                         ctx.model.extraStore[SummaryState.xToLabelKey][value.toInt()]!!
@@ -509,13 +508,15 @@ private fun Histogram(
 @Composable
 private fun graphTextComponent() = rememberTextComponent(
     background = rememberShapeComponent(
-        fill = fill(MaterialTheme.colorScheme.surfaceContainer),
-        shape = CorneredShape.Pill,
-        margins = Insets(allDp = 2f)
+        fill = Fill(MaterialTheme.colorScheme.surfaceContainer),
+        shape = RoundedCornerShape(percent = 33),
+        margins = Insets(all = 2.dp)
     ),
-    color = contentColorFor(MaterialTheme.colorScheme.surfaceContainer),
-    padding = insets(horizontal = 8.dp, vertical = 4.dp),
-    typeface = Typeface.MONOSPACE
+    style = TextStyle(
+        color = contentColorFor(MaterialTheme.colorScheme.surfaceContainer),
+        fontFamily = FontFamily.Monospace
+    ),
+    padding = Insets(horizontal = 8.dp, vertical = 4.dp),
 )
 
 @Preview

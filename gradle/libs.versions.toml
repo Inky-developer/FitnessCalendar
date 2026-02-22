@@ -22,7 +22,7 @@ navigationCompose = "2.9.7"
 robolectric = "4.16.1"
 room = "2.8.4"
 screengrab = "2.1.1"
-vico = "2.4.3"
+vico = "3.0.0"
 
 [libraries]
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
@@ -55,7 +55,6 @@ robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectr
 screengrab = { module = "tools.fastlane:screengrab", version.ref = "screengrab" }
 vico-compose = { group = "com.patrykandpatrick.vico", name = "compose", version.ref = "vico" }
 vico-compose-m3 = { group = "com.patrykandpatrick.vico", name = "compose-m3", version.ref = "vico" }
-vico-core = { group = "com.patrykandpatrick.vico", name = "core", version.ref = "vico" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

@@ -138,7 +138,6 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.vico.compose)
     implementation(libs.vico.compose.m3)
-    implementation(libs.vico.core)
     implementation(libs.androidx.datastore.preferences)
     implementation(libs.coil.compose)
     implementation(libs.google.accompanist.permissions)

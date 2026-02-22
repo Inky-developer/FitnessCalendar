@@ -1,15 +1,13 @@
 package com.inky.fitnesscalendar.ui.views
 
 import android.content.Context
-import android.graphics.RectF
-import android.graphics.Typeface
-import android.text.SpannableStringBuilder
 import androidx.annotation.ColorRes
 import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
@@ -31,12 +29,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.graphics.toColor
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.gpx.Coordinate
@@ -51,37 +52,30 @@ import com.inky.fitnesscalendar.ui.util.defaultAreaFill
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.view_model.BaseViewModel
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
+import com.patrykandpatrick.vico.compose.cartesian.CartesianDrawingContext
+import com.patrykandpatrick.vico.compose.cartesian.Zoom
+import com.patrykandpatrick.vico.compose.cartesian.axis.Axis
+import com.patrykandpatrick.vico.compose.cartesian.axis.HorizontalAxis
+import com.patrykandpatrick.vico.compose.cartesian.axis.VerticalAxis
 import com.patrykandpatrick.vico.compose.cartesian.axis.rememberAxisGuidelineComponent
-import com.patrykandpatrick.vico.compose.cartesian.axis.rememberBottom
-import com.patrykandpatrick.vico.compose.cartesian.axis.rememberEnd
-import com.patrykandpatrick.vico.compose.cartesian.axis.rememberStart
-import com.patrykandpatrick.vico.compose.cartesian.layer.continuous
+import com.patrykandpatrick.vico.compose.cartesian.data.CartesianChartModelProducer
+import com.patrykandpatrick.vico.compose.cartesian.data.CartesianLayerModel
+import com.patrykandpatrick.vico.compose.cartesian.data.CartesianLayerRangeProvider
+import com.patrykandpatrick.vico.compose.cartesian.data.CartesianValueFormatter
+import com.patrykandpatrick.vico.compose.cartesian.data.LineCartesianLayerDrawingModel
+import com.patrykandpatrick.vico.compose.cartesian.data.LineCartesianLayerModel
+import com.patrykandpatrick.vico.compose.cartesian.data.lineSeries
+import com.patrykandpatrick.vico.compose.cartesian.layer.LineCartesianLayer
+import com.patrykandpatrick.vico.compose.cartesian.marker.CartesianMarker
+import com.patrykandpatrick.vico.compose.cartesian.marker.DefaultCartesianMarker
 import com.patrykandpatrick.vico.compose.cartesian.marker.rememberDefaultCartesianMarker
 import com.patrykandpatrick.vico.compose.cartesian.rememberCartesianChart
 import com.patrykandpatrick.vico.compose.cartesian.rememberVicoZoomState
+import com.patrykandpatrick.vico.compose.common.Fill
+import com.patrykandpatrick.vico.compose.common.Insets
 import com.patrykandpatrick.vico.compose.common.component.rememberShapeComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
-import com.patrykandpatrick.vico.compose.common.fill
-import com.patrykandpatrick.vico.compose.common.insets
-import com.patrykandpatrick.vico.core.cartesian.CartesianDrawingContext
-import com.patrykandpatrick.vico.core.cartesian.Zoom
-import com.patrykandpatrick.vico.core.cartesian.axis.Axis
-import com.patrykandpatrick.vico.core.cartesian.axis.HorizontalAxis
-import com.patrykandpatrick.vico.core.cartesian.axis.VerticalAxis
-import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
-import com.patrykandpatrick.vico.core.cartesian.data.CartesianLayerModel
-import com.patrykandpatrick.vico.core.cartesian.data.CartesianLayerRangeProvider
-import com.patrykandpatrick.vico.core.cartesian.data.CartesianValueFormatter
-import com.patrykandpatrick.vico.core.cartesian.data.LineCartesianLayerDrawingModel
-import com.patrykandpatrick.vico.core.cartesian.data.LineCartesianLayerModel
-import com.patrykandpatrick.vico.core.cartesian.data.lineSeries
-import com.patrykandpatrick.vico.core.cartesian.layer.LineCartesianLayer
-import com.patrykandpatrick.vico.core.cartesian.marker.CartesianMarker
-import com.patrykandpatrick.vico.core.cartesian.marker.DefaultCartesianMarker
-import com.patrykandpatrick.vico.core.common.Fill
-import com.patrykandpatrick.vico.core.common.Insets
-import com.patrykandpatrick.vico.core.common.data.ExtraStore
-import com.patrykandpatrick.vico.core.common.shape.CorneredShape
+import com.patrykandpatrick.vico.compose.common.data.ExtraStore
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.text.DecimalFormat
@@ -236,30 +230,33 @@ fun TrackGraph(
             if (scalableContentWidth == 0f) {
                 1f
             } else {
-                (bounds.width() - layerDimensions.unscalablePadding) / scalableContentWidth
+                (bounds.width - layerDimensions.unscalablePadding) / scalableContentWidth
             }
         }
     }
     val zoomState = rememberVicoZoomState(initialZoom = contentZoom)
+    val verticalAxisLabel = stringResource(projection.verticalAxisLabel)
+    val legendLabel = stringResource(R.string.legend_distance_km)
 
     CartesianChartHost(
         chart = rememberCartesianChart(
             *layers,
             startAxis = VerticalAxis.rememberStart(
-                title = stringResource(projection.verticalAxisLabel),
+                title = { verticalAxisLabel },
                 titleComponent = legendComponent(),
                 horizontalLabelPosition = VerticalAxis.HorizontalLabelPosition.Inside
             ),
             endAxis = overlay?.let {
+                val label = stringResource(it.verticalAxisLabel)
                 VerticalAxis.rememberEnd(
-                    title = stringResource(it.verticalAxisLabel),
+                    title = { label },
                     titleComponent = legendComponent(),
                     horizontalLabelPosition = VerticalAxis.HorizontalLabelPosition.Inside
                 )
             },
             bottomAxis = HorizontalAxis.rememberBottom(
                 guideline = null,
-                title = stringResource(R.string.legend_distance_km),
+                title = { legendLabel },
                 titleComponent = legendComponent(),
                 itemPlacer = remember {
                     HorizontalAxis.ItemPlacer.aligned(addExtremeLabelPadding = true)
@@ -268,7 +265,7 @@ fun TrackGraph(
             ),
             marker = rememberDefaultCartesianMarker(
                 label = rememberTextComponent(
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                    style = TextStyle(color = MaterialTheme.colorScheme.onPrimaryContainer),
                 ),
                 guideline = rememberAxisGuidelineComponent(),
                 valueFormatter = rememberMarkerFormatter(projection, overlay)
@@ -283,13 +280,15 @@ fun TrackGraph(
 @Composable
 private fun legendComponent() = rememberTextComponent(
     background = rememberShapeComponent(
-        fill = fill(MaterialTheme.colorScheme.secondaryContainer),
-        shape = CorneredShape.Pill,
-        margins = Insets(allDp = 2f)
+        fill = Fill(MaterialTheme.colorScheme.secondaryContainer),
+        shape = RoundedCornerShape(percent = 33),
+        margins = Insets(all = 2.dp)
     ),
-    color = MaterialTheme.colorScheme.onSecondaryContainer,
-    padding = insets(horizontal = 8.dp, vertical = 4.dp),
-    typeface = Typeface.MONOSPACE
+    style = TextStyle(
+        color = MaterialTheme.colorScheme.onSecondaryContainer,
+        fontFamily = FontFamily.Monospace
+    ),
+    padding = Insets(horizontal = 8.dp, vertical = 4.dp),
 )
 
 @Composable
@@ -300,10 +299,8 @@ private fun rememberMarkerFormatter(
     val context = LocalContext.current
     return remember(projection, overlay) {
         val formatters = listOfNotNull(
-            overlay?.let {
-                DefaultCartesianMarker.ValueFormatter.default(decimalFormat = it.format(context))
-            },
-            DefaultCartesianMarker.ValueFormatter.default(decimalFormat = projection.format(context)),
+            overlay?.format(context),
+            projection.format(context),
         )
         MultiMarkerFormatter(formatters)
     }
@@ -321,9 +318,9 @@ private fun rememberKmValueFormatter(): CartesianValueFormatter {
 
 private fun TrackGraphProjection.line(context: Context): LineCartesianLayer.Line =
     LineCartesianLayer.Line(
-        fill = LineCartesianLayer.LineFill.single(Fill(context.getColor(color))),
-        areaFill = defaultAreaFill(context.getColor(color).toColor()),
-        stroke = LineCartesianLayer.LineStroke.continuous(thickness = 1.dp),
+        fill = LineCartesianLayer.LineFill.single(Fill(Color(context.getColor(color)))),
+        areaFill = defaultAreaFill(Color(context.getColor(color))),
+        stroke = LineCartesianLayer.LineStroke.Continuous(thickness = 1.dp),
     )
 
 // This annotation is needed as long as [TrackGraphProjection] is used as a NavArg
@@ -366,11 +363,18 @@ enum class TrackGraphProjection(
         return result
     }
 
-    fun format(context: Context): DecimalFormat {
+    fun format(context: Context): DefaultCartesianMarker.ValueFormatter {
         val unitString = context.getString(unit)
         return when (this) {
-            HeartRate, Elevation -> DecimalFormat("0$unitString")
-            else -> DecimalFormat("#.#$unitString")
+            HeartRate, Elevation -> DefaultCartesianMarker.ValueFormatter.default(
+                decimalCount = 0,
+                suffix = unitString
+            )
+
+            else -> DefaultCartesianMarker.ValueFormatter.default(
+                decimalCount = 1,
+                suffix = unitString
+            )
         }
     }
 
@@ -405,8 +409,6 @@ private class LODLineCartesianLayer(
     rangeProvider = rangeProvider,
     verticalAxisPosition = verticalAxisPosition
 ) {
-    private fun RectF.getStart(isLtr: Boolean): Float = if (isLtr) left else right
-
     private inline fun <T : CartesianLayerModel.Entry> List<T>.forEachIn(
         range: ClosedFloatingPointRange<Double>,
         padding: Int = 0,
@@ -462,8 +464,8 @@ private class LODLineCartesianLayer(
         var x: Float? = null
         var nextX: Float? = null
 
-        val boundsStart = layerBounds.getStart(isLtr = isLtr)
-        val boundsEnd = boundsStart + layoutDirectionMultiplier * layerBounds.width()
+        val boundsStart = if (isLtr) layerBounds.left else layerBounds.right
+        val boundsEnd = boundsStart + layoutDirectionMultiplier * layerBounds.width
 
         fun getDrawX(entry: LineCartesianLayerModel.Entry): Float =
             drawingStart +
@@ -474,7 +476,7 @@ private class LODLineCartesianLayer(
             return layerBounds.bottom -
                     (pointInfoMap?.get(entry.x)?.y
                         ?: ((entry.y - yRange.minY) / yRange.length).toFloat()) *
-                    layerBounds.height()
+                    layerBounds.height
         }
 
         fun pointAvg(points: List<LineCartesianLayerModel.Entry>): LineCartesianLayerModel.Entry {
@@ -542,14 +544,14 @@ class MultiMarkerFormatter(val formatters: List<DefaultCartesianMarker.ValueForm
             formatter.format(context, listOf(target))
         }
 
-        val buf = SpannableStringBuilder()
+        val buf = AnnotatedString.Builder()
         for ((index, value) in values.withIndex()) {
             buf.append(value)
             if (index < values.lastIndex) {
                 buf.append(", ")
             }
         }
-        return buf
+        return buf.toAnnotatedString()
     }
 }
 

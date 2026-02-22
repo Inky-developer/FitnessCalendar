@@ -1,21 +1,28 @@
 package com.inky.fitnesscalendar.view_model.statistics
 
-import android.text.Spannable
-import android.text.SpannableStringBuilder
-import android.text.style.ForegroundColorSpan
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.withStyle
 import com.inky.fitnesscalendar.data.measure.format
-import com.patrykandpatrick.vico.core.cartesian.CartesianDrawingContext
-import com.patrykandpatrick.vico.core.cartesian.marker.CartesianMarker
-import com.patrykandpatrick.vico.core.cartesian.marker.DefaultCartesianMarker
-import com.patrykandpatrick.vico.core.cartesian.marker.LineCartesianLayerMarkerTarget
+import com.patrykandpatrick.vico.compose.cartesian.CartesianDrawingContext
+import com.patrykandpatrick.vico.compose.cartesian.marker.CartesianMarker
+import com.patrykandpatrick.vico.compose.cartesian.marker.DefaultCartesianMarker
+import com.patrykandpatrick.vico.compose.cartesian.marker.LineCartesianLayerMarkerTarget
 import kotlin.time.Duration.Companion.hours
 
 class TimeMarkerFormatter : DefaultCartesianMarker.ValueFormatter {
+    private fun AnnotatedString.Builder.append(text: String, color: Color) {
+        withStyle(SpanStyle(color = color)) {
+            append(text)
+        }
+    }
+
     override fun format(
         context: CartesianDrawingContext,
         targets: List<CartesianMarker.Target>
     ): CharSequence {
-        val builder = SpannableStringBuilder()
+        val builder = AnnotatedString.Builder()
 
         for (target in targets) {
             when (target) {
@@ -29,8 +36,7 @@ class TimeMarkerFormatter : DefaultCartesianMarker.ValueFormatter {
                     columns.forEachIndexed { index, column ->
                         builder.append(
                             column.entry.y.hours.format(),
-                            ForegroundColorSpan(column.color),
-                            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+                            column.color
                         )
                         if (index != lastIndex) {
                             builder.append(", ")
@@ -43,6 +49,6 @@ class TimeMarkerFormatter : DefaultCartesianMarker.ValueFormatter {
             }
         }
 
-        return builder
+        return builder.toAnnotatedString()
     }
 }

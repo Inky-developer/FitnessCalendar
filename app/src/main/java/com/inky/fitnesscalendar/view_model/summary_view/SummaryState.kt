@@ -15,9 +15,9 @@ import com.inky.fitnesscalendar.ui.components.MosaicChartState
 import com.inky.fitnesscalendar.ui.components.PieChartEntry
 import com.inky.fitnesscalendar.ui.components.PieChartState
 import com.inky.fitnesscalendar.ui.components.calculateMosaicState
-import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
-import com.patrykandpatrick.vico.core.cartesian.data.columnSeries
-import com.patrykandpatrick.vico.core.common.data.ExtraStore
+import com.patrykandpatrick.vico.compose.cartesian.data.CartesianChartModelProducer
+import com.patrykandpatrick.vico.compose.cartesian.data.columnSeries
+import com.patrykandpatrick.vico.compose.common.data.ExtraStore
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.TextStyle
