@@ -1,10 +1,11 @@
 # Unreleased
 
+- Fix recording tile being unavailable
 - Improve performance of the statistics graphs
 
 # 2026.02.1
 
-- Correctly distribute actity duration in statistics (#68)
+- Correctly distribute activity duration in statistics (#68)
 - Add Russian translation
 - Some bug & crash fixes
 
