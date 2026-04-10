@@ -368,7 +368,7 @@ private fun Graph(
             LineCartesianLayer.Line(
                 fill = LineCartesianLayer.LineFill.single(Fill(color)),
                 areaFill = defaultAreaFill(color),
-                pointConnector = LineCartesianLayer.PointConnector.cubic()
+                interpolator = LineCartesianLayer.Interpolator.cubic()
             )
         }
     }
