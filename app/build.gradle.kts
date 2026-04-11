@@ -132,6 +132,7 @@ android {
         disable += "SyntheticAccessor" // Not a issue in this app
         disable += "DuplicateStrings" // I don't care
         disable += "ChromeOsAbiSupport" // The app is still mostly intended for smartphones. Can add support for it later if someone needs it
+        disable += "OldTargetApi" // not relevant
     }
 }
 
