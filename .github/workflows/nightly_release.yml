@@ -66,3 +66,4 @@ jobs:
           makeLatest: true
           omitBody: true
           prerelease: true
+          draft: false

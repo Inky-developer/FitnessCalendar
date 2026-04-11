@@ -29,7 +29,7 @@ A private and fully offline activity tracker.
 This app does not connect to the internet by default, but has a setting for
 enabling [mapLibre](https://maplibre.org/) maps.
 A nice free provider is [OpenFreeMap](https://openfreemap.org).
-To use this provider, simpy copy the following url into the 'map provider url' setting in the
+To use this provider, simply copy the following URL into the 'map provider url' setting in the
 app: https://tiles.openfreemap.org/styles/liberty
 
 ## Public API
