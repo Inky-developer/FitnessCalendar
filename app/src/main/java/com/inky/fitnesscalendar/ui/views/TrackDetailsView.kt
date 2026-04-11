@@ -294,9 +294,6 @@ fun TrackDetailsData(
             .border(1.dp, MaterialTheme.colorScheme.outlineVariant, shape)
             .fillMaxWidth()
             .aspectRatio(4f / 3)
-            .sharedBounds(
-                SharedContentKey.Map
-            )
     )
 
     ActivityDescription(
