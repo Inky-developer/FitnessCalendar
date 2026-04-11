@@ -23,6 +23,7 @@ robolectric = "4.16.1"
 room = "2.8.4"
 screengrab = "2.1.1"
 vico = "3.1.0"
+maplibre-compose = "0.12.1"
 
 [libraries]
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
@@ -55,6 +56,8 @@ robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectr
 screengrab = { module = "tools.fastlane:screengrab", version.ref = "screengrab" }
 vico-compose = { group = "com.patrykandpatrick.vico", name = "compose", version.ref = "vico" }
 vico-compose-m3 = { group = "com.patrykandpatrick.vico", name = "compose-m3", version.ref = "vico" }
+#maplibre-compose = { module = "com.github.Inky-developer:maplibre-compose", version.ref = "maplibre-compose" }
+maplibre-compose = { module = "org.maplibre.compose:maplibre-compose", version.ref = "maplibre-compose" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

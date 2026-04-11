@@ -9,8 +9,8 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -48,7 +48,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -70,9 +69,9 @@ import com.inky.fitnesscalendar.ui.components.DescriptionTextInput
 import com.inky.fitnesscalendar.ui.components.FavoriteIcon
 import com.inky.fitnesscalendar.ui.components.ImageLimit
 import com.inky.fitnesscalendar.ui.components.ImageViewer
+import com.inky.fitnesscalendar.ui.components.Map
 import com.inky.fitnesscalendar.ui.components.OkayCancelDialog
 import com.inky.fitnesscalendar.ui.components.SelectImageDropdownMenuItem
-import com.inky.fitnesscalendar.ui.components.TrackView
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.util.Icons
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
@@ -84,6 +83,10 @@ import com.inky.fitnesscalendar.util.toLocalDate
 import com.inky.fitnesscalendar.view_model.BaseViewModel
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
+import org.maplibre.compose.map.GestureOptions
+import org.maplibre.compose.map.MapOptions
+import org.maplibre.compose.map.OrnamentOptions
+import org.maplibre.compose.util.ClickResult
 
 @Composable
 fun TrackDetailsView(
@@ -274,25 +277,27 @@ fun TrackDetailsData(
         )
     }
 
-    Box(
+    val shape = MaterialTheme.shapes.large
+    Map(
+        trackSvg = state.data.preview,
+        onClick = {
+            onNavigateMap()
+            ClickResult.Consume
+        },
+        options = MapOptions(
+            gestureOptions = GestureOptions.AllDisabled,
+            ornamentOptions = OrnamentOptions.AllDisabled
+        ),
         modifier = Modifier
             .padding(all = 8.dp)
-            .clip(MaterialTheme.shapes.medium)
+            .clip(shape)
+            .border(1.dp, MaterialTheme.colorScheme.outlineVariant, shape)
             .fillMaxWidth()
-            .aspectRatio(4f / 3f)
-            .background(MaterialTheme.colorScheme.secondaryContainer)
-            .clickable { onNavigateMap() }
-    ) {
-        TrackView(
-            track = state.data.preview,
-            color = Color.Black,
-            modifier = Modifier
-                .padding(all = 8.dp)
-                .fillMaxWidth()
-                .aspectRatio(4f / 3)
-                .sharedBounds(SharedContentKey.Map)
-        )
-    }
+            .aspectRatio(4f / 3)
+            .sharedBounds(
+                SharedContentKey.Map
+            )
+    )
 
     ActivityDescription(
         description = state.editState.description,

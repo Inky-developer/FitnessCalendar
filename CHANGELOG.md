@@ -1,5 +1,6 @@
 # Unreleased
 
+- Add configurable map to tracks
 - Fix recording tile being unavailable
 - Improve performance of the statistics graphs
 

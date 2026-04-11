@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenu
@@ -21,6 +22,8 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -35,13 +38,17 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.inky.fitnesscalendar.BuildConfig
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.preferences.Preference
 import com.inky.fitnesscalendar.repository.backup.BackupRepository
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
+import com.inky.fitnesscalendar.ui.components.optionGroupDefaultBackground
 import com.inky.fitnesscalendar.ui.util.Icons
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.sharedBounds
@@ -87,6 +94,7 @@ fun SettingsView(
         ) {
             item {
                 ProjectionSelect()
+                PreferenceTextField(Preference.PREF_MAP_PROVIDER)
                 Setting(
                     title = stringResource(R.string.configure_activity_types),
                     onClick = onNavigateTypes
@@ -231,6 +239,47 @@ private fun ProjectionSelect() {
                     showModal = false
                     scope.launch { preference.set(context, projection) }
                 }
+            )
+        }
+    }
+}
+
+@Composable
+private fun <T> PreferenceTextField(preference: Preference<String, T>) {
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    var showModal by rememberSaveable { mutableStateOf(false) }
+    val selectedValue by preference.collectAsState()
+    Column(
+        modifier = Modifier
+            .clickable { showModal = true }
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+    ) {
+        Text(stringResource(preference.titleId!!))
+        AnimatedContent(selectedValue, label = "value animation") { value ->
+            val text = value.ifBlank { stringResource(preference.descriptionId!!) }
+            Text(text, style = MaterialTheme.typography.bodySmall)
+        }
+    }
+
+    if (showModal) {
+        Dialog(onDismissRequest = { showModal = false }) {
+            TextField(
+                value = selectedValue,
+                onValueChange = { scope.launch { preference.set(context, it) } },
+                placeholder = { Text(stringResource(preference.descriptionId!!)) },
+                keyboardOptions = remember {
+                    KeyboardOptions(
+                        capitalization = KeyboardCapitalization.None,
+                        autoCorrectEnabled = false,
+                        keyboardType = KeyboardType.Uri
+                    )
+                },
+                colors = TextFieldDefaults.colors(unfocusedContainerColor = optionGroupDefaultBackground()),
+                shape = MaterialTheme.shapes.small,
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
             )
         }
     }

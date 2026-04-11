@@ -2,6 +2,7 @@ package com.inky.fitnesscalendar.db.entities
 
 import com.inky.fitnesscalendar.data.gpx.Coordinate
 import kotlinx.serialization.Serializable
+import org.maplibre.spatialk.geojson.BoundingBox
 
 @Serializable
 data class CoordinateRect(
@@ -10,6 +11,13 @@ data class CoordinateRect(
     val longitudeMin: Double,
     val longitudeMax: Double
 ) {
+    fun toMapLibreBoundingBox(): BoundingBox = BoundingBox(
+        south = latitudeMin,
+        north = latitudeMax,
+        west = longitudeMin,
+        east = longitudeMax
+    )
+
     companion object {
         fun List<Coordinate>.calculateBounds(): CoordinateRect? {
             if (isEmpty()) {

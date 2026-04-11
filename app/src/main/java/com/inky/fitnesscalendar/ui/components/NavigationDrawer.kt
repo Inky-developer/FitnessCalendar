@@ -50,6 +50,7 @@ fun NavigationDrawer(
 
     ModalNavigationDrawer(
         drawerState = drawerState,
+        gesturesEnabled = currentView?.drawerGesturesEnabled ?: true,
         drawerContent = {
             ModalDrawerSheet(
                 drawerState = drawerState,

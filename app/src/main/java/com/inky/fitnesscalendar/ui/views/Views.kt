@@ -5,14 +5,20 @@ import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.util.DEEP_LINK_BASE_PATH
 import com.inky.fitnesscalendar.view_model.statistics.Period
+import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.Transient
 
 
 @Parcelize
 @Serializable
 sealed class Views : Parcelable {
     abstract val nameId: Int
+
+    @IgnoredOnParcel
+    @Transient
+    open val drawerGesturesEnabled: Boolean = true
 
     @Serializable
     data object Home : Views() {
@@ -83,6 +89,10 @@ sealed class Views : Parcelable {
     @Serializable
     data class Map(val activityId: Int) : Views() {
         override val nameId get() = R.string.Map
+
+        @IgnoredOnParcel
+        @Transient
+        override val drawerGesturesEnabled: Boolean = false
     }
 
     @Serializable

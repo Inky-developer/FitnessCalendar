@@ -144,6 +144,7 @@ dependencies {
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.androidx.emoji2.emojipicker)
     implementation(libs.androidx.documentfile)
+    implementation(libs.maplibre.compose)
 
     ksp(libs.hilt.android.compiler)
     ksp(libs.androidx.room.compiler)

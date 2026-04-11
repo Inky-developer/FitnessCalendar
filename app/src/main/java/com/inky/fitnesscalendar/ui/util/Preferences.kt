@@ -21,6 +21,7 @@ data class Preferences(
     val watchedFolders: Set<Uri>,
     val watchedFoldersLastImport: Date,
     val preferEndDateAsDuration: Boolean,
+    val mapProviderUrl: String
 ) {
     companion object {
         // Ouch
@@ -31,7 +32,8 @@ data class Preferences(
             Preference.PREF_ENABLE_PUBLIC_API.flow(context),
             Preference.PREF_WATCHED_FOLDERS.flow(context),
             Preference.PREF_WATCHED_FOLDERS_LAST_IMPORT.flow(context),
-            Preference.PREF_PREFER_END_DATE_AS_DURATION.flow(context)
+            Preference.PREF_PREFER_END_DATE_AS_DURATION.flow(context),
+            Preference.PREF_MAP_PROVIDER.flow(context)
         )
         { values ->
             Preferences(
@@ -40,7 +42,8 @@ data class Preferences(
                 enablePublicApi = values[2] as Boolean,
                 watchedFolders = values[3] as Set<Uri>,
                 watchedFoldersLastImport = values[4] as Date,
-                preferEndDateAsDuration = values[5] as Boolean
+                preferEndDateAsDuration = values[5] as Boolean,
+                mapProviderUrl = values[6] as String
             )
         }
     }

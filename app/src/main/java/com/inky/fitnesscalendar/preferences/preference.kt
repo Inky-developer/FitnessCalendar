@@ -157,5 +157,9 @@ sealed class Preference<T, P>(
         val PREF_WATCHED_FOLDERS_LAST_IMPORT = DatePreference("PREF_WATCHED_FOLDERS_LAST_IMPORT")
         val PREF_PREFER_END_DATE_AS_DURATION =
             PrimitivePreference.create("PREF_PREFER_END_DATE_AS_DURATION", false)
+        val PREF_MAP_PROVIDER = PrimitivePreference.create("PREF_MAP_PROVIDER", "").apply {
+            titleId = R.string.map_provider_url
+            descriptionId = R.string.map_provider_url_description
+        }
     }
 }

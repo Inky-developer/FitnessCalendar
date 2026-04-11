@@ -6,3 +6,16 @@
 - Create custom activity types
 - Statistics
 - Basic diary functionality
+
+## Map
+
+This app does not connect to the internet by default, but has a setting for enabling [mapLibre](https://maplibre.org/) maps.
+A nice free provider is [OpenFreeMap](https://openfreemap.org).
+To use this provider, simpy copy the following url into the 'map provider url' setting in the app: https://tiles.openfreemap.org/styles/liberty
+
+## Public API
+
+The app supports a public API which can be used by automation tools. For more information see the main repository Readme.
+
+## Translation
+Please help to translate on the [Weblate](https://toolate.othing.xyz/projects/fitnesscalendar).

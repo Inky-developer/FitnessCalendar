@@ -342,4 +342,6 @@
     <string name="switch_to_date_input">Switch to date input</string>
     <string name="previous_frame">Previous frame</string>
     <string name="next_frame">Next frame</string>
+    <string name="map_provider_url">Map provider URL</string>
+    <string name="map_provider_url_description">Leave blank to not use a provider</string>
 </resources>

@@ -341,4 +341,6 @@
     <string name="switch_to_date_input">Zur Eingabe des Datums wechseln</string>
     <string name="previous_frame">Vorheriges Bild</string>
     <string name="next_frame">Nächstes Bild</string>
+    <string name="map_provider_url">Kartenanbieter-URL</string>
+    <string name="map_provider_url_description">Leer lassen, um keinen Anbieter zu nutzen</string>
 </resources>
