@@ -22,7 +22,12 @@ import org.maplibre.compose.map.OrnamentOptions
 @Composable
 fun MapView(viewModel: BaseViewModel = hiltViewModel(), activityId: Int, onBack: () -> Unit) {
     val trackSvg by remember(activityId) {
-        viewModel.repository.getActivity(activityId).map { it.activity.trackPreview?.toTrackSvg() }
+        viewModel.repository.getTrackByActivity(activityId)
+            .map {
+                it?.points?.let { points ->
+                    TrackSvg.fromPoints(points.map { point -> point.coordinate })
+                }
+            }
     }.collectAsState(null)
 
     if (trackSvg != null) {
