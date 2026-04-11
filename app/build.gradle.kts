@@ -50,6 +50,12 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        ndk {
+            // Filters set to reduce app size. Should support most devices.
+            // Support for a new arch can be added if needed.
+            abiFilters += listOf("arm64-v8a", "armeabi-v7a")
+        }
     }
 
     signingConfigs {
@@ -102,6 +108,10 @@ android {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
+        jniLibs {
+            // Since this app is not distributed as bundle, try to compress its size by other means
+            useLegacyPackaging = true
+        }
     }
     dependenciesInfo {
         // These two settings exclude dependency information in the apk
@@ -121,6 +131,7 @@ android {
         disable += "LogConditional" // Logging in release mode is fine for this app
         disable += "SyntheticAccessor" // Not a issue in this app
         disable += "DuplicateStrings" // I don't care
+        disable += "ChromeOsAbiSupport" // The app is still mostly intended for smartphones. Can add support for it later if someone needs it
     }
 }
 
