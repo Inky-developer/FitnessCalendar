@@ -56,7 +56,6 @@ robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectr
 screengrab = { module = "tools.fastlane:screengrab", version.ref = "screengrab" }
 vico-compose = { group = "com.patrykandpatrick.vico", name = "compose", version.ref = "vico" }
 vico-compose-m3 = { group = "com.patrykandpatrick.vico", name = "compose-m3", version.ref = "vico" }
-#maplibre-compose = { module = "com.github.Inky-developer:maplibre-compose", version.ref = "maplibre-compose" }
 maplibre-compose = { module = "org.maplibre.compose:maplibre-compose", version.ref = "maplibre-compose" }
 
 [plugins]
