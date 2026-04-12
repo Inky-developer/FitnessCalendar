@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.gpx.TrackSvg
@@ -86,11 +87,17 @@ fun Map(
             width = const(4.dp)
         )
 
+        val locationIcon = image(painterResource(Icons.Location.resourceId), drawAsSdf = true)
+        // This hardcoded offset has the purpose of putting the tip of the pin on the coordinate,
+        // instead of its center
+        val locationIconOffset = const(DpOffset(0.dp, (-12).dp))
+
         val startSource = rememberGeoJsonSource(GeoJsonData.Features(startPoint))
         SymbolLayer(
             id = "start-point",
             source = startSource,
-            iconImage = image(painterResource(Icons.Location.resourceId)),
+            iconImage = locationIcon,
+            iconOffset = locationIconOffset,
             iconColor = const(colorResource(R.color.start_point)),
         )
 
@@ -98,8 +105,9 @@ fun Map(
         SymbolLayer(
             id = "end-point",
             source = endSource,
-            iconImage = image(painterResource(Icons.Location.resourceId)),
-            iconColor = const(colorResource(R.color.end_point))
+            iconImage = locationIcon,
+            iconOffset = locationIconOffset,
+            iconColor = const(colorResource(R.color.end_point)),
         )
     }
 }

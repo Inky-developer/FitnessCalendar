@@ -344,4 +344,6 @@
     <string name="next_frame">Next frame</string>
     <string name="map_provider_url">Map provider URL</string>
     <string name="map_provider_url_description">Leave blank to not use a provider</string>
+    <string name="start">Start</string>
+    <string name="end">End</string>
 </resources>
