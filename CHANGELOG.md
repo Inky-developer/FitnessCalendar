@@ -1,5 +1,7 @@
 # Unreleased
 
+# 2026.04.1
+
 - Add configurable map to tracks
 - Fix recording tile being unavailable
 - Improve performance of the statistics graphs
