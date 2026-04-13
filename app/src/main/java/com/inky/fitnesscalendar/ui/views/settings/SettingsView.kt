@@ -246,6 +246,30 @@ private fun ProjectionSelect() {
 
 @Composable
 private fun <T> PreferenceTextField(preference: Preference<String, T>) {
+    @Composable
+    fun TextInputModal(initialText: String, onDismiss: (updatedText: String) -> Unit) {
+        var currentText by rememberSaveable(initialText) { mutableStateOf(initialText) }
+
+        Dialog(onDismissRequest = { onDismiss(currentText) }) {
+            TextField(
+                value = currentText,
+                onValueChange = { currentText = it },
+                placeholder = { Text(stringResource(preference.descriptionId!!)) },
+                keyboardOptions = remember {
+                    KeyboardOptions(
+                        capitalization = KeyboardCapitalization.None,
+                        autoCorrectEnabled = false,
+                        keyboardType = KeyboardType.Uri
+                    )
+                },
+                colors = TextFieldDefaults.colors(unfocusedContainerColor = optionGroupDefaultBackground()),
+                shape = MaterialTheme.shapes.small,
+                singleLine = true,
+                modifier = Modifier.fillMaxWidth()
+            )
+        }
+    }
+
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var showModal by rememberSaveable { mutableStateOf(false) }
@@ -264,23 +288,14 @@ private fun <T> PreferenceTextField(preference: Preference<String, T>) {
     }
 
     if (showModal) {
-        Dialog(onDismissRequest = { showModal = false }) {
-            TextField(
-                value = selectedValue,
-                onValueChange = { scope.launch { preference.set(context, it) } },
-                placeholder = { Text(stringResource(preference.descriptionId!!)) },
-                keyboardOptions = remember {
-                    KeyboardOptions(
-                        capitalization = KeyboardCapitalization.None,
-                        autoCorrectEnabled = false,
-                        keyboardType = KeyboardType.Uri
-                    )
-                },
-                colors = TextFieldDefaults.colors(unfocusedContainerColor = optionGroupDefaultBackground()),
-                shape = MaterialTheme.shapes.small,
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
+        TextInputModal(
+            initialText = selectedValue,
+            onDismiss = { newText ->
+                scope.launch {
+                    preference.set(context, newText)
+                    showModal = false
+                }
+            }
+        )
     }
 }
