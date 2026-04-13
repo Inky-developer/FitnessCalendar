@@ -17,6 +17,7 @@ import com.inky.fitnesscalendar.ui.util.Icons
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.localPreferences
 import com.inky.fitnesscalendar.ui.util.sharedElement
+import com.inky.fitnesscalendar.ui.util.skipToLookaheadSize
 import org.maplibre.compose.camera.rememberCameraState
 import org.maplibre.compose.expressions.dsl.const
 import org.maplibre.compose.expressions.dsl.image
@@ -72,7 +73,9 @@ fun Map(
         baseStyle = baseStyle,
         onMapClick = { _, _ -> onClick() },
         options = options,
-        modifier = modifier.sharedElement(SharedContentKey.Map)
+        modifier = Modifier
+            .sharedElement(SharedContentKey.Map)
+            .skipToLookaheadSize() then modifier
     ) {
         if (uri == null) {
             BackgroundLayer(
