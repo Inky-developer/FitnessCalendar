@@ -343,6 +343,4 @@
     <string name="next_frame">Nächstes Bild</string>
     <string name="map_provider_url">Kartenanbieter-URL</string>
     <string name="map_provider_url_description">Leer lassen, um keinen Anbieter zu nutzen</string>
-    <string name="start">Start</string>
-    <string name="end">End</string>
 </resources>
