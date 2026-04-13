@@ -14,7 +14,9 @@ import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.gpx.TrackSvg
 import com.inky.fitnesscalendar.ui.util.Icons
+import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.localPreferences
+import com.inky.fitnesscalendar.ui.util.sharedElement
 import org.maplibre.compose.camera.rememberCameraState
 import org.maplibre.compose.expressions.dsl.const
 import org.maplibre.compose.expressions.dsl.image
@@ -70,7 +72,7 @@ fun Map(
         baseStyle = baseStyle,
         onMapClick = { _, _ -> onClick() },
         options = options,
-        modifier = modifier
+        modifier = modifier.sharedElement(SharedContentKey.Map)
     ) {
         if (uri == null) {
             BackgroundLayer(

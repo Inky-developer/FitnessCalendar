@@ -25,6 +25,8 @@ sealed class SharedContentKey {
     data object FilterInformation : SharedContentKey()
 
     data object NoActivitiesInfoBox : SharedContentKey()
+
+    data object Map : SharedContentKey()
 }
 
 
