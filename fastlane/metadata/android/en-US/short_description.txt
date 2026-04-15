@@ -1,1 +1,1 @@
-A private and fully offline activity tracker.
+A private and offline by default activity tracker.
