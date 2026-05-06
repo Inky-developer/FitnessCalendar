@@ -2,7 +2,6 @@ package com.inky.fitnesscalendar.view_model
 
 import android.content.Context
 import androidx.lifecycle.viewModelScope
-import com.inky.fitnesscalendar.repository.DatabaseRepository
 import com.inky.fitnesscalendar.data.ActivityStatistics
 import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
@@ -10,6 +9,7 @@ import com.inky.fitnesscalendar.data.activity_filter.DateRangeOption
 import com.inky.fitnesscalendar.data.measure.Duration.Companion.until
 import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.db.entities.Recording
+import com.inky.fitnesscalendar.repository.DatabaseRepository
 import com.inky.fitnesscalendar.repository.RecordingRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -66,6 +66,10 @@ class HomeViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.IO) {
             recordingRepository.endRecording(recording)
         }
+    }
+
+    suspend fun updateRecording(recording: Recording) {
+        recordingRepository.updateRecording(recording)
     }
 
     private fun loadWeekStats(): Flow<ActivityStatistics> {

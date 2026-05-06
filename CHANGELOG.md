@@ -1,5 +1,7 @@
 # Unreleased
 
+- Add editable description to recordings
+
 # 2026.04.1
 
 - Add configurable map to tracks

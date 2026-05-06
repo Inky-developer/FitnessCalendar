@@ -57,6 +57,11 @@ class RecordingRepository @Inject constructor(
         return true
     }
 
+    suspend fun updateRecording(recording: Recording) {
+        Log.d(TAG, "Updating $recording")
+        recordingDao.update(recording)
+    }
+
     suspend fun endAllRecordingsOfType(type: ActivityType): Int {
         if (type.uid == null) return 0
 

@@ -37,6 +37,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.listSaver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -52,6 +53,7 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -68,6 +70,7 @@ import com.inky.fitnesscalendar.ui.components.ActivityCard
 import com.inky.fitnesscalendar.ui.components.ActivityCardCallbacks
 import com.inky.fitnesscalendar.ui.components.ActivityImage
 import com.inky.fitnesscalendar.ui.components.CompactActivityCard
+import com.inky.fitnesscalendar.ui.components.DescriptionTextInput
 import com.inky.fitnesscalendar.ui.components.FeelSelector
 import com.inky.fitnesscalendar.ui.components.ImageViewer
 import com.inky.fitnesscalendar.ui.components.NewActivityFAB
@@ -81,6 +84,7 @@ import com.inky.fitnesscalendar.ui.util.sharedElement
 import com.inky.fitnesscalendar.util.showRecordingNotification
 import com.inky.fitnesscalendar.view_model.HomeViewModel
 import com.inky.fitnesscalendar.view_model.statistics.Period
+import kotlinx.coroutines.launch
 
 private const val TAG = "HOME"
 
@@ -160,8 +164,8 @@ fun Home(
                     richRecordings = typeRecordings ?: emptyList(),
                     localizationRepository = viewModel.repository.localizationRepository,
                     onAbort = { viewModel.abortRecording(it) },
-                    onSave = { viewModel.saveRecording(it) }
-
+                    onSave = { viewModel.saveRecording(it) },
+                    onUpdate = { viewModel.updateRecording(it) }
                 )
             }
 
@@ -197,6 +201,7 @@ fun Recordings(
     richRecordings: List<RichRecording>,
     localizationRepository: LocalizationRepository,
     onAbort: (Recording) -> Unit,
+    onUpdate: suspend (Recording) -> Unit,
     onSave: (Recording) -> Unit
 ) {
     Card(
@@ -212,7 +217,8 @@ fun Recordings(
                     localizationRepository,
                     time,
                     onAbort = { onAbort(typeRecording.recording) },
-                    onSave = { onSave(typeRecording.recording) }
+                    onSave = { onSave(typeRecording.recording) },
+                    onUpdate = onUpdate,
                 )
             }
         }
@@ -224,6 +230,7 @@ fun RecordingStatus(
     richRecording: RichRecording,
     localizationRepository: LocalizationRepository,
     currentTimeMs: Long,
+    onUpdate: suspend (Recording) -> Unit,
     onAbort: () -> Unit,
     onSave: () -> Unit
 ) {
@@ -232,6 +239,23 @@ fun RecordingStatus(
 
     val durationString = remember(currentTimeMs) {
         localizationRepository.formatDuration(richRecording.recording.startTime)
+    }
+
+    val recording = richRecording.recording
+    var updatedDescription by rememberSaveable() { mutableStateOf<String?>(null) }
+    val scope = rememberCoroutineScope()
+
+    updatedDescription?.let { description ->
+        Dialog(onDismissRequest = {
+            scope.launch {
+                onUpdate(recording.copy(description = description))
+                updatedDescription = null
+            }
+        }) {
+            DescriptionTextInput(
+                description = description,
+                onDescription = { updatedDescription = it })
+        }
     }
 
     Column(modifier = Modifier.padding(all = 8.dp)) {
@@ -255,7 +279,26 @@ fun RecordingStatus(
             Text(timeString)
             Text(durationString, modifier = Modifier)
         }
-        Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
+        AnimatedContent(recording.description) { description ->
+            if (description.isNotBlank()) {
+                Row {
+                    Text(
+                        description,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(4.dp)
+                            .clip(MaterialTheme.shapes.small)
+                            .background(MaterialTheme.colorScheme.surfaceContainer)
+                            .padding(4.dp)
+                    )
+                }
+            }
+        }
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
+            IconButton(onClick = { updatedDescription = recording.description }) {
+                Icons.Edit("edit")
+            }
+            Spacer(modifier = Modifier.weight(1f))
             TextButton(onClick = onAbort) {
                 Text(stringResource(R.string.abort))
             }

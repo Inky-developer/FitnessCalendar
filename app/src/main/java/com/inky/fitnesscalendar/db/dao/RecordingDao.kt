@@ -5,6 +5,7 @@ import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
+import androidx.room.Update
 import com.inky.fitnesscalendar.db.entities.Recording
 import com.inky.fitnesscalendar.db.entities.RichRecording
 import kotlinx.coroutines.flow.Flow
@@ -23,6 +24,9 @@ interface RecordingDao {
 
     @Insert
     suspend fun insert(recording: Recording): Long
+
+    @Update
+    suspend fun update(recording: Recording)
 
     @Delete
     suspend fun delete(recording: Recording)
