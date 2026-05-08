@@ -36,13 +36,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
-import com.inky.fitnesscalendar.data.gpx.Coordinate
-import com.inky.fitnesscalendar.data.gpx.GpxTrackPoint
-import com.inky.fitnesscalendar.data.measure.Elevation
 import com.inky.fitnesscalendar.data.measure.meters
 import com.inky.fitnesscalendar.db.entities.Track
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
@@ -77,10 +73,11 @@ import com.patrykandpatrick.vico.compose.common.component.rememberShapeComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
 import com.patrykandpatrick.vico.compose.common.data.ExtraStore
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import java.text.DecimalFormat
-import java.time.Instant
-import java.util.Date
 import kotlin.math.ceil
 import kotlin.math.floor
 import kotlin.math.log10
@@ -97,8 +94,12 @@ fun TrackGraphView(
     projection: TrackGraphProjection,
     onBack: () -> Unit
 ) {
-    val track by remember(activityId) { viewModel.repository.getTrackByActivity(activityId) }
-        .collectAsState(null)
+    fun getGraphData(): Flow<Map<TrackGraphProjection, Map<Long, Double>>> =
+        viewModel.repository.getTrackByActivity(activityId).filterNotNull().map { track ->
+            TrackGraphProjection.entries.associateWith { entry -> entry.apply(track) }
+        }
+
+    val graphData by remember(activityId) { getGraphData() }.collectAsState(null)
     var overlayProjection by rememberSaveable { mutableStateOf<TrackGraphProjection?>(null) }
 
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
@@ -114,6 +115,7 @@ fun TrackGraphView(
                 },
                 actions = {
                     OverlaySelectButton(
+                        graphData = graphData ?: emptyMap(),
                         baseProjection = projection,
                         overlay = overlayProjection,
                         onOverlay = { overlayProjection = it }
@@ -126,11 +128,11 @@ fun TrackGraphView(
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
-            AnimatedContent(track, label = "TrackGraphOrLoadingIndicator") { actualTrack ->
-                when (actualTrack) {
+            AnimatedContent(graphData, label = "TrackGraphOrLoadingIndicator") { actualData ->
+                when (actualData) {
                     null -> CircularProgressIndicator()
                     else -> TrackGraph(
-                        actualTrack,
+                        actualData,
                         projection,
                         overlayProjection,
                         modifier = Modifier.fillMaxSize()
@@ -143,10 +145,15 @@ fun TrackGraphView(
 
 @Composable
 private fun OverlaySelectButton(
+    graphData: Map<TrackGraphProjection, Map<Long, Double>>,
     baseProjection: TrackGraphProjection,
     overlay: TrackGraphProjection?,
     onOverlay: (TrackGraphProjection?) -> Unit
 ) {
+    val validProjections = remember(graphData) {
+        // A projection needs at least 2 points to be renderable
+        TrackGraphProjection.entries.filter { (graphData[it]?.size ?: 0) > 2 }
+    }
     var menuOpen by rememberSaveable { mutableStateOf(false) }
     TextButton(onClick = { menuOpen = true }) {
         Text(if (overlay == null) stringResource(R.string.no_overlay) else stringResource(overlay.shortName))
@@ -163,7 +170,7 @@ private fun OverlaySelectButton(
 
         HorizontalDivider()
 
-        for (projection in TrackGraphProjection.entries) {
+        for (projection in validProjections) {
             if (projection == baseProjection) continue
 
             DropdownMenuItem(
@@ -179,17 +186,17 @@ private fun OverlaySelectButton(
 
 @Composable
 fun TrackGraph(
-    track: Track,
+    dataPoints: Map<TrackGraphProjection, Map<Long, Double>>,
     projection: TrackGraphProjection,
     overlay: TrackGraphProjection?,
     modifier: Modifier = Modifier
 ) {
     val modelProducer = remember { CartesianChartModelProducer() }
 
-    LaunchedEffect(track, overlay) {
+    LaunchedEffect(dataPoints, overlay) {
         withContext(Dispatchers.Default) {
-            val values = projection.apply(track)
-            val overlayValues = overlay?.apply(track)
+            val values = dataPoints[projection]!!
+            val overlayValues = overlay?.let { dataPoints[it]!! }
 
             modelProducer.runTransaction {
                 if (overlayValues != null) {
@@ -553,56 +560,4 @@ class MultiMarkerFormatter(val formatters: List<DefaultCartesianMarker.ValueForm
         }
         return buf.toAnnotatedString()
     }
-}
-
-@Preview
-@Composable
-fun PreviewTrackGraph() {
-    val trackPointTime = Date.from(Instant.now())
-    val track = Track(
-        activityId = -1, points = listOf(
-            GpxTrackPoint(
-                Coordinate(0.0, 0.0),
-                time = trackPointTime,
-                elevation = Elevation(meters = 0.0)
-            ),
-            GpxTrackPoint(
-                Coordinate(0.0, 0.0),
-                time = trackPointTime,
-                elevation = Elevation(meters = 10.0)
-            ),
-            GpxTrackPoint(
-                Coordinate(0.0, 0.0),
-                time = trackPointTime,
-                elevation = Elevation(meters = 5.0)
-            ),
-            GpxTrackPoint(
-                Coordinate(0.0, 0.0),
-                time = trackPointTime,
-                elevation = Elevation(meters = 10.0)
-            ),
-            GpxTrackPoint(
-                Coordinate(0.0, 0.0),
-                time = trackPointTime,
-                elevation = Elevation(meters = 20.0)
-            ),
-            GpxTrackPoint(
-                Coordinate(0.0, 0.0),
-                time = trackPointTime,
-                elevation = Elevation(meters = 17.0)
-            ),
-            GpxTrackPoint(
-                Coordinate(0.0, 0.0),
-                time = trackPointTime,
-                elevation = Elevation(meters = 6.0)
-            ),
-            GpxTrackPoint(
-                Coordinate(0.0, 0.0),
-                time = trackPointTime,
-                elevation = Elevation(meters = 0.0)
-            ),
-        )
-    )
-
-    TrackGraph(track, TrackGraphProjection.Elevation, null, modifier = Modifier.fillMaxSize())
 }
