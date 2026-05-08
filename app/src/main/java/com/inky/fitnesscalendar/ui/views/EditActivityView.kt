@@ -207,11 +207,9 @@ fun NewActivity(
     var imageViewerImage by rememberSaveable { mutableStateOf<ImageName?>(null) }
 
     val isKeyboardVisible = WindowInsets.isImeVisible
-    // TODO: Get rid of the `isTest` hack
-    // In testing, the ime is always visible for some reason which means that the save button can never be clicked.
-    val showSaveButton by remember(isKeyboardVisible, editState) {
+    val showSaveButton by remember(editState) {
         derivedStateOf {
-            (!isKeyboardVisible || isTest) && (editState.activityId == null || editState != initialState) && editState.isValid
+            (editState.activityId == null || editState != initialState) && editState.isValid
         }
     }
 
@@ -295,16 +293,18 @@ fun NewActivity(
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icons.Check(stringResource(R.string.save))
-                        Text(
-                            stringResource(R.string.save),
-                            style = MaterialTheme.typography.titleMedium,
-                            modifier = Modifier.padding(start = 8.dp)
-                        )
+                        AnimatedVisibility(!isKeyboardVisible) {
+                            Text(
+                                stringResource(R.string.save),
+                                style = MaterialTheme.typography.titleMedium,
+                                modifier = Modifier.padding(start = 8.dp)
+                            )
+                        }
                     }
                 }
             }
         },
-        floatingActionButtonPosition = FabPosition.Center,
+        floatingActionButtonPosition = if (isKeyboardVisible) FabPosition.End else FabPosition.Center,
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { paddingValues ->
         Column(
