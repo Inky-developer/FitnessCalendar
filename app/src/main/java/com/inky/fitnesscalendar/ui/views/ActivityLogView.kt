@@ -126,7 +126,11 @@ fun ActivityLog(
                         )
                     }
                     IconButton(onClick = onFilter) {
-                        Icons.Search(stringResource(R.string.filter))
+                        val icon = remember(filter) {
+                            if (filter.isEmpty()) Icons.FilterOff
+                            else Icons.FilterOn
+                        }
+                        icon(stringResource(R.string.filter))
                     }
                 },
                 scrollBehavior = scrollBehavior,

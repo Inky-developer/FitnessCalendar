@@ -171,10 +171,10 @@ fun StatisticsView(
                     )
                     IconButton(onClick = onNavigateFilterView) {
                         val icon = remember(state.filter) {
-                            if (state.filter.isEmpty()) R.drawable.outline_filter_list_off_24
-                            else R.drawable.outline_filter_list_24
+                            if (state.filter.isEmpty()) Icons.FilterOff
+                            else Icons.FilterOn
                         }
-                        Icon(painterResource(icon), stringResource(R.string.filter))
+                        icon(stringResource(R.string.filter))
                     }
                     ProjectionSelectButton(state.projection, onProjection = onProjection)
                 },
