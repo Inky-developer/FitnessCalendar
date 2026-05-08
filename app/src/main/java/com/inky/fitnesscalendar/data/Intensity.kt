@@ -11,5 +11,5 @@ data class Intensity(val value: Byte) : Parcelable, ContextFormat {
         assert(value in 0..10)
     }
 
-    override fun formatWithContext(context: Context) = toString()
+    override fun formatWithContext(context: Context) = value.toString()
 }
