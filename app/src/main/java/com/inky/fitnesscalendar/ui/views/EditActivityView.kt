@@ -429,7 +429,7 @@ fun NewActivity(
             }
 
             DescriptionTextInput(
-                description = editState.description,
+                initialDescription = editState.description,
                 onDescription = { onState(editState.copy(description = it)) },
                 modifier = Modifier
                     .testTag("input-description")

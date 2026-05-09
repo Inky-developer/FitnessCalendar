@@ -253,7 +253,7 @@ fun RecordingStatus(
             }
         }) {
             DescriptionTextInput(
-                description = description,
+                initialDescription = description,
                 onDescription = { updatedDescription = it },
                 autoShowKeyboard = true,
             )

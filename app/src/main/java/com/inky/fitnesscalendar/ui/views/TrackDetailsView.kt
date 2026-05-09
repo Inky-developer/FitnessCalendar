@@ -388,7 +388,7 @@ private fun ActivityDescription(description: String, onDescription: (String) -> 
     if (showDialog) {
         Dialog(onDismissRequest = { showDialog = false }) {
             DescriptionTextInput(
-                description = description,
+                initialDescription = description,
                 onDescription = onDescription,
                 autoShowKeyboard = true
             )

@@ -119,7 +119,7 @@ fun EditDayDialog(
             }
 
             DescriptionTextInput(
-                description = editState.description,
+                initialDescription = editState.description,
                 onDescription = { editState = editState.copy(description = it) },
                 maxLines = 8,
                 modifier = Modifier.padding(vertical = 4.dp),

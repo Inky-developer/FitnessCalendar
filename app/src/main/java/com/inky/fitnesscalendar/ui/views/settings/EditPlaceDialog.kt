@@ -166,7 +166,7 @@ private fun EditPlaceDialog(initialPlace: Place?, onDismiss: () -> Unit, onSave:
             }
 
             DescriptionTextInput(
-                description = description,
+                initialDescription = description,
                 onDescription = { description = it },
                 maxLines = 3,
                 modifier = Modifier.padding(vertical = 4.dp)
