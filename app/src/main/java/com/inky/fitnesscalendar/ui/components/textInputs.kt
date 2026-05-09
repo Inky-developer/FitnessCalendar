@@ -7,8 +7,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import com.inky.fitnesscalendar.R
@@ -18,16 +21,30 @@ fun DescriptionTextInput(
     description: String,
     onDescription: (String) -> Unit,
     modifier: Modifier = Modifier,
-    maxLines: Int = Int.MAX_VALUE
+    maxLines: Int = Int.MAX_VALUE,
+    autoShowKeyboard: Boolean = false,
 ) {
+    val focusRequester = remember { FocusRequester() }
+    LaunchedEffect(autoShowKeyboard) {
+        if (autoShowKeyboard) {
+            focusRequester.requestFocus()
+        }
+    }
     TextField(
         value = description,
         onValueChange = onDescription,
         placeholder = { Text(stringResource(R.string.placeholder_description)) },
-        keyboardOptions = remember { KeyboardOptions(capitalization = KeyboardCapitalization.Sentences) },
+        keyboardOptions = remember(autoShowKeyboard) {
+            KeyboardOptions(
+                capitalization = KeyboardCapitalization.Sentences,
+                showKeyboardOnFocus = autoShowKeyboard
+            )
+        },
         colors = TextFieldDefaults.colors(unfocusedContainerColor = optionGroupDefaultBackground()),
         shape = MaterialTheme.shapes.small,
         maxLines = maxLines,
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier
+            .focusRequester(focusRequester)
+            .fillMaxWidth()
     )
 }
