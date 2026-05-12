@@ -4,7 +4,7 @@
 [<img src="https://github.com/user-attachments/assets/59dd953e-c30d-4d11-b156-47f0977141ca" alt="Get it on Github" height="80">](https://github.com/Inky-developer/FitnessCalendar/releases)
 
 
-A private and fully offline activity tracker.
+A private and offline by default activity tracker.
 
 ## Features
 - Track activities of all kinds
