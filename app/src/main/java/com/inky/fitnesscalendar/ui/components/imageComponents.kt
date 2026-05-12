@@ -4,29 +4,39 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.media.MediaMetadataRetriever
 import android.net.Uri
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.border
+import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.BottomAppBarDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
@@ -44,18 +54,24 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
@@ -65,6 +81,7 @@ import coil.compose.AsyncImagePainter
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ImageName
 import com.inky.fitnesscalendar.ui.util.Icons
+import com.inky.fitnesscalendar.ui.views.ActivityEditState
 import com.inky.fitnesscalendar.util.NonEmptyList
 import com.inky.fitnesscalendar.util.asNonEmptyOrNull
 import com.inky.fitnesscalendar.util.copyFileToStorage
@@ -81,21 +98,26 @@ const val IMAGE_ASPECT_RATIO: Float = 4 / 3f
 
 @Composable
 fun ActivityImages(
-    images: NonEmptyList<ImageName>,
+    images: NonEmptyList<ActivityEditState.ImageState>,
     modifier: Modifier = Modifier,
+    state: LazyListState = rememberLazyListState(),
     onClick: (ImageName) -> Unit = {},
+    onLongClick: ((ImageName) -> Unit)? = null,
     onState: ((ImageName, AsyncImagePainter.State) -> Unit)? = null,
 ) {
     val imageScale = if (images.size == 1) 1f else 0.9f
     BoxWithConstraints(modifier = modifier) {
         val imageWidth = this.maxWidth * imageScale
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        LazyRow(state = state, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             items(images) { image ->
                 ActivityImage(
-                    uri = image.getImageUri(),
+                    uri = image.imageName.getImageUri(),
                     modifier = Modifier.width(imageWidth),
-                    onClick = { onClick(image) },
-                    onState = { state -> onState?.let { it(image, state) } }
+                    horizontalBias = image.horizontalBias,
+                    verticalBias = image.verticalBias,
+                    onClick = { onClick(image.imageName) },
+                    onLongClick = onLongClick?.let { { it(image.imageName) } },
+                    onState = { state -> onState?.let { it(image.imageName, state) } }
                 )
             }
         }
@@ -106,7 +128,10 @@ fun ActivityImages(
 fun ActivityImage(
     uri: Uri,
     modifier: Modifier = Modifier,
+    horizontalBias: Float = 0f,
+    verticalBias: Float = 0f,
     onClick: () -> Unit = {},
+    onLongClick: (() -> Unit)? = null,
     onState: ((AsyncImagePainter.State) -> Unit)? = null,
 ) {
     AsyncImage(
@@ -114,11 +139,129 @@ fun ActivityImage(
         contentDescription = stringResource(R.string.user_uploaded_image),
         onState = onState,
         contentScale = ContentScale.Crop,
+        alignment = BiasAlignment(horizontalBias, verticalBias),
         modifier = modifier
             .aspectRatio(IMAGE_ASPECT_RATIO)
             .clip(MaterialTheme.shapes.large)
-            .clickable { onClick() }
+            .combinedClickable(onClick = onClick, onLongClick = onLongClick)
     )
+}
+
+@Composable
+fun EditableActivityImages(
+    images: NonEmptyList<ActivityEditState.ImageState>,
+    onChange: (ActivityEditState.ImageState) -> Unit,
+    onClick: (ImageName) -> Unit,
+    modifier: Modifier = Modifier,
+    onState: ((ImageName, AsyncImagePainter.State) -> Unit)? = null,
+) {
+    var currentEditImage by rememberSaveable { mutableStateOf<ActivityEditState.ImageState?>(null) }
+    val state = rememberLazyListState()
+
+    AnimatedContent(currentEditImage, contentKey = { it?.imageName }) { adjustingImage ->
+        if (adjustingImage != null) {
+            AdjustImageViewport(
+                image = adjustingImage,
+                onChange = { image ->
+                    currentEditImage = image
+                },
+                onDone = {
+                    onChange(adjustingImage)
+                    currentEditImage = null
+                },
+                onCancel = {
+                    currentEditImage = null
+                },
+                modifier = modifier,
+            )
+        } else {
+            ActivityImages(
+                images = images,
+                state = state,
+                onClick = onClick,
+                onLongClick = { name -> currentEditImage = images.find { it.imageName == name } },
+                onState = onState,
+                modifier = modifier
+            )
+        }
+    }
+}
+
+@Composable
+private fun AdjustImageViewport(
+    image: ActivityEditState.ImageState,
+    onChange: (ActivityEditState.ImageState) -> Unit,
+    onDone: () -> Unit,
+    onCancel: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    val initialImage = remember(image.imageName) { image }
+    var intrinsicSize by remember(image.imageName) { mutableStateOf<Size?>(null) }
+    var viewportSize by remember { mutableStateOf(IntSize.Zero) }
+    val latestBias = rememberUpdatedState(image.horizontalBias to image.verticalBias)
+    val borderColor = MaterialTheme.colorScheme.primary
+
+    BackHandler {
+        onCancel()
+    }
+
+    Box(
+        modifier = modifier.fillMaxWidth(),
+        contentAlignment = Alignment.BottomCenter
+    ) {
+        AsyncImage(
+            model = image.imageName.getImageUri(),
+            contentDescription = stringResource(R.string.adjust_image_viewport),
+            onState = { state ->
+                if (state is AsyncImagePainter.State.Success) {
+                    val size = state.painter.intrinsicSize
+                    if (size != Size.Unspecified) intrinsicSize = size
+                }
+            },
+            contentScale = ContentScale.Crop,
+            alignment = BiasAlignment(image.horizontalBias, image.verticalBias),
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(IMAGE_ASPECT_RATIO)
+                .clip(MaterialTheme.shapes.large)
+                .border(2.dp, borderColor, MaterialTheme.shapes.large)
+                .onSizeChanged { viewportSize = it }
+                .pointerInput(image.imageName, intrinsicSize, viewportSize) {
+                    val size = intrinsicSize ?: return@pointerInput
+                    if (size.width <= 0 || size.height <= 0) return@pointerInput
+                    if (viewportSize.width == 0 || viewportSize.height == 0) return@pointerInput
+                    val dx = size.width - viewportSize.width.toFloat()
+                    val dy = size.height - viewportSize.height.toFloat()
+                    var h = 0f
+                    var v = 0f
+                    detectDragGestures(
+                        onDragStart = {
+                            h = latestBias.value.first
+                            v = latestBias.value.second
+                        },
+                        onDrag = { change, offset ->
+                            change.consume()
+                            if (dx > 0f) h = (h - 2f * offset.x / dx).coerceIn(-1f, 1f)
+                            if (dy > 0f) v = (v - 2f * offset.y / dy).coerceIn(-1f, 1f)
+                            onChange(image.copy(verticalBias = v, horizontalBias = h))
+                        }
+                    )
+                }
+        )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.padding(8.dp)
+        ) {
+            AnimatedVisibility(image != initialImage) {
+                FilledTonalIconButton(onClick = { onChange(initialImage) }) {
+                    Icons.ResetImage(stringResource(R.string.reset_image_viewport))
+                }
+            }
+            FilledIconButton(onClick = onDone) {
+                Icons.Check(stringResource(R.string.done_adjusting_image))
+            }
+        }
+    }
 }
 
 enum class ImageLimit {

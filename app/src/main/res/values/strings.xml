@@ -344,4 +344,7 @@
     <string name="next_frame">Next frame</string>
     <string name="map_provider_url">Map provider URL</string>
     <string name="map_provider_url_description">Leave blank to not use a provider</string>
+    <string name="adjust_image_viewport">Adjust image viewport</string>
+    <string name="reset_image_viewport">Reset image viewport</string>
+    <string name="done_adjusting_image">Done adjusting image</string>
 </resources>

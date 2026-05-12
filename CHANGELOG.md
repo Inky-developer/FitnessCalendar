@@ -1,6 +1,7 @@
 # Unreleased
 
 - Add editable description to recordings
+- Allow configuring the image viewport (Via long tap on the image in the activity editor)
 
 # 2026.04.1
 

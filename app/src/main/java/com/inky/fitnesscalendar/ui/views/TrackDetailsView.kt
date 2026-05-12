@@ -64,8 +64,8 @@ import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.repository.DatabaseRepository
-import com.inky.fitnesscalendar.ui.components.ActivityImages
 import com.inky.fitnesscalendar.ui.components.DescriptionTextInput
+import com.inky.fitnesscalendar.ui.components.EditableActivityImages
 import com.inky.fitnesscalendar.ui.components.FavoriteIcon
 import com.inky.fitnesscalendar.ui.components.ImageLimit
 import com.inky.fitnesscalendar.ui.components.ImageViewer
@@ -257,9 +257,12 @@ fun TrackDetailsData(
 
     val images = state.editState.images.asNonEmptyOrNull()
     if (images != null) {
-        ActivityImages(
+        EditableActivityImages(
             images,
             onClick = { imagePopup = it },
+            onChange = { image ->
+                state.updateImage(image)
+            },
             modifier = Modifier
                 .padding(all = 8.dp)
                 .sharedElement(SharedContentKey.ActivityImage(state.initialActivity.activity.uid!!))
@@ -507,11 +510,23 @@ class DetailsState(
     val hasChanged = derivedStateOf { editState != initialEditState }
 
     fun removeImage(image: ImageName) {
-        editState = editState.copy(images = editState.images - image)
+        editState = editState.copy(images = editState.images.filter { it.imageName != image })
     }
 
     fun addImages(images: NonEmptyList<ImageName>) {
-        editState = editState.copy(images = editState.images + images)
+        editState = editState.copy(
+            images = editState.images + images.map { ActivityEditState.ImageState(it) }
+        )
+    }
+
+    fun updateImage(changedImage: ActivityEditState.ImageState) {
+        editState = editState.copy(images = editState.images.map { image ->
+            if (image.imageName == changedImage.imageName) {
+                changedImage
+            } else {
+                image
+            }
+        })
     }
 
     fun toggleIsFavorite() {
@@ -523,18 +538,18 @@ class DetailsState(
 
 @Parcelize
 data class DetailsEditState(
-    val images: List<ImageName>,
+    val images: List<ActivityEditState.ImageState>,
     val description: String,
     val isFavorite: Boolean
 ) : Parcelable {
     constructor(richActivity: RichActivity) : this(
-        images = richActivity.images,
+        images = richActivity.images.map { ActivityEditState.ImageState(it) },
         description = richActivity.activity.description,
         isFavorite = richActivity.activity.favorite
     )
 
     fun getActivity(initialActivity: RichActivity) = initialActivity.copy(
-        images = images,
+        images = images.map { it.toActivityImage(initialActivity.activity.uid!!) },
         activity = initialActivity.activity.copy(
             description = description,
             favorite = isFavorite

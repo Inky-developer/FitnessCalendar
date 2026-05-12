@@ -70,15 +70,16 @@ import com.inky.fitnesscalendar.data.Intensity
 import com.inky.fitnesscalendar.data.measure.format
 import com.inky.fitnesscalendar.data.measure.kilometers
 import com.inky.fitnesscalendar.db.entities.Activity
+import com.inky.fitnesscalendar.db.entities.ActivityImage
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.preferences.Preference
-import com.inky.fitnesscalendar.ui.components.ActivityImages
 import com.inky.fitnesscalendar.ui.components.ActivitySelector
 import com.inky.fitnesscalendar.ui.components.ActivitySelectorState
 import com.inky.fitnesscalendar.ui.components.DateTimePicker
 import com.inky.fitnesscalendar.ui.components.DescriptionTextInput
 import com.inky.fitnesscalendar.ui.components.DurationPicker
+import com.inky.fitnesscalendar.ui.components.EditableActivityImages
 import com.inky.fitnesscalendar.ui.components.FavoriteIcon
 import com.inky.fitnesscalendar.ui.components.FeelSelector
 import com.inky.fitnesscalendar.ui.components.ImageLimit
@@ -313,10 +314,19 @@ fun NewActivity(
                 .padding(horizontal = 8.dp)
                 .verticalScroll(scrollState)
         ) {
-            val imageNames = editState.images.map { it.imageName }.asNonEmptyOrNull()
-            if (imageNames != null) {
-                ActivityImages(
-                    images = imageNames,
+            val images = editState.images.asNonEmptyOrNull()
+            if (images != null) {
+                EditableActivityImages(
+                    images = images,
+                    onChange = { changedImage ->
+                        onState(editState.copy(images = editState.images.map { image ->
+                            if (image.imageName == changedImage.imageName) {
+                                changedImage
+                            } else {
+                                image
+                            }
+                        }))
+                    },
                     onState = { image, state ->
                         if (state is AsyncImagePainter.State.Error && !initialState.images.any { it.imageName == image }) {
                             onState(editState.copy(images = editState.images.filter { it.imageName != image }))
@@ -673,15 +683,27 @@ data class ActivityEditState(
             activity = newActivity,
             place = activitySelectorState.place,
             type = activitySelectorState.activityType,
-            images = images.map { it.imageName }
+            images = images.map { it.toActivityImage(activityId ?: 0) }
         )
     }
 
     @Parcelize
     data class ImageState(
-        val activityId: Int?,
-        val imageName: ImageName
+        val imageName: ImageName,
+        val horizontalBias: Float = 0f,
+        val verticalBias: Float = 0f,
     ) : Parcelable {
-        constructor(imageName: ImageName) : this(null, imageName)
+        constructor(image: ActivityImage) : this(
+            imageName = image.imageName,
+            horizontalBias = image.horizontalBias,
+            verticalBias = image.verticalBias,
+        )
+
+        fun toActivityImage(activityId: Int) = ActivityImage(
+            activityId = activityId,
+            imageName = imageName,
+            horizontalBias = horizontalBias,
+            verticalBias = verticalBias,
+        )
     }
 }

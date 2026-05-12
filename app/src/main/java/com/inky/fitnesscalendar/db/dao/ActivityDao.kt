@@ -96,9 +96,9 @@ abstract class ActivityDao {
     abstract suspend fun addActivityImages(images: List<ActivityImage>)
 
     @Transaction
-    open suspend fun setActivityImages(id: Int, images: List<ImageName>) {
+    open suspend fun setActivityImages(id: Int, images: List<ActivityImage>) {
         deleteActivityImages(id)
-        addActivityImages(images.map { ActivityImage(id, it) })
+        addActivityImages(images.map { it.copy(activityId = id) })
     }
 
     @Query("SELECT image_name FROM ActivityImage")

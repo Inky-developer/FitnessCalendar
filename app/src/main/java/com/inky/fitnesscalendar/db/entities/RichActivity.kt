@@ -4,7 +4,6 @@ import androidx.compose.runtime.Immutable
 import androidx.room.Embedded
 import androidx.room.Ignore
 import androidx.room.Relation
-import com.inky.fitnesscalendar.data.ImageName
 
 // The var isSynthetic should never be modified after initial creation, so the @Immutable is valid
 @Immutable
@@ -14,13 +13,8 @@ data class RichActivity(
     val type: ActivityType,
     @Relation(parentColumn = "place_id", entityColumn = "uid")
     val place: Place?,
-    @Relation(
-        parentColumn = "uid",
-        entityColumn = "activity_id",
-        entity = ActivityImage::class,
-        projection = ["image_name"]
-    )
-    val images: List<ImageName>,
+    @Relation(parentColumn = "uid", entityColumn = "activity_id")
+    val images: List<ActivityImage>,
 ) {
     /// If true, this richActivity was generated in the statistics for the purpose of attributing a single
     /// activity to multiple time windows

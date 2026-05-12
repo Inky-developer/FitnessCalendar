@@ -23,5 +23,7 @@ import kotlinx.parcelize.Parcelize
 )
 data class ActivityImage(
     @ColumnInfo(name = "activity_id") val activityId: Int,
-    @PrimaryKey @ColumnInfo(name = "image_name") val imageName: ImageName
+    @PrimaryKey @ColumnInfo(name = "image_name") val imageName: ImageName,
+    @ColumnInfo(name = "horizontal_bias", defaultValue = "0") val horizontalBias: Float = 0f,
+    @ColumnInfo(name = "vertical_bias", defaultValue = "0") val verticalBias: Float = 0f,
 ) : Parcelable
