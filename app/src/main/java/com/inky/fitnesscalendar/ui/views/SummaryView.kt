@@ -221,6 +221,24 @@ private fun SummaryViewInner(
             }
         }
 
+        if (state.filter.range == null) {
+            item(key = "mosaic") {
+                MosaicChart(
+                    state.mosaicState,
+                    hoverText = { entry ->
+                        val date = entry.data.format(LocalizationRepository.shortLocalDateFormatter)
+                        pluralStringResource(
+                            R.plurals.tooltip_activities_on_day,
+                            entry.count,
+                            date,
+                            entry.count
+                        )
+                    },
+                    modifier = Modifier.padding(vertical = 8.dp)
+                )
+            }
+        }
+
         item(key = "SummaryBox") { SummaryBox(state.summaryBoxState) }
 
         item(key = "RecordBox") { RecordsBox(state.recordsBoxState, onNavigateActivity) }
@@ -267,24 +285,6 @@ private fun SummaryViewInner(
                 title = stringResource(R.string.Activities_by_time_of_day),
                 xAxisLabel = stringResource(R.string.Hour)
             )
-        }
-
-        item(key = "mosaic") {
-            if (state.filter.range == null) {
-                MosaicChart(
-                    state.mosaicState,
-                    hoverText = { entry ->
-                        val date = entry.data.format(LocalizationRepository.shortLocalDateFormatter)
-                        pluralStringResource(
-                            R.plurals.tooltip_activities_on_day,
-                            entry.count,
-                            date,
-                            entry.count
-                        )
-                    },
-                    modifier = Modifier.padding(vertical = 8.dp)
-                )
-            }
         }
     }
 }
