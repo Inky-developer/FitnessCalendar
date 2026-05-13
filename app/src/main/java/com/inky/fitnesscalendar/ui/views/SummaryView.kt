@@ -204,13 +204,20 @@ private fun SummaryViewInner(
             .fillMaxWidth()
             .padding(horizontal = 8.dp)
     ) {
-        item(key = "PieChart") {
-            PieChart(state.pieChartState, onClick = {
-                val newFilter = state.handlePieChartClick(it)
-                newFilter?.let(onEditFilter)
-            })
-            AnimatedContent(state.legendItems, label = "LegendItems") { legendItems ->
-                Legend(legendItems)
+        if (state.pieChartState.dataPoints.size > 1) {
+            item(key = "PieChart") {
+                Column(modifier = Modifier.animateItem()) {
+                    PieChart(
+                        state.pieChartState,
+                        onClick = {
+                            val newFilter = state.handlePieChartClick(it)
+                            newFilter?.let(onEditFilter)
+                        }
+                    )
+                    AnimatedContent(state.legendItems, label = "LegendItems") { legendItems ->
+                        Legend(legendItems)
+                    }
+                }
             }
         }
 
