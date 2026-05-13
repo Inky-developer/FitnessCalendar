@@ -101,7 +101,7 @@ fun ActivityStatistics.calculateMosaicState(colors: List<Color>): MosaicChartSta
     )
 }
 
-const val TILE_SIZE_DP = 12
+const val TILE_SIZE_DP = 18
 
 @Composable
 fun <T> MosaicChart(
