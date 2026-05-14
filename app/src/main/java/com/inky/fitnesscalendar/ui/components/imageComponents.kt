@@ -80,8 +80,8 @@ import coil.compose.AsyncImage
 import coil.compose.AsyncImagePainter
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ImageName
+import com.inky.fitnesscalendar.db.entities.UserImage
 import com.inky.fitnesscalendar.ui.util.Icons
-import com.inky.fitnesscalendar.ui.views.ActivityEditState
 import com.inky.fitnesscalendar.util.NonEmptyList
 import com.inky.fitnesscalendar.util.asNonEmptyOrNull
 import com.inky.fitnesscalendar.util.copyFileToStorage
@@ -98,7 +98,7 @@ const val IMAGE_ASPECT_RATIO: Float = 4 / 3f
 
 @Composable
 fun ActivityImages(
-    images: NonEmptyList<ActivityEditState.ImageState>,
+    images: NonEmptyList<UserImage>,
     modifier: Modifier = Modifier,
     state: LazyListState = rememberLazyListState(),
     onClick: (ImageName) -> Unit = {},
@@ -111,13 +111,13 @@ fun ActivityImages(
         LazyRow(state = state, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
             items(images) { image ->
                 ActivityImage(
-                    uri = image.imageName.getImageUri(),
+                    uri = image.name.getImageUri(),
                     modifier = Modifier.width(imageWidth),
                     horizontalBias = image.horizontalBias,
                     verticalBias = image.verticalBias,
-                    onClick = { onClick(image.imageName) },
-                    onLongClick = onLongClick?.let { { it(image.imageName) } },
-                    onState = { state -> onState?.let { it(image.imageName, state) } }
+                    onClick = { onClick(image.name) },
+                    onLongClick = onLongClick?.let { { it(image.name) } },
+                    onState = { state -> onState?.let { it(image.name, state) } }
                 )
             }
         }
@@ -149,16 +149,16 @@ fun ActivityImage(
 
 @Composable
 fun EditableActivityImages(
-    images: NonEmptyList<ActivityEditState.ImageState>,
-    onChange: (ActivityEditState.ImageState) -> Unit,
+    images: NonEmptyList<UserImage>,
+    onChange: (UserImage) -> Unit,
     onClick: (ImageName) -> Unit,
     modifier: Modifier = Modifier,
     onState: ((ImageName, AsyncImagePainter.State) -> Unit)? = null,
 ) {
-    var currentEditImage by rememberSaveable { mutableStateOf<ActivityEditState.ImageState?>(null) }
+    var currentEditImage by rememberSaveable { mutableStateOf<UserImage?>(null) }
     val state = rememberLazyListState()
 
-    AnimatedContent(currentEditImage, contentKey = { it?.imageName }) { adjustingImage ->
+    AnimatedContent(currentEditImage, contentKey = { it?.name }) { adjustingImage ->
         if (adjustingImage != null) {
             AdjustImageViewport(
                 image = adjustingImage,
@@ -179,7 +179,7 @@ fun EditableActivityImages(
                 images = images,
                 state = state,
                 onClick = onClick,
-                onLongClick = { name -> currentEditImage = images.find { it.imageName == name } },
+                onLongClick = { name -> currentEditImage = images.find { it.name == name } },
                 onState = onState,
                 modifier = modifier
             )
@@ -189,14 +189,14 @@ fun EditableActivityImages(
 
 @Composable
 private fun AdjustImageViewport(
-    image: ActivityEditState.ImageState,
-    onChange: (ActivityEditState.ImageState) -> Unit,
+    image: UserImage,
+    onChange: (UserImage) -> Unit,
     onDone: () -> Unit,
     onCancel: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val initialImage = remember(image.imageName) { image }
-    var intrinsicSize by remember(image.imageName) { mutableStateOf<Size?>(null) }
+    val initialImage = remember(image.name) { image }
+    var intrinsicSize by remember(image.name) { mutableStateOf<Size?>(null) }
     var viewportSize by remember { mutableStateOf(IntSize.Zero) }
     val latestBias = rememberUpdatedState(image.horizontalBias to image.verticalBias)
     val borderColor = MaterialTheme.colorScheme.primary
@@ -210,7 +210,7 @@ private fun AdjustImageViewport(
         contentAlignment = Alignment.BottomCenter
     ) {
         AsyncImage(
-            model = image.imageName.getImageUri(),
+            model = image.name.getImageUri(),
             contentDescription = stringResource(R.string.adjust_image_viewport),
             onState = { state ->
                 if (state is AsyncImagePainter.State.Success) {
@@ -226,7 +226,7 @@ private fun AdjustImageViewport(
                 .clip(MaterialTheme.shapes.large)
                 .border(2.dp, borderColor, MaterialTheme.shapes.large)
                 .onSizeChanged { viewportSize = it }
-                .pointerInput(image.imageName, intrinsicSize, viewportSize) {
+                .pointerInput(image.name, intrinsicSize, viewportSize) {
                     val size = intrinsicSize ?: return@pointerInput
                     if (size.width <= 0 || size.height <= 0) return@pointerInput
                     if (viewportSize.width == 0 || viewportSize.height == 0) return@pointerInput

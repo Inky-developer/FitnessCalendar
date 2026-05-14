@@ -319,7 +319,7 @@ private fun ActivityShareCard(
         }
 
         AnimatedVisibility(config.showImage) {
-            images.map { ActivityEditState.ImageState(it) }.asNonEmptyOrNull()?.let { images ->
+            images.map { it.image }.asNonEmptyOrNull()?.let { images ->
                 HorizontalDivider()
                 ActivityImages(
                     images = images,

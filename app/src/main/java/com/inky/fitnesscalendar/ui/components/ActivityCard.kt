@@ -65,7 +65,6 @@ import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.applyIf
 import com.inky.fitnesscalendar.ui.util.sharedElement
 import com.inky.fitnesscalendar.ui.util.skipToLookaheadSize
-import com.inky.fitnesscalendar.ui.views.ActivityEditState
 import com.inky.fitnesscalendar.util.asNonEmptyOrNull
 import com.inky.fitnesscalendar.util.gpx.simplify
 
@@ -144,7 +143,7 @@ fun ActivityCard(
             }
         }
 
-        images.map { ActivityEditState.ImageState(it) }.asNonEmptyOrNull()?.let { images ->
+        images.map { it.image }.asNonEmptyOrNull()?.let { images ->
             HorizontalDivider()
             ActivityImages(
                 images = images,

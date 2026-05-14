@@ -72,6 +72,7 @@ import com.inky.fitnesscalendar.data.measure.kilometers
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.ActivityImage
 import com.inky.fitnesscalendar.db.entities.RichActivity
+import com.inky.fitnesscalendar.db.entities.UserImage
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.preferences.Preference
 import com.inky.fitnesscalendar.ui.components.ActivitySelector
@@ -273,7 +274,7 @@ fun NewActivity(
                             imageLimit = ImageLimit.Multiple,
                             onImages = { images ->
                                 onState(editState.copy(images = editState.images + images.map {
-                                    ActivityEditState.ImageState(it)
+                                    UserImage(it)
                                 }))
                             },
                             onDismissMenu = { contextMenuOpen = false },
@@ -320,7 +321,7 @@ fun NewActivity(
                     images = images,
                     onChange = { changedImage ->
                         onState(editState.copy(images = editState.images.map { image ->
-                            if (image.imageName == changedImage.imageName) {
+                            if (image.name == changedImage.name) {
                                 changedImage
                             } else {
                                 image
@@ -328,8 +329,8 @@ fun NewActivity(
                         }))
                     },
                     onState = { image, state ->
-                        if (state is AsyncImagePainter.State.Error && !initialState.images.any { it.imageName == image }) {
-                            onState(editState.copy(images = editState.images.filter { it.imageName != image }))
+                        if (state is AsyncImagePainter.State.Error && !initialState.images.any { it.name == image }) {
+                            onState(editState.copy(images = editState.images.filter { it.name != image }))
                         }
                     },
                     onClick = { imageViewerImage = it },
@@ -454,7 +455,7 @@ fun NewActivity(
                 imageUri = image.getImageUri(),
                 onDismiss = { imageViewerImage = null },
                 onDelete = {
-                    onState(editState.copy(images = editState.images.filter { it.imageName != image }))
+                    onState(editState.copy(images = editState.images.filter { it.name != image }))
                     imageViewerImage = null
                 },
             )
@@ -622,7 +623,7 @@ data class ActivityEditState(
     val distanceString: String,
     val intensity: Intensity?,
     val feel: Feel,
-    val images: List<ImageState>,
+    val images: List<UserImage>,
     val favorite: Boolean,
 
     val activityId: Int?,
@@ -639,7 +640,7 @@ data class ActivityEditState(
         distanceString = activity?.activity?.distance?.kilometers?.toString() ?: "",
         intensity = activity?.activity?.intensity,
         feel = activity?.activity?.feel ?: Feel.Ok,
-        images = activity?.images?.map { ImageState(it) } ?: emptyList(),
+        images = activity?.images?.map { it.image } ?: emptyList(),
         favorite = activity?.activity?.favorite ?: false,
         activityId = activity?.activity?.uid
     )
@@ -683,27 +684,8 @@ data class ActivityEditState(
             activity = newActivity,
             place = activitySelectorState.place,
             type = activitySelectorState.activityType,
-            images = images.map { it.toActivityImage(activityId ?: 0) }
+            images = images.map { ActivityImage(activityId ?: 0, it) }
         )
     }
 
-    @Parcelize
-    data class ImageState(
-        val imageName: ImageName,
-        val horizontalBias: Float = 0f,
-        val verticalBias: Float = 0f,
-    ) : Parcelable {
-        constructor(image: ActivityImage) : this(
-            imageName = image.imageName,
-            horizontalBias = image.horizontalBias,
-            verticalBias = image.verticalBias,
-        )
-
-        fun toActivityImage(activityId: Int) = ActivityImage(
-            activityId = activityId,
-            imageName = imageName,
-            horizontalBias = horizontalBias,
-            verticalBias = verticalBias,
-        )
-    }
 }

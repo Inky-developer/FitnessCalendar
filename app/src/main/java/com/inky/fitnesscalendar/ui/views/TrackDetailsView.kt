@@ -60,8 +60,10 @@ import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ImageName
 import com.inky.fitnesscalendar.data.gpx.GpxTrackStats
 import com.inky.fitnesscalendar.data.gpx.TrackSvg
+import com.inky.fitnesscalendar.db.entities.ActivityImage
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.RichActivity
+import com.inky.fitnesscalendar.db.entities.UserImage
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.repository.DatabaseRepository
 import com.inky.fitnesscalendar.ui.components.DescriptionTextInput
@@ -510,18 +512,18 @@ class DetailsState(
     val hasChanged = derivedStateOf { editState != initialEditState }
 
     fun removeImage(image: ImageName) {
-        editState = editState.copy(images = editState.images.filter { it.imageName != image })
+        editState = editState.copy(images = editState.images.filter { it.name != image })
     }
 
     fun addImages(images: NonEmptyList<ImageName>) {
         editState = editState.copy(
-            images = editState.images + images.map { ActivityEditState.ImageState(it) }
+            images = editState.images + images.map { UserImage(it) }
         )
     }
 
-    fun updateImage(changedImage: ActivityEditState.ImageState) {
+    fun updateImage(changedImage: UserImage) {
         editState = editState.copy(images = editState.images.map { image ->
-            if (image.imageName == changedImage.imageName) {
+            if (image.name == changedImage.name) {
                 changedImage
             } else {
                 image
@@ -538,18 +540,18 @@ class DetailsState(
 
 @Parcelize
 data class DetailsEditState(
-    val images: List<ActivityEditState.ImageState>,
+    val images: List<UserImage>,
     val description: String,
     val isFavorite: Boolean
 ) : Parcelable {
     constructor(richActivity: RichActivity) : this(
-        images = richActivity.images.map { ActivityEditState.ImageState(it) },
+        images = richActivity.images.map { it.image },
         description = richActivity.activity.description,
         isFavorite = richActivity.activity.favorite
     )
 
     fun getActivity(initialActivity: RichActivity) = initialActivity.copy(
-        images = images.map { it.toActivityImage(initialActivity.activity.uid!!) },
+        images = images.map { ActivityImage(initialActivity.activity.uid!!, it) },
         activity = initialActivity.activity.copy(
             description = description,
             favorite = isFavorite
