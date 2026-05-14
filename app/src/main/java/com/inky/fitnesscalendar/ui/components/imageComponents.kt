@@ -230,8 +230,12 @@ private fun AdjustImageViewport(
                     val size = intrinsicSize ?: return@pointerInput
                     if (size.width <= 0 || size.height <= 0) return@pointerInput
                     if (viewportSize.width == 0 || viewportSize.height == 0) return@pointerInput
-                    val dx = size.width - viewportSize.width.toFloat()
-                    val dy = size.height - viewportSize.height.toFloat()
+                    val scale = maxOf(
+                        viewportSize.width / size.width,
+                        viewportSize.height / size.height,
+                    )
+                    val dx = (size.width * scale - viewportSize.width).coerceAtLeast(0f)
+                    val dy = (size.height * scale - viewportSize.height).coerceAtLeast(0f)
                     var h = 0f
                     var v = 0f
                     detectDragGestures(
