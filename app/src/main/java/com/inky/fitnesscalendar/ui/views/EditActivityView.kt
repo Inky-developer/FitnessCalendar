@@ -70,7 +70,6 @@ import com.inky.fitnesscalendar.data.Intensity
 import com.inky.fitnesscalendar.data.measure.format
 import com.inky.fitnesscalendar.data.measure.kilometers
 import com.inky.fitnesscalendar.db.entities.Activity
-import com.inky.fitnesscalendar.db.entities.ActivityImage
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.db.entities.UserImage
 import com.inky.fitnesscalendar.localization.LocalizationRepository
@@ -640,7 +639,7 @@ data class ActivityEditState(
         distanceString = activity?.activity?.distance?.kilometers?.toString() ?: "",
         intensity = activity?.activity?.intensity,
         feel = activity?.activity?.feel ?: Feel.Ok,
-        images = activity?.images?.map { it.image } ?: emptyList(),
+        images = activity?.images ?: emptyList(),
         favorite = activity?.activity?.favorite ?: false,
         activityId = activity?.activity?.uid
     )
@@ -684,7 +683,7 @@ data class ActivityEditState(
             activity = newActivity,
             place = activitySelectorState.place,
             type = activitySelectorState.activityType,
-            images = images.map { ActivityImage(activityId ?: 0, it) }
+            images = images
         )
     }
 

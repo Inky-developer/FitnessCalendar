@@ -12,6 +12,7 @@ import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.ActivityImage
 import com.inky.fitnesscalendar.db.entities.Recording
 import com.inky.fitnesscalendar.db.entities.RichActivity
+import com.inky.fitnesscalendar.db.entities.UserImage
 import kotlinx.coroutines.flow.Flow
 import java.util.Date
 
@@ -96,9 +97,9 @@ abstract class ActivityDao {
     abstract suspend fun addActivityImages(images: List<ActivityImage>)
 
     @Transaction
-    open suspend fun setActivityImages(id: Int, images: List<ActivityImage>) {
+    open suspend fun setActivityImages(id: Int, images: List<UserImage>) {
         deleteActivityImages(id)
-        addActivityImages(images.map { it.copy(activityId = id) })
+        addActivityImages(images.map { ActivityImage(id, it) })
     }
 
     @Query("SELECT image_name FROM ActivityImage")

@@ -13,8 +13,12 @@ data class RichActivity(
     val type: ActivityType,
     @Relation(parentColumn = "place_id", entityColumn = "uid")
     val place: Place?,
-    @Relation(parentColumn = "uid", entityColumn = "activity_id")
-    val images: List<ActivityImage>,
+    @Relation(
+        entity = ActivityImage::class,
+        parentColumn = "uid",
+        entityColumn = "activity_id",
+    )
+    val images: List<UserImage>,
 ) {
     /// If true, this richActivity was generated in the statistics for the purpose of attributing a single
     /// activity to multiple time windows

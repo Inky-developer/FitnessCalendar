@@ -143,7 +143,7 @@ fun ActivityCard(
             }
         }
 
-        images.map { it.image }.asNonEmptyOrNull()?.let { images ->
+        images.asNonEmptyOrNull()?.let { images ->
             HorizontalDivider()
             ActivityImages(
                 images = images,

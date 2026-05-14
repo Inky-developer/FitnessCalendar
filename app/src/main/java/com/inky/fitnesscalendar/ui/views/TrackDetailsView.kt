@@ -60,7 +60,6 @@ import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ImageName
 import com.inky.fitnesscalendar.data.gpx.GpxTrackStats
 import com.inky.fitnesscalendar.data.gpx.TrackSvg
-import com.inky.fitnesscalendar.db.entities.ActivityImage
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.db.entities.UserImage
@@ -545,13 +544,13 @@ data class DetailsEditState(
     val isFavorite: Boolean
 ) : Parcelable {
     constructor(richActivity: RichActivity) : this(
-        images = richActivity.images.map { it.image },
+        images = richActivity.images,
         description = richActivity.activity.description,
         isFavorite = richActivity.activity.favorite
     )
 
     fun getActivity(initialActivity: RichActivity) = initialActivity.copy(
-        images = images.map { ActivityImage(initialActivity.activity.uid!!, it) },
+        images = images,
         activity = initialActivity.activity.copy(
             description = description,
             favorite = isFavorite
