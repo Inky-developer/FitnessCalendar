@@ -63,7 +63,7 @@ class BackupRepositoryTest {
 
     private fun createBackupFile(repo: BackupRepository): File {
         val backupFile = File.createTempFile("backup", ".zip")
-        repo.backup(backupFile)
+        repo.backupFile(backupFile)
         return backupFile
     }
 

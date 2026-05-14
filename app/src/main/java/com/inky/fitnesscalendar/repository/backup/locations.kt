@@ -75,7 +75,7 @@ internal data object ImagesLocation : BackupLocation {
     override fun backup(context: Context, database: AppDatabase, zip: ZipWriter) {
         val dir = context.getOrCreateImagesDir()
         for (file in dir.listFiles() ?: return) {
-            zip.addFile(file, directory = key)
+            zip.addFile(file, directory = key, compressed = false)
         }
     }
 

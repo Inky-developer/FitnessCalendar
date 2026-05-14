@@ -6,20 +6,19 @@ import android.os.Build
 import android.util.Log
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Immutable
-import androidx.core.net.toUri
 import androidx.documentfile.provider.DocumentFile
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.db.AppDatabase
-import com.inky.fitnesscalendar.util.BACKUP_CACHE_FILE
 import com.inky.fitnesscalendar.util.SDK_MIN_VERSION_FOR_SQLITE_VACUUM
 import com.inky.fitnesscalendar.util.ZipWriter
-import com.inky.fitnesscalendar.util.copyFile
 import com.inky.fitnesscalendar.util.entries
 import com.inky.fitnesscalendar.util.restartApplication
 import com.inky.fitnesscalendar.util.toLocalDateTime
 import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
+import java.io.FileOutputStream
 import java.io.IOException
+import java.io.OutputStream
 import java.time.Instant
 import java.time.LocalDateTime
 import java.util.Date
@@ -58,25 +57,29 @@ class BackupRepository @Inject constructor(
      * Creates a backup file in the given directory, or returns an error
      */
     fun backup(directory: Uri): BackupError? {
+        if (!isBackupSupported()) return BackupError.OldAndroidVersion
+
         val targetUri = prepareBackupFile(directory) ?: return BackupError.CannotAccessFile
-        val zipFile = File(context.cacheDir, BACKUP_CACHE_FILE)
+        val outputStream = context.contentResolver.openOutputStream(targetUri)
+            ?: return BackupError.CannotAccessFile
 
-        backup(zipFile)
-
-        context.copyFile(zipFile.toUri(), targetUri)
+        writeBackup(outputStream)
         return null
     }
 
-    fun backup(file: File): BackupError? {
+    fun backupFile(file: File): BackupError? {
         if (!isBackupSupported()) return BackupError.OldAndroidVersion
 
-        ZipWriter(file).use { zip ->
+        writeBackup(FileOutputStream(file))
+        return null
+    }
+
+    private fun writeBackup(output: OutputStream) {
+        ZipWriter(output).use { zip ->
             for (location in BACKUP_LOCATIONS.values) {
                 location.backup(context, database, zip)
             }
         }
-
-        return null
     }
 
     /**

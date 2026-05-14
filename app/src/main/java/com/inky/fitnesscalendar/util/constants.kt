@@ -24,7 +24,6 @@ const val SHARED_TRACKS_DIR = "shared_tracks_cache"
 // which is supported at android sdk version 30 (Android 11) and higher
 const val SDK_MIN_VERSION_FOR_SQLITE_VACUUM = 30
 
-const val BACKUP_CACHE_FILE = "backup-temp.zip"
 const val BACKUP_DB_NAME = "database.sqlite"
 
 const val EXTRA_TOAST = "toast_message"
