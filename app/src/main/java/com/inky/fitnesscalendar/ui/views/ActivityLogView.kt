@@ -25,6 +25,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -66,7 +67,6 @@ import com.inky.fitnesscalendar.view_model.activity_log.ActivityListItem
 import com.inky.fitnesscalendar.view_model.activity_log.ActivityListState
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ActivityLog(
     viewModel: ActivityLogViewModel = hiltViewModel(),
@@ -80,27 +80,56 @@ fun ActivityLog(
     onSummary: () -> Unit,
     initialSelectedActivityId: Int? = null,
 ) {
-    val scope = rememberCoroutineScope()
 
     val activityListState by viewModel.activityListState.collectAsState()
-
-    val isAtTopOfList by remember { derivedStateOf { activityListState.listState.firstVisibleItemIndex <= 1 } }
-
     LaunchedEffect(filter) {
         viewModel.setFilter(filter)
     }
+
+    ActivityLogImpl(
+        state = activityListState,
+        snackbarHostState = viewModel.snackbarHostState,
+        localizationRepository = viewModel.repository.localizationRepository,
+        activityCardCallbacks = activityCardCallbacks,
+        onEditFilter = onEditFilter,
+        onOpenDrawer = onOpenDrawer,
+        onNewActivity = onNewActivity,
+        onShowDay = onShowDay,
+        onFilter = onFilter,
+        onSummary = onSummary,
+        initialSelectedActivityId = initialSelectedActivityId
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun ActivityLogImpl(
+    state: ActivityListState,
+    snackbarHostState: SnackbarHostState,
+    localizationRepository: LocalizationRepository,
+    activityCardCallbacks: ActivityCardCallbacks,
+    onEditFilter: (ActivityFilter) -> Unit,
+    onOpenDrawer: () -> Unit,
+    onNewActivity: () -> Unit,
+    onShowDay: (EpochDay) -> Unit,
+    onFilter: () -> Unit,
+    onSummary: () -> Unit,
+    initialSelectedActivityId: Int?,
+) {
+    val scope = rememberCoroutineScope()
+    val isAtTopOfList by remember { derivedStateOf { state.listState.firstVisibleItemIndex <= 1 } }
 
     // Scroll to requested activity or to the newest activity
     var nextScrollTarget by rememberSaveable(initialSelectedActivityId) {
         mutableStateOf(initialSelectedActivityId)
     }
-    LaunchedEffect(activityListState.data) {
-        if (activityListState.data != null) {
+    LaunchedEffect(state.data) {
+        if (state.data != null) {
             if (nextScrollTarget != null) {
-                activityListState.scrollToActivity(nextScrollTarget)
+                state.scrollToActivity(nextScrollTarget)
                 nextScrollTarget = null
-            } else if (activityListState.listState.firstVisibleItemIndex == 0) {
-                activityListState.listState.scrollToItem(1)
+            } else if (state.listState.firstVisibleItemIndex == 0) {
+                state.listState.scrollToItem(1)
             }
         }
     }
@@ -126,10 +155,7 @@ fun ActivityLog(
                         )
                     }
                     IconButton(onClick = onFilter) {
-                        val icon = remember(filter) {
-                            if (filter.isEmpty()) Icons.FilterOff
-                            else Icons.FilterOn
-                        }
+                        val icon = if (state.filter.isEmpty()) Icons.FilterOff else Icons.FilterOn
                         icon(stringResource(R.string.filter))
                     }
                 },
@@ -146,7 +172,7 @@ fun ActivityLog(
                 ) {
                     SmallFloatingActionButton(onClick = {
                         scope.launch {
-                            activityListState.listState.animateScrollToItem(1)
+                            state.listState.animateScrollToItem(1)
                             scrollBehavior.state.contentOffset = 0f
                             scrollBehavior.state.heightOffset = 0f
                         }
@@ -157,7 +183,7 @@ fun ActivityLog(
                 NewActivityFAB(onClick = { onNewActivity() })
             }
         },
-        snackbarHost = { SnackbarHost(hostState = viewModel.snackbarHostState) },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { innerPadding ->
         Column(
@@ -169,10 +195,10 @@ fun ActivityLog(
                     .background(appBarContainerColor)
                     .padding(all = 8.dp)
             ) {
-                FilterInformation(filter = filter, onChange = onEditFilter)
+                FilterInformation(filter = state.filter, onChange = onEditFilter)
             }
 
-            AnimatedContent(activityListState.data, label = "EmptyStateAnimation") { data ->
+            AnimatedContent(state.data, label = "EmptyStateAnimation") { data ->
                 when {
                     data == null -> Box(
                         modifier = Modifier.fillMaxSize(),
@@ -182,15 +208,15 @@ fun ActivityLog(
                     }
 
                     data.numActivities == 0 -> NoActivitiesInfoBox(
-                        filter.isEmpty(),
+                        state.filter.isEmpty(),
                         modifier = Modifier.fillMaxSize()
                     )
 
                     else -> ActivityList(
-                        state = activityListState,
+                        state = state,
                         data = data,
                         activityCardCallbacks = activityCardCallbacks.copy(onJumpTo = null),
-                        localizationRepository = viewModel.repository.localizationRepository,
+                        localizationRepository = localizationRepository,
                         onShowDay = onShowDay,
                     )
                 }
