@@ -67,6 +67,10 @@ class ActivityLogViewModel @Inject constructor(
             .launchIn(viewModelScope)
     }
 
+    /**
+     * Zips the activities and days into a single list of items.
+     * Assumes that activities and days are sorted by descending dates.
+     */
     private fun calculateActivityListItems(
         activities: List<RichActivity>,
         days: List<Day>
