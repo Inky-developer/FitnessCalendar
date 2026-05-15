@@ -2,6 +2,7 @@ package com.inky.fitnesscalendar.view_model
 
 import android.content.Context
 import androidx.lifecycle.viewModelScope
+import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.db.entities.RichActivity
@@ -75,10 +76,9 @@ class ActivityLogViewModel @Inject constructor(
         activities: List<RichActivity>,
         days: List<Day>
     ): List<ActivityListItem> {
-        val daysWithData = days.map { it.day }.toSet()
-
         val dayIter = days.iterator()
         var day = if (dayIter.hasNext()) dayIter.next() else null
+        var lastDay: EpochDay? = null
 
         val zoneId = ZoneId.systemDefault()
 
@@ -86,12 +86,14 @@ class ActivityLogViewModel @Inject constructor(
             sequence {
                 while (day != null && day!!.day >= activity.activity.epochDay(zoneId)) {
                     yield(ActivityListItem.DateHeader(day!!))
+                    lastDay = day?.day
                     day = if (dayIter.hasNext()) dayIter.next() else null
                 }
 
                 val activityDay = activity.activity.epochDay(zoneId)
-                if (!daysWithData.contains(activityDay)) {
+                if (lastDay != activityDay) {
                     yield(ActivityListItem.DateHeader(Day(activityDay)))
+                    lastDay = activityDay
                 }
 
                 yield(ActivityListItem.Activity(activity))
