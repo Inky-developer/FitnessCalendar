@@ -264,7 +264,7 @@ private fun ActivityList(
         }
         for (item in listItems) {
             when (item) {
-                is ActivityListItem.DateHeader -> stickyHeader(
+                is ActivityListItem.DateHeader -> item(
                     key = item.day.day,
                     contentType = item.contentType
                 ) {
