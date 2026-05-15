@@ -130,10 +130,11 @@ fun ActivityImage(
     modifier: Modifier = Modifier,
     horizontalBias: Float = 0f,
     verticalBias: Float = 0f,
-    onClick: () -> Unit = {},
+    onClick: (() -> Unit)? = null,
     onLongClick: (() -> Unit)? = null,
     onState: ((AsyncImagePainter.State) -> Unit)? = null,
 ) {
+    val clickEnabled = onClick != null || onLongClick != null
     AsyncImage(
         model = uri,
         contentDescription = stringResource(R.string.user_uploaded_image),
@@ -142,8 +143,11 @@ fun ActivityImage(
         alignment = BiasAlignment(horizontalBias, verticalBias),
         modifier = modifier
             .aspectRatio(IMAGE_ASPECT_RATIO)
-            .clip(MaterialTheme.shapes.large)
-            .combinedClickable(onClick = onClick, onLongClick = onLongClick)
+            .clip(MaterialTheme.shapes.large) then
+                if (clickEnabled) Modifier.combinedClickable(
+                    onClick = onClick ?: {},
+                    onLongClick = onLongClick
+                ) else Modifier
     )
 }
 

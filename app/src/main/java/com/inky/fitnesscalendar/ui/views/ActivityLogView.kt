@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -44,15 +45,18 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.data.Feel
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
+import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivityCard
 import com.inky.fitnesscalendar.ui.components.ActivityCardCallbacks
+import com.inky.fitnesscalendar.ui.components.ActivityImage
 import com.inky.fitnesscalendar.ui.components.FilterInformation
 import com.inky.fitnesscalendar.ui.components.NewActivityFAB
 import com.inky.fitnesscalendar.ui.components.NoActivitiesInfoBox
@@ -264,26 +268,11 @@ private fun ActivityList(
                     key = item.day.day,
                     contentType = item.contentType
                 ) {
-                    val feel = item.day.feel
-                    Row(
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .background(MaterialTheme.colorScheme.secondaryContainer)
-                            .padding(horizontal = 8.dp)
-                            .fillMaxWidth()
-                            .animateItem()
-                            .clickable { onShowDay(item.day.day) }
-                    ) {
-                        Text(
-                            LocalizationRepository.localDateFormatter.format(item.day.day.toLocalDate()),
-                            style = MaterialTheme.typography.titleMedium,
-                        )
-
-                        if (feel != Feel.Ok) {
-                            Text(feel.emoji, style = MaterialTheme.typography.titleMedium)
-                        }
-                    }
+                    DayRow(
+                        item.day,
+                        onShowDay = { onShowDay(item.day.day) },
+                        modifier = Modifier.animateItem()
+                    )
                 }
 
                 is ActivityListItem.Activity -> item(
@@ -300,6 +289,54 @@ private fun ActivityList(
                     )
                 }
             }
+        }
+    }
+}
+
+@Composable
+private fun DayRow(day: Day, onShowDay: () -> Unit, modifier: Modifier = Modifier) {
+    Column(
+        modifier = modifier
+            .background(MaterialTheme.colorScheme.secondaryContainer)
+            .padding(horizontal = 8.dp)
+            .fillMaxWidth()
+            .clickable { onShowDay() }
+    ) {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                LocalizationRepository.localDateFormatter.format(day.day.toLocalDate()),
+                style = MaterialTheme.typography.titleMedium,
+            )
+
+            if (day.feel != Feel.Ok) {
+                Text(day.feel.emoji, style = MaterialTheme.typography.titleMedium)
+            }
+        }
+
+        if (day.description.isNotBlank()) {
+            Text(
+                day.description,
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(all = 8.dp)
+            )
+        }
+
+        if (day.imageName != null) {
+            ActivityImage(
+                uri = day.imageName.getImageUri(),
+                modifier = Modifier
+                    .padding(horizontal = 8.dp, vertical = 4.dp)
+                    .sharedElement(SharedContentKey.DayImage)
+            )
+        }
+
+        if (day.description.isNotBlank() || day.imageName != null) {
+            HorizontalDivider()
         }
     }
 }
