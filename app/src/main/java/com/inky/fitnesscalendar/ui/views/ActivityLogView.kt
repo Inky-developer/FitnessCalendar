@@ -329,9 +329,7 @@ private fun DayRow(day: Day, onShowDay: () -> Unit, modifier: Modifier = Modifie
         if (day.imageName != null) {
             ActivityImage(
                 uri = day.imageName.getImageUri(),
-                modifier = Modifier
-                    .padding(horizontal = 8.dp, vertical = 4.dp)
-                    .sharedElement(SharedContentKey.DayImage)
+                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
             )
         }
 
