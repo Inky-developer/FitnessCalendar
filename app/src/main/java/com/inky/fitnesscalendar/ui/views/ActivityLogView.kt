@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -121,7 +123,8 @@ private fun ActivityLogImpl(
     initialSelectedActivityId: Int?,
 ) {
     val scope = rememberCoroutineScope()
-    val isAtTopOfList by remember { derivedStateOf { state.listState.firstVisibleItemIndex <= 1 } }
+    val listState = rememberLazyListState()
+    val isAtTopOfList by remember { derivedStateOf { listState.firstVisibleItemIndex <= 1 } }
 
     // Scroll to requested activity or to the newest activity
     var nextScrollTarget by rememberSaveable(initialSelectedActivityId) {
@@ -130,10 +133,10 @@ private fun ActivityLogImpl(
     LaunchedEffect(state.data) {
         if (state.data != null) {
             if (nextScrollTarget != null) {
-                state.scrollToActivity(nextScrollTarget)
+                getActivityIndex(state.data, nextScrollTarget)?.let { listState.scrollToItem(it) }
                 nextScrollTarget = null
-            } else if (state.listState.firstVisibleItemIndex == 0) {
-                state.listState.scrollToItem(1)
+            } else if (listState.firstVisibleItemIndex == 0) {
+                listState.scrollToItem(1)
             }
         }
     }
@@ -176,7 +179,7 @@ private fun ActivityLogImpl(
                 ) {
                     SmallFloatingActionButton(onClick = {
                         scope.launch {
-                            state.listState.animateScrollToItem(1)
+                            listState.animateScrollToItem(1)
                             scrollBehavior.state.contentOffset = 0f
                             scrollBehavior.state.heightOffset = 0f
                         }
@@ -217,7 +220,7 @@ private fun ActivityLogImpl(
                     )
 
                     else -> ActivityList(
-                        state = state,
+                        listState = listState,
                         data = data,
                         activityCardCallbacks = activityCardCallbacks.copy(onJumpTo = null),
                         localizationRepository = localizationRepository,
@@ -232,14 +235,13 @@ private fun ActivityLogImpl(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun ActivityList(
-    state: ActivityListState,
+    listState: LazyListState,
     data: ActivityListState.Data,
     activityCardCallbacks: ActivityCardCallbacks,
     localizationRepository: LocalizationRepository,
     onShowDay: (EpochDay) -> Unit,
 ) {
     val listItems = data.items
-    val listState = state.listState
 
     LazyColumn(
         state = listState,
@@ -339,3 +341,6 @@ private fun DayRow(day: Day, onShowDay: () -> Unit, modifier: Modifier = Modifie
     }
 }
 
+private fun getActivityIndex(data: ActivityListState.Data?, activityId: Int?) =
+    data?.items?.withIndex()
+        ?.firstOrNull { (_, item) -> item is ActivityListItem.Activity && item.richActivity.activity.uid == activityId }?.index
