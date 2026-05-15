@@ -56,7 +56,11 @@ class ActivityLogViewModel @Inject constructor(
             .combine(dayFlow) { activities, days ->
                 _activityListState.value.copy(
                     data = ActivityListState.Data(
-                        items = calculateActivityListItems(activities, days),
+                        items = calculateActivityListItems(
+                            activities,
+                            days,
+                            isUnfiltered = filter.isEmpty()
+                        ),
                         numActivities = activities.size
                     ),
                     filter = filter,
@@ -71,10 +75,13 @@ class ActivityLogViewModel @Inject constructor(
     /**
      * Zips the activities and days into a single list of items.
      * Assumes that activities and days are sorted by descending dates.
+     * Excludes days without activities if a filter is active.
+     * TODO: Consider allowing filtering for days, e.g by text
      */
     private fun calculateActivityListItems(
         activities: List<RichActivity>,
-        days: List<Day>
+        days: List<Day>,
+        isUnfiltered: Boolean,
     ): List<ActivityListItem> {
         val dayIter = days.iterator()
         var day = if (dayIter.hasNext()) dayIter.next() else null
@@ -84,13 +91,16 @@ class ActivityLogViewModel @Inject constructor(
 
         return activities.flatMap { activity ->
             sequence {
+                val activityDay = activity.activity.epochDay(zoneId)
+
                 while (day != null && day!!.day >= activity.activity.epochDay(zoneId)) {
-                    yield(ActivityListItem.DateHeader(day!!))
+                    if (isUnfiltered || day?.day == activityDay) {
+                        yield(ActivityListItem.DateHeader(day!!))
+                    }
                     lastDay = day?.day
                     day = if (dayIter.hasNext()) dayIter.next() else null
                 }
 
-                val activityDay = activity.activity.epochDay(zoneId)
                 if (lastDay != activityDay) {
                     yield(ActivityListItem.DateHeader(Day(activityDay)))
                     lastDay = activityDay
