@@ -5,16 +5,19 @@ import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 
 data class ActivityListState(
     // All items that should be displayed
-    val items: List<ActivityListItem>,
-    val numActivities: Int,
+    val data: Data?,
     val filter: ActivityFilter,
-    val isInitialized: Boolean,
     val listState: LazyListState = LazyListState()
 ) {
+    data class Data(
+        val items: List<ActivityListItem>,
+        val numActivities: Int,
+    )
+
     suspend fun scrollToActivity(activityId: Int?): Boolean {
         return getActivityIndex(activityId)?.let { listState.scrollToItem(it) } != null
     }
 
-    private fun getActivityIndex(activityId: Int?) = items.withIndex()
-        .firstOrNull { (_, item) -> item is ActivityListItem.Activity && item.richActivity.activity.uid == activityId }?.index
+    private fun getActivityIndex(activityId: Int?) = data?.items?.withIndex()
+        ?.firstOrNull { (_, item) -> item is ActivityListItem.Activity && item.richActivity.activity.uid == activityId }?.index
 }

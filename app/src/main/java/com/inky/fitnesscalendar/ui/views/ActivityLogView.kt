@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CenterAlignedTopAppBar
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -84,7 +85,6 @@ fun ActivityLog(
     val activityListState by viewModel.activityListState.collectAsState()
 
     val isAtTopOfList by remember { derivedStateOf { activityListState.listState.firstVisibleItemIndex <= 1 } }
-    val activitiesEmpty = activityListState.numActivities == 0
 
     LaunchedEffect(filter) {
         viewModel.setFilter(filter)
@@ -94,8 +94,8 @@ fun ActivityLog(
     var nextScrollTarget by rememberSaveable(initialSelectedActivityId) {
         mutableStateOf(initialSelectedActivityId)
     }
-    LaunchedEffect(activityListState.items) {
-        if (activityListState.isInitialized) {
+    LaunchedEffect(activityListState.data) {
+        if (activityListState.data != null) {
             if (nextScrollTarget != null) {
                 activityListState.scrollToActivity(nextScrollTarget)
                 nextScrollTarget = null
@@ -172,12 +172,23 @@ fun ActivityLog(
                 FilterInformation(filter = filter, onChange = onEditFilter)
             }
 
-            AnimatedContent(activitiesEmpty, label = "EmptyStateAnimation") { isEmpty ->
-                if (isEmpty) {
-                    NoActivitiesInfoBox(filter.isEmpty(), modifier = Modifier.fillMaxSize())
-                } else {
-                    ActivityList(
+            AnimatedContent(activityListState.data, label = "EmptyStateAnimation") { data ->
+                when {
+                    data == null -> Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+
+                    data.numActivities == 0 -> NoActivitiesInfoBox(
+                        filter.isEmpty(),
+                        modifier = Modifier.fillMaxSize()
+                    )
+
+                    else -> ActivityList(
                         state = activityListState,
+                        data = data,
                         activityCardCallbacks = activityCardCallbacks.copy(onJumpTo = null),
                         localizationRepository = viewModel.repository.localizationRepository,
                         onShowDay = onShowDay,
@@ -192,11 +203,12 @@ fun ActivityLog(
 @Composable
 private fun ActivityList(
     state: ActivityListState,
+    data: ActivityListState.Data,
     activityCardCallbacks: ActivityCardCallbacks,
     localizationRepository: LocalizationRepository,
     onShowDay: (EpochDay) -> Unit,
 ) {
-    val listItems = state.items
+    val listItems = data.items
     val listState = state.listState
 
     LazyColumn(
@@ -213,8 +225,8 @@ private fun ActivityList(
                 Text(
                     pluralStringResource(
                         R.plurals.num_activities,
-                        state.numActivities,
-                        state.numActivities
+                        data.numActivities,
+                        data.numActivities
                     ),
                     style = MaterialTheme.typography.titleMedium
                 )

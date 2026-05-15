@@ -30,10 +30,8 @@ class ActivityLogViewModel @Inject constructor(
 ) : BaseViewModel(context, repository) {
     private val _activityListState = MutableStateFlow(
         ActivityListState(
-            items = emptyList(),
-            numActivities = 0,
+            data = null,
             filter = ActivityFilter(),
-            isInitialized = false
         )
     )
     val activityListState: StateFlow<ActivityListState> = _activityListState.asStateFlow()
@@ -56,10 +54,11 @@ class ActivityLogViewModel @Inject constructor(
             .getActivities(filter)
             .combine(dayFlow) { activities, days ->
                 _activityListState.value.copy(
-                    items = calculateActivityListItems(activities, days),
-                    numActivities = activities.size,
+                    data = ActivityListState.Data(
+                        items = calculateActivityListItems(activities, days),
+                        numActivities = activities.size
+                    ),
                     filter = filter,
-                    isInitialized = true
                 )
             }
             .onEach { newState ->
