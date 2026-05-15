@@ -419,7 +419,7 @@ private fun rememberActivityCardCallbacks(
             onFilter(ActivityFilter())
         },
         onShowDay = {
-            navController.navigate(Views.DayView(it.activity.epochDay.day))
+            navController.navigate(Views.DayView(it.activity.epochDay().day))
         },
         onFilterByType = {
             onFilter(ActivityFilter(types = listOf(it.type)))

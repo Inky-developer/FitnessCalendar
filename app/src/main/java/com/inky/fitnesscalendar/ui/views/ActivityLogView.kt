@@ -196,10 +196,9 @@ private fun ActivityList(
     localizationRepository: LocalizationRepository,
     onShowDay: (EpochDay) -> Unit,
 ) {
-    val numActivities = remember(state) { state.activities.size }
-    val listItems = remember(state) { state.items }
-    val days = remember(state) { state.days }
-    val listState = remember(state) { state.listState }
+    val numActivities = state.activities.size
+    val listItems = state.items
+    val listState = state.listState
 
     LazyColumn(
         state = listState,
@@ -221,10 +220,10 @@ private fun ActivityList(
         for (item in listItems) {
             when (item) {
                 is ActivityListItem.DateHeader -> stickyHeader(
-                    key = item.date,
+                    key = item.day.day,
                     contentType = item.contentType
                 ) {
-                    val feel = days[EpochDay(item.date.toEpochDay())]?.feel
+                    val feel = item.day.feel
                     Row(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
@@ -233,14 +232,14 @@ private fun ActivityList(
                             .padding(horizontal = 8.dp)
                             .fillMaxWidth()
                             .animateItem()
-                            .clickable { onShowDay(EpochDay(item.date.toEpochDay())) }
+                            .clickable { onShowDay(item.day.day) }
                     ) {
                         Text(
-                            LocalizationRepository.localDateFormatter.format(item.date),
+                            LocalizationRepository.localDateFormatter.format(item.day.day.toLocalDate()),
                             style = MaterialTheme.typography.titleMedium,
                         )
 
-                        if (feel != null && feel != Feel.Ok) {
+                        if (feel != Feel.Ok) {
                             Text(feel.emoji, style = MaterialTheme.typography.titleMedium)
                         }
                     }

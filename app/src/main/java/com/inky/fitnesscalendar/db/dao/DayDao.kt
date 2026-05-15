@@ -13,7 +13,7 @@ interface DayDao {
     @Query("SELECT image_name FROM Day WHERE image_name IS NOT NULL")
     suspend fun getImages(): List<ImageName>
 
-    @Query("SELECT * FROM Day")
+    @Query("SELECT * FROM Day ORDER BY day DESC")
     fun getDays(): Flow<List<Day>>
 
     @Query("SELECT * FROM Day WHERE day = :day")

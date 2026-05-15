@@ -1,9 +1,7 @@
 package com.inky.fitnesscalendar.view_model.activity_log
 
 import androidx.compose.foundation.lazy.LazyListState
-import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
-import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.db.entities.RichActivity
 
 data class ActivityListState(
@@ -11,8 +9,6 @@ data class ActivityListState(
     val items: List<ActivityListItem>,
     // All (potentially filtered) activities
     val activities: List<RichActivity>,
-    // All relevant days
-    val days: Map<EpochDay, Day>,
     val filter: ActivityFilter,
     val isInitialized: Boolean,
     val listState: LazyListState = LazyListState()

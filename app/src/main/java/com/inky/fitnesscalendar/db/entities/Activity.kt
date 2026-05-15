@@ -20,6 +20,7 @@ import com.inky.fitnesscalendar.data.measure.VerticalDistance
 import com.inky.fitnesscalendar.data.measure.metersPerSecond
 import com.inky.fitnesscalendar.util.toLocalDate
 import kotlinx.serialization.json.Json
+import java.time.ZoneId
 import java.util.Date
 
 @Entity(
@@ -70,7 +71,8 @@ data class Activity(
         intensity = if (type.hasIntensity) intensity else null,
     )
 
-    val epochDay get() = EpochDay(startTime.toLocalDate().toEpochDay())
+    fun epochDay(zoneId: ZoneId = ZoneId.systemDefault()) =
+        EpochDay(startTime.toLocalDate(zoneId).toEpochDay())
 
     val duration
         get() = startTime until endTime

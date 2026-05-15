@@ -3,9 +3,9 @@ package com.inky.fitnesscalendar.view_model
 import android.content.Context
 import androidx.lifecycle.viewModelScope
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
+import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.repository.DatabaseRepository
-import com.inky.fitnesscalendar.util.toLocalDate
 import com.inky.fitnesscalendar.view_model.activity_log.ActivityListItem
 import com.inky.fitnesscalendar.view_model.activity_log.ActivityListState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -32,7 +32,6 @@ class ActivityLogViewModel @Inject constructor(
         ActivityListState(
             items = emptyList(),
             activities = emptyList(),
-            days = emptyMap(),
             filter = ActivityFilter(),
             isInitialized = false
         )
@@ -57,9 +56,8 @@ class ActivityLogViewModel @Inject constructor(
             .getActivities(filter)
             .combine(dayFlow) { activities, days ->
                 _activityListState.value.copy(
-                    items = calculateActivityListItems(activities),
+                    items = calculateActivityListItems(activities, days),
                     activities = activities,
-                    days = days,
                     filter = filter,
                     isInitialized = true
                 )
@@ -72,17 +70,29 @@ class ActivityLogViewModel @Inject constructor(
 
     private fun calculateActivityListItems(
         activities: List<RichActivity>,
+        days: List<Day>
     ): List<ActivityListItem> {
-        val result = mutableListOf<ActivityListItem>()
+        val daysWithData = days.map { it.day }.toSet()
+
+        val dayIter = days.iterator()
+        var day = if (dayIter.hasNext()) dayIter.next() else null
 
         val zoneId = ZoneId.systemDefault()
-        val activitiesByDay = activities.groupBy { it.activity.startTime.toLocalDate(zoneId) }
 
-        for ((day, items) in activitiesByDay) {
-            result.add(ActivityListItem.DateHeader(day))
-            result.addAll(items.map { ActivityListItem.Activity(it) })
+        return activities.flatMap { activity ->
+            sequence {
+                while (day != null && day!!.day >= activity.activity.epochDay(zoneId)) {
+                    yield(ActivityListItem.DateHeader(day!!))
+                    day = if (dayIter.hasNext()) dayIter.next() else null
+                }
+
+                val activityDay = activity.activity.epochDay(zoneId)
+                if (!daysWithData.contains(activityDay)) {
+                    yield(ActivityListItem.DateHeader(Day(activityDay)))
+                }
+
+                yield(ActivityListItem.Activity(activity))
+            }
         }
-
-        return result
     }
 }
