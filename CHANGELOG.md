@@ -2,6 +2,7 @@
 
 - Add editable description to recordings
 - Allow configuring the image viewport (Via long tap on the image in the activity editor)
+- Show more day information in the activity log
 
 # 2026.04.1
 
