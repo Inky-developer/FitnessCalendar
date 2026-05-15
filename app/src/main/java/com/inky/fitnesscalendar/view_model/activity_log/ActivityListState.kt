@@ -2,13 +2,11 @@ package com.inky.fitnesscalendar.view_model.activity_log
 
 import androidx.compose.foundation.lazy.LazyListState
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
-import com.inky.fitnesscalendar.db.entities.RichActivity
 
 data class ActivityListState(
     // All items that should be displayed
     val items: List<ActivityListItem>,
-    // All (potentially filtered) activities
-    val activities: List<RichActivity>,
+    val numActivities: Int,
     val filter: ActivityFilter,
     val isInitialized: Boolean,
     val listState: LazyListState = LazyListState()

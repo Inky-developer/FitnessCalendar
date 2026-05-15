@@ -84,7 +84,7 @@ fun ActivityLog(
     val activityListState by viewModel.activityListState.collectAsState()
 
     val isAtTopOfList by remember { derivedStateOf { activityListState.listState.firstVisibleItemIndex <= 1 } }
-    val activitiesEmpty by remember { derivedStateOf { activityListState.activities.isEmpty() } }
+    val activitiesEmpty = activityListState.numActivities == 0
 
     LaunchedEffect(filter) {
         viewModel.setFilter(filter)
@@ -94,7 +94,7 @@ fun ActivityLog(
     var nextScrollTarget by rememberSaveable(initialSelectedActivityId) {
         mutableStateOf(initialSelectedActivityId)
     }
-    LaunchedEffect(activityListState.activities) {
+    LaunchedEffect(activityListState.items) {
         if (activityListState.isInitialized) {
             if (nextScrollTarget != null) {
                 activityListState.scrollToActivity(nextScrollTarget)
@@ -196,7 +196,6 @@ private fun ActivityList(
     localizationRepository: LocalizationRepository,
     onShowDay: (EpochDay) -> Unit,
 ) {
-    val numActivities = state.activities.size
     val listItems = state.items
     val listState = state.listState
 
@@ -212,7 +211,11 @@ private fun ActivityList(
                     .fillMaxWidth()
             ) {
                 Text(
-                    pluralStringResource(R.plurals.num_activities, numActivities, numActivities),
+                    pluralStringResource(
+                        R.plurals.num_activities,
+                        state.numActivities,
+                        state.numActivities
+                    ),
                     style = MaterialTheme.typography.titleMedium
                 )
             }

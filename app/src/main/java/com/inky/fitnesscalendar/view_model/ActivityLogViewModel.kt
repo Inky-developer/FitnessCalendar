@@ -31,7 +31,7 @@ class ActivityLogViewModel @Inject constructor(
     private val _activityListState = MutableStateFlow(
         ActivityListState(
             items = emptyList(),
-            activities = emptyList(),
+            numActivities = 0,
             filter = ActivityFilter(),
             isInitialized = false
         )
@@ -57,7 +57,7 @@ class ActivityLogViewModel @Inject constructor(
             .combine(dayFlow) { activities, days ->
                 _activityListState.value.copy(
                     items = calculateActivityListItems(activities, days),
-                    activities = activities,
+                    numActivities = activities.size,
                     filter = filter,
                     isInitialized = true
                 )
