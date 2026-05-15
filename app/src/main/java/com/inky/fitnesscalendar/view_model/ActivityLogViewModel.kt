@@ -89,7 +89,7 @@ class ActivityLogViewModel @Inject constructor(
 
         val zoneId = ZoneId.systemDefault()
 
-        return activities.flatMap { activity ->
+        val result = activities.flatMap { activity ->
             sequence {
                 val activityDay = activity.activity.epochDay(zoneId)
 
@@ -108,6 +108,11 @@ class ActivityLogViewModel @Inject constructor(
 
                 yield(ActivityListItem.Activity(activity))
             }
+        }.toMutableList()
+        if (isUnfiltered) {
+            day?.let { result.add(ActivityListItem.DateHeader(it)) }
+            result += dayIter.asSequence().map { ActivityListItem.DateHeader(it) }
         }
+        return result
     }
 }
