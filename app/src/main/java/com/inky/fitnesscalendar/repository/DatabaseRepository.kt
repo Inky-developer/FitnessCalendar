@@ -161,7 +161,7 @@ class DatabaseRepository @Inject constructor(
         )
 
     suspend fun saveDay(day: Day) {
-        dayDao.upsert(day)
+        dayDao.upsertOrDelete(day)
     }
 
     fun getPlace(id: Int) = placeDao.get(id)

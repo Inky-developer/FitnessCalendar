@@ -12,5 +12,7 @@ data class Day(
     @PrimaryKey @ColumnInfo(name = "day") val day: EpochDay,
     @ColumnInfo(name = "description") val description: String = "",
     @ColumnInfo(name = "feel") val feel: Feel = Feel.Ok,
-    @ColumnInfo(name = "image_name") val imageName: ImageName? = null
-)
+    @ColumnInfo(name = "image_name") val imageName: ImageName? = null,
+) {
+    fun isDefault() = this == Day(day)
+}
