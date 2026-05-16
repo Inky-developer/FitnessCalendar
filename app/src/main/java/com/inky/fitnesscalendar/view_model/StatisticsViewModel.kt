@@ -81,11 +81,7 @@ class StatisticsViewModel @Inject constructor(
     }
 
     fun setGrouping(grouping: Grouping) {
-        val newGrouping = if (grouping is FilteredGrouping) {
-            grouping
-        } else {
-            FilteredGrouping(grouping)
-        }
+        val newGrouping = grouping as? FilteredGrouping ?: FilteredGrouping(grouping)
         graphState.value?.copy(grouping = newGrouping)?.let { updateState(it) }
     }
 
