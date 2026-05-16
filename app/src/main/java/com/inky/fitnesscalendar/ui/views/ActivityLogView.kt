@@ -17,7 +17,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -38,6 +37,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -120,7 +120,12 @@ private fun ActivityLogImpl(
     initialSelectedActivityId: Int?,
 ) {
     val scope = rememberCoroutineScope()
-    val listState = rememberLazyListState(initialFirstVisibleItemIndex = 1)
+    val initialSelectedIndex = remember(initialSelectedActivityId, state.data == null) {
+        getActivityIndex(state.data, initialSelectedActivityId) ?: 1
+    }
+    val listState = rememberSaveable(initialSelectedIndex, saver = LazyListState.Saver) {
+        LazyListState(firstVisibleItemIndex = initialSelectedIndex)
+    }
     val isAtTopOfList by remember { derivedStateOf { listState.firstVisibleItemIndex <= 1 } }
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
@@ -332,6 +337,8 @@ private fun DayRow(day: Day, onShowDay: () -> Unit, modifier: Modifier = Modifie
     }
 }
 
-private fun getActivityIndex(data: ActivityListState.Data?, activityId: Int?) =
-    data?.items?.withIndex()
+private fun getActivityIndex(data: ActivityListState.Data?, activityId: Int?): Int? {
+    if (activityId == null) return null
+    return data?.items?.withIndex()
         ?.firstOrNull { (_, item) -> item is ActivityListItem.Activity && item.richActivity.activity.uid == activityId }?.index
+}
