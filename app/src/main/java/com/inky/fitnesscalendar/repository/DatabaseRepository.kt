@@ -172,8 +172,6 @@ class DatabaseRepository @Inject constructor(
 
     fun getPlaces() = placeDao.getAll()
 
-    fun getActivityCountPerPlace() = placeDao.getWithActivityCount()
-
     fun getActivityTypeNames() =
         activityTypeNameDao
             .getAll()

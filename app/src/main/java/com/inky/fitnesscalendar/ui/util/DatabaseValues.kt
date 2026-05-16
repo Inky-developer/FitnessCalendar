@@ -9,7 +9,7 @@ import androidx.compose.runtime.remember
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilterChip
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilterChip.Companion.toActivityFilterChip
 import com.inky.fitnesscalendar.db.entities.ActivityType
-import com.inky.fitnesscalendar.db.entities.Place
+import com.inky.fitnesscalendar.db.entities.RichPlace
 import com.inky.fitnesscalendar.repository.DatabaseRepository
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
@@ -21,7 +21,7 @@ data class DatabaseValues(
     val activityTypes: List<ActivityType>,
     val activityTypeNames: Map<String, ActivityType>,
     val activityTypeRows: List<List<ActivityType>>,
-    val places: List<Place>,
+    val places: List<RichPlace>,
     val activityFilterChips: List<ActivityFilterChip>
 ) {
     companion object {

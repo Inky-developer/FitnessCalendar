@@ -19,6 +19,7 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -39,24 +40,29 @@ import com.inky.fitnesscalendar.ui.components.OptionGroup
 import com.inky.fitnesscalendar.ui.components.SelectImageDropdownMenuItem
 import com.inky.fitnesscalendar.ui.components.optionGroupDefaultBackground
 import com.inky.fitnesscalendar.ui.util.Icons
-import com.inky.fitnesscalendar.view_model.PlaceListViewModel
+import com.inky.fitnesscalendar.view_model.BaseViewModel
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.launch
 
 @Composable
 fun EditPlaceDialog(
-    viewModel: PlaceListViewModel = hiltViewModel(),
+    viewModel: BaseViewModel = hiltViewModel(),
     initialPlaceId: Int?,
     onDismiss: () -> Unit,
 ) {
-    val place by (initialPlaceId?.let { viewModel.get(it) }
+    val scope = rememberCoroutineScope()
+    val repository = viewModel.repository
+    val place by (initialPlaceId?.let { repository.getPlace(it) }
         ?: flowOf(null)).collectAsState(initial = null)
     if (initialPlaceId == null || place != null) {
         EditPlaceDialog(
             initialPlace = place,
             onDismiss = onDismiss,
             onSave = {
-                viewModel.save(it)
-                onDismiss()
+                scope.launch {
+                    repository.savePlace(it)
+                    onDismiss()
+                }
             }
         )
     } else {

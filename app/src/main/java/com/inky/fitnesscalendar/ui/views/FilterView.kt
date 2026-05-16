@@ -42,6 +42,7 @@ import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.data.activity_filter.AttributeFilter
 import com.inky.fitnesscalendar.data.activity_filter.DateRangeOption
 import com.inky.fitnesscalendar.db.entities.Place
+import com.inky.fitnesscalendar.db.entities.RichPlace
 import com.inky.fitnesscalendar.ui.components.ActivityCategorySelector
 import com.inky.fitnesscalendar.ui.components.ActivityTypeSelector
 import com.inky.fitnesscalendar.ui.components.FavoriteIcon
@@ -191,7 +192,7 @@ fun FilterViewInner(
         var places = localDatabaseValues.current.places
         if (filter.types.isNotEmpty()) {
             val validColors = filter.types.mapNotNull { it.limitPlacesByColor }.toSet()
-            places = places.filter { validColors.contains(it.color) }
+            places = places.filter { validColors.contains(it.place.color) }
         }
         AnimatedVisibility(places.isNotEmpty()) {
             OptionGroup(
@@ -325,12 +326,13 @@ fun FilterViewInner(
 
 @Composable
 private fun PlacesSelector(
-    places: List<Place>,
+    places: List<RichPlace>,
     isSelected: (Place) -> Boolean,
     onSelect: (Place) -> Unit
 ) {
     LazyRow {
-        items(places, key = { it.uid!! }) { place ->
+        items(places, key = { it.place.uid!! }) { richPlace ->
+            val place = richPlace.place
             FilterChip(
                 selected = isSelected(place),
                 onClick = { onSelect(place) },

@@ -31,6 +31,7 @@ import com.inky.fitnesscalendar.data.Vehicle
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.Place
 import com.inky.fitnesscalendar.db.entities.Recording
+import com.inky.fitnesscalendar.db.entities.RichPlace
 import com.inky.fitnesscalendar.db.entities.RichRecording
 import com.inky.fitnesscalendar.di.DecisionTrees
 import com.inky.fitnesscalendar.ui.util.Icons
@@ -122,7 +123,7 @@ fun ActivitySelector(
                 currentPlace = state.place,
                 onPlace = { onState(state.copy(selectedPlace = it.some())) },
                 onNavigateNewPlace = onNavigateNewPlace,
-                placeFilter = { state.activityType?.limitPlacesByColor == null || state.activityType.limitPlacesByColor == it.color }
+                placeFilter = { state.activityType?.limitPlacesByColor == null || state.activityType.limitPlacesByColor == it.place.color }
             )
         }
 
@@ -157,7 +158,7 @@ private fun PlaceSelector(
     currentPlace: Place?,
     onPlace: (Place?) -> Unit,
     onNavigateNewPlace: (() -> Unit)?,
-    placeFilter: (Place) -> Boolean
+    placeFilter: (RichPlace) -> Boolean
 ) {
     val allPlaces = localDatabaseValues.current.places
     val places = remember(placeFilter, allPlaces) { allPlaces.filter(placeFilter) }
@@ -207,11 +208,11 @@ private fun PlaceSelector(
 
         for (place in places) {
             DropdownMenuItem(
-                text = { Text(place.name) },
-                leadingIcon = { PlaceIcon(place) },
+                text = { Text(place.place.name) },
+                leadingIcon = { PlaceIcon(place.place) },
                 onClick = {
                     showDialog = false
-                    onPlace(place)
+                    onPlace(place.place)
                 },
             )
         }
