@@ -205,7 +205,16 @@ private fun ActivityLogImpl(
                 FilterInformation(filter = state.filter, onChange = onEditFilter)
             }
 
-            AnimatedContent(state.data, label = "EmptyStateAnimation") { data ->
+            AnimatedContent(
+                state.data,
+                label = "EmptyStateAnimation",
+                contentKey = {
+                    // Important to not animate when just state.data changes,
+                    // otherwise there would be a conflict between this AnimatedContent
+                    // and the LazyList which also animates changes
+                    it == null
+                },
+            ) { data ->
                 when {
                     data == null -> Box(
                         modifier = Modifier.fillMaxSize(),
