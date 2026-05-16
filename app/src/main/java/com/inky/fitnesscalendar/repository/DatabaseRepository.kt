@@ -6,11 +6,13 @@ import androidx.annotation.RequiresApi
 import androidx.compose.runtime.Immutable
 import androidx.room.withTransaction
 import com.inky.fitnesscalendar.data.EpochDay
+import com.inky.fitnesscalendar.data.Feel
 import com.inky.fitnesscalendar.data.ImageName
 import com.inky.fitnesscalendar.data.Vehicle
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilterChip
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilterChip.Companion.toActivityFilterChip
+import com.inky.fitnesscalendar.data.activity_filter.AttributeFilter
 import com.inky.fitnesscalendar.data.activity_filter.DateRange
 import com.inky.fitnesscalendar.data.activity_filter.DateRangeOption
 import com.inky.fitnesscalendar.db.AppDatabase
@@ -36,6 +38,7 @@ import com.inky.fitnesscalendar.util.toEpochDay
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -154,13 +157,41 @@ class DatabaseRepository @Inject constructor(
     fun getDays() = dayDao.getDays()
 
     fun getDaysFiltered(filter: ActivityFilter): Flow<Set<EpochDay>> {
+        // Instead of reading the attributes directly from the filter, we
+        // loop over the filter items and return an empty set if we don't know that item.
+        // This is to make sure that we don't include days that should be filtered out
+        // by some filter that days don't support.
+        var searchText: String? = null
+        val feels: MutableList<Feel> = mutableListOf()
+        var start: EpochDay? = null
+        var end: EpochDay? = null
+        var hasImage: Boolean? = null
+        for (chip in filter.items()) {
+            when (chip) {
+                is ActivityFilterChip.TextFilterChip -> searchText = chip.text
+                is ActivityFilterChip.FeelFilterChip -> feels.add(chip.feel)
+                is ActivityFilterChip.DateFilterChip -> {
+                    start = chip.option.range.start.toEpochDay()
+                    chip.option.range.end?.let { end = it.toEpochDay() }
+                }
+
+                is ActivityFilterChip.AttributeFilterChip -> if (chip.attribute == AttributeFilter.Attribute.Image) {
+                    hasImage = chip.state
+                } else {
+                    return flowOf(emptySet())
+                }
+
+                else -> return flowOf(emptySet())
+            }
+        }
+
         return dayDao.getDaysFiltered(
-            search = filter.text?.let { "%$it%" },
-            feels = filter.feels,
-            isFeelEmpty = filter.feels.isEmpty(),
-            start = filter.range?.range?.start?.toEpochDay(),
-            end = filter.range?.range?.end?.toEpochDay(),
-            hasImage = filter.attributes.image.toBooleanOrNull()
+            search = searchText?.let { "%$it%" },
+            feels = feels,
+            isFeelEmpty = feels.isEmpty(),
+            start = start,
+            end = end,
+            hasImage = hasImage
         ).map { it.toSet() }
     }
 
