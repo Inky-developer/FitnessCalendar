@@ -1,6 +1,7 @@
 package com.inky.fitnesscalendar.util
 
 import android.os.Build
+import com.inky.fitnesscalendar.data.EpochDay
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -18,3 +19,6 @@ fun Date.toLocalDate(zoneId: ZoneId = ZoneId.systemDefault()): LocalDate =
 
 fun Date.toLocalDateTime(zoneId: ZoneId = ZoneId.systemDefault()): LocalDateTime =
     LocalDateTime.ofInstant(toInstant(), zoneId)
+
+fun Date.toEpochDay(zoneId: ZoneId = ZoneId.systemDefault()): EpochDay =
+    EpochDay(toLocalDate(zoneId).toEpochDay())

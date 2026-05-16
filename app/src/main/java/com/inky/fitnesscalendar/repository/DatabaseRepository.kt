@@ -32,6 +32,7 @@ import com.inky.fitnesscalendar.db.generateSampleActivities
 import com.inky.fitnesscalendar.di.ActivityTypeOrder
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.util.Ordering
+import com.inky.fitnesscalendar.util.toEpochDay
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -151,6 +152,17 @@ class DatabaseRepository @Inject constructor(
     fun getFilterHistoryItems() = filterHistoryDao.getItems()
 
     fun getDays() = dayDao.getDays()
+
+    fun getDaysFiltered(filter: ActivityFilter): Flow<Set<EpochDay>> {
+        return dayDao.getDaysFiltered(
+            search = filter.text?.let { "%$it%" },
+            feels = filter.feels,
+            isFeelEmpty = filter.feels.isEmpty(),
+            start = filter.range?.range?.start?.toEpochDay(),
+            end = filter.range?.range?.end?.toEpochDay(),
+            hasImage = filter.attributes.image.toBooleanOrNull()
+        ).map { it.toSet() }
+    }
 
     fun getDay(day: EpochDay): Flow<Day> = dayDao.get(day).map { it ?: Day(day = day) }
 

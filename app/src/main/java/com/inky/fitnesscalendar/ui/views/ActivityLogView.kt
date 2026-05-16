@@ -36,11 +36,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -123,23 +120,8 @@ private fun ActivityLogImpl(
     initialSelectedActivityId: Int?,
 ) {
     val scope = rememberCoroutineScope()
-    val listState = rememberLazyListState()
+    val listState = rememberLazyListState(initialFirstVisibleItemIndex = 1)
     val isAtTopOfList by remember { derivedStateOf { listState.firstVisibleItemIndex <= 1 } }
-
-    // Scroll to requested activity or to the newest activity
-    var nextScrollTarget by rememberSaveable(initialSelectedActivityId) {
-        mutableStateOf(initialSelectedActivityId)
-    }
-    LaunchedEffect(state.data) {
-        if (state.data != null) {
-            if (nextScrollTarget != null) {
-                getActivityIndex(state.data, nextScrollTarget)?.let { listState.scrollToItem(it) }
-                nextScrollTarget = null
-            } else if (listState.firstVisibleItemIndex == 0) {
-                listState.scrollToItem(1)
-            }
-        }
-    }
 
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     val appBarContainerColor = getAppBarContainerColor(scrollBehavior = scrollBehavior)
@@ -223,7 +205,7 @@ private fun ActivityLogImpl(
                         CircularProgressIndicator()
                     }
 
-                    data.numActivities == 0 -> NoActivitiesInfoBox(
+                    data.items.isEmpty() -> NoActivitiesInfoBox(
                         state.filter.isEmpty(),
                         modifier = Modifier.fillMaxSize()
                     )
