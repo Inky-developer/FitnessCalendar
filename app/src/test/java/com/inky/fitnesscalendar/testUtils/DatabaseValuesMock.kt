@@ -11,8 +11,7 @@ import com.inky.fitnesscalendar.data.ContentColor
 import com.inky.fitnesscalendar.db.AppDatabase
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.loadDefaultData
-import com.inky.fitnesscalendar.localization.LocalizationRepository
-import com.inky.fitnesscalendar.repository.DatabaseRepository
+import com.inky.fitnesscalendar.di.AppContext
 import com.inky.fitnesscalendar.ui.util.DatabaseValues
 import com.inky.fitnesscalendar.ui.util.localDatabaseValues
 
@@ -56,21 +55,9 @@ fun mockDatabase(context: Context): AppDatabase {
         .build()
 }
 
-fun mockDatabaseRepository(context: Context): DatabaseRepository {
-    val db = mockDatabase(context)
-    return DatabaseRepository(
-        context = context,
-        database = db,
-        activityDao = db.activityDao(),
-        activityTypeDao = db.activityTypeDao(),
-        filterHistoryDao = db.filterHistoryDao(),
-        activityTypeNameDao = db.activityTypeNameDao(),
-        trackDao = db.trackDao(),
-        dayDao = db.dayDao(),
-        placeDao = db.placeDao(),
-        localizationRepository = LocalizationRepository(context)
-    )
-}
+
+fun mockAppContext(context: Context, database: AppDatabase = mockDatabase(context)): AppContext =
+    AppContext(context, database)
 
 private fun getDatabaseValues(): DatabaseValues {
     val activityTypesByCategory = mockActivityTypes.groupBy { it.activityCategory }

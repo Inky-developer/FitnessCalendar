@@ -11,8 +11,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.inky.fitnesscalendar.data.gpx.TrackSvg
+import com.inky.fitnesscalendar.di.appViewModel
 import com.inky.fitnesscalendar.ui.components.Map
 import com.inky.fitnesscalendar.view_model.BaseViewModel
 import kotlinx.coroutines.flow.map
@@ -20,7 +20,11 @@ import org.maplibre.compose.map.MapOptions
 import org.maplibre.compose.map.OrnamentOptions
 
 @Composable
-fun MapView(viewModel: BaseViewModel = hiltViewModel(), activityId: Int, onBack: () -> Unit) {
+fun MapView(
+    viewModel: BaseViewModel = appViewModel { BaseViewModel(this) },
+    activityId: Int,
+    onBack: () -> Unit
+) {
     val trackSvg by remember(activityId) {
         viewModel.repository.getTrackByActivity(activityId)
             .map {

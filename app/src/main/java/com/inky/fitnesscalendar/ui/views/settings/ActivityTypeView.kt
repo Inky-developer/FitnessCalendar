@@ -39,9 +39,9 @@ import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.db.entities.ActivityType
+import com.inky.fitnesscalendar.di.appViewModel
 import com.inky.fitnesscalendar.ui.components.ActivityCategorySelector
 import com.inky.fitnesscalendar.ui.components.ActivityTypeSelector
 import com.inky.fitnesscalendar.ui.components.BaseEditDialog
@@ -56,7 +56,10 @@ import com.inky.fitnesscalendar.view_model.settings.ActivityTypeViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ActivityTypeView(viewModel: ActivityTypeViewModel = hiltViewModel(), onBack: () -> Unit) {
+fun ActivityTypeView(
+    viewModel: ActivityTypeViewModel = appViewModel { ActivityTypeViewModel(this) },
+    onBack: () -> Unit
+) {
     var selectedType by rememberSaveable { mutableStateOf<ActivityType?>(null) }
     val initialEditState = remember(selectedType) {
         selectedType?.let { ActivityTypeEditState(it) } ?: ActivityTypeEditState()

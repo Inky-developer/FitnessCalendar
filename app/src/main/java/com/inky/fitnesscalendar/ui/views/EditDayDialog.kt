@@ -18,13 +18,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil.compose.AsyncImagePainter
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.data.Feel
 import com.inky.fitnesscalendar.data.ImageName
 import com.inky.fitnesscalendar.db.entities.Day
+import com.inky.fitnesscalendar.di.appViewModel
 import com.inky.fitnesscalendar.ui.components.ActivityImage
 import com.inky.fitnesscalendar.ui.components.BaseEditDialog
 import com.inky.fitnesscalendar.ui.components.DescriptionTextInput
@@ -39,7 +39,7 @@ import kotlinx.parcelize.Parcelize
 
 @Composable
 fun EditDayDialog(
-    viewModel: BaseViewModel = hiltViewModel(),
+    viewModel: BaseViewModel = appViewModel { BaseViewModel(this) },
     epochDay: EpochDay,
     onNavigateBack: () -> Unit
 ) {

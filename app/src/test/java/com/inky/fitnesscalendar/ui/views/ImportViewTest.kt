@@ -14,8 +14,7 @@ import androidx.compose.ui.test.performClick
 import androidx.test.core.app.ApplicationProvider
 import com.inky.fitnesscalendar.MainApp
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
-import com.inky.fitnesscalendar.repository.ImportRepository
-import com.inky.fitnesscalendar.testUtils.mockDatabaseRepository
+import com.inky.fitnesscalendar.testUtils.mockAppContext
 import com.inky.fitnesscalendar.ui.ImportView
 import com.inky.fitnesscalendar.ui.util.ProvideDatabaseValues
 import com.inky.fitnesscalendar.view_model.ImportViewModel
@@ -51,12 +50,9 @@ class ImportViewTest {
     fun test_can_import_activities() {
         val context = ApplicationProvider.getApplicationContext<MainApp>()
 
-        val databaseRepository = mockDatabaseRepository(context)
-        val viewModel = ImportViewModel(
-            context = context,
-            dbRepository = databaseRepository,
-            importRepository = ImportRepository(databaseRepository)
-        )
+        val appContext = mockAppContext(context)
+        val databaseRepository = appContext.databaseRepo
+        val viewModel = ImportViewModel(appContext)
 
         val testFileNames = listOf(
             TestFile("/gpx/valid_track.gpx", false),

@@ -4,7 +4,6 @@ import java.util.Properties
 
 plugins {
     alias(libs.plugins.androidApplication)
-    alias(libs.plugins.hilt)
     id("kotlin-parcelize")
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.room)
@@ -16,14 +15,13 @@ room {
     schemaDirectory("$projectDir/schemas")
 }
 
-hilt {
-    enableAggregatingTask = true
-}
-
 kotlin {
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_17)
-        freeCompilerArgs.add("-XXLanguage:+PropertyParamAnnotationDefaultTargetMode")
+        freeCompilerArgs.run {
+            add("-XXLanguage:+PropertyParamAnnotationDefaultTargetMode")
+            add("-Xcontext-parameters")
+        }
     }
 }
 
@@ -139,8 +137,7 @@ android {
 }
 
 dependencies {
-    implementation(libs.androidx.hilt.navigation.compose)
-    implementation(libs.hilt.android)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
@@ -160,7 +157,6 @@ dependencies {
     implementation(libs.androidx.documentfile)
     implementation(libs.maplibre.compose)
 
-    ksp(libs.hilt.android.compiler)
     ksp(libs.androidx.room.compiler)
 
     testImplementation(libs.junit)

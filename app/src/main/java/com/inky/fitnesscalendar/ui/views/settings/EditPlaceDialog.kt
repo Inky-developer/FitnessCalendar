@@ -26,10 +26,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil.compose.AsyncImagePainter
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.db.entities.Place
+import com.inky.fitnesscalendar.di.appViewModel
 import com.inky.fitnesscalendar.ui.components.ActivityImage
 import com.inky.fitnesscalendar.ui.components.BaseEditDialog
 import com.inky.fitnesscalendar.ui.components.ColorSelector
@@ -46,7 +46,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun EditPlaceDialog(
-    viewModel: BaseViewModel = hiltViewModel(),
+    viewModel: BaseViewModel = appViewModel { BaseViewModel(this) },
     initialPlaceId: Int?,
     onDismiss: () -> Unit,
 ) {

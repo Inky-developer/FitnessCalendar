@@ -37,10 +37,10 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.measure.meters
 import com.inky.fitnesscalendar.db.entities.Track
+import com.inky.fitnesscalendar.di.appViewModel
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.util.Icons
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
@@ -89,7 +89,7 @@ import kotlin.math.roundToLong
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TrackGraphView(
-    viewModel: BaseViewModel = hiltViewModel(),
+    viewModel: BaseViewModel = appViewModel { BaseViewModel(this) },
     activityId: Int,
     projection: TrackGraphProjection,
     onBack: () -> Unit

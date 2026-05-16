@@ -53,12 +53,12 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityCategory
 import com.inky.fitnesscalendar.data.Displayable
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.db.entities.Activity
+import com.inky.fitnesscalendar.di.appViewModel
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.CompactActivityCard
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
@@ -95,7 +95,7 @@ import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
 
 @Composable
 fun StatisticsView(
-    viewModel: StatisticsViewModel = hiltViewModel(),
+    viewModel: StatisticsViewModel = appViewModel { StatisticsViewModel(this) },
     initialPeriod: Period? = null,
     onOpenDrawer: () -> Unit,
     onViewActivity: (Activity) -> Unit,

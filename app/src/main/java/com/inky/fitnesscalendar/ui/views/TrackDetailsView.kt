@@ -55,7 +55,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ImageName
 import com.inky.fitnesscalendar.data.gpx.GpxTrackStats
@@ -63,6 +62,7 @@ import com.inky.fitnesscalendar.data.gpx.TrackSvg
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.db.entities.UserImage
+import com.inky.fitnesscalendar.di.appViewModel
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.repository.DatabaseRepository
 import com.inky.fitnesscalendar.ui.components.DescriptionTextInput
@@ -91,7 +91,7 @@ import org.maplibre.compose.util.ClickResult
 
 @Composable
 fun TrackDetailsView(
-    viewModel: BaseViewModel = hiltViewModel(),
+    viewModel: BaseViewModel = appViewModel { BaseViewModel(this) },
     activityId: Int,
     onBack: () -> Unit,
     onShare: () -> Unit,

@@ -1,17 +1,14 @@
 package com.inky.fitnesscalendar.view_model.settings
 
-import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import androidx.compose.material3.SnackbarDuration
 import androidx.lifecycle.viewModelScope
 import com.inky.fitnesscalendar.R
+import com.inky.fitnesscalendar.di.AppContext
 import com.inky.fitnesscalendar.preferences.Preference.Companion.PREF_BACKUP_URI
-import com.inky.fitnesscalendar.repository.DatabaseRepository
 import com.inky.fitnesscalendar.repository.backup.BackupRepository
 import com.inky.fitnesscalendar.view_model.BaseViewModel
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -19,14 +16,9 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
-import javax.inject.Inject
 
-@HiltViewModel
-class BackupViewModel @Inject constructor(
-    @ApplicationContext context: Context,
-    repository: DatabaseRepository,
-    private val backupRepository: BackupRepository
-) : BaseViewModel(context, repository) {
+class BackupViewModel(app: AppContext) : BaseViewModel(app) {
+    private val backupRepository: BackupRepository = app.backupRepository
 
     private var _backupInProgress = MutableStateFlow(false)
     val backupInProgress get() = _backupInProgress.asStateFlow()

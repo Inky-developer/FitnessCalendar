@@ -3,7 +3,6 @@ package com.inky.fitnesscalendar.repository
 import android.os.ParcelFileDescriptor
 import android.util.Log
 import androidx.annotation.StringRes
-import androidx.compose.runtime.Immutable
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.gpx.GpxTrack
 import com.inky.fitnesscalendar.data.gpx.TrackSvg
@@ -19,14 +18,10 @@ import com.inky.fitnesscalendar.util.result.tryScope
 import kotlinx.coroutines.flow.first
 import java.io.FileInputStream
 import java.io.InputStream
-import javax.inject.Inject
-import javax.inject.Singleton
 
 private const val TAG = "ImportRepository"
 
-@Immutable
-@Singleton
-class ImportRepository @Inject constructor(private val dbRepository: DatabaseRepository) {
+class ImportRepository(private val dbRepository: DatabaseRepository) {
     /**
      * Tries to import the given files without user interaction.
      * This only works if the activity type mapping is known.

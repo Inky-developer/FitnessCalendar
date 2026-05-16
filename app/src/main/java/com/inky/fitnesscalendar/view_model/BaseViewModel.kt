@@ -10,18 +10,14 @@ import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.db.entities.RichActivity
+import com.inky.fitnesscalendar.di.AppContext
 import com.inky.fitnesscalendar.repository.DatabaseRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-open class BaseViewModel @Inject constructor(
-    @ApplicationContext val context: Context,
-    val repository: DatabaseRepository,
-) : ViewModel() {
+open class BaseViewModel(val app: AppContext) : ViewModel() {
+    val context: Context get() = app.context
+    val repository: DatabaseRepository get() = app.databaseRepo
     val snackbarHostState = SnackbarHostState()
 
     fun addToFilterHistory(filter: ActivityFilter) {

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.inky.fitnesscalendar.data.ActivityStatistics
 import com.inky.fitnesscalendar.data.Displayable
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
+import com.inky.fitnesscalendar.di.AppContext
 import com.inky.fitnesscalendar.preferences.Preference
 import com.inky.fitnesscalendar.repository.DatabaseRepository
 import com.inky.fitnesscalendar.view_model.statistics.GraphState
@@ -16,8 +17,6 @@ import com.patrykandpatrick.vico.compose.cartesian.AutoScrollCondition
 import com.patrykandpatrick.vico.compose.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.compose.cartesian.data.lineSeries
 import com.patrykandpatrick.vico.compose.common.data.ExtraStore
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -25,13 +24,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.shareIn
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class StatisticsViewModel @Inject constructor(
-    @ApplicationContext val context: Context,
-    val databaseRepository: DatabaseRepository
-) : ViewModel() {
+class StatisticsViewModel(private val app: AppContext) : ViewModel() {
+    val context: Context get() = app.context
+    val databaseRepository: DatabaseRepository get() = app.databaseRepo
+
     private var _graphState = MutableStateFlow<GraphState?>(null)
     val graphState get() = _graphState.asStateFlow()
 

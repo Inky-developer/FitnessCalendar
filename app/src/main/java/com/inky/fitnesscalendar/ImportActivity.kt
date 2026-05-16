@@ -9,22 +9,27 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
+import com.inky.fitnesscalendar.di.appContext
 import com.inky.fitnesscalendar.ui.ImportView
 import com.inky.fitnesscalendar.ui.components.AppFrame
 import com.inky.fitnesscalendar.ui.util.AppContextProviders
 import com.inky.fitnesscalendar.view_model.ImportViewModel
-import dagger.hilt.android.AndroidEntryPoint
 import java.io.FileNotFoundException
 
 private const val TAG = "ImportActivity"
 
-@AndroidEntryPoint
 class ImportActivity : ComponentActivity() {
+    private val viewModel: ImportViewModel by viewModels {
+        val app = appContext
+        viewModelFactory { initializer { ImportViewModel(app) } }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
 
-        val viewModel: ImportViewModel by viewModels()
         viewModel.closeActivity = {
             finish()
         }

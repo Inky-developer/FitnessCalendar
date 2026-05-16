@@ -4,25 +4,19 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
-import androidx.compose.runtime.Immutable
 import androidx.documentfile.provider.DocumentFile
 import com.inky.fitnesscalendar.ImportActivity
 import com.inky.fitnesscalendar.preferences.Preference.Companion.PREF_WATCHED_FOLDERS
 import com.inky.fitnesscalendar.preferences.Preference.Companion.PREF_WATCHED_FOLDERS_LAST_IMPORT
-import dagger.hilt.android.qualifiers.ApplicationContext
 import okio.FileNotFoundException
 import java.time.Instant
 import java.util.Date
-import javax.inject.Inject
-import javax.inject.Singleton
 
 private const val TAG = "AutoImportRepository"
 
-@Immutable
-@Singleton
-class AutoImportRepository @Inject constructor(
+class AutoImportRepository(
     private val importRepository: ImportRepository,
-    @ApplicationContext private val context: Context
+    private val context: Context
 ) {
 
     /**

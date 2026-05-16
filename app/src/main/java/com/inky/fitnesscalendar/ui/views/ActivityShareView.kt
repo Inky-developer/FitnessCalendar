@@ -53,7 +53,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.inky.fitnesscalendar.BuildConfig
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityCategory
@@ -66,6 +65,7 @@ import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.db.entities.Track
+import com.inky.fitnesscalendar.di.appViewModel
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivityCardContent
 import com.inky.fitnesscalendar.ui.components.ActivityImages
@@ -90,7 +90,7 @@ import java.util.Date
 
 @Composable
 fun ActivityShareView(
-    viewModel: BaseViewModel = hiltViewModel(),
+    viewModel: BaseViewModel = appViewModel { BaseViewModel(this) },
     activityId: Int,
     onBack: () -> Unit
 ) {

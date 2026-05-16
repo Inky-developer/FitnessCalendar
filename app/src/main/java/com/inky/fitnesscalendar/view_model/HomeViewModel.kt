@@ -1,6 +1,5 @@
 package com.inky.fitnesscalendar.view_model
 
-import android.content.Context
 import androidx.lifecycle.viewModelScope
 import com.inky.fitnesscalendar.data.ActivityStatistics
 import com.inky.fitnesscalendar.data.EpochDay
@@ -9,10 +8,8 @@ import com.inky.fitnesscalendar.data.activity_filter.DateRangeOption
 import com.inky.fitnesscalendar.data.measure.Duration.Companion.until
 import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.db.entities.Recording
-import com.inky.fitnesscalendar.repository.DatabaseRepository
+import com.inky.fitnesscalendar.di.AppContext
 import com.inky.fitnesscalendar.repository.RecordingRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,14 +21,10 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.util.Date
-import javax.inject.Inject
 
-@HiltViewModel
-class HomeViewModel @Inject constructor(
-    @ApplicationContext context: Context,
-    repository: DatabaseRepository,
-    private val recordingRepository: RecordingRepository
-) : BaseViewModel(context, repository) {
+class HomeViewModel(app: AppContext) : BaseViewModel(app) {
+    private val recordingRepository: RecordingRepository = app.recordingRepository
+
     val weekStats = loadWeekStats()
     val monthStats = loadMonthStats()
     val activitiesToday = repository.getDayActivities(EpochDay.today())

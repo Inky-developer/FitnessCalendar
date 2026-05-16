@@ -2,13 +2,11 @@ package com.inky.fitnesscalendar.localization
 
 import android.content.Context
 import android.text.format.DateFormat
-import androidx.compose.runtime.Immutable
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.measure.Duration.Companion.until
 import com.inky.fitnesscalendar.util.DAY_START_OFFSET_HOURS
 import com.inky.fitnesscalendar.util.toLocalDate
 import com.inky.fitnesscalendar.util.toLocalDateTime
-import dagger.hilt.android.qualifiers.ApplicationContext
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -18,12 +16,8 @@ import java.time.format.TextStyle
 import java.time.temporal.ChronoUnit
 import java.util.Date
 import java.util.Locale
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Immutable
-@Singleton
-class LocalizationRepository @Inject constructor(@ApplicationContext private val context: Context) {
+class LocalizationRepository(private val context: Context) {
     val timeFormatter: java.text.DateFormat = DateFormat.getTimeFormat(context)
     val dateFormatter: java.text.DateFormat = DateFormat.getMediumDateFormat(context)
 

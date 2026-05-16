@@ -60,7 +60,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil.compose.AsyncImagePainter
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.EpochDay
@@ -72,6 +71,7 @@ import com.inky.fitnesscalendar.data.measure.kilometers
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.db.entities.UserImage
+import com.inky.fitnesscalendar.di.appViewModel
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.preferences.Preference
 import com.inky.fitnesscalendar.ui.components.ActivitySelector
@@ -110,7 +110,7 @@ import kotlin.math.roundToInt
 @Composable
 fun NewActivity(
     activityId: Int?,
-    viewModel: NewActivityViewModel = hiltViewModel(),
+    viewModel: NewActivityViewModel = appViewModel { NewActivityViewModel(this) },
     onSave: (RichActivity) -> Unit,
     onNavigateBack: () -> Unit,
     onNavigateNewPlace: () -> Unit,

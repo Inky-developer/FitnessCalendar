@@ -10,25 +10,22 @@ import androidx.lifecycle.viewModelScope
 import com.inky.fitnesscalendar.MainActivity
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.db.entities.ActivityType
+import com.inky.fitnesscalendar.di.AppContext
 import com.inky.fitnesscalendar.repository.DatabaseRepository
 import com.inky.fitnesscalendar.repository.ImportRepository
 import com.inky.fitnesscalendar.util.EXTRA_TOAST
 import com.inky.fitnesscalendar.util.result.isOk
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import java.io.ByteArrayInputStream
-import javax.inject.Inject
 
-@HiltViewModel
-class ImportViewModel @Inject constructor(
-    @ApplicationContext val context: Context,
-    val dbRepository: DatabaseRepository,
-    private val importRepository: ImportRepository
-) : ViewModel() {
+class ImportViewModel(private val app: AppContext) : ViewModel() {
+    val context: Context get() = app.context
+    val dbRepository: DatabaseRepository get() = app.databaseRepo
+    private val importRepository: ImportRepository get() = app.importRepository
+
     var closeActivity: () -> Unit = {}
 
     private val _tracks = MutableStateFlow(emptyList<ImportRepository.ImportTrack>())

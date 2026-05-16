@@ -9,18 +9,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.db.entities.ActivityType
+import com.inky.fitnesscalendar.di.AppContext
 import com.inky.fitnesscalendar.repository.DatabaseRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
-@HiltViewModel
-class ActivityTypeViewModel @Inject constructor(
-    @ApplicationContext private val context: Context,
-    private val repository: DatabaseRepository
-) : ViewModel() {
+class ActivityTypeViewModel(private val app: AppContext) : ViewModel() {
+    private val context: Context get() = app.context
+    private val repository: DatabaseRepository get() = app.databaseRepo
+
     val snackbarHostState = SnackbarHostState()
 
     fun save(activityType: ActivityType) = viewModelScope.launch(Dispatchers.IO) {

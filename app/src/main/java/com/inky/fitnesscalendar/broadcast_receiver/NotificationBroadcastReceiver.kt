@@ -4,28 +4,23 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.util.Log
-import com.inky.fitnesscalendar.repository.RecordingRepository
+import com.inky.fitnesscalendar.di.appContext
 import com.inky.fitnesscalendar.util.ACTION_CANCEL
 import com.inky.fitnesscalendar.util.ACTION_SAVE
 import com.inky.fitnesscalendar.util.EXTRA_RECORDING_ID
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 private const val TAG = "NotificationPodcastReceiver"
 
-@AndroidEntryPoint
 class NotificationBroadcastReceiver : BroadcastReceiver() {
-    @Inject
-    lateinit var repository: RecordingRepository
-
     override fun onReceive(context: Context?, intent: Intent?) {
         Log.d(TAG, intent?.toUri(Intent.URI_INTENT_SCHEME) ?: "Intent was null")
 
-        if (intent == null) return
+        if (intent == null || context == null) return
 
+        val repository = context.appContext.recordingRepository
         val id = intent.getIntExtra(EXTRA_RECORDING_ID, -1)
 
         // TODO: Looks like the recommended solution is to use workers

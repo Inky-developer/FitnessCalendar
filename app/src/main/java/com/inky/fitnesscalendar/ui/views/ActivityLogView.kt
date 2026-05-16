@@ -46,12 +46,12 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.data.Feel
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.db.entities.Day
+import com.inky.fitnesscalendar.di.appViewModel
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivityCard
 import com.inky.fitnesscalendar.ui.components.ActivityCardCallbacks
@@ -72,7 +72,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun ActivityLog(
-    viewModel: ActivityLogViewModel = hiltViewModel(),
+    viewModel: ActivityLogViewModel = appViewModel { ActivityLogViewModel(this) },
     filter: ActivityFilter,
     activityCardCallbacks: ActivityCardCallbacks,
     onEditFilter: (ActivityFilter) -> Unit,

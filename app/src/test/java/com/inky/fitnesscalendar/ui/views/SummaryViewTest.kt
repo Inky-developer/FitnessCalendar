@@ -10,7 +10,7 @@ import androidx.test.core.app.ApplicationProvider
 import com.inky.fitnesscalendar.MainApp
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.testUtils.TestApp
-import com.inky.fitnesscalendar.testUtils.mockDatabaseRepository
+import com.inky.fitnesscalendar.testUtils.mockAppContext
 import com.inky.fitnesscalendar.view_model.BaseViewModel
 import org.junit.Rule
 import org.junit.Test
@@ -30,11 +30,7 @@ class SummaryViewTest {
     fun `test empty summary view does not crash`() {
         val context = ApplicationProvider.getApplicationContext<MainApp>()
 
-        val databaseRepository = mockDatabaseRepository(context)
-        val viewModel = BaseViewModel(
-            context = context,
-            repository = databaseRepository
-        )
+        val viewModel = BaseViewModel(mockAppContext(context))
 
         composeTestRule.setContent {
             TestApp {

@@ -47,12 +47,12 @@ import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ContentColor
 import com.inky.fitnesscalendar.db.entities.Place
 import com.inky.fitnesscalendar.db.entities.RichPlace
+import com.inky.fitnesscalendar.di.appViewModel
 import com.inky.fitnesscalendar.ui.components.ActivityImage
 import com.inky.fitnesscalendar.ui.components.BottomSheetButton
 import com.inky.fitnesscalendar.ui.components.ImageViewer
@@ -65,7 +65,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun PlaceListView(
-    viewModel: BaseViewModel = hiltViewModel(),
+    viewModel: BaseViewModel = appViewModel { BaseViewModel(this) },
     onBack: () -> Unit,
     onEditPlace: (Place?) -> Unit
 ) {

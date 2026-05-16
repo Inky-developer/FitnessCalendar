@@ -5,7 +5,6 @@ import android.net.Uri
 import android.os.Build
 import android.util.Log
 import androidx.annotation.StringRes
-import androidx.compose.runtime.Immutable
 import androidx.documentfile.provider.DocumentFile
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.db.AppDatabase
@@ -14,7 +13,6 @@ import com.inky.fitnesscalendar.util.ZipWriter
 import com.inky.fitnesscalendar.util.entries
 import com.inky.fitnesscalendar.util.restartApplication
 import com.inky.fitnesscalendar.util.toLocalDateTime
-import dagger.hilt.android.qualifiers.ApplicationContext
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
@@ -23,18 +21,14 @@ import java.time.Instant
 import java.time.LocalDateTime
 import java.util.Date
 import java.util.zip.ZipInputStream
-import javax.inject.Inject
-import javax.inject.Singleton
 
 private const val BACKUP_NAME = "backup.zip"
 
 private const val TAG = "BackupRepository"
 
-@Immutable
-@Singleton
-class BackupRepository @Inject constructor(
+class BackupRepository(
     private val database: AppDatabase,
-    @ApplicationContext private val context: Context
+    private val context: Context
 ) {
     enum class BackupError(@StringRes val msgID: Int) {
         OldAndroidVersion(R.string.your_android_version_is_too_old_for_backup),

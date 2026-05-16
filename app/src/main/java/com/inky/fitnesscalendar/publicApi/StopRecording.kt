@@ -2,18 +2,11 @@ package com.inky.fitnesscalendar.publicApi
 
 import android.widget.Toast
 import com.inky.fitnesscalendar.R
-import com.inky.fitnesscalendar.repository.DatabaseRepository
-import com.inky.fitnesscalendar.repository.RecordingRepository
-import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
+import com.inky.fitnesscalendar.di.appContext
 
-@AndroidEntryPoint
 class StopRecording : ApiActivity() {
-    @Inject
-    lateinit var recordingRepository: RecordingRepository
-
-    @Inject
-    lateinit var databaseRepository: DatabaseRepository
+    private val recordingRepository = appContext.recordingRepository
+    private val databaseRepository = appContext.databaseRepo
 
     override suspend fun handleRequest() {
         val activityType = extractActivityTypeByName(intent, databaseRepository) ?: return

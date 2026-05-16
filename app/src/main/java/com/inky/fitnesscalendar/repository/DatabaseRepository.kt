@@ -3,7 +3,6 @@ package com.inky.fitnesscalendar.repository
 import android.content.Context
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.runtime.Immutable
 import androidx.room.withTransaction
 import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.data.Feel
@@ -16,13 +15,6 @@ import com.inky.fitnesscalendar.data.activity_filter.AttributeFilter
 import com.inky.fitnesscalendar.data.activity_filter.DateRange
 import com.inky.fitnesscalendar.data.activity_filter.DateRangeOption
 import com.inky.fitnesscalendar.db.AppDatabase
-import com.inky.fitnesscalendar.db.dao.ActivityDao
-import com.inky.fitnesscalendar.db.dao.ActivityTypeDao
-import com.inky.fitnesscalendar.db.dao.ActivityTypeNameDao
-import com.inky.fitnesscalendar.db.dao.DayDao
-import com.inky.fitnesscalendar.db.dao.FilterHistoryDao
-import com.inky.fitnesscalendar.db.dao.PlaceDao
-import com.inky.fitnesscalendar.db.dao.TrackDao
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.ActivityTypeName
@@ -35,28 +27,24 @@ import com.inky.fitnesscalendar.di.ActivityTypeOrder
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.util.Ordering
 import com.inky.fitnesscalendar.util.toEpochDay
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Immutable
-@Singleton
-class DatabaseRepository @Inject constructor(
-    @ApplicationContext val context: Context,
+class DatabaseRepository(
+    val context: Context,
     private val database: AppDatabase,
-    private val activityDao: ActivityDao,
-    private val activityTypeDao: ActivityTypeDao,
-    private val filterHistoryDao: FilterHistoryDao,
-    private val activityTypeNameDao: ActivityTypeNameDao,
-    private val trackDao: TrackDao,
-    private val dayDao: DayDao,
-    private val placeDao: PlaceDao,
     val localizationRepository: LocalizationRepository
 ) {
+    private val activityDao = database.activityDao()
+    private val activityTypeDao = database.activityTypeDao()
+    private val filterHistoryDao = database.filterHistoryDao()
+    private val activityTypeNameDao = database.activityTypeNameDao()
+    private val trackDao = database.trackDao()
+    private val dayDao = database.dayDao()
+    private val placeDao = database.placeDao()
+
     fun getActivities(
         filter: ActivityFilter,
         order: Ordering = Ordering.DESC

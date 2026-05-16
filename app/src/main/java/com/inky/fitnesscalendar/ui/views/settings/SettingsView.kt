@@ -42,9 +42,9 @@ import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.inky.fitnesscalendar.BuildConfig
 import com.inky.fitnesscalendar.R
+import com.inky.fitnesscalendar.di.appViewModel
 import com.inky.fitnesscalendar.preferences.Preference
 import com.inky.fitnesscalendar.repository.backup.BackupRepository
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
@@ -59,7 +59,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsView(
-    viewModel: SettingsViewModel = hiltViewModel(),
+    viewModel: SettingsViewModel = appViewModel { SettingsViewModel(this) },
     onOpenDrawer: () -> Unit,
     onNavigateAbout: () -> Unit,
     onNavigateDebug: () -> Unit,

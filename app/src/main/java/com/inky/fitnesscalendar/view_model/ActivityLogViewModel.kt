@@ -1,16 +1,13 @@
 package com.inky.fitnesscalendar.view_model
 
-import android.content.Context
 import androidx.lifecycle.viewModelScope
 import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.db.entities.RichActivity
-import com.inky.fitnesscalendar.repository.DatabaseRepository
+import com.inky.fitnesscalendar.di.AppContext
 import com.inky.fitnesscalendar.view_model.activity_log.ActivityListItem
 import com.inky.fitnesscalendar.view_model.activity_log.ActivityListState
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -19,13 +16,8 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.stateIn
 import java.time.ZoneId
-import javax.inject.Inject
 
-@HiltViewModel
-class ActivityLogViewModel @Inject constructor(
-    @ApplicationContext context: Context,
-    repository: DatabaseRepository
-) : BaseViewModel(context, repository) {
+class ActivityLogViewModel(app: AppContext) : BaseViewModel(app) {
     private val filterFlow = MutableStateFlow(ActivityFilter())
 
     private val dayFlow = repository.getDays()

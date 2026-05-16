@@ -56,7 +56,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.Popup
 import androidx.compose.ui.window.PopupProperties
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityStatistics
 import com.inky.fitnesscalendar.data.EpochDay
@@ -65,6 +64,7 @@ import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.db.entities.Recording
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.db.entities.RichRecording
+import com.inky.fitnesscalendar.di.appViewModel
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivityCard
 import com.inky.fitnesscalendar.ui.components.ActivityCardCallbacks
@@ -91,7 +91,7 @@ private const val TAG = "HOME"
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Home(
-    viewModel: HomeViewModel = hiltViewModel(),
+    viewModel: HomeViewModel = appViewModel { HomeViewModel(this) },
     activityCardCallbacks: ActivityCardCallbacks,
     onNewActivity: () -> Unit,
     onEditDay: (EpochDay) -> Unit,

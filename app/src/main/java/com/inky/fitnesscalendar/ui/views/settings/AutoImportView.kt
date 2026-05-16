@@ -28,8 +28,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
+import com.inky.fitnesscalendar.di.appViewModel
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.util.Icons
 import com.inky.fitnesscalendar.ui.util.localPreferences
@@ -37,7 +37,10 @@ import com.inky.fitnesscalendar.view_model.settings.AutoImportViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AutoImportView(viewModel: AutoImportViewModel = hiltViewModel(), onBack: () -> Unit) {
+fun AutoImportView(
+    viewModel: AutoImportViewModel = appViewModel { AutoImportViewModel(this) },
+    onBack: () -> Unit
+) {
     val scrollBehavior = TopAppBarDefaults.enterAlwaysScrollBehavior()
     Scaffold(
         topBar = {

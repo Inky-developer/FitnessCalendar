@@ -20,7 +20,6 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalContext
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -30,6 +29,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
+import com.inky.fitnesscalendar.di.appViewModel
 import com.inky.fitnesscalendar.ui.components.ActivityCardCallbacks
 import com.inky.fitnesscalendar.ui.components.ActivitySelectorState
 import com.inky.fitnesscalendar.ui.components.NavigationDrawer
@@ -52,7 +52,6 @@ import com.inky.fitnesscalendar.ui.views.TrackGraphView
 import com.inky.fitnesscalendar.ui.views.Views
 import com.inky.fitnesscalendar.ui.views.settings.SettingsViews
 import com.inky.fitnesscalendar.ui.views.settingsDestination
-import com.inky.fitnesscalendar.view_model.AppViewModel
 import com.inky.fitnesscalendar.view_model.BaseViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
@@ -60,7 +59,7 @@ import java.time.ZoneOffset
 
 
 @Composable
-fun App(viewModel: BaseViewModel = hiltViewModel()) {
+fun App(viewModel: BaseViewModel = appViewModel { BaseViewModel(this) }) {
     val navController = rememberNavController()
     val scope = rememberCoroutineScope()
 
@@ -104,7 +103,7 @@ fun App(viewModel: BaseViewModel = hiltViewModel()) {
 @Composable
 @OptIn(ExperimentalSharedTransitionApi::class)
 private fun AppNavigation(
-    viewModel: AppViewModel = hiltViewModel(),
+    viewModel: BaseViewModel = appViewModel { BaseViewModel(this) },
     navController: NavHostController,
     openDrawer: () -> Unit,
     onCurrentView: (Views) -> Unit,
@@ -365,7 +364,7 @@ private fun AppNavigation(
                 onCurrentView(Views.RecordActivity)
                 RecordActivity(
                     onStart = {
-                        scope.launch { viewModel.recordingRepository.startRecording(it) }
+                        scope.launch { viewModel.app.recordingRepository.startRecording(it) }
                         navController.popBackStack()
                     },
                     localizationRepository = viewModel.repository.localizationRepository,
@@ -399,7 +398,7 @@ private fun AppNavigation(
 
 @Composable
 private fun rememberActivityCardCallbacks(
-    viewModel: BaseViewModel = hiltViewModel(),
+    viewModel: BaseViewModel = appViewModel { BaseViewModel(this) },
     onFilter: (ActivityFilter) -> Unit,
     navController: NavController
 ) = remember(onFilter, navController) {

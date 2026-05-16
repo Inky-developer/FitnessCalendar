@@ -5,18 +5,14 @@ import android.content.Intent
 import androidx.core.app.TaskStackBuilder
 import androidx.core.net.toUri
 import com.inky.fitnesscalendar.MainActivity
-import com.inky.fitnesscalendar.repository.DatabaseRepository
+import com.inky.fitnesscalendar.di.appContext
 import com.inky.fitnesscalendar.ui.views.Views
-import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 /**
  * Enables third party applications to create a new fitness calendar activity using intents
  */
-@AndroidEntryPoint
 class CreateActivity : ApiActivity() {
-    @Inject
-    lateinit var repository: DatabaseRepository
+    private val repository = appContext.databaseRepo
 
     override suspend fun handleRequest() {
         val activityType = extractActivityTypeByName(intent, repository) ?: return
