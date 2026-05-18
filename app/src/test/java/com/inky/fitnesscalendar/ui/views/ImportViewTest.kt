@@ -7,15 +7,17 @@ import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertCountEquals
 import androidx.compose.ui.test.assertTextContains
 import androidx.compose.ui.test.hasTestTag
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.hasText
+import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onAllNodesWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.test.core.app.ApplicationProvider
 import com.inky.fitnesscalendar.MainApp
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
+import com.inky.fitnesscalendar.db.loadDefaultData
 import com.inky.fitnesscalendar.repository.ImportRepository
-import com.inky.fitnesscalendar.testUtils.mockDatabaseRepository
+import com.inky.fitnesscalendar.testUtils.mockAppRepository
 import com.inky.fitnesscalendar.ui.ImportView
 import com.inky.fitnesscalendar.ui.util.ProvideDatabaseValues
 import com.inky.fitnesscalendar.view_model.ImportViewModel
@@ -51,11 +53,11 @@ class ImportViewTest {
     fun test_can_import_activities() {
         val context = ApplicationProvider.getApplicationContext<MainApp>()
 
-        val databaseRepository = mockDatabaseRepository(context)
+        val app = mockAppRepository(context) { loadDefaultData(it, context) }
         val viewModel = ImportViewModel(
             context = context,
-            dbRepository = databaseRepository,
-            importRepository = ImportRepository(databaseRepository)
+            app = app,
+            importRepository = ImportRepository(app.db)
         )
 
         val testFileNames = listOf(
@@ -74,8 +76,10 @@ class ImportViewTest {
         assertEquals("Both tracks should have been imported", 2, viewModel.tracks.value.size)
 
         composeTestRule.setContent {
-            ProvideDatabaseValues(databaseRepository) {
-                ImportView(viewModel)
+            context(app) {
+                ProvideDatabaseValues(app.db) {
+                    ImportView(viewModel)
+                }
             }
         }
 
@@ -90,6 +94,7 @@ class ImportViewTest {
 
                 // Select the activity type for biking for this activity
                 node.performClick()
+                waitUntilExactlyOneExists(hasText("🚴"))
                 onNodeWithText("🚴").performClick()
                 onNodeWithText("Save").performClick()
                 waitForIdle()
@@ -111,7 +116,7 @@ class ImportViewTest {
                 assertEquals(
                     "Initially, there should be no activities",
                     0,
-                    databaseRepository.getActivities(ActivityFilter()).first().size
+                    app.db.getActivities(ActivityFilter()).first().size
                 )
             }
 
@@ -119,14 +124,14 @@ class ImportViewTest {
 
             waitUntil(timeoutMillis = 5000) {
                 runBlocking {
-                    databaseRepository.getActivities(ActivityFilter()).first().isNotEmpty()
+                    app.db.getActivities(ActivityFilter()).first().isNotEmpty()
                 }
             }
         }
         runBlocking {
             WithTimeZone("UTC").use {
                 Approvals.verifyAll(
-                    databaseRepository.getActivities(ActivityFilter()).first().toTypedArray()
+                    app.db.getActivities(ActivityFilter()).first().toTypedArray()
                 ) { it.toString() }
             }
         }

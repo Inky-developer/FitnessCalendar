@@ -20,8 +20,7 @@ import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.db.entities.RichRecording
-import com.inky.fitnesscalendar.repository.DatabaseRepository
-import com.inky.fitnesscalendar.repository.RecordingRepository
+import com.inky.fitnesscalendar.di.AppRepository
 import com.inky.fitnesscalendar.ui.components.AppFrame
 import com.inky.fitnesscalendar.ui.util.ProvideDatabaseValues
 import com.inky.fitnesscalendar.ui.views.QsTileRecordActivityDialog
@@ -35,10 +34,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class RecordTileService : TileService() {
     @Inject
-    lateinit var dbRepository: DatabaseRepository
-
-    @Inject
-    lateinit var recordingRepository: RecordingRepository
+    lateinit var app: AppRepository
 
     private val job = SupervisorJob()
     private val scope = CoroutineScope(Dispatchers.IO + job)
@@ -46,7 +42,7 @@ class RecordTileService : TileService() {
     override fun onClick() {
         super.onClick()
         showDialog(
-            TileServiceDialog(this, dbRepository, onStartRecording = { startRecording(it) })
+            TileServiceDialog(this, app, onStartRecording = { startRecording(it) })
         )
     }
 
@@ -61,12 +57,12 @@ class RecordTileService : TileService() {
     }
 
     private fun startRecording(richRecording: RichRecording) = scope.launch {
-        recordingRepository.startRecording(richRecording)
+        app.recordingRepository.startRecording(richRecording)
     }
 
     class TileServiceDialog(
         context: Context,
-        val repository: DatabaseRepository,
+        val app: AppRepository,
         val onStartRecording: (RichRecording) -> Unit
     ) : Dialog(context, R.style.FullHeightDialog) {
         private val lifecycleOwner = MyHackyLifecycleOwner()
@@ -83,15 +79,16 @@ class RecordTileService : TileService() {
 
                 setContent {
                     AppFrame {
-                        ProvideDatabaseValues(repository = repository) {
-                            QsTileRecordActivityDialog(
-                                localizationRepository = repository.localizationRepository,
-                                onSave = {
-                                    onStartRecording(it)
-                                    dismiss()
-                                },
-                                onDismiss = { dismiss() }
-                            )
+                        ProvideDatabaseValues(db = app.db) {
+                            context(app) {
+                                QsTileRecordActivityDialog(
+                                    onSave = {
+                                        onStartRecording(it)
+                                        dismiss()
+                                    },
+                                    onDismiss = { dismiss() }
+                                )
+                            }
                         }
                     }
                 }

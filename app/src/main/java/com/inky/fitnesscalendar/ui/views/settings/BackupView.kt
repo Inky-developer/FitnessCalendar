@@ -64,7 +64,7 @@ fun BackupView(viewModel: BackupViewModel = hiltViewModel(), onBack: () -> Unit)
                 scrollBehavior = scrollBehavior,
             )
         },
-        snackbarHost = { SnackbarHost(hostState = viewModel.snackbarHostState) },
+        snackbarHost = { SnackbarHost(hostState = viewModel.app.snackbarHostState) },
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { innerPadding ->
         Column(

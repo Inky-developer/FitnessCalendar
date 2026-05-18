@@ -3,9 +3,7 @@ package com.inky.fitnesscalendar.repository
 import android.content.Context
 import android.util.Log
 import androidx.compose.runtime.Immutable
-import com.inky.fitnesscalendar.db.dao.ActivityDao
-import com.inky.fitnesscalendar.db.dao.ActivityTypeDao
-import com.inky.fitnesscalendar.db.dao.RecordingDao
+import com.inky.fitnesscalendar.db.AppDatabase
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.Recording
 import com.inky.fitnesscalendar.db.entities.RichRecording
@@ -21,10 +19,12 @@ private const val TAG = "RecordingRepository"
 @Singleton
 class RecordingRepository @Inject constructor(
     @ApplicationContext private val context: Context,
-    private val recordingDao: RecordingDao,
-    private val activityTypeDao: ActivityTypeDao,
-    private val activityDao: ActivityDao
+    db: AppDatabase,
 ) {
+    private val recordingDao = db.recordingDao()
+    private val activityTypeDao = db.activityTypeDao()
+    private val activityDao = db.activityDao()
+
     suspend fun startRecording(richRecording: RichRecording) {
         val recordingId = recordingDao.insert(richRecording.recording).toInt()
         context.showRecordingNotification(

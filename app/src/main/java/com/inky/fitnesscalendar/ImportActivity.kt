@@ -58,8 +58,10 @@ class ImportActivity : ComponentActivity() {
 
         setContent {
             AppFrame {
-                AppContextProviders(repository = viewModel.dbRepository) {
-                    ImportView(viewModel)
+                context(viewModel.app) {
+                    AppContextProviders {
+                        ImportView(viewModel)
+                    }
                 }
             }
         }

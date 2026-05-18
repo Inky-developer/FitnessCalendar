@@ -38,21 +38,22 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.viewModelScope
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ContentColor
 import com.inky.fitnesscalendar.db.entities.Place
 import com.inky.fitnesscalendar.db.entities.RichPlace
+import com.inky.fitnesscalendar.di.AppRepository
 import com.inky.fitnesscalendar.ui.components.ActivityImage
 import com.inky.fitnesscalendar.ui.components.BottomSheetButton
 import com.inky.fitnesscalendar.ui.components.ImageViewer
@@ -60,37 +61,43 @@ import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.components.getAppBarContainerColor
 import com.inky.fitnesscalendar.ui.util.Icons
 import com.inky.fitnesscalendar.ui.util.localDatabaseValues
-import com.inky.fitnesscalendar.view_model.BaseViewModel
 import kotlinx.coroutines.launch
 
 @Composable
+context(app: AppRepository)
 fun PlaceListView(
-    viewModel: BaseViewModel = hiltViewModel(),
     onBack: () -> Unit,
     onEditPlace: (Place?) -> Unit
 ) {
+    val scope = rememberCoroutineScope()
+    val res = LocalResources.current
     PlaceListViewImpl(
-        snackbarHostState = viewModel.snackbarHostState,
+        snackbarHostState = app.snackbarHostState,
         onBack = onBack,
         onEditPlace = onEditPlace,
-        onDeletePlace = { place -> viewModel.deletePlace(place) }
+        onDeletePlace = { place ->
+            scope.launch {
+                deletePlace(place)
+            }
+        }
     )
 }
 
-private fun BaseViewModel.deletePlace(place: Place) = viewModelScope.launch {
+context(app: AppRepository)
+private suspend fun deletePlace(place: Place) {
     try {
-        repository.deletePlace(place)
-        val result = snackbarHostState.showSnackbar(
-            message = context.getString(R.string.deleted_place),
-            actionLabel = context.getString(R.string.undo),
+        app.db.deletePlace(place)
+        val result = app.snackbarHostState.showSnackbar(
+            message = app.context.getString(R.string.deleted_place),
+            actionLabel = app.context.getString(R.string.undo),
             duration = SnackbarDuration.Short
         )
         when (result) {
-            SnackbarResult.ActionPerformed -> repository.savePlace(place)
+            SnackbarResult.ActionPerformed -> app.db.savePlace(place)
             SnackbarResult.Dismissed -> {}
         }
     } catch (e: SQLiteConstraintException) {
-        snackbarHostState.showSnackbar(message = context.getString(R.string.cannot_delete_place_because_there_are_still_activities))
+        app.snackbarHostState.showSnackbar(message = app.context.getString(R.string.cannot_delete_place_because_there_are_still_activities))
     }
 }
 

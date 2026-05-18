@@ -27,7 +27,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -52,6 +51,7 @@ import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.data.Feel
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.db.entities.Day
+import com.inky.fitnesscalendar.di.AppRepository
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivityCard
 import com.inky.fitnesscalendar.ui.components.ActivityCardCallbacks
@@ -71,6 +71,7 @@ import com.inky.fitnesscalendar.view_model.activity_log.ActivityListState
 import kotlinx.coroutines.launch
 
 @Composable
+context(_: AppRepository)
 fun ActivityLog(
     viewModel: ActivityLogViewModel = hiltViewModel(),
     filter: ActivityFilter,
@@ -91,8 +92,6 @@ fun ActivityLog(
 
     ActivityLogImpl(
         state = activityListState,
-        snackbarHostState = viewModel.snackbarHostState,
-        localizationRepository = viewModel.repository.localizationRepository,
         activityCardCallbacks = activityCardCallbacks,
         onEditFilter = onEditFilter,
         onOpenDrawer = onOpenDrawer,
@@ -106,10 +105,9 @@ fun ActivityLog(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+context(app: AppRepository)
 private fun ActivityLogImpl(
     state: ActivityListState,
-    snackbarHostState: SnackbarHostState,
-    localizationRepository: LocalizationRepository,
     activityCardCallbacks: ActivityCardCallbacks,
     onEditFilter: (ActivityFilter) -> Unit,
     onOpenDrawer: () -> Unit,
@@ -177,7 +175,7 @@ private fun ActivityLogImpl(
                 NewActivityFAB(onClick = { onNewActivity() })
             }
         },
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+        snackbarHost = { SnackbarHost(hostState = app.snackbarHostState) },
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { innerPadding ->
         Column(
@@ -219,7 +217,6 @@ private fun ActivityLogImpl(
                         listState = listState,
                         data = data,
                         activityCardCallbacks = activityCardCallbacks.copy(onJumpTo = null),
-                        localizationRepository = localizationRepository,
                         onShowDay = onShowDay,
                     )
                 }
@@ -230,11 +227,11 @@ private fun ActivityLogImpl(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
+context(_: LocalizationRepository)
 private fun ActivityList(
     listState: LazyListState,
     data: ActivityListState.Data,
     activityCardCallbacks: ActivityCardCallbacks,
-    localizationRepository: LocalizationRepository,
     onShowDay: (EpochDay) -> Unit,
 ) {
     val listItems = data.items
@@ -280,7 +277,6 @@ private fun ActivityList(
                     ActivityCard(
                         item.richActivity,
                         callbacks = activityCardCallbacks,
-                        localizationRepository = localizationRepository,
                         modifier = Modifier
                             .animateItem()
                             .sharedElement(SharedContentKey.ActivityCard(item.richActivity.activity.uid))

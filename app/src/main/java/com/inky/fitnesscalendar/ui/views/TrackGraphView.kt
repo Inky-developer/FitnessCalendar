@@ -37,16 +37,15 @@ import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.measure.meters
 import com.inky.fitnesscalendar.db.entities.Track
+import com.inky.fitnesscalendar.di.AppRepository
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.util.Icons
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.defaultAreaFill
 import com.inky.fitnesscalendar.ui.util.sharedBounds
-import com.inky.fitnesscalendar.view_model.BaseViewModel
 import com.patrykandpatrick.vico.compose.cartesian.CartesianChartHost
 import com.patrykandpatrick.vico.compose.cartesian.CartesianDrawingContext
 import com.patrykandpatrick.vico.compose.cartesian.Zoom
@@ -88,14 +87,14 @@ import kotlin.math.roundToLong
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+context(app: AppRepository)
 fun TrackGraphView(
-    viewModel: BaseViewModel = hiltViewModel(),
     activityId: Int,
     projection: TrackGraphProjection,
     onBack: () -> Unit
 ) {
     fun getGraphData(): Flow<Map<TrackGraphProjection, Map<Long, Double>>> =
-        viewModel.repository.getTrackByActivity(activityId).filterNotNull().map { track ->
+        app.db.getTrackByActivity(activityId).filterNotNull().map { track ->
             TrackGraphProjection.entries.associateWith { entry -> entry.apply(track) }
         }
 

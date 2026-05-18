@@ -23,7 +23,10 @@ hilt {
 kotlin {
     compilerOptions {
         jvmTarget.set(JvmTarget.JVM_17)
-        freeCompilerArgs.add("-XXLanguage:+PropertyParamAnnotationDefaultTargetMode")
+        freeCompilerArgs.run {
+            add("-XXLanguage:+PropertyParamAnnotationDefaultTargetMode")
+            add("-XXLanguage:+ContextParameters")
+        }
     }
 }
 

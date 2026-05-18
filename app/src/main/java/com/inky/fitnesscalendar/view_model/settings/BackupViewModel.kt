@@ -6,8 +6,8 @@ import android.net.Uri
 import androidx.compose.material3.SnackbarDuration
 import androidx.lifecycle.viewModelScope
 import com.inky.fitnesscalendar.R
+import com.inky.fitnesscalendar.di.AppRepository
 import com.inky.fitnesscalendar.preferences.Preference.Companion.PREF_BACKUP_URI
-import com.inky.fitnesscalendar.repository.DatabaseRepository
 import com.inky.fitnesscalendar.repository.backup.BackupRepository
 import com.inky.fitnesscalendar.view_model.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,9 +24,9 @@ import javax.inject.Inject
 @HiltViewModel
 class BackupViewModel @Inject constructor(
     @ApplicationContext context: Context,
-    repository: DatabaseRepository,
+    app: AppRepository,
     private val backupRepository: BackupRepository
-) : BaseViewModel(context, repository) {
+) : BaseViewModel(context, app) {
 
     private var _backupInProgress = MutableStateFlow(false)
     val backupInProgress get() = _backupInProgress.asStateFlow()
@@ -70,7 +70,7 @@ class BackupViewModel @Inject constructor(
             null -> context.getString(R.string.backup_successful)
             else -> context.getString(error.msgID)
         }
-        snackbarHostState.showSnackbar(
+        app.snackbarHostState.showSnackbar(
             message,
             duration = SnackbarDuration.Long
         )
@@ -86,7 +86,7 @@ class BackupViewModel @Inject constructor(
         _restoreInProgress.value = false
 
         val message = context.getString(error.msgID)
-        snackbarHostState.showSnackbar(message, duration = SnackbarDuration.Long)
+        app.snackbarHostState.showSnackbar(message, duration = SnackbarDuration.Long)
     }
 
     private fun updateLastBackup(dir: Uri?) {

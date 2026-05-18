@@ -8,6 +8,7 @@ import androidx.test.core.app.ApplicationProvider
 import com.inky.fitnesscalendar.MainApp
 import com.inky.fitnesscalendar.db.AppDatabase
 import com.inky.fitnesscalendar.db.generateSampleActivities
+import com.inky.fitnesscalendar.db.loadDefaultData
 import com.inky.fitnesscalendar.repository.backup.BackupRepository
 import com.inky.fitnesscalendar.testUtils.mockDatabase
 import com.inky.fitnesscalendar.util.DATABASE_NAME
@@ -28,7 +29,10 @@ class BackupRepositoryTest {
     fun testRestore() {
         val context = ApplicationProvider.getApplicationContext<MainApp>()
 
-        val originalDb = mockDatabase(context).also(::generateSampleActivities)
+        val originalDb = mockDatabase(
+            context,
+            onCreate = { loadDefaultData(it, context) }
+        ).also(::generateSampleActivities)
         val originalActivities = runBlocking { originalDb.activityDao().loadActivities() }
         val originalTypes = runBlocking { originalDb.activityTypeDao().loadTypes() }
 

@@ -27,7 +27,11 @@ class GpxRoundtripTest {
 
         val gpxTrack = tracks[0]
         val track = Track(uid = 1, activityId = 1, points = gpxTrack.points)
-        val activity = Activity(uid = 1, typeId = 1, startTime = Date.from(Instant.now()))
+        val activity = Activity(
+            uid = 1,
+            typeId = SportActivityType.uid!!,
+            startTime = Date.from(Instant.now())
+        )
         val richActivity = RichActivity(activity, SportActivityType, null, images = emptyList())
 
         val writer = StringWriter()

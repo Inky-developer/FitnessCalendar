@@ -8,6 +8,8 @@ import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.SnackbarDuration
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -20,6 +22,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalResources
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -29,7 +32,9 @@ import androidx.navigation.compose.dialog
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
 import androidx.navigation.toRoute
+import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
+import com.inky.fitnesscalendar.di.AppRepository
 import com.inky.fitnesscalendar.ui.components.ActivityCardCallbacks
 import com.inky.fitnesscalendar.ui.components.ActivitySelectorState
 import com.inky.fitnesscalendar.ui.components.NavigationDrawer
@@ -52,8 +57,8 @@ import com.inky.fitnesscalendar.ui.views.TrackGraphView
 import com.inky.fitnesscalendar.ui.views.Views
 import com.inky.fitnesscalendar.ui.views.settings.SettingsViews
 import com.inky.fitnesscalendar.ui.views.settingsDestination
-import com.inky.fitnesscalendar.view_model.AppViewModel
 import com.inky.fitnesscalendar.view_model.BaseViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.time.ZoneOffset
@@ -77,48 +82,50 @@ fun App(viewModel: BaseViewModel = hiltViewModel()) {
     }
     var currentView by rememberSaveable { mutableStateOf<Views?>(null) }
 
-    AppContextProviders(repository = viewModel.repository) {
-        NavigationDrawer(
-            drawerState = navigationDrawerState,
-            currentView = currentView,
-            onNavigate = {
-                navController.navigate(it) {
-                    popUpTo(it) {
-                        inclusive = true
+    context(viewModel.app) {
+        AppContextProviders {
+            NavigationDrawer(
+                drawerState = navigationDrawerState,
+                currentView = currentView,
+                onNavigate = {
+                    navController.navigate(it) {
+                        popUpTo(it) {
+                            inclusive = true
+                        }
+                    }
+                    scope.launch {
+                        navigationDrawerState.close()
                     }
                 }
-                scope.launch {
-                    navigationDrawerState.close()
-                }
+            ) {
+                AppNavigation(
+                    navController = navController,
+                    openDrawer = openDrawer,
+                    onCurrentView = { currentView = it }
+                )
             }
-        ) {
-            AppNavigation(
-                navController = navController,
-                openDrawer = openDrawer,
-                onCurrentView = { currentView = it }
-            )
         }
     }
 }
 
 @Composable
 @OptIn(ExperimentalSharedTransitionApi::class)
+context(app: AppRepository)
 private fun AppNavigation(
-    viewModel: AppViewModel = hiltViewModel(),
     navController: NavHostController,
     openDrawer: () -> Unit,
     onCurrentView: (Views) -> Unit,
 ) {
     var filterState by rememberSaveable { mutableStateOf(ActivityFilter()) }
+    val scope = rememberCoroutineScope()
 
     val activityCardCallbacks = rememberActivityCardCallbacks(
         onFilter = {
-            filterState = it
-            viewModel.addToFilterHistory(filterState)
+            filterState = it.normalize()
+            scope.launch { addToFilterHistory(filterState) }
         },
         navController = navController
     )
-    val scope = rememberCoroutineScope()
 
     SharedTransitionLayout {
         NavHost(
@@ -185,8 +192,8 @@ private fun AppNavigation(
                             navController.navigate(Views.SummaryView)
                         },
                         onEditFilter = {
-                            filterState = it
-                            viewModel.addToFilterHistory(filterState)
+                            filterState = it.normalize()
+                            scope.launch { addToFilterHistory(filterState) }
                         },
                     )
                 }
@@ -201,7 +208,7 @@ private fun AppNavigation(
                         initialFilter = filterState,
                         onFilterChange = {
                             filterState = it.normalize()
-                            viewModel.addToFilterHistory(filterState)
+                            scope.launch { addToFilterHistory(filterState) }
                         },
                         onNavigateBack = { navController.popBackStack() }
                     )
@@ -234,7 +241,7 @@ private fun AppNavigation(
                         route.activityId,
                         onSave = {
                             scope.launch {
-                                viewModel.repository.saveActivity(it)
+                                app.db.saveActivity(it)
                             }
                             navController.popBackStack()
                         },
@@ -274,10 +281,9 @@ private fun AppNavigation(
                     editState = editState,
                     onState = { editState = it },
                     initialState = initialState,
-                    localizationRepository = viewModel.repository.localizationRepository,
                     onSave = {
                         scope.launch {
-                            viewModel.repository.saveActivity(editState.toRichActivity(null))
+                            app.db.saveActivity(editState.toRichActivity(null))
                         }
                         context.finishOrGoBack(navController)
                     },
@@ -352,7 +358,9 @@ private fun AppNavigation(
                         },
                         onEditFilter = {
                             filterState = it
-                            viewModel.addToFilterHistory(filterState)
+                            scope.launch {
+                                app.db.upsertFilterHistoryChips(filterState.items())
+                            }
                         },
                         onNavigateActivity = {
                             navController.navigate(Views.ActivityLog(it))
@@ -365,10 +373,9 @@ private fun AppNavigation(
                 onCurrentView(Views.RecordActivity)
                 RecordActivity(
                     onStart = {
-                        scope.launch { viewModel.recordingRepository.startRecording(it) }
+                        scope.launch { app.recordingRepository.startRecording(it) }
                         navController.popBackStack()
                     },
-                    localizationRepository = viewModel.repository.localizationRepository,
                     onNavigateBack = { navController.popBackStack() },
                 )
             }
@@ -398,33 +405,50 @@ private fun AppNavigation(
 }
 
 @Composable
+context(app: AppRepository)
 private fun rememberActivityCardCallbacks(
-    viewModel: BaseViewModel = hiltViewModel(),
     onFilter: (ActivityFilter) -> Unit,
     navController: NavController
-) = remember(onFilter, navController) {
-    ActivityCardCallbacks(
-        onDetails = { activity ->
-            activity.activity.uid?.let {
-                navController.navigate(Views.TrackDetails(it))
+): ActivityCardCallbacks {
+    val scope = rememberCoroutineScope()
+    val res = LocalResources.current
+    return remember(onFilter, navController) {
+        ActivityCardCallbacks(
+            onDetails = { activity ->
+                activity.activity.uid?.let {
+                    navController.navigate(Views.TrackDetails(it))
+                }
+            },
+            onEdit = { navController.navigate(Views.NewActivity(it.activity.uid)) },
+            onDelete = { richActivity ->
+                scope.launch(Dispatchers.IO) {
+                    app.db.deleteActivity(richActivity.activity)
+                    val result = app.snackbarHostState.showSnackbar(
+                        res.getString(R.string.deleted_activity),
+                        actionLabel = res.getString(R.string.undo),
+                        duration = SnackbarDuration.Short
+                    )
+                    when (result) {
+                        SnackbarResult.ActionPerformed -> app.db.saveActivity(richActivity)
+                        SnackbarResult.Dismissed -> {}
+                    }
+                }
+            },
+            onShare = { activity ->
+                activity.activity.uid?.let { navController.navigate(Views.ShareActivity(it)) }
+            },
+            onJumpTo = {
+                navController.navigate(Views.ActivityLog(it.activity.uid))
+                onFilter(ActivityFilter())
+            },
+            onShowDay = {
+                navController.navigate(Views.DayView(it.activity.epochDay().day))
+            },
+            onFilterByType = {
+                onFilter(ActivityFilter(types = listOf(it.type)))
             }
-        },
-        onEdit = { navController.navigate(Views.NewActivity(it.activity.uid)) },
-        onDelete = { viewModel.deleteActivity(it) },
-        onShare = { activity ->
-            activity.activity.uid?.let { navController.navigate(Views.ShareActivity(it)) }
-        },
-        onJumpTo = {
-            navController.navigate(Views.ActivityLog(it.activity.uid))
-            onFilter(ActivityFilter())
-        },
-        onShowDay = {
-            navController.navigate(Views.DayView(it.activity.epochDay().day))
-        },
-        onFilterByType = {
-            onFilter(ActivityFilter(types = listOf(it.type)))
-        }
-    )
+        )
+    }
 }
 
 
@@ -465,3 +489,7 @@ private fun Context.finishOrGoBack(navController: NavHostController) {
         navController.popBackStack()
     }
 }
+
+context(app: AppRepository)
+private suspend fun addToFilterHistory(filter: ActivityFilter) =
+    app.db.upsertFilterHistoryChips(filter.items())

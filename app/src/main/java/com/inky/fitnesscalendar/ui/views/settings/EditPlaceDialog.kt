@@ -26,10 +26,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil.compose.AsyncImagePainter
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.db.entities.Place
+import com.inky.fitnesscalendar.di.AppRepository
 import com.inky.fitnesscalendar.ui.components.ActivityImage
 import com.inky.fitnesscalendar.ui.components.BaseEditDialog
 import com.inky.fitnesscalendar.ui.components.ColorSelector
@@ -40,19 +40,17 @@ import com.inky.fitnesscalendar.ui.components.OptionGroup
 import com.inky.fitnesscalendar.ui.components.SelectImageDropdownMenuItem
 import com.inky.fitnesscalendar.ui.components.optionGroupDefaultBackground
 import com.inky.fitnesscalendar.ui.util.Icons
-import com.inky.fitnesscalendar.view_model.BaseViewModel
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 
 @Composable
+context(app: AppRepository)
 fun EditPlaceDialog(
-    viewModel: BaseViewModel = hiltViewModel(),
     initialPlaceId: Int?,
     onDismiss: () -> Unit,
 ) {
     val scope = rememberCoroutineScope()
-    val repository = viewModel.repository
-    val place by (initialPlaceId?.let { repository.getPlace(it) }
+    val place by (initialPlaceId?.let { app.db.getPlace(it) }
         ?: flowOf(null)).collectAsState(initial = null)
     if (initialPlaceId == null || place != null) {
         EditPlaceDialog(
@@ -60,7 +58,7 @@ fun EditPlaceDialog(
             onDismiss = onDismiss,
             onSave = {
                 scope.launch {
-                    repository.savePlace(it)
+                    app.db.savePlace(it)
                     onDismiss()
                 }
             }

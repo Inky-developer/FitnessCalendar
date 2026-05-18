@@ -9,7 +9,7 @@ import com.inky.fitnesscalendar.data.activity_filter.DateRangeOption
 import com.inky.fitnesscalendar.data.measure.Duration.Companion.until
 import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.db.entities.Recording
-import com.inky.fitnesscalendar.repository.DatabaseRepository
+import com.inky.fitnesscalendar.di.AppRepository
 import com.inky.fitnesscalendar.repository.RecordingRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -29,17 +29,17 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     @ApplicationContext context: Context,
-    repository: DatabaseRepository,
+    app: AppRepository,
     private val recordingRepository: RecordingRepository
-) : BaseViewModel(context, repository) {
+) : BaseViewModel(context, app) {
     val weekStats = loadWeekStats()
     val monthStats = loadMonthStats()
-    val activitiesToday = repository.getDayActivities(EpochDay.today())
+    val activitiesToday = app.db.getDayActivities(EpochDay.today())
 
     private val _today = MutableStateFlow(Day(day = EpochDay.today()))
     val today: StateFlow<Day> = _today.asStateFlow()
 
-    val mostRecentActivity = repository.getMostRecentActivity().map { typeActivity ->
+    val mostRecentActivity = app.db.getMostRecentActivity().map { typeActivity ->
         if (typeActivity?.activity?.let { it.endTime.until(Date.from(Instant.now())).elapsedHours < 2.0 } == true) {
             typeActivity
         } else {
@@ -49,11 +49,11 @@ class HomeViewModel @Inject constructor(
     val recordings = recordingRepository.getRecordings()
 
     init {
-        repository.getDay(EpochDay.today()).onEach { _today.emit(it) }.launchIn(viewModelScope)
+        app.db.getDay(EpochDay.today()).onEach { _today.emit(it) }.launchIn(viewModelScope)
     }
 
     fun updateDay(day: Day) = viewModelScope.launch(Dispatchers.IO) {
-        repository.saveDay(day)
+        app.db.saveDay(day)
     }
 
     fun abortRecording(recording: Recording) {
@@ -74,14 +74,14 @@ class HomeViewModel @Inject constructor(
 
     private fun loadWeekStats(): Flow<ActivityStatistics> {
         val filter = ActivityFilter(range = DateRangeOption.sevenDays())
-        return repository.getActivities(filter).map { activities ->
+        return app.db.getActivities(filter).map { activities ->
             ActivityStatistics(activities)
         }
     }
 
     private fun loadMonthStats(): Flow<ActivityStatistics> {
         val filter = ActivityFilter(range = DateRangeOption.fourWeeks())
-        return repository.getActivities(filter).map { activities ->
+        return app.db.getActivities(filter).map { activities ->
             ActivityStatistics(activities)
         }
     }

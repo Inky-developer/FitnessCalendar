@@ -53,7 +53,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.FileProvider
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.inky.fitnesscalendar.BuildConfig
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityCategory
@@ -66,7 +65,9 @@ import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.db.entities.Track
+import com.inky.fitnesscalendar.di.AppRepository
 import com.inky.fitnesscalendar.localization.LocalizationRepository
+import com.inky.fitnesscalendar.localization.LocalizationRepositoryImpl
 import com.inky.fitnesscalendar.ui.components.ActivityCardContent
 import com.inky.fitnesscalendar.ui.components.ActivityImages
 import com.inky.fitnesscalendar.ui.components.TrackView
@@ -80,7 +81,6 @@ import com.inky.fitnesscalendar.util.getOrCreateSharedMediaCache
 import com.inky.fitnesscalendar.util.getOrCreateSharedTracksCache
 import com.inky.fitnesscalendar.util.gpx.GpxWriter
 import com.inky.fitnesscalendar.util.toLocalDate
-import com.inky.fitnesscalendar.view_model.BaseViewModel
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import java.io.File
@@ -89,16 +89,16 @@ import java.time.Instant
 import java.util.Date
 
 @Composable
+context(app: AppRepository)
 fun ActivityShareView(
-    viewModel: BaseViewModel = hiltViewModel(),
     activityId: Int,
     onBack: () -> Unit
 ) {
     val richActivity by remember {
-        viewModel.repository.getActivity(activityId)
+        app.db.getActivity(activityId)
     }.collectAsState(initial = null)
     val track by remember {
-        viewModel.repository.getTrackByActivity(activityId)
+        app.db.getTrackByActivity(activityId)
     }.collectAsState(initial = null)
 
     when (val activity = richActivity) {
@@ -106,7 +106,6 @@ fun ActivityShareView(
         else -> ActivityShareView(
             richActivity = activity,
             track = track,
-            localizationRepository = viewModel.repository.localizationRepository,
             onBack = onBack
         )
     }
@@ -114,10 +113,10 @@ fun ActivityShareView(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+context(_: LocalizationRepository)
 private fun ActivityShareView(
     richActivity: RichActivity,
     track: Track?,
-    localizationRepository: LocalizationRepository,
     onBack: () -> Unit
 ) {
     var shareCardConfig by rememberSaveable { mutableStateOf(ShareCardConfig()) }
@@ -185,8 +184,7 @@ private fun ActivityShareView(
                 ScreenShotBox(shareGraphicsLayer) {
                     ActivityShareCard(
                         richActivity = richActivity,
-                        config = shareCardConfig,
-                        localizationRepository = localizationRepository
+                        config = shareCardConfig
                     )
                 }
             }
@@ -258,10 +256,10 @@ private fun SettingsChip(selected: Boolean, onToggle: () -> Unit, label: String)
 }
 
 @Composable
+context(localizationRepository: LocalizationRepository)
 private fun ActivityShareCard(
     richActivity: RichActivity,
-    config: ShareCardConfig,
-    localizationRepository: LocalizationRepository
+    config: ShareCardConfig
 ) {
     val containerColor = MaterialTheme.colorScheme.primaryContainer
 
@@ -416,5 +414,7 @@ fun ActivityShareCardPreview() {
         place = null,
         images = emptyList()
     )
-    ActivityShareCard(richActivity, ShareCardConfig(), LocalizationRepository(LocalContext.current))
+    context(LocalizationRepositoryImpl(LocalContext.current)) {
+        ActivityShareCard(richActivity, ShareCardConfig())
+    }
 }

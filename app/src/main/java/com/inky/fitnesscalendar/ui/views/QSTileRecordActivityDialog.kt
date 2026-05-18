@@ -23,8 +23,8 @@ import com.inky.fitnesscalendar.ui.components.optionGroupDefaultBackground
  * The recording dialog that is shown when the user taps on the quick settings tile
  */
 @Composable
+context(_: LocalizationRepository)
 fun QsTileRecordActivityDialog(
-    localizationRepository: LocalizationRepository,
     onDismiss: () -> Unit,
     onSave: (RichRecording) -> Unit
 ) {
@@ -37,7 +37,6 @@ fun QsTileRecordActivityDialog(
     ) {
         RecordActivityInner(
             state = state,
-            localizationRepository = localizationRepository,
             onState = { state = it },
             includeTimePicker = false,
         )

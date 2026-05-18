@@ -55,7 +55,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ImageName
 import com.inky.fitnesscalendar.data.gpx.GpxTrackStats
@@ -63,8 +62,8 @@ import com.inky.fitnesscalendar.data.gpx.TrackSvg
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.db.entities.UserImage
+import com.inky.fitnesscalendar.di.AppRepository
 import com.inky.fitnesscalendar.localization.LocalizationRepository
-import com.inky.fitnesscalendar.repository.DatabaseRepository
 import com.inky.fitnesscalendar.ui.components.DescriptionTextInput
 import com.inky.fitnesscalendar.ui.components.EditableActivityImages
 import com.inky.fitnesscalendar.ui.components.FavoriteIcon
@@ -81,7 +80,6 @@ import com.inky.fitnesscalendar.ui.util.sharedElement
 import com.inky.fitnesscalendar.util.NonEmptyList
 import com.inky.fitnesscalendar.util.asNonEmptyOrNull
 import com.inky.fitnesscalendar.util.toLocalDate
-import com.inky.fitnesscalendar.view_model.BaseViewModel
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import org.maplibre.compose.map.GestureOptions
@@ -90,8 +88,8 @@ import org.maplibre.compose.map.OrnamentOptions
 import org.maplibre.compose.util.ClickResult
 
 @Composable
+context(app: AppRepository)
 fun TrackDetailsView(
-    viewModel: BaseViewModel = hiltViewModel(),
     activityId: Int,
     onBack: () -> Unit,
     onShare: () -> Unit,
@@ -99,7 +97,7 @@ fun TrackDetailsView(
     onNavigateGraph: (Int, TrackGraphProjection) -> Unit,
 ) {
     val scope = rememberCoroutineScope()
-    val state = rememberDetailsState(activityId, viewModel.repository)
+    val state = rememberDetailsState(activityId)
 
     if (state != null) {
         TrackDetailsView(
@@ -107,7 +105,7 @@ fun TrackDetailsView(
             onUpdate = {
                 scope.launch {
                     val newActivity = state.getUpdatedActivity()
-                    viewModel.repository.saveActivity(newActivity)
+                    app.db.saveActivity(newActivity)
                 }
             },
             onShare = onShare,
@@ -452,14 +450,12 @@ private fun SimpleStatistic(@StringRes labelRes: Int, value: String?) {
 }
 
 @Composable
-private fun rememberDetailsState(
-    activityId: Int,
-    repository: DatabaseRepository,
-): DetailsState? {
+context(app: AppRepository)
+private fun rememberDetailsState(activityId: Int): DetailsState? {
     val context = LocalContext.current
 
-    val activity by remember(activityId) { repository.getActivity(activityId) }.collectAsState(null)
-    val track by remember(activityId) { repository.getTrackByActivity(activityId) }.collectAsState(
+    val activity by remember(activityId) { app.db.getActivity(activityId) }.collectAsState(null)
+    val track by remember(activityId) { app.db.getTrackByActivity(activityId) }.collectAsState(
         null
     )
     val preview = remember(activity) { activity?.activity?.trackPreview?.toTrackSvg() }
@@ -478,7 +474,6 @@ private fun rememberDetailsState(
                     activity,
                     stats,
                     preview,
-                    repository.localizationRepository,
                     context
                 )
             )
@@ -584,11 +579,11 @@ data class DetailsData(
     val hasTemperature get() = averageTemperature != null
 
     companion object {
+        context(localizationRepository: LocalizationRepository)
         fun initialize(
             richActivity: RichActivity,
             stats: GpxTrackStats,
             preview: TrackSvg,
-            localizationRepository: LocalizationRepository,
             context: Context
         ): DetailsData {
             val activity = richActivity.activity

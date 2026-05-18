@@ -6,8 +6,8 @@ import androidx.lifecycle.viewModelScope
 import com.inky.fitnesscalendar.data.ActivityStatistics
 import com.inky.fitnesscalendar.data.Displayable
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
+import com.inky.fitnesscalendar.di.AppRepository
 import com.inky.fitnesscalendar.preferences.Preference
-import com.inky.fitnesscalendar.repository.DatabaseRepository
 import com.inky.fitnesscalendar.view_model.statistics.GraphState
 import com.inky.fitnesscalendar.view_model.statistics.Grouping
 import com.inky.fitnesscalendar.view_model.statistics.Period
@@ -30,7 +30,7 @@ import javax.inject.Inject
 @HiltViewModel
 class StatisticsViewModel @Inject constructor(
     @ApplicationContext val context: Context,
-    val databaseRepository: DatabaseRepository
+    val app: AppRepository
 ) : ViewModel() {
     private var _graphState = MutableStateFlow<GraphState?>(null)
     val graphState get() = _graphState.asStateFlow()
@@ -108,7 +108,7 @@ class StatisticsViewModel @Inject constructor(
         val filter =
             state.grouping.filterCategory()?.let { state.filter.withCategory(it) } ?: state.filter
         viewModelScope.launch(Dispatchers.IO) {
-            val statistics = databaseRepository
+            val statistics = app.db
                 .getActivities(filter)
                 .shareIn(viewModelScope, SharingStarted.Eagerly)
                 .first()

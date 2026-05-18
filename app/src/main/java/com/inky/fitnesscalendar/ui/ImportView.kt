@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.gpx.GpxTrack
 import com.inky.fitnesscalendar.db.entities.ActivityType
+import com.inky.fitnesscalendar.di.AppRepository
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.repository.ImportRepository
 import com.inky.fitnesscalendar.ui.components.ActivityTypeSelector
@@ -54,6 +55,7 @@ import com.inky.fitnesscalendar.util.result.isOk
 import com.inky.fitnesscalendar.view_model.ImportViewModel
 
 @Composable
+context(_: AppRepository)
 fun ImportView(viewModel: ImportViewModel) {
     val done by viewModel.done
     val tracks by viewModel.tracks.collectAsState()
@@ -71,7 +73,6 @@ fun ImportView(viewModel: ImportViewModel) {
     } else {
         ImportView(
             tracks = tracks,
-            localizationRepository = viewModel.dbRepository.localizationRepository,
             onImport = viewModel::import,
             onTypeMapping = viewModel::updateTypeMapping
         )
@@ -80,9 +81,9 @@ fun ImportView(viewModel: ImportViewModel) {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+context(_: LocalizationRepository)
 fun ImportView(
     tracks: List<ImportRepository.ImportTrack>,
-    localizationRepository: LocalizationRepository,
     onImport: (List<Pair<ImportRepository.ImportTrack, ActivityType>>) -> Unit,
     onTypeMapping: (String, ActivityType) -> Unit,
 ) {
@@ -138,7 +139,6 @@ fun ImportView(
                 TrackView(
                     track = track,
                     selectedType = type,
-                    localizationRepository = localizationRepository,
                     onChangeType = { key, value -> onTypeMapping(key, value) }
                 )
             }
@@ -147,10 +147,10 @@ fun ImportView(
 }
 
 @Composable
+context(_: LocalizationRepository)
 fun TrackView(
     track: ImportRepository.ImportTrack,
     selectedType: ActivityType?,
-    localizationRepository: LocalizationRepository,
     onChangeType: (String, ActivityType) -> Unit,
 ) {
     var dialogOpen by rememberSaveable { mutableStateOf(false) }
@@ -170,12 +170,11 @@ fun TrackView(
         if (richActivity != null) {
             CompactActivityCard(
                 richActivity = richActivity,
-                localizationRepository = localizationRepository,
                 expand = true
             )
         } else {
             Column {
-                ActivityCardWithoutType(track.track, error, localizationRepository)
+                ActivityCardWithoutType(track.track, error)
             }
         }
     }
@@ -205,10 +204,10 @@ fun TrackView(
 }
 
 @Composable
+context(localizationRepository: LocalizationRepository)
 private fun ActivityCardWithoutType(
     track: GpxTrack,
-    error: ImportRepository.ImportError?,
-    localizationRepository: LocalizationRepository
+    error: ImportRepository.ImportError?
 ) {
     val time = remember(track) {
         track.startTime?.let { localizationRepository.formatRelativeDate(it) } ?: ""

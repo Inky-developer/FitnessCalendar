@@ -70,10 +70,10 @@ import com.inky.fitnesscalendar.util.gpx.simplify
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
+context(localizationRepository: LocalizationRepository)
 fun ActivityCard(
     richActivity: RichActivity,
     callbacks: ActivityCardCallbacks,
-    localizationRepository: LocalizationRepository,
     modifier: Modifier = Modifier,
     containerColor: Color = MaterialTheme.colorScheme.surfaceContainer,
     contentColor: Color = contentColorFor(containerColor)
@@ -175,9 +175,9 @@ fun ActivityCard(
 }
 
 @Composable
+context(localizationRepository: LocalizationRepository)
 fun CompactActivityCard(
     richActivity: RichActivity,
-    localizationRepository: LocalizationRepository,
     modifier: Modifier = Modifier,
     expand: Boolean = false,
 ) {

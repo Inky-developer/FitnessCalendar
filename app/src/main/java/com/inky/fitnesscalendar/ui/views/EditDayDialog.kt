@@ -12,19 +12,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil.compose.AsyncImagePainter
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.data.Feel
 import com.inky.fitnesscalendar.data.ImageName
 import com.inky.fitnesscalendar.db.entities.Day
+import com.inky.fitnesscalendar.di.AppRepository
 import com.inky.fitnesscalendar.ui.components.ActivityImage
 import com.inky.fitnesscalendar.ui.components.BaseEditDialog
 import com.inky.fitnesscalendar.ui.components.DescriptionTextInput
@@ -34,33 +35,35 @@ import com.inky.fitnesscalendar.ui.components.ImageViewer
 import com.inky.fitnesscalendar.ui.components.OptionGroup
 import com.inky.fitnesscalendar.ui.components.SelectImageDropdownMenuItem
 import com.inky.fitnesscalendar.ui.util.Icons
-import com.inky.fitnesscalendar.view_model.BaseViewModel
+import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 
 @Composable
+context(app: AppRepository)
 fun EditDayDialog(
-    viewModel: BaseViewModel = hiltViewModel(),
     epochDay: EpochDay,
     onNavigateBack: () -> Unit
 ) {
-    val day by viewModel.repository.getDay(epochDay).collectAsState(initial = null)
+    val day by app.db.getDay(epochDay).collectAsState(initial = null)
     when (val dayValue = day) {
         null -> {
             CircularProgressIndicator()
         }
 
         else -> {
-            EditDayDialog(viewModel = viewModel, day = dayValue, onNavigateBack = onNavigateBack)
+            EditDayDialog(day = dayValue, onNavigateBack = onNavigateBack)
         }
     }
 }
 
 @Composable
+context(app: AppRepository)
 fun EditDayDialog(
-    viewModel: BaseViewModel,
     day: Day,
     onNavigateBack: () -> Unit
 ) {
+    val scope = rememberCoroutineScope()
+
     var editState by rememberSaveable(day) { mutableStateOf(EditDayState(day)) }
     var showImageViewer by rememberSaveable { mutableStateOf(false) }
 
@@ -68,8 +71,10 @@ fun EditDayDialog(
         title = stringResource(R.string.edit_day),
         onNavigateBack = onNavigateBack,
         onSave = {
-            viewModel.saveDay(editState.toDay(day.day))
-            onNavigateBack()
+            scope.launch {
+                app.db.saveDay(editState.toDay(day.day))
+                onNavigateBack()
+            }
         },
         actions = {
             var showMenu by rememberSaveable { mutableStateOf(false) }

@@ -59,6 +59,7 @@ import com.inky.fitnesscalendar.data.ActivityCategory
 import com.inky.fitnesscalendar.data.Displayable
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.db.entities.Activity
+import com.inky.fitnesscalendar.di.AppRepository
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.CompactActivityCard
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
@@ -94,6 +95,7 @@ import com.patrykandpatrick.vico.compose.common.component.rememberShapeComponent
 import com.patrykandpatrick.vico.compose.common.component.rememberTextComponent
 
 @Composable
+context(_: AppRepository)
 fun StatisticsView(
     viewModel: StatisticsViewModel = hiltViewModel(),
     initialPeriod: Period? = null,
@@ -117,7 +119,6 @@ fun StatisticsView(
         StatisticsView(
             state = graphState!!,
             modelProducer = viewModel.modelProducer,
-            localizationRepository = viewModel.databaseRepository.localizationRepository,
             onProjection = viewModel::setProjection,
             onGrouping = viewModel::setGrouping,
             onPeriod = viewModel::setPeriod,
@@ -142,10 +143,10 @@ fun StatisticsView(
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalFoundationApi::class)
 @Composable
+context(_: LocalizationRepository)
 fun StatisticsView(
     state: GraphState,
     modelProducer: CartesianChartModelProducer,
-    localizationRepository: LocalizationRepository,
     onGrouping: (Grouping) -> Unit,
     onProjection: (Projection) -> Unit,
     onPeriod: (Period) -> Unit,
@@ -252,7 +253,6 @@ fun StatisticsView(
                     contentType = { ContentType.Activity }) { typeActivity ->
                     CompactActivityCard(
                         richActivity = typeActivity,
-                        localizationRepository = localizationRepository,
                         modifier = Modifier.clickable { onViewActivity(typeActivity.activity) }
                     )
                 }

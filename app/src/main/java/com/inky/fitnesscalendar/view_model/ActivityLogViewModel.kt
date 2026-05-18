@@ -6,7 +6,7 @@ import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.db.entities.RichActivity
-import com.inky.fitnesscalendar.repository.DatabaseRepository
+import com.inky.fitnesscalendar.di.AppRepository
 import com.inky.fitnesscalendar.view_model.activity_log.ActivityListItem
 import com.inky.fitnesscalendar.view_model.activity_log.ActivityListState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -24,19 +24,19 @@ import javax.inject.Inject
 @HiltViewModel
 class ActivityLogViewModel @Inject constructor(
     @ApplicationContext context: Context,
-    repository: DatabaseRepository
-) : BaseViewModel(context, repository) {
+    app: AppRepository
+) : BaseViewModel(context, app) {
     private val filterFlow = MutableStateFlow(ActivityFilter())
 
-    private val dayFlow = repository.getDays()
+    private val dayFlow = app.db.getDays()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     val activityListState: StateFlow<ActivityListState> = filterFlow
         .flatMapLatest { filter ->
             combine(
-                repository.getActivities(filter),
+                app.db.getActivities(filter),
                 dayFlow,
-                repository.getDaysFiltered(filter),
+                app.db.getDaysFiltered(filter),
             ) { activities, allDays, filteredDays ->
                 ActivityListState(
                     data = ActivityListState.Data(

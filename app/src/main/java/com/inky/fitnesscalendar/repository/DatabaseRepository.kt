@@ -16,13 +16,6 @@ import com.inky.fitnesscalendar.data.activity_filter.AttributeFilter
 import com.inky.fitnesscalendar.data.activity_filter.DateRange
 import com.inky.fitnesscalendar.data.activity_filter.DateRangeOption
 import com.inky.fitnesscalendar.db.AppDatabase
-import com.inky.fitnesscalendar.db.dao.ActivityDao
-import com.inky.fitnesscalendar.db.dao.ActivityTypeDao
-import com.inky.fitnesscalendar.db.dao.ActivityTypeNameDao
-import com.inky.fitnesscalendar.db.dao.DayDao
-import com.inky.fitnesscalendar.db.dao.FilterHistoryDao
-import com.inky.fitnesscalendar.db.dao.PlaceDao
-import com.inky.fitnesscalendar.db.dao.TrackDao
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.ActivityTypeName
@@ -32,7 +25,6 @@ import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.db.entities.Track
 import com.inky.fitnesscalendar.db.generateSampleActivities
 import com.inky.fitnesscalendar.di.ActivityTypeOrder
-import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.util.Ordering
 import com.inky.fitnesscalendar.util.toEpochDay
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -47,16 +39,16 @@ import javax.inject.Singleton
 @Singleton
 class DatabaseRepository @Inject constructor(
     @ApplicationContext val context: Context,
-    private val database: AppDatabase,
-    private val activityDao: ActivityDao,
-    private val activityTypeDao: ActivityTypeDao,
-    private val filterHistoryDao: FilterHistoryDao,
-    private val activityTypeNameDao: ActivityTypeNameDao,
-    private val trackDao: TrackDao,
-    private val dayDao: DayDao,
-    private val placeDao: PlaceDao,
-    val localizationRepository: LocalizationRepository
+    private val db: AppDatabase,
 ) {
+    private val activityDao = db.activityDao()
+    private val activityTypeDao = db.activityTypeDao()
+    private val filterHistoryDao = db.filterHistoryDao()
+    private val activityTypeNameDao = db.activityTypeNameDao()
+    private val trackDao = db.trackDao()
+    private val dayDao = db.dayDao()
+    private val placeDao = db.placeDao()
+
     fun getActivities(
         filter: ActivityFilter,
         order: Ordering = Ordering.DESC
@@ -140,7 +132,7 @@ class DatabaseRepository @Inject constructor(
     private fun getActivityTypesByCategory() = activityTypeDao.getActivityTypesByCategory()
 
     suspend fun upsertFilterHistoryChips(chips: List<ActivityFilterChip>) =
-        database.withTransaction {
+        db.withTransaction {
             val historyItems = getFilterHistoryItems().first()
                 .associate { it.toActivityFilterChip()!! to it.item.uid!! }
             for (item in chips) {
@@ -231,5 +223,5 @@ class DatabaseRepository @Inject constructor(
     fun getTrackByActivity(activityId: Int) = trackDao.getByActivityId(activityId)
 
     @RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
-    fun generateSampleActivitiesForTesting() = generateSampleActivities(database)
+    fun generateSampleActivitiesForTesting() = generateSampleActivities(db)
 }

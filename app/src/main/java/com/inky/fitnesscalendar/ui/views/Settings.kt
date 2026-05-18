@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.dialog
 import androidx.navigation.navigation
 import androidx.navigation.toRoute
+import com.inky.fitnesscalendar.di.AppRepository
 import com.inky.fitnesscalendar.ui.ProvideSharedContent
 import com.inky.fitnesscalendar.ui.views.settings.AboutView
 import com.inky.fitnesscalendar.ui.views.settings.ActivityTypeView
@@ -24,6 +25,7 @@ import com.inky.fitnesscalendar.ui.views.settings.SettingsViews
 
 
 @OptIn(ExperimentalSharedTransitionApi::class)
+context(_: AppRepository)
 fun NavGraphBuilder.settingsDestination(
     sharedContentScope: SharedTransitionScope,
     onNavigate: (Any) -> Unit,

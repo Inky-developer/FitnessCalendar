@@ -1,8 +1,10 @@
 package com.inky.fitnesscalendar.ui.views
 
 import android.os.Build
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsEnabled
-import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.hasTestTag
+import androidx.compose.ui.test.junit4.v2.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTextInput
@@ -14,8 +16,7 @@ import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.RichActivity
-import com.inky.fitnesscalendar.localization.LocalizationRepository
-import com.inky.fitnesscalendar.testUtils.MockDatabaseValues
+import com.inky.fitnesscalendar.testUtils.MockApplication
 import com.inky.fitnesscalendar.util.toDate
 import com.inky.fitnesscalendar.util.toLocalDateTime
 import org.junit.Assert.assertEquals
@@ -28,6 +29,7 @@ import org.robolectric.annotation.Config
 import java.time.LocalDate
 import java.time.LocalDateTime
 
+@OptIn(ExperimentalTestApi::class)
 @Config(sdk = [Build.VERSION_CODES.UPSIDE_DOWN_CAKE])
 @RunWith(RobolectricTestRunner::class)
 class EditActivityViewTest {
@@ -66,10 +68,9 @@ class EditActivityViewTest {
             images = emptyList()
         )
         composeTestRule.setContent {
-            MockDatabaseValues {
+            MockApplication {
                 NewActivity(
                     richActivity = richActivity,
-                    localizationRepository = LocalizationRepository(context),
                     onSave = { success = true },
                     onNavigateBack = {},
                     onNavigateNewPlace = {},
@@ -78,6 +79,7 @@ class EditActivityViewTest {
             }
         }
 
+        composeTestRule.waitUntilExactlyOneExists(hasTestTag("input-description"))
         // Initially, the confirm button should not exist, because no inputs have been made
         composeTestRule.onNodeWithTag("button-confirm").assertDoesNotExist()
         composeTestRule.onNodeWithTag("input-description").performTextInput("Foo")
@@ -93,8 +95,6 @@ class EditActivityViewTest {
     @Test
     fun test_initial_day_works() {
         var hasBeenClicked = false
-
-        val context = ApplicationProvider.getApplicationContext<MainApp>()
 
         val start = LocalDateTime.of(2024, 11, 1, 23, 30)
         val end = start.plusHours(1)
@@ -118,10 +118,9 @@ class EditActivityViewTest {
             images = emptyList()
         )
         composeTestRule.setContent {
-            MockDatabaseValues {
+            MockApplication {
                 NewActivity(
                     richActivity = richActivity,
-                    localizationRepository = LocalizationRepository(context),
                     onSave = {
                         assertEquals(
                             LocalDateTime.of(2024, 12, 31, 23, 30),
@@ -141,6 +140,7 @@ class EditActivityViewTest {
             }
         }
 
+        composeTestRule.waitUntilExactlyOneExists(hasTestTag("input-description"))
         // Initially, the confirm button should not exist, because no inputs have been made
         composeTestRule.onNodeWithTag("button-confirm").assertDoesNotExist()
         composeTestRule.onNodeWithTag("input-description").performTextInput("Foo")

@@ -84,7 +84,7 @@ fun SettingsView(
                 modifier = Modifier.sharedBounds(SharedContentKey.AppBar)
             )
         },
-        snackbarHost = { SnackbarHost(viewModel.snackbarHostState) },
+        snackbarHost = { SnackbarHost(viewModel.app.snackbarHostState) },
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { paddingValues ->
         LazyColumn(
@@ -140,7 +140,7 @@ fun SettingsView(
                     Setting(
                         title = "Load sample activities",
                         onClick = {
-                            viewModel.repository.generateSampleActivitiesForTesting()
+                            viewModel.app.db.generateSampleActivitiesForTesting()
                         }
                     )
                 }

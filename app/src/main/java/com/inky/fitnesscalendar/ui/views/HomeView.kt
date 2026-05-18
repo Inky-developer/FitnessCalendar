@@ -65,6 +65,7 @@ import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.db.entities.Recording
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.db.entities.RichRecording
+import com.inky.fitnesscalendar.di.AppRepository
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivityCard
 import com.inky.fitnesscalendar.ui.components.ActivityCardCallbacks
@@ -90,6 +91,7 @@ private const val TAG = "HOME"
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+context(app: AppRepository)
 fun Home(
     viewModel: HomeViewModel = hiltViewModel(),
     activityCardCallbacks: ActivityCardCallbacks,
@@ -150,7 +152,7 @@ fun Home(
             )
         },
         floatingActionButton = { NewActivityFAB(onClick = onNewActivity) },
-        snackbarHost = { SnackbarHost(viewModel.snackbarHostState) },
+        snackbarHost = { SnackbarHost(app.snackbarHostState) },
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { paddingValues ->
         Column(
@@ -162,7 +164,6 @@ fun Home(
             AnimatedVisibility(visible = typeRecordings?.isNotEmpty() ?: false) {
                 Recordings(
                     richRecordings = typeRecordings ?: emptyList(),
-                    localizationRepository = viewModel.repository.localizationRepository,
                     onAbort = { viewModel.abortRecording(it) },
                     onSave = { viewModel.saveRecording(it) },
                     onUpdate = { viewModel.updateRecording(it) }
@@ -172,12 +173,10 @@ fun Home(
             RecentActivityOrNull(
                 recentActivity,
                 callbacks = activityCardCallbacks.copy(onFilterByType = null),
-                viewModel.repository.localizationRepository,
             )
             Today(
                 richActivities = activitiesToday ?: emptyList(),
                 day = day,
-                localizationRepository = viewModel.repository.localizationRepository,
                 onDay = { viewModel.updateDay(it) },
                 onEditDay = onEditDay,
                 onNavigateToday = onNavigateToday
@@ -197,9 +196,9 @@ fun Home(
 }
 
 @Composable
+context(_: LocalizationRepository)
 fun Recordings(
     richRecordings: List<RichRecording>,
-    localizationRepository: LocalizationRepository,
     onAbort: (Recording) -> Unit,
     onUpdate: suspend (Recording) -> Unit,
     onSave: (Recording) -> Unit
@@ -214,7 +213,6 @@ fun Recordings(
             Timer { time ->
                 RecordingStatus(
                     typeRecording,
-                    localizationRepository,
                     time,
                     onAbort = { onAbort(typeRecording.recording) },
                     onSave = { onSave(typeRecording.recording) },
@@ -226,9 +224,9 @@ fun Recordings(
 }
 
 @Composable
+context(localizationRepository: LocalizationRepository)
 fun RecordingStatus(
     richRecording: RichRecording,
-    localizationRepository: LocalizationRepository,
     currentTimeMs: Long,
     onUpdate: suspend (Recording) -> Unit,
     onAbort: () -> Unit,
@@ -386,10 +384,10 @@ fun Statistics(name: String, stats: ActivityStatistics, onClick: () -> Unit) {
 }
 
 @Composable
+context(_: LocalizationRepository)
 fun Today(
     richActivities: List<RichActivity>,
     day: Day,
-    localizationRepository: LocalizationRepository,
     onDay: (Day) -> Unit,
     onEditDay: (EpochDay) -> Unit,
     onNavigateToday: () -> Unit,
@@ -501,7 +499,6 @@ fun Today(
                         for (richActivity in richActivities) {
                             CompactActivityCard(
                                 richActivity = richActivity,
-                                localizationRepository = localizationRepository,
                                 modifier = Modifier.sharedElement(
                                     SharedContentKey.ActivityCard(
                                         richActivity.activity.uid
@@ -574,10 +571,10 @@ fun CompactFeelSelector(feel: Feel, onFeel: (Feel) -> Unit, modifier: Modifier =
 }
 
 @Composable
+context(_: LocalizationRepository)
 fun RecentActivityOrNull(
     richActivity: RichActivity?,
     callbacks: ActivityCardCallbacks,
-    localizationRepository: LocalizationRepository,
 ) {
     AnimatedContent(
         targetState = richActivity,
@@ -587,22 +584,20 @@ fun RecentActivityOrNull(
             RecentActivity(
                 richActivity = actualActivity,
                 callbacks = callbacks,
-                localizationRepository = localizationRepository,
             )
         }
     }
 }
 
 @Composable
+context(_: LocalizationRepository)
 fun RecentActivity(
     richActivity: RichActivity,
     callbacks: ActivityCardCallbacks,
-    localizationRepository: LocalizationRepository,
 ) {
     ActivityCard(
         richActivity = richActivity,
         callbacks = callbacks,
-        localizationRepository = localizationRepository,
         containerColor = MaterialTheme.colorScheme.tertiaryContainer,
         contentColor = contentColorFor(MaterialTheme.colorScheme.tertiaryContainer),
     )

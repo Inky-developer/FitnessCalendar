@@ -27,9 +27,9 @@ import kotlinx.parcelize.Parcelize
 import java.time.LocalDateTime
 
 @Composable
+context(_: LocalizationRepository)
 fun RecordActivity(
     onStart: (RichRecording) -> Unit,
-    localizationRepository: LocalizationRepository,
     onNavigateBack: () -> Unit
 ) {
     var state by rememberSaveable { mutableStateOf(RecordActivityState()) }
@@ -44,7 +44,6 @@ fun RecordActivity(
     ) {
         RecordActivityInner(
             state = state,
-            localizationRepository = localizationRepository,
             onState = { state = it },
             includeTimePicker = true,
             modifier = Modifier.padding(all = 8.dp)
@@ -53,9 +52,9 @@ fun RecordActivity(
 }
 
 @Composable
+context(_: LocalizationRepository)
 fun RecordActivityInner(
     state: RecordActivityState,
-    localizationRepository: LocalizationRepository,
     onState: (RecordActivityState) -> Unit,
     includeTimePicker: Boolean,
     modifier: Modifier = Modifier
@@ -72,7 +71,6 @@ fun RecordActivityInner(
             // use this to configure the recording in advance.
             DateTimeInput(
                 date = state.customStart,
-                localizationRepository = localizationRepository,
                 onDate = { onState(state.copy(customStart = it)) }
             )
         }
@@ -80,9 +78,9 @@ fun RecordActivityInner(
 }
 
 @Composable
+context(localizationRepository: LocalizationRepository)
 private fun DateTimeInput(
     date: LocalDateTime?,
-    localizationRepository: LocalizationRepository,
     onDate: (LocalDateTime) -> Unit
 ) {
     var showPicker by rememberSaveable { mutableStateOf(false) }

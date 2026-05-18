@@ -25,12 +25,12 @@ data class DatabaseValues(
     val activityFilterChips: List<ActivityFilterChip>
 ) {
     companion object {
-        fun flow(repository: DatabaseRepository) = combine(
-            repository.getActivityTypes(),
-            repository.getActivityTypeNames(),
-            repository.getActivityTypeRows(),
-            repository.getPlaces(),
-            repository.getFilterHistoryItems()
+        fun flow(db: DatabaseRepository) = combine(
+            db.getActivityTypes(),
+            db.getActivityTypeNames(),
+            db.getActivityTypeRows(),
+            db.getPlaces(),
+            db.getFilterHistoryItems()
                 .map { item -> item.mapNotNull { it.toActivityFilterChip() } }
         ) { activityTypes, typeNames, activityTypeRows, places, activityFilterChips ->
             DatabaseValues(
@@ -48,8 +48,8 @@ val localDatabaseValues =
     compositionLocalOf<DatabaseValues> { error("Database values are not loaded yet") }
 
 @Composable
-fun ProvideDatabaseValues(repository: DatabaseRepository, content: @Composable () -> Unit) {
-    val databaseValues by remember { DatabaseValues.flow(repository) }.collectAsState(initial = null)
+fun ProvideDatabaseValues(db: DatabaseRepository, content: @Composable () -> Unit) {
+    val databaseValues by remember { DatabaseValues.flow(db) }.collectAsState(initial = null)
 
     databaseValues?.let {
         CompositionLocalProvider(value = localDatabaseValues provides it) {

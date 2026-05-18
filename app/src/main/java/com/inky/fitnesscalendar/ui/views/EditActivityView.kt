@@ -60,7 +60,6 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import coil.compose.AsyncImagePainter
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.EpochDay
@@ -72,6 +71,7 @@ import com.inky.fitnesscalendar.data.measure.kilometers
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.db.entities.UserImage
+import com.inky.fitnesscalendar.di.AppRepository
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.preferences.Preference
 import com.inky.fitnesscalendar.ui.components.ActivitySelector
@@ -98,7 +98,6 @@ import com.inky.fitnesscalendar.util.Option
 import com.inky.fitnesscalendar.util.asNonEmptyOrNull
 import com.inky.fitnesscalendar.util.toDate
 import com.inky.fitnesscalendar.util.toLocalDateTime
-import com.inky.fitnesscalendar.view_model.NewActivityViewModel
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.IgnoredOnParcel
@@ -108,16 +107,16 @@ import java.time.LocalDateTime
 import kotlin.math.roundToInt
 
 @Composable
+context(app: AppRepository)
 fun NewActivity(
     activityId: Int?,
-    viewModel: NewActivityViewModel = hiltViewModel(),
     onSave: (RichActivity) -> Unit,
     onNavigateBack: () -> Unit,
     onNavigateNewPlace: () -> Unit,
     initialDay: EpochDay?
 ) {
     val activity =
-        (activityId?.let { viewModel.repository.getActivity(it) } ?: flowOf(null)).collectAsState(
+        (activityId?.let { app.db.getActivity(it) } ?: flowOf(null)).collectAsState(
             initial = null
         )
 
@@ -125,7 +124,6 @@ fun NewActivity(
     if (activityId == null || activity.value != null) {
         NewActivity(
             richActivity = activity.value,
-            localizationRepository = viewModel.localizationRepository,
             onSave = onSave,
             onNavigateBack = onNavigateBack,
             onNavigateNewPlace = onNavigateNewPlace,
@@ -137,9 +135,9 @@ fun NewActivity(
 }
 
 @Composable
+context(_: LocalizationRepository)
 fun NewActivity(
     richActivity: RichActivity?,
-    localizationRepository: LocalizationRepository,
     onSave: (RichActivity) -> Unit,
     onNavigateBack: () -> Unit,
     onNavigateNewPlace: () -> Unit,
@@ -166,25 +164,22 @@ fun NewActivity(
         editState = editState,
         onState = { editState = it },
         initialState = initialState,
-        localizationRepository = localizationRepository,
         onSave = { onSave(editState.toRichActivity(initialActivity = richActivity)) },
         onNavigateBack = onNavigateBack,
         onNavigateNewPlace = onNavigateNewPlace,
-        isTest = isTest
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
+context(_: LocalizationRepository)
 fun NewActivity(
     editState: ActivityEditState,
     onState: (ActivityEditState) -> Unit,
     initialState: ActivityEditState,
-    localizationRepository: LocalizationRepository,
     onSave: () -> Unit,
     onNavigateBack: () -> Unit,
     onNavigateNewPlace: () -> Unit,
-    isTest: Boolean = false
 ) {
     var showBackDialog by rememberSaveable { mutableStateOf(false) }
 
@@ -358,7 +353,6 @@ fun NewActivity(
                     }
                     DateTimeInput(
                         dateTime = editState.startDateTime,
-                        localizationRepository = localizationRepository,
                         labelId = dateLabelId,
                         onDateTime = { onState(editState.copy(startDateTime = it)) },
                         modifier = Modifier
@@ -370,7 +364,6 @@ fun NewActivity(
                         DateAndDurationInput(
                             editState = editState,
                             onEnd = { onState(editState.copy(endDateTime = it)) },
-                            localizationRepository = localizationRepository
                         )
                     }
                 }
@@ -492,9 +485,9 @@ private fun DateTimeInputButton(
 }
 
 @Composable
+context(localizationRepository: LocalizationRepository)
 private fun DateTimeInput(
     dateTime: LocalDateTime,
-    localizationRepository: LocalizationRepository,
     labelId: Int,
     onDateTime: (LocalDateTime) -> Unit,
     modifier: Modifier = Modifier,
@@ -555,10 +548,10 @@ private fun DurationInput(duration: Duration, onDuration: (Duration) -> Unit, is
 }
 
 @Composable
+context(_: LocalizationRepository)
 private fun RowScope.DateAndDurationInput(
     editState: ActivityEditState,
     onEnd: (LocalDateTime) -> Unit,
-    localizationRepository: LocalizationRepository
 ) {
     val preferDuration = localPreferences.current.preferEndDateAsDuration
     val context = LocalContext.current
@@ -581,7 +574,6 @@ private fun RowScope.DateAndDurationInput(
             DateTimeInput(
                 dateTime = editState.endDateTime,
                 showDate = editState.startDateTime.toLocalDate() != editState.endDateTime.toLocalDate(),
-                localizationRepository = localizationRepository,
                 labelId = R.string.datetime_end,
                 onDateTime = onEnd,
                 isError = editState.isEndDateTimeError,

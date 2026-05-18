@@ -3,7 +3,7 @@ package com.inky.fitnesscalendar.view_model
 import android.content.Context
 import androidx.lifecycle.viewModelScope
 import com.inky.fitnesscalendar.R
-import com.inky.fitnesscalendar.repository.DatabaseRepository
+import com.inky.fitnesscalendar.di.AppRepository
 import com.inky.fitnesscalendar.repository.ImportRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -14,13 +14,13 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     @ApplicationContext context: Context,
-    repository: DatabaseRepository,
+    app: AppRepository,
     private val importRepository: ImportRepository
-) : BaseViewModel(context, repository) {
+) : BaseViewModel(context, app) {
     fun recalculateTrackData() = viewModelScope.launch(Dispatchers.Default) {
         val numUpdatedActivities = importRepository.updateTrackActivities()
 
-        snackbarHostState.showSnackbar(
+        app.snackbarHostState.showSnackbar(
             context.resources.getQuantityString(
                 R.plurals.updated_activities,
                 numUpdatedActivities,

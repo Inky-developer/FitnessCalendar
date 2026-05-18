@@ -2,7 +2,7 @@ package com.inky.fitnesscalendar.publicApi
 
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.rememberCoroutineScope
-import com.inky.fitnesscalendar.repository.DatabaseRepository
+import com.inky.fitnesscalendar.di.AppRepository
 import com.inky.fitnesscalendar.repository.RecordingRepository
 import com.inky.fitnesscalendar.ui.components.AppFrame
 import com.inky.fitnesscalendar.ui.util.AppContextProviders
@@ -17,7 +17,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class CreateRecording : ApiActivity() {
     @Inject
-    lateinit var databaseRepository: DatabaseRepository
+    lateinit var app: AppRepository
 
     @Inject
     lateinit var recordingRepository: RecordingRepository
@@ -26,17 +26,18 @@ class CreateRecording : ApiActivity() {
         setContent {
             val scope = rememberCoroutineScope()
             AppFrame {
-                AppContextProviders(repository = databaseRepository) {
-                    QsTileRecordActivityDialog(
-                        localizationRepository = databaseRepository.localizationRepository,
-                        onSave = {
-                            scope.launch {
-                                recordingRepository.startRecording(it)
-                                finishAndRemoveTask()
-                            }
-                        },
-                        onDismiss = { finishAndRemoveTask() }
-                    )
+                context(app) {
+                    AppContextProviders {
+                        QsTileRecordActivityDialog(
+                            onSave = {
+                                scope.launch {
+                                    recordingRepository.startRecording(it)
+                                    finishAndRemoveTask()
+                                }
+                            },
+                            onDismiss = { finishAndRemoveTask() }
+                        )
+                    }
                 }
             }
         }

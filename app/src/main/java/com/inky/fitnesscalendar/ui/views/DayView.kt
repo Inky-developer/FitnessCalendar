@@ -46,11 +46,11 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.db.entities.RichActivity
+import com.inky.fitnesscalendar.di.AppRepository
 import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivityCard
 import com.inky.fitnesscalendar.ui.components.ActivityCardCallbacks
@@ -63,7 +63,6 @@ import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.ui.util.sharedElement
 import com.inky.fitnesscalendar.util.toDate
-import com.inky.fitnesscalendar.view_model.BaseViewModel
 import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDateTime
@@ -72,8 +71,8 @@ import java.util.Date
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+context(app: AppRepository)
 fun DayView(
-    viewModel: BaseViewModel = hiltViewModel(),
     initialEpochDay: EpochDay,
     activityCardCallbacks: ActivityCardCallbacks,
     onNewActivity: (EpochDay) -> Unit,
@@ -107,7 +106,7 @@ fun DayView(
             CenterAlignedTopAppBar(
                 title = {
                     val todayString = remember(epochDay) {
-                        viewModel.repository.localizationRepository.formatRelativeLocalDate(epochDay.toLocalDate())
+                        app.localizationRepository.formatRelativeLocalDate(epochDay.toLocalDate())
                     }
 
                     Text(todayString)
@@ -142,7 +141,7 @@ fun DayView(
             )
         },
         floatingActionButton = { NewActivityFAB(onClick = { onNewActivity(epochDay) }) },
-        snackbarHost = { SnackbarHost(viewModel.snackbarHostState) },
+        snackbarHost = { SnackbarHost(app.snackbarHostState) },
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { paddingValues ->
         Column(modifier = Modifier.padding(paddingValues)) {
@@ -152,17 +151,16 @@ fun DayView(
                 modifier = Modifier.fillMaxSize()
             ) { page ->
                 val actualEpochDay = EpochDay(page.toLong())
-                val day by remember(actualEpochDay) { viewModel.repository.getDay(actualEpochDay) }
+                val day by remember(actualEpochDay) { app.db.getDay(actualEpochDay) }
                     .collectAsState(initial = null)
                 val activities by remember(actualEpochDay) {
-                    viewModel.repository.getDayActivities(actualEpochDay)
+                    app.db.getDayActivities(actualEpochDay)
                 }.collectAsState(initial = null)
 
                 if (day != null && activities != null) {
                     DayViewInner(
                         day = day!!,
                         activities = activities!!,
-                        localizationRepository = viewModel.repository.localizationRepository,
                         activityCardCallbacks = activityCardCallbacks.copy(onFilterByType = null),
                         onEditDay = { onEditDay(actualEpochDay) },
                         // Kind of hacky. The problem is that Horizontal Pager instantiates
@@ -194,10 +192,10 @@ fun DayView(
 }
 
 @Composable
+context(_: LocalizationRepository)
 fun DayViewInner(
     day: Day,
     activities: List<RichActivity>,
-    localizationRepository: LocalizationRepository,
     activityCardCallbacks: ActivityCardCallbacks,
     onEditDay: () -> Unit,
     sharedElement: @Composable Modifier.(SharedContentKey) -> Modifier,
@@ -284,7 +282,6 @@ fun DayViewInner(
                     ActivityCard(
                         richActivity = richActivity,
                         callbacks = activityCardCallbacks,
-                        localizationRepository = localizationRepository,
                         modifier = Modifier.sharedBounds(
                             SharedContentKey.ActivityCard(
                                 richActivity.activity.uid

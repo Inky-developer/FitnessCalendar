@@ -52,7 +52,7 @@ fun AutoImportView(viewModel: AutoImportViewModel = hiltViewModel(), onBack: () 
                 scrollBehavior = scrollBehavior,
             )
         },
-        snackbarHost = { SnackbarHost(hostState = viewModel.snackbarHostState) },
+        snackbarHost = { SnackbarHost(hostState = viewModel.app.snackbarHostState) },
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { innerPadding ->
         Column(

@@ -8,7 +8,11 @@ import com.inky.fitnesscalendar.data.measure.Duration.Companion.until
 import com.inky.fitnesscalendar.util.DAY_START_OFFSET_HOURS
 import com.inky.fitnesscalendar.util.toLocalDate
 import com.inky.fitnesscalendar.util.toLocalDateTime
+import dagger.Binds
+import dagger.Module
+import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -22,12 +26,34 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Immutable
-@Singleton
-class LocalizationRepository @Inject constructor(@ApplicationContext private val context: Context) {
-    val timeFormatter: java.text.DateFormat = DateFormat.getTimeFormat(context)
-    val dateFormatter: java.text.DateFormat = DateFormat.getMediumDateFormat(context)
+interface LocalizationRepository {
+    val timeFormatter: java.text.DateFormat
+    val dateFormatter: java.text.DateFormat
 
-    fun formatDuration(date: Date, now: Date = Date.from(Instant.now())): String {
+    fun formatDuration(date: Date, now: Date = Date.from(Instant.now())): String
+    fun formatRelativeDate(date: Date, now: LocalDateTime = LocalDateTime.now()): String
+    fun formatRelativeLocalDate(localDate: LocalDate): String
+
+    companion object {
+        val localDateFormatter: DateTimeFormatter by lazy {
+            DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL)
+        }
+
+        val shortLocalDateFormatter: DateTimeFormatter by lazy {
+            DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)
+        }
+    }
+}
+
+@Immutable
+@Singleton
+class LocalizationRepositoryImpl @Inject constructor(
+    @ApplicationContext private val context: Context
+) : LocalizationRepository {
+    override val timeFormatter: java.text.DateFormat = DateFormat.getTimeFormat(context)
+    override val dateFormatter: java.text.DateFormat = DateFormat.getMediumDateFormat(context)
+
+    override fun formatDuration(date: Date, now: Date): String {
         val duration = date until now
 
         if (duration.elapsedMs < ChronoUnit.DAYS.duration.toMillis()) {
@@ -37,7 +63,7 @@ class LocalizationRepository @Inject constructor(@ApplicationContext private val
         return formatRelativeDate(date, now.toLocalDateTime())
     }
 
-    fun formatRelativeDate(date: Date, now: LocalDateTime = LocalDateTime.now()): String {
+    override fun formatRelativeDate(date: Date, now: LocalDateTime): String {
         val localDate = date.toLocalDate()
         val daysDiff = localDate.until(
             now.minusHours(DAY_START_OFFSET_HOURS).toLocalDate(),
@@ -52,11 +78,10 @@ class LocalizationRepository @Inject constructor(@ApplicationContext private val
             return localDate.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault())
         }
 
-        // For farther in the past, just format the date itself
         return dateFormatter.format(date.toInstant().toEpochMilli())
     }
 
-    fun formatRelativeLocalDate(localDate: LocalDate): String {
+    override fun formatRelativeLocalDate(localDate: LocalDate): String {
         val daysDiff = localDate.until(
             LocalDateTime.now().minusHours(DAY_START_OFFSET_HOURS).toLocalDate(),
             ChronoUnit.DAYS
@@ -73,16 +98,16 @@ class LocalizationRepository @Inject constructor(@ApplicationContext private val
             return localDate.dayOfWeek.getDisplayName(TextStyle.FULL, Locale.getDefault())
         }
 
-        return localDate.format(localDateFormatter)
+        return localDate.format(LocalizationRepository.localDateFormatter)
     }
+}
 
-    companion object {
-        val localDateFormatter: DateTimeFormatter by lazy {
-            DateTimeFormatter.ofLocalizedDate(FormatStyle.FULL)
-        }
-
-        val shortLocalDateFormatter: DateTimeFormatter by lazy {
-            DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT)
-        }
-    }
+@InstallIn(SingletonComponent::class)
+@Module
+abstract class LocalizationModule {
+    @Binds
+    @Singleton
+    abstract fun bindLocalizationRepository(
+        impl: LocalizationRepositoryImpl
+    ): LocalizationRepository
 }

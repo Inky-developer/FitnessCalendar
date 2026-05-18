@@ -10,7 +10,7 @@ import androidx.lifecycle.viewModelScope
 import com.inky.fitnesscalendar.MainActivity
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.db.entities.ActivityType
-import com.inky.fitnesscalendar.repository.DatabaseRepository
+import com.inky.fitnesscalendar.di.AppRepository
 import com.inky.fitnesscalendar.repository.ImportRepository
 import com.inky.fitnesscalendar.util.EXTRA_TOAST
 import com.inky.fitnesscalendar.util.result.isOk
@@ -26,7 +26,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ImportViewModel @Inject constructor(
     @ApplicationContext val context: Context,
-    val dbRepository: DatabaseRepository,
+    val app: AppRepository,
     private val importRepository: ImportRepository
 ) : ViewModel() {
     var closeActivity: () -> Unit = {}
@@ -68,7 +68,7 @@ class ImportViewModel @Inject constructor(
 
     fun updateTypeMapping(key: String, value: ActivityType) =
         viewModelScope.launch(Dispatchers.IO) {
-            dbRepository.setActivityTypeName(key, value)
+            app.db.setActivityTypeName(key, value)
         }
 
     fun loadFiles(files: List<ParcelFileDescriptor>) = viewModelScope.launch(Dispatchers.IO) {
