@@ -2,7 +2,6 @@ package com.inky.fitnesscalendar
 
 import android.app.Application
 import android.util.Log
-import com.inky.fitnesscalendar.di.ActivityTypeOrder
 import com.inky.fitnesscalendar.di.DecisionTrees
 import com.inky.fitnesscalendar.repository.AutoImportRepository
 import com.inky.fitnesscalendar.repository.DatabaseRepository
@@ -48,7 +47,6 @@ class MainApp : Application() {
 
         val activities = databaseRepository.loadMostRecentActivities(200)
 
-        ActivityTypeOrder.init(activities)
         DecisionTrees.init(activities)
         Log.i("MainApp", "App data successfully initialized")
     }

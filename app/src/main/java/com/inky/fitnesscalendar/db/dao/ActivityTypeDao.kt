@@ -23,7 +23,12 @@ abstract class ActivityTypeDao {
     @Query("SELECT * FROM ActivityType WHERE uid in (:filterIds)")
     abstract fun getTypes(filterIds: List<Int>): Flow<List<ActivityType>>
 
-    @Query("SELECT * FROM ActivityType")
+    @Query(
+        "SELECT ty.* FROM ActivityType AS ty " +
+                "LEFT JOIN Activity as a ON ty.uid = a.type_id " +
+                "GROUP BY ty.uid " +
+                "ORDER BY COUNT(a.uid) DESC"
+    )
     abstract fun getActivityTypesByCategory(): Flow<Map<@MapColumn(columnName = "activity_category") ActivityCategory, List<ActivityType>>>
 
     @Upsert

@@ -24,7 +24,6 @@ import com.inky.fitnesscalendar.db.entities.Place
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.db.entities.Track
 import com.inky.fitnesscalendar.db.generateSampleActivities
-import com.inky.fitnesscalendar.di.ActivityTypeOrder
 import com.inky.fitnesscalendar.util.Ordering
 import com.inky.fitnesscalendar.util.toEpochDay
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -127,9 +126,7 @@ class DatabaseRepository @Inject constructor(
     fun getActivityTypes() = activityTypeDao.getTypes()
 
     fun getActivityTypeRows() =
-        getActivityTypesByCategory().map { ActivityTypeOrder.getRowsOrDefault(it) }
-
-    private fun getActivityTypesByCategory() = activityTypeDao.getActivityTypesByCategory()
+        activityTypeDao.getActivityTypesByCategory().map { it.values.toList() }
 
     suspend fun upsertFilterHistoryChips(chips: List<ActivityFilterChip>) =
         db.withTransaction {
