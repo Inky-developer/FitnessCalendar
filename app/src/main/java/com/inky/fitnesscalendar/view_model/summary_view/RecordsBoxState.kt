@@ -4,7 +4,7 @@ import android.content.Context
 import com.inky.fitnesscalendar.data.ActivityStatistics
 import com.inky.fitnesscalendar.data.measure.Measure
 import com.inky.fitnesscalendar.db.entities.RichActivity
-import com.inky.fitnesscalendar.localization.LocalizationRepository
+import com.inky.fitnesscalendar.repository.LocalizationRepository
 import com.inky.fitnesscalendar.util.toLocalDate
 
 data class RecordsBoxState(

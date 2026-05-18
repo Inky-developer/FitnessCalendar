@@ -59,7 +59,7 @@ import com.inky.fitnesscalendar.data.Displayable
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.db.entities.Place
 import com.inky.fitnesscalendar.di.AppRepository
-import com.inky.fitnesscalendar.localization.LocalizationRepository
+import com.inky.fitnesscalendar.repository.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.FilterInformation
 import com.inky.fitnesscalendar.ui.components.MosaicChart
 import com.inky.fitnesscalendar.ui.components.NoActivitiesInfoBox

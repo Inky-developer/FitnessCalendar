@@ -1,4 +1,4 @@
-package com.inky.fitnesscalendar.localization
+package com.inky.fitnesscalendar.repository
 
 import android.content.Context
 import android.text.format.DateFormat

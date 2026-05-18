@@ -72,8 +72,8 @@ import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.db.entities.UserImage
 import com.inky.fitnesscalendar.di.AppRepository
-import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.preferences.Preference
+import com.inky.fitnesscalendar.repository.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivitySelector
 import com.inky.fitnesscalendar.ui.components.ActivitySelectorState
 import com.inky.fitnesscalendar.ui.components.DateTimePicker

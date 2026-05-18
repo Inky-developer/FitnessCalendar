@@ -66,8 +66,8 @@ import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.db.entities.Track
 import com.inky.fitnesscalendar.di.AppRepository
-import com.inky.fitnesscalendar.localization.LocalizationRepository
-import com.inky.fitnesscalendar.localization.LocalizationRepositoryImpl
+import com.inky.fitnesscalendar.repository.LocalizationRepository
+import com.inky.fitnesscalendar.repository.LocalizationRepositoryImpl
 import com.inky.fitnesscalendar.ui.components.ActivityCardContent
 import com.inky.fitnesscalendar.ui.components.ActivityImages
 import com.inky.fitnesscalendar.ui.components.TrackView

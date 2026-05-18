@@ -11,8 +11,8 @@ import com.inky.fitnesscalendar.data.ContentColor
 import com.inky.fitnesscalendar.db.AppDatabase
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.di.AppRepository
-import com.inky.fitnesscalendar.localization.LocalizationRepositoryImpl
 import com.inky.fitnesscalendar.repository.DatabaseRepository
+import com.inky.fitnesscalendar.repository.LocalizationRepositoryImpl
 import com.inky.fitnesscalendar.repository.RecordingRepository
 import com.inky.fitnesscalendar.ui.util.ProvideDatabaseValues
 import kotlinx.coroutines.runBlocking

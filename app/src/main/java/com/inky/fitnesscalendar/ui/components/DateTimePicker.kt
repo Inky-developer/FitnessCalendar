@@ -30,7 +30,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.Wallpapers
 import com.inky.fitnesscalendar.R
-import com.inky.fitnesscalendar.localization.LocalizationRepository
+import com.inky.fitnesscalendar.repository.LocalizationRepository
 import com.inky.fitnesscalendar.ui.util.Icons
 import com.inky.fitnesscalendar.ui.util.horizontalOrderedTransitionSpec
 import com.inky.fitnesscalendar.util.toDate

@@ -16,7 +16,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.db.entities.RichRecording
-import com.inky.fitnesscalendar.localization.LocalizationRepository
+import com.inky.fitnesscalendar.repository.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivitySelector
 import com.inky.fitnesscalendar.ui.components.ActivitySelectorState
 import com.inky.fitnesscalendar.ui.components.BaseEditDialog

@@ -58,7 +58,7 @@ import com.inky.fitnesscalendar.data.measure.Duration.Companion.until
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.db.entities.Place
 import com.inky.fitnesscalendar.db.entities.RichActivity
-import com.inky.fitnesscalendar.localization.LocalizationRepository
+import com.inky.fitnesscalendar.repository.LocalizationRepository
 import com.inky.fitnesscalendar.ui.util.ContextFormat
 import com.inky.fitnesscalendar.ui.util.Icons
 import com.inky.fitnesscalendar.ui.util.SharedContentKey

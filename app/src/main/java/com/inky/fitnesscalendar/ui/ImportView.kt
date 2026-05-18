@@ -42,8 +42,8 @@ import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.gpx.GpxTrack
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.di.AppRepository
-import com.inky.fitnesscalendar.localization.LocalizationRepository
 import com.inky.fitnesscalendar.repository.ImportRepository
+import com.inky.fitnesscalendar.repository.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivityTypeSelector
 import com.inky.fitnesscalendar.ui.components.BaseEditDialog
 import com.inky.fitnesscalendar.ui.components.CompactActivityCard

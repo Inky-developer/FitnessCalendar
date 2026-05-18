@@ -2,7 +2,7 @@ package com.inky.fitnesscalendar.data.activity_filter
 
 import android.os.Parcelable
 import com.inky.fitnesscalendar.data.EpochDay
-import com.inky.fitnesscalendar.localization.LocalizationRepository
+import com.inky.fitnesscalendar.repository.LocalizationRepository
 import com.inky.fitnesscalendar.util.DAY_START_OFFSET_HOURS
 import com.inky.fitnesscalendar.util.toDate
 import com.inky.fitnesscalendar.util.toLocalDate

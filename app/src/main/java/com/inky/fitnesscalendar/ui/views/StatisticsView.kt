@@ -60,7 +60,7 @@ import com.inky.fitnesscalendar.data.Displayable
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.di.AppRepository
-import com.inky.fitnesscalendar.localization.LocalizationRepository
+import com.inky.fitnesscalendar.repository.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.CompactActivityCard
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.util.Icons
