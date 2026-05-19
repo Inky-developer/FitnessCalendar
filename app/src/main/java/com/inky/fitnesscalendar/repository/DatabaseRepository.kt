@@ -123,7 +123,7 @@ class DatabaseRepository @Inject constructor(
     suspend fun deleteActivityType(activityType: ActivityType) =
         activityTypeDao.delete(activityType)
 
-    fun getActivityTypes() = activityTypeDao.getTypes()
+    fun getAllActivityTypes() = activityTypeDao.getTypes()
 
     fun getActivityTypeRows() =
         activityTypeDao.getActivityTypesByCategory().map { it.values.toList() }

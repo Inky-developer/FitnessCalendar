@@ -346,4 +346,7 @@
     <string name="adjust_image_viewport">Ansichtsbereich anpassen</string>
     <string name="reset_image_viewport">Ansichtsbereich zurücksetzen</string>
     <string name="done_adjusting_image">Fertig</string>
+    <string name="restored_activity_type">Aktivitätsart wurde wiederhergestellt</string>
+    <string name="archived_activity_types">Archivierte Aktivitätsarten</string>
+    <string name="archive_activity_type">Aktivitätsart archivieren</string>
 </resources>

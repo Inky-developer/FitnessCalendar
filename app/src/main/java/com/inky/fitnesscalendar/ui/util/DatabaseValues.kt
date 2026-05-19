@@ -15,9 +15,10 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 
 /**
- * Composition local for easier access to common database values
+ * Composition local for sync access to common database values
  */
 data class DatabaseValues(
+    /** A list of all activityTypes, including archived ones */
     val activityTypes: List<ActivityType>,
     val activityTypeNames: Map<String, ActivityType>,
     val activityTypeRows: List<List<ActivityType>>,
@@ -26,7 +27,7 @@ data class DatabaseValues(
 ) {
     companion object {
         fun flow(db: DatabaseRepository) = combine(
-            db.getActivityTypes(),
+            db.getAllActivityTypes(),
             db.getActivityTypeNames(),
             db.getActivityTypeRows(),
             db.getPlaces(),

@@ -258,7 +258,8 @@ private fun AppNavigation(
                 val route: Views.ApiNewActivity = backStackEntry.toRoute()
 
                 val context = LocalContext.current
-                val activityTypes = localDatabaseValues.current.activityTypes
+                val activityTypes =
+                    localDatabaseValues.current.activityTypes.filter { !it.archived }
                 val initialState = remember(route) {
                     val activityType =
                         route.activityTypeId?.let { id -> activityTypes.find { it.uid == id } }

@@ -42,7 +42,7 @@ abstract class ApiActivity : ComponentActivity() {
         intent: Intent,
         repository: DatabaseRepository
     ): ActivityType? {
-        val activityTypes = repository.getActivityTypes().first()
+        val activityTypes = repository.getAllActivityTypes().first().filter { !it.archived }
 
         val activityTypeName = intent.getStringExtra(EXTRA_ACTIVITY_TYPE)
         if (activityTypeName == null) {

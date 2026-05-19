@@ -18,6 +18,7 @@ data class ActivityType(
     @ColumnInfo(name = "name") val name: String,
     @ColumnInfo(name = "emoji") val emoji: String,
     @ColumnInfo(name = "color") val color: ContentColor,
+    @ColumnInfo(name = "archived", defaultValue = "false") val archived: Boolean,
     @ColumnInfo(name = "has_place", defaultValue = "false") val hasPlace: Boolean = false,
     // Only suggests places for this activity type that have this color
     @ColumnInfo(name = "limit_places_by_color") val limitPlacesByColor: ContentColor? = null,

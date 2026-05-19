@@ -14,18 +14,16 @@ abstract class ActivityTypeDao {
     @Query("SELECT * FROM ActivityType")
     abstract suspend fun loadTypes(): List<ActivityType>
 
-    @Query("SELECT * FROM ACTIVITYTYPE WHERE uid = :id")
+    @Query("SELECT * FROM ActivityType WHERE uid = :id")
     abstract suspend fun get(id: Int): ActivityType?
 
     @Query("SELECT * FROM ActivityType")
     abstract fun getTypes(): Flow<List<ActivityType>>
 
-    @Query("SELECT * FROM ActivityType WHERE uid in (:filterIds)")
-    abstract fun getTypes(filterIds: List<Int>): Flow<List<ActivityType>>
-
     @Query(
         "SELECT ty.* FROM ActivityType AS ty " +
                 "LEFT JOIN Activity as a ON ty.uid = a.type_id " +
+                "WHERE NOT archived " +
                 "GROUP BY ty.uid " +
                 "ORDER BY COUNT(a.uid) DESC"
     )

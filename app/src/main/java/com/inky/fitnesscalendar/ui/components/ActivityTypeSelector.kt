@@ -26,24 +26,33 @@ fun ActivityTypeSelector(
         for (activities in typeRows) {
             LazyRow {
                 items(activities) { activityType ->
-                    FilterChip(
+                    ActivityTypeFilterChip(
+                        activityType = activityType,
                         selected = isSelected(activityType),
                         onClick = { onSelect(activityType) },
-                        label = {
-                            Text(
-                                activityType.emoji,
-                                style = MaterialTheme.typography.headlineMedium
-                            )
-                        },
-                        border = FilterChipDefaults.filterChipBorder(
-                            enabled = true,
-                            selected = isSelected(activityType),
-                            borderColor = colorResource(activityType.color.colorId)
-                        ),
-                        modifier = Modifier.padding(horizontal = 4.dp)
                     )
                 }
             }
         }
     }
+}
+
+@Composable
+fun ActivityTypeFilterChip(activityType: ActivityType, selected: Boolean, onClick: () -> Unit) {
+    FilterChip(
+        selected = selected,
+        onClick = onClick,
+        label = {
+            Text(
+                activityType.emoji,
+                style = MaterialTheme.typography.headlineMedium
+            )
+        },
+        border = FilterChipDefaults.filterChipBorder(
+            enabled = true,
+            selected = selected,
+            borderColor = colorResource(activityType.color.colorId)
+        ),
+        modifier = Modifier.padding(horizontal = 4.dp)
+    )
 }

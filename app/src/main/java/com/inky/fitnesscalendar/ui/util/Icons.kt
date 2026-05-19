@@ -28,6 +28,7 @@ object Icons {
 
 
     val Add = Icon(R.drawable.add_24px)
+    val Archive = Icon(R.drawable.archive_24px)
     val ArrowBack = Icon(R.drawable.arrow_back_24px)
     val ArrowForward = Icon(R.drawable.arrow_forward_24px)
     val CalendarToday = Icon(R.drawable.calendar_today_24px)
