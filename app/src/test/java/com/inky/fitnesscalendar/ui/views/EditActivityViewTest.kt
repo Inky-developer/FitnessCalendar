@@ -62,7 +62,8 @@ class EditActivityViewTest {
                 activityCategory = ActivityCategory.Sports,
                 name = "TestActivityType",
                 emoji = ":)",
-                color = ContentColor.Color1
+                color = ContentColor.Color1,
+                archived = false
             ),
             place = null,
             images = emptyList()
@@ -112,7 +113,8 @@ class EditActivityViewTest {
                 activityCategory = ActivityCategory.Sports,
                 name = "TestActivityType",
                 emoji = ":)",
-                color = ContentColor.Color1
+                color = ContentColor.Color1,
+                archived = false
             ),
             place = null,
             images = emptyList()

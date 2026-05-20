@@ -26,6 +26,7 @@ val SportActivityType = ActivityType(
     emoji = "S",
     color = ContentColor.Color1,
     hasPlace = true,
+    archived = false,
 )
 val ProgrammingActivityType = ActivityType(
     uid = 101,
@@ -33,6 +34,7 @@ val ProgrammingActivityType = ActivityType(
     name = "Programming",
     emoji = "P",
     color = ContentColor.Color2,
+    archived = false
 )
 
 val mockActivityTypes = listOf(

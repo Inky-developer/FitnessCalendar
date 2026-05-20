@@ -39,6 +39,7 @@ fun mockSportsActivity(
             name = "Biking",
             emoji = "🚴‍♂️",
             color = ContentColor.Color1,
+            archived = false
         ),
         place = null,
         images = emptyList()

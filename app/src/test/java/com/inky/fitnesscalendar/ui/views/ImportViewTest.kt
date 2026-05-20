@@ -99,11 +99,15 @@ class ImportViewTest {
                 onNodeWithText("Save").performClick()
                 waitForIdle()
 
+                // This executes pending tasks
+                Shadows.shadowOf(Looper.getMainLooper()).idle()
                 if (testFileNames[index].isError) {
+                    waitUntil {
+                        node.fetchSemanticsNode().config.get(SemanticsProperties.Text)
+                            .any { it.contains("An error occurred.") }
+                    }
                     node.assertTextContains("An error occurred.", substring = true)
                 } else {
-                    // This executes pending tasks
-                    Shadows.shadowOf(Looper.getMainLooper()).idle()
                     waitUntil {
                         node.fetchSemanticsNode().config.get(SemanticsProperties.Text)
                             .any { it.contains("🚴") }
