@@ -63,7 +63,8 @@ fun Map(
     val cameraState = rememberCameraState()
     LaunchedEffect(trackSvg) {
         val boundingBox = trackSvg.bounds.toMapLibreBoundingBox()
-        cameraState.animateTo(boundingBox, padding = PaddingValues(32.dp))
+        cameraState.jumpTo(boundingBox, padding = PaddingValues(32.dp))
+//        cameraState.animateTo(boundingBox, padding = PaddingValues(32.dp))
     }
 
     val uri = localPreferences.current.mapProviderUrl.takeIf { it.isNotBlank() }
