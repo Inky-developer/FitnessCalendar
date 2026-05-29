@@ -5,7 +5,6 @@ import androidx.compose.animation.core.FastOutLinearInEasing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
@@ -16,12 +15,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.lerp
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun defaultTopAppBarColors() = TopAppBarDefaults.topAppBarColors(
-    scrolledContainerColor = MaterialTheme.colorScheme.primaryContainer,
-    titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-)
+fun defaultTopAppBarColors() = TopAppBarDefaults.topAppBarColors()
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
