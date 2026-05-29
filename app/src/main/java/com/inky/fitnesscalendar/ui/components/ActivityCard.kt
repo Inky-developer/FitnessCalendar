@@ -93,7 +93,10 @@ fun ActivityCard(
     val context = LocalContext.current
 
     Card(
-        colors = CardDefaults.cardColors(containerColor = containerColor),
+        colors = CardDefaults.cardColors(
+            containerColor = containerColor,
+            contentColor = contentColor
+        ),
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 8.dp, vertical = 4.dp)
@@ -127,8 +130,7 @@ fun ActivityCard(
             Column(modifier = Modifier.fillMaxWidth()) {
                 Text(
                     time,
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.secondary,
+                    style = MaterialTheme.typography.bodySmall,
                     modifier = Modifier
                         .align(Alignment.End)
                         .padding(horizontal = 4.dp)
