@@ -37,10 +37,10 @@ data class AttributeFilter(
 
     enum class Attribute(@StringRes val nameId: Int) {
         Description(R.string.description),
-        Vehicle(R.string.vehicle),
         Image(R.string.image),
         Place(R.string.place),
-        Track(R.string.track);
+        Track(R.string.track),
+        Vehicle(R.string.vehicle);
 
         fun getString(context: Resources, state: Boolean): String {
             val filterStringId = if (state) {
