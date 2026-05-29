@@ -84,43 +84,42 @@ fun FilterViewInner(
     onBack: () -> Unit,
 ) {
     val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
-    val appBar = @Composable {
-        TopAppBar(
-            title = {
-                TextField(
-                    filter.text ?: "",
-                    onValueChange = {
-                        onFilter(filter.copy(text = it))
-                    },
-                    placeholder = { Text(stringResource(R.string.search_for_activity)) },
-                    colors = TextFieldDefaults.colors(
-                        unfocusedContainerColor = Color.Transparent,
-                        focusedContainerColor = Color.Transparent
-                    ),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                    keyboardActions = KeyboardActions(onSearch = { onBack() }),
-                    modifier = Modifier.fillMaxWidth()
-                )
-            },
-            navigationIcon = {
-                IconButton(onClick = { onBack() }) {
-                    Icons.ArrowBack(stringResource(R.string.back))
-                }
-            },
-            actions = {
-                IconButton(
-                    onClick = { onFilter(ActivityFilter()) }, enabled = !filter.isEmpty()
-                ) {
-                    Icons.Close(stringResource(R.string.reset_filters))
-                }
-            },
-            scrollBehavior = scrollBehavior,
-            modifier = Modifier.sharedBounds(SharedContentKey.AppBar)
-        )
-    }
     Scaffold(
-        topBar = appBar,
+        topBar = {
+            TopAppBar(
+                title = {
+                    TextField(
+                        filter.text ?: "",
+                        onValueChange = {
+                            onFilter(filter.copy(text = it))
+                        },
+                        placeholder = { Text(stringResource(R.string.search_for_activity)) },
+                        colors = TextFieldDefaults.colors(
+                            unfocusedContainerColor = Color.Transparent,
+                            focusedContainerColor = Color.Transparent
+                        ),
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                        keyboardActions = KeyboardActions(onSearch = { onBack() }),
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                },
+                navigationIcon = {
+                    IconButton(onClick = { onBack() }) {
+                        Icons.ArrowBack(stringResource(R.string.back))
+                    }
+                },
+                actions = {
+                    IconButton(
+                        onClick = { onFilter(ActivityFilter()) }, enabled = !filter.isEmpty()
+                    ) {
+                        Icons.Close(stringResource(R.string.reset_filters))
+                    }
+                },
+                scrollBehavior = scrollBehavior,
+                modifier = Modifier.sharedBounds(SharedContentKey.AppBar)
+            )
+        },
         containerColor = MaterialTheme.colorScheme.surface,
         modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { paddingValues ->
