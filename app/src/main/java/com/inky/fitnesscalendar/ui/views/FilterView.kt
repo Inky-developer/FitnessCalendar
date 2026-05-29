@@ -30,6 +30,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -81,12 +83,9 @@ fun FilterViewInner(
     onFilter: (ActivityFilter) -> Unit,
     onBack: () -> Unit,
 ) {
+    val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior()
     val appBar = @Composable {
         TopAppBar(
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer,
-                titleContentColor = MaterialTheme.colorScheme.onPrimaryContainer
-            ),
             title = {
                 TextField(
                     filter.text ?: "",
@@ -95,8 +94,8 @@ fun FilterViewInner(
                     },
                     placeholder = { Text(stringResource(R.string.search_for_activity)) },
                     colors = TextFieldDefaults.colors(
-                        unfocusedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-                        focusedContainerColor = MaterialTheme.colorScheme.primaryContainer
+                        unfocusedContainerColor = Color.Transparent,
+                        focusedContainerColor = Color.Transparent
                     ),
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
@@ -116,11 +115,14 @@ fun FilterViewInner(
                     Icons.Close(stringResource(R.string.reset_filters))
                 }
             },
+            scrollBehavior = scrollBehavior,
             modifier = Modifier.sharedBounds(SharedContentKey.AppBar)
         )
     }
     Scaffold(
-        topBar = appBar, containerColor = MaterialTheme.colorScheme.surface
+        topBar = appBar,
+        containerColor = MaterialTheme.colorScheme.surface,
+        modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
     ) { paddingValues ->
         FilterViewInner(
             filter = filter,
