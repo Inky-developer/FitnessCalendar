@@ -44,7 +44,8 @@ class StatisticsViewModel @Inject constructor(
         viewModelScope.launch(Dispatchers.Default) {
             val projection = Preference.PREF_STATS_PROJECTION.get(context)
             _graphState.value = GraphState(
-                grouping = FilteredGrouping(Grouping.All),
+                grouping = Grouping.All,
+                groups = emptyList(),
                 period = initialPeriod,
                 filter = initialFilter,
                 projection = projection,
@@ -81,8 +82,14 @@ class StatisticsViewModel @Inject constructor(
     }
 
     fun setGrouping(grouping: Grouping) {
-        val newGrouping = grouping as? FilteredGrouping ?: FilteredGrouping(grouping)
-        graphState.value?.copy(grouping = newGrouping)?.let { updateState(it) }
+        graphState.value?.copy(grouping = grouping)?.let(::updateState)
+    }
+
+    fun toggleGroup(index: Int) {
+        val groups = graphState.value?.groups?.toMutableList() ?: return
+        groups.getOrNull(index) ?: return
+        groups[index] = groups[index].copy(enabled = !groups[index].enabled)
+        graphState.value?.copy(groups = groups)?.let(::updateState)
     }
 
     private fun updateState(newState: GraphState) {
@@ -113,7 +120,10 @@ class StatisticsViewModel @Inject constructor(
                 .shareIn(viewModelScope, SharingStarted.Eagerly)
                 .first()
             val statisticsMap = state.period.filter(ActivityStatistics(statistics))
-            _graphState.value = state.copy(statistics = statisticsMap)
+            _graphState.value = state.copy(
+                statistics = statisticsMap,
+                groups = state.grouping.apply(ActivityStatistics(statistics))
+            )
             refreshModel()
         }
     }
@@ -124,30 +134,29 @@ class StatisticsViewModel @Inject constructor(
             ModelData(
                 entryName = entry.value.entryName,
                 groups = state.grouping.apply(entry.value.statistics)
+                    .associate { it.value to it.stats }
             )
         }
-        if (dataPoints.isEmpty()) return
 
-        val groups = state.grouping.options()
-        val groupedDataPoints = groups.map { group ->
-            dataPoints.mapNotNull { (key, modelData) ->
-                val value = modelData.groups[group]?.let { state.projection.apply(it) }
-                    ?: state.projection.getDefault()
-                value?.let { key to it }
-            }.toMap()
+        val groupedDataPoints = state.groups.map { group ->
+            // Disabled groups keep their line (so line/series counts stay aligned) but render empty
+            if (!group.enabled) {
+                emptyMap()
+            } else {
+                dataPoints.mapNotNull { (key, modelData) ->
+                    val value = modelData.groups[group.value]?.let { state.projection.apply(it) }
+                        ?: state.projection.getDefault()
+                    value?.let { key to it }
+                }.toMap()
+            }
         }
         modelProducer.runTransaction {
-            // If no data are available, use this hack to clear the graph
-            if (groupedDataPoints.all { it.isEmpty() }) {
-                lineSeries { series(0) }
-            } else {
-                lineSeries {
-                    for (line in groupedDataPoints) {
-                        if (line.isNotEmpty()) {
-                            series(x = line.keys, y = line.values)
-                        } else {
-                            series(0)
-                        }
+            lineSeries {
+                for (line in groupedDataPoints) {
+                    if (line.isNotEmpty()) {
+                        series(x = line.keys, y = line.values)
+                    } else {
+                        series(0)
                     }
                 }
             }
@@ -164,41 +173,10 @@ class StatisticsViewModel @Inject constructor(
         val groups: Map<out Displayable, ActivityStatistics>
     )
 
-    data class FilteredGrouping(
-        val grouping: Grouping,
-        val filteredIndexes: Set<Int> = emptySet()
-    ) : Grouping by grouping {
-        fun withIndex(index: Int): FilteredGrouping {
-            val options = grouping.options()
-            // Don't allow filtering every index, because vico would crash otherwise :(
-            if (options.size == filteredIndexes.size + 1) {
-                return this
-            }
-            return copy(filteredIndexes = filteredIndexes + index)
-        }
-
-        fun withoutIndex(index: Int) = copy(filteredIndexes = filteredIndexes - index)
-
-        // Sets all groups that are filtered out to 0
-        override fun apply(statistics: ActivityStatistics): Map<out Displayable, ActivityStatistics> {
-            val unfilteredMap = grouping.apply(statistics)
-            val validGroups =
-                options().toSet().filterIndexed { index, _ -> !filteredIndexes.contains(index) }
-
-            return unfilteredMap.mapValues {
-                if (validGroups.contains(it.key)) {
-                    it.value
-                } else {
-                    ActivityStatistics(emptyList())
-                }
-            }
-        }
-    }
-
     companion object {
         val xToDateKey = ExtraStore.Key<Map<Long, String>>()
         val periodKey = ExtraStore.Key<Int>()
-        val groupingKey = ExtraStore.Key<FilteredGrouping>()
+        val groupingKey = ExtraStore.Key<Grouping>()
 
         val autoScrollCondition = AutoScrollCondition { oldModel, newModel ->
             if (oldModel == null) {
@@ -217,8 +195,8 @@ class StatisticsViewModel @Inject constructor(
             }
 
             if (
-                newModel.extraStore.getOrNull(groupingKey)?.grouping
-                != oldModel.extraStore.getOrNull(groupingKey)?.grouping
+                newModel.extraStore.getOrNull(groupingKey)
+                != oldModel.extraStore.getOrNull(groupingKey)
             ) {
                 return@AutoScrollCondition true
             }

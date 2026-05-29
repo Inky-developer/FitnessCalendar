@@ -1,10 +1,10 @@
 package com.inky.fitnesscalendar.view_model.statistics
 
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
-import com.inky.fitnesscalendar.view_model.StatisticsViewModel
 
 data class GraphState(
-    val grouping: StatisticsViewModel.FilteredGrouping,
+    val grouping: Grouping,
+    val groups: List<Grouping.Group>,
     val filter: ActivityFilter,
     val period: Period,
     val projection: Projection,

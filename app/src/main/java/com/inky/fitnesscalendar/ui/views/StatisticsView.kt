@@ -56,7 +56,6 @@ import androidx.compose.ui.window.Popup
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityCategory
-import com.inky.fitnesscalendar.data.Displayable
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.db.entities.Activity
 import com.inky.fitnesscalendar.di.AppRepository
@@ -121,6 +120,7 @@ fun StatisticsView(
             modelProducer = viewModel.modelProducer,
             onProjection = viewModel::setProjection,
             onGrouping = viewModel::setGrouping,
+            onToggleGroup = viewModel::toggleGroup,
             onPeriod = viewModel::setPeriod,
             onOpenDrawer = onOpenDrawer,
             onViewActivity = onViewActivity,
@@ -148,6 +148,7 @@ fun StatisticsView(
     state: GraphState,
     modelProducer: CartesianChartModelProducer,
     onGrouping: (Grouping) -> Unit,
+    onToggleGroup: (Int) -> Unit,
     onProjection: (Projection) -> Unit,
     onPeriod: (Period) -> Unit,
     onOpenDrawer: () -> Unit,
@@ -205,7 +206,6 @@ fun StatisticsView(
 
             item(contentType = ContentType.Graph) {
                 Column(modifier = Modifier.padding(all = 8.dp)) {
-                    val groupingOptions = remember(state.grouping) { state.grouping.options() }
                     Text(
                         stringResource(state.projection.legendTextId),
                         style = MaterialTheme.typography.labelLarge,
@@ -214,25 +214,13 @@ fun StatisticsView(
                         modelProducer,
                         state.projection,
                         state.period,
-                        groupingOptions,
+                        state.groups,
                         modifier = Modifier
                             .fillParentMaxHeight(0.9f)
                             .fillMaxWidth()
                     )
 
-                    GraphLegend(
-                        options = groupingOptions,
-                        removedGroups = state.grouping.filteredIndexes,
-                        onToggle = { index ->
-                            onGrouping(
-                                if (state.grouping.filteredIndexes.contains(index)) {
-                                    state.grouping.withoutIndex(index)
-                                } else {
-                                    state.grouping.withIndex(index)
-                                }
-                            )
-                        }
-                    )
+                    GraphLegend(groups = state.groups, onToggle = onToggleGroup)
                 }
             }
 
@@ -358,19 +346,21 @@ private fun Graph(
     modelProducer: CartesianChartModelProducer,
     projection: Projection,
     period: Period,
-    groupingOptions: List<Displayable>,
+    groups: List<Grouping.Group>,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
-    val lines = remember(groupingOptions) {
-        groupingOptions.map { group ->
-            val color = Color(group.getColor(context))
-            LineCartesianLayer.Line(
-                fill = LineCartesianLayer.LineFill.single(Fill(color)),
-                areaFill = defaultAreaFill(color),
-                interpolator = LineCartesianLayer.Interpolator.cubic()
-            )
-        }
+    val fallbackColor = MaterialTheme.colorScheme.primary
+    val lines = remember(groups, fallbackColor) {
+        fun line(color: Color) = LineCartesianLayer.Line(
+            fill = LineCartesianLayer.LineFill.single(Fill(color)),
+            areaFill = defaultAreaFill(color),
+            interpolator = LineCartesianLayer.Interpolator.cubic()
+        )
+        // Vico crashes if the line provider is empty, so fall back to a single line when
+        // there are no groups yet (e.g. before the first data load has populated them).
+        groups.map { line(Color(it.value.getColor(context))) }
+            .ifEmpty { listOf(line(fallbackColor)) }
     }
 
     val scrollState = rememberVicoScrollState(
@@ -406,7 +396,10 @@ private fun Graph(
                 ),
                 title = { xLabelTitle },
                 valueFormatter = { ctx, value, _ ->
-                    ctx.model.extraStore[StatisticsViewModel.xToDateKey][value.toLong()] ?: ""
+                    // Vico throws if the formatter returns a blank string. Missing keys only
+                    // occur for the synthetic x=0 of the "clear the graph" hack (an empty
+                    // grouping), so fall back to a dash rather than an empty label.
+                    ctx.model.extraStore[StatisticsViewModel.xToDateKey][value.toLong()] ?: "-"
                 },
                 itemPlacer = HorizontalAxis.ItemPlacer.aligned(addExtremeLabelPadding = true),
             ),
@@ -421,25 +414,21 @@ private fun Graph(
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun GraphLegend(
-    options: List<Displayable>,
-    removedGroups: Set<Int>,
-    onToggle: (Int) -> Unit
-) {
+private fun GraphLegend(groups: List<Grouping.Group>, onToggle: (Int) -> Unit) {
     FlowRow {
-        for ((index, option) in options.withIndex()) {
+        for ((index, option) in groups.withIndex()) {
             FilterChip(
-                selected = !removedGroups.contains(index),
+                selected = option.enabled,
                 onClick = { onToggle(index) },
                 label = {
-                    Text(option.text(), style = MaterialTheme.typography.labelSmall)
+                    Text(option.value.text(), style = MaterialTheme.typography.labelSmall)
                 },
                 leadingIcon = {
                     Box(
                         modifier = Modifier
                             .size(8.dp)
                             .clip(CircleShape)
-                            .background(option.color())
+                            .background(option.value.color())
                     )
                 },
                 modifier = Modifier.padding(horizontal = 4.dp)

@@ -1,5 +1,6 @@
 package com.inky.fitnesscalendar.view_model.statistics
 
+import android.text.format.DateFormat
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityStatistics
 import com.inky.fitnesscalendar.data.LocalDateRange
@@ -36,7 +37,6 @@ enum class Period(
 
         val result = mutableMapOf<Long, StatisticsEntry>()
         val activityMap = groupStats(statistics).toSortedMap(LocalDateRange.COMPARATOR)
-        val lastRange = activityMap.lastKey()
         // Make sure there are at least two data points
         // Otherwise, the graph might not render correctly
         val currentRange = rangeOf(today)
@@ -56,7 +56,7 @@ enum class Period(
             )
             index += 1
 
-            if (LocalDateRange.COMPARATOR.compare(range, lastRange) < 0) {
+            if (LocalDateRange.COMPARATOR.compare(range, currentRange) < 0) {
                 var nextRange = rangeOf(range.endExclusive.toLocalDate())
                 while (!activityMap.contains(nextRange)) {
                     result[index] = StatisticsEntry(
@@ -87,8 +87,9 @@ enum class Period(
     }
 
     private fun format(date: LocalDate, today: LocalDate) = when (this) {
-        Day, Week -> formatRelativeDay(date, today)
-        Month -> date.month.getDisplayName(TextStyle.SHORT, Locale.getDefault())
+        Day -> formatRelativeDay(date, today)
+        Week -> date.format(dateFormatter)
+        Month -> formatRelativeMonth(date, today)
         Year -> date.year.toString()
     }
 
@@ -101,6 +102,13 @@ enum class Period(
         } else {
             day.format(dateFormatter)
         }
+    }
+
+    private fun formatRelativeMonth(date: LocalDate, today: LocalDate): String {
+        val locale = Locale.getDefault()
+        val skeleton = if (date.year == today.year) "MMM" else "MMMyy"
+        val pattern = DateFormat.getBestDateTimePattern(locale, skeleton)
+        return date.format(DateTimeFormatter.ofPattern(pattern, locale))
     }
 
     data class StatisticsEntry(val statistics: ActivityStatistics, val entryName: String)

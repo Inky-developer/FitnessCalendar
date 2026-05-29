@@ -18,16 +18,21 @@ import com.inky.fitnesscalendar.db.entities.ActivityType
 interface Grouping {
     fun filterCategory(): ActivityCategory?
 
-    fun apply(statistics: ActivityStatistics): Map<out Displayable, ActivityStatistics>
+    fun apply(statistics: ActivityStatistics): List<Group>
 
-    fun options(): List<Displayable>
+    data class Group(
+        val value: Displayable,
+        val stats: ActivityStatistics,
+        val enabled: Boolean = true
+    )
 
     data object All : Grouping {
         override fun filterCategory() = null
 
-        override fun apply(statistics: ActivityStatistics) = statistics.activitiesByCategory
-
-        override fun options() = ActivityCategory.entries
+        override fun apply(statistics: ActivityStatistics) =
+            statistics.activitiesByCategory
+                .map { (k, v) -> Group(k, v) }
+                .sortedBy { -it.stats.size }
     }
 
     data class Category(val category: ActivityCategory, val activityTypes: List<ActivityType>) :
@@ -35,9 +40,12 @@ interface Grouping {
         override fun filterCategory() = category
 
         override fun apply(statistics: ActivityStatistics) =
-            statistics.activitiesByCategory.filter { it.key == category } + statistics.activitiesByType
+            (statistics.activitiesByCategory.filter { it.key == category }
+                .map { (k, v) -> Group(k, v) }
+                    + statistics.activitiesByType.filter { (k, _) -> k.activityCategory == category }
+                .map { (k, v) ->
+                    Group(k, v, enabled = !k.archived || v.isEmpty())
+                }).sortedBy { -it.stats.size }
 
-        override fun options() =
-            listOf(category) + activityTypes.filter { it.activityCategory == category }
     }
 }

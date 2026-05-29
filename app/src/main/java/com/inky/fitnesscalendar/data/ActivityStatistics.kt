@@ -21,9 +21,6 @@ import com.inky.fitnesscalendar.util.toLocalDateTime
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.ZoneId
-import java.time.temporal.WeekFields
-import java.util.Date
-import java.util.Locale
 
 /**
  * Class for calculating various statistics about activities.
@@ -171,24 +168,14 @@ data class ActivityStatistics(
 
 
     fun activitiesByDay(): Map<LocalDateRange, ActivityStatistics> =
-        keepNewerThanOneYear().groupByDateRange { LocalDateRange.dayOf(it) }
+        groupByDateRange { LocalDateRange.dayOf(it) }
 
-    fun activitiesByWeek(): Map<LocalDateRange, ActivityStatistics> {
-        val dayOfWeekField = WeekFields.of(Locale.getDefault()).dayOfWeek()
-        val firstDateToInclude =
-            LocalDate.now().minusYears(1).plusWeeks(1).with(dayOfWeekField, 1).atStartOfDay()
-        return keepNewer(firstDateToInclude.toDate()).groupByDateRange {
-            LocalDateRange.weekOf(it)
-        }
+    fun activitiesByWeek(): Map<LocalDateRange, ActivityStatistics> = groupByDateRange {
+        LocalDateRange.weekOf(it)
     }
 
-    fun activitiesByMonth(): Map<LocalDateRange, ActivityStatistics> {
-        val today = LocalDate.now()
-        val firstDateToInclude =
-            today.minusYears(1).withDayOfMonth(1).plusMonths(1).atStartOfDay()
-        return keepNewer(firstDateToInclude.toDate())
-            .groupByDateRange { LocalDateRange.monthOf(it) }
-    }
+    fun activitiesByMonth(): Map<LocalDateRange, ActivityStatistics> =
+        groupByDateRange { LocalDateRange.monthOf(it) }
 
     fun activitiesByYear(): Map<LocalDateRange, ActivityStatistics> =
         groupByDateRange { LocalDateRange.yearOf(it) }
@@ -263,10 +250,4 @@ data class ActivityStatistics(
         activities.groupBy(func).mapValues { ActivityStatistics(it.value) }
 
     inline fun filter(func: (RichActivity) -> Boolean) = ActivityStatistics(activities.filter(func))
-
-    private fun keepNewer(date: Date): ActivityStatistics =
-        filter { it.activity.startTime.after(date) }
-
-    private fun keepNewerThanOneYear() =
-        keepNewer(LocalDate.now().minusYears(1).plusDays(1).atStartOfDay().toDate())
 }

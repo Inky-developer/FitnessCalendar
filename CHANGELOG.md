@@ -4,6 +4,7 @@
 - Allow configuring the image viewport (Via long tap on the image in the activity editor)
 - Show more day information in the activity log
 - Activity types can now be archived
+- Show all statistics instead of limiting them to one year
 
 # 2026.04.1
 
