@@ -8,7 +8,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Icon
 import androidx.compose.material3.InputChip
-import androidx.compose.material3.InputChipDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
@@ -38,11 +37,7 @@ fun FilterInformation(
     val filterItems = remember(filter) { filter.items() }
     val historyItems = localDatabaseValues.current.activityFilterChips
     val filteredHistoryItems = remember(filter, historyItems) {
-        historyItems.filter {
-            !filterItems.contains(
-                it
-            )
-        }
+        historyItems.filter { !filterItems.contains(it) }
     }
 
     LaunchedEffect(filterItems) {
@@ -117,12 +112,11 @@ private fun LazyItemScope.FilterChip(
     onClick: () -> Unit
 ) {
     InputChip(
-        selected = false,
+        selected = true,
         onClick = onClick,
         label = label,
         leadingIcon = leadingIcon,
         trailingIcon = { Icons.Close(stringResource(R.string.clear)) },
-        colors = InputChipDefaults.inputChipColors(containerColor = MaterialTheme.colorScheme.tertiaryContainer),
         modifier = Modifier
             .padding(horizontal = 4.dp)
             .animateItem()
