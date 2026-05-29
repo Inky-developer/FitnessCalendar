@@ -296,7 +296,7 @@ fun RecordingStatus(
         }
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
             IconButton(onClick = { updatedDescription = recording.description }) {
-                Icons.Edit("edit")
+                Icons.Edit(stringResource(R.string.edit_object))
             }
             Spacer(modifier = Modifier.weight(1f))
             TextButton(onClick = onAbort) {
