@@ -239,7 +239,8 @@ fun RecordingStatus(
     }
 
     val recording = richRecording.recording
-    var updatedDescription by rememberSaveable() { mutableStateOf<String?>(null) }
+    var updatedDescription by rememberSaveable { mutableStateOf<String?>(null) }
+    var showDialog by rememberSaveable { mutableStateOf(false) }
     val scope = rememberCoroutineScope()
 
     updatedDescription?.let { description ->
@@ -294,7 +295,10 @@ fun RecordingStatus(
             }
         }
         Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth()) {
-            IconButton(onClick = { updatedDescription = recording.description }) {
+            IconButton(onClick = {
+                updatedDescription = recording.description
+                showDialog = true
+            }) {
                 Icons.Edit(stringResource(R.string.edit_object))
             }
             Spacer(modifier = Modifier.weight(1f))
