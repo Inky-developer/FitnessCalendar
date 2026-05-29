@@ -27,7 +27,9 @@ function writeFastlaneChangelog() {
 
 # Moves all notes under the unreleased header into the new release
 function updateChangelog() {
-  sed -i "1s/.*/# Unreleased\n\n/; 2s/.*/# $NEW_VERSION_NAME\n/" "$CHANGELOG_FILE"
+  sed -i.bak "1a\\
+\\
+# $NEW_VERSION_NAME" "$CHANGELOG_FILE" && rm -f "$CHANGELOG_FILE.bak"
 }
 
 echo "Incrementing the version number…"
