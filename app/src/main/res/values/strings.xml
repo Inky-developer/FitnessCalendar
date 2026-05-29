@@ -351,4 +351,5 @@
     <string name="archived_activity_types">Archived activity types</string>
     <string name="archive_activity_type">Archive activity type</string>
     <string name="archived">Archived</string>
+    <string name="vehicle_plane">Plane</string>
 </resources>
