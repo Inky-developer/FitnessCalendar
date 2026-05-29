@@ -32,6 +32,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -226,11 +227,13 @@ fun StatisticsView(
 
             for ((activities, header) in state.statistics.values.reversed()) {
                 stickyHeader(contentType = ContentType.Date) {
+                    val textColor = MaterialTheme.colorScheme.primaryContainer
                     Text(
                         header,
                         style = MaterialTheme.typography.titleMedium,
+                        color = contentColorFor(textColor),
                         modifier = Modifier
-                            .background(MaterialTheme.colorScheme.primaryContainer)
+                            .background(textColor)
                             .padding(horizontal = 8.dp)
                             .fillMaxWidth()
                     )
