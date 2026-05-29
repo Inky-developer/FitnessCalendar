@@ -244,9 +244,9 @@ fun RecordingStatus(
 
     updatedDescription?.let { description ->
         Dialog(onDismissRequest = {
-            updatedDescription = null
             scope.launch {
                 onUpdate(recording.copy(description = description))
+                updatedDescription = null
             }
         }) {
             DescriptionTextInput(
