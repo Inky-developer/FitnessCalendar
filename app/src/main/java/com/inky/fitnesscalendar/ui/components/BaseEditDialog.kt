@@ -11,10 +11,13 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -42,26 +45,31 @@ fun BaseEditDialog(
         Card(
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.background),
         ) {
-            Column(modifier = Modifier.background(MaterialTheme.colorScheme.primaryContainer)) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally)
-                        .padding(horizontal = 8.dp)
+            val backgroundColor = MaterialTheme.colorScheme.primaryContainer
+            Column(modifier = Modifier.background(backgroundColor)) {
+                CompositionLocalProvider(
+                    LocalContentColor provides contentColorFor(backgroundColor)
                 ) {
-                    Text(
-                        title,
-                        style = MaterialTheme.typography.displaySmall,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer,
-                        overflow = TextOverflow.Ellipsis,
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier
-                            .weight(1f)
-                            .wrapContentSize()
-                            .animateContentSize()
-                    )
+                            .align(Alignment.CenterHorizontally)
+                            .padding(horizontal = 8.dp)
+                    ) {
+                        Text(
+                            title,
+                            style = MaterialTheme.typography.displaySmall,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier
+                                .weight(1f)
+                                .wrapContentSize()
+                                .animateContentSize()
+                        )
 
-                    Column {
-                        actions()
+                        Column {
+
+                            actions()
+                        }
                     }
                 }
                 HorizontalDivider()
