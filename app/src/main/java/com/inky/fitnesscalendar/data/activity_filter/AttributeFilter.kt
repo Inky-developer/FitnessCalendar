@@ -16,6 +16,7 @@ data class AttributeFilter(
     val image: TriState = TriState.Undefined,
     val place: TriState = TriState.Undefined,
     val track: TriState = TriState.Undefined,
+    val archived: TriState = TriState.Undefined,
 ) : Parcelable {
     fun with(attribute: Attribute, value: TriState) = when (attribute) {
         Attribute.Description -> copy(description = value)
@@ -23,6 +24,7 @@ data class AttributeFilter(
         Attribute.Image -> copy(image = value)
         Attribute.Place -> copy(place = value)
         Attribute.Track -> copy(track = value)
+        Attribute.Archived -> copy(archived = value)
     }
 
     fun get(attribute: Attribute): TriState = when (attribute) {
@@ -31,11 +33,13 @@ data class AttributeFilter(
         Attribute.Image -> image
         Attribute.Place -> place
         Attribute.Track -> track
+        Attribute.Archived -> archived
     }
 
     fun entries() = Attribute.entries.map { it to get(it) }
 
     enum class Attribute(@StringRes val nameId: Int) {
+        Archived(R.string.archived),
         Description(R.string.description),
         Image(R.string.image),
         Place(R.string.place),

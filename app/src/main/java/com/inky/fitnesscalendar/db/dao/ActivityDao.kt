@@ -53,7 +53,8 @@ abstract class ActivityDao {
                 "   ((vehicle IS NOT NULL) == :hasVehicle OR :hasVehicle IS NULL) AND" +
                 "   (EXISTS (SELECT 1 FROM ActivityImage WHERE ActivityImage.activity_id = Activity.uid) == :hasImage OR :hasImage IS NULL) AND" +
                 "   ((place_id IS NOT NULL) == :hasPlace OR :hasPlace IS NULL) AND" +
-                "   ((track_preview IS NOT NULL) == :hasTrack OR :hasTrack IS NULL)" +
+                "   ((track_preview IS NOT NULL) == :hasTrack OR :hasTrack IS NULL) AND" +
+                "   (archived == :isArchived OR :isArchived IS NULL)" +
                 "ORDER BY " +
                 "   CASE WHEN :order = 0 THEN start_time END ASC," +
                 "   CASE WHEN :order = 1 THEN start_time END DESC"
@@ -80,6 +81,7 @@ abstract class ActivityDao {
         hasImage: Boolean?,
         hasPlace: Boolean?,
         hasTrack: Boolean?,
+        isArchived: Boolean?
     ): Flow<List<RichActivity>>
 
     @Transaction

@@ -70,6 +70,7 @@ class DatabaseRepository @Inject constructor(
         val hasImage = filter.attributes.image.toBooleanOrNull()
         val hasPlace = filter.attributes.place.toBooleanOrNull()
         val hasTrack = filter.attributes.track.toBooleanOrNull()
+        val isArchived = filter.attributes.archived.toBooleanOrNull()
 
         return activityDao.getFiltered(
             order = order.ordinal,
@@ -93,6 +94,7 @@ class DatabaseRepository @Inject constructor(
             hasImage = hasImage,
             hasPlace = hasPlace,
             hasTrack = hasTrack,
+            isArchived = isArchived,
         )
     }
 
