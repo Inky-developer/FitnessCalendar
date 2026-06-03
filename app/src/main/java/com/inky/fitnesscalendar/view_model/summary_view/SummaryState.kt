@@ -17,7 +17,7 @@ import com.inky.fitnesscalendar.ui.components.PieChartState
 import com.inky.fitnesscalendar.ui.components.calculateMosaicState
 import com.inky.fitnesscalendar.util.weekDays
 import com.patrykandpatrick.vico.compose.cartesian.data.CartesianChartModelProducer
-import com.patrykandpatrick.vico.compose.cartesian.data.columnSeries
+import com.patrykandpatrick.vico.compose.cartesian.data.columnModel
 import com.patrykandpatrick.vico.compose.common.data.ExtraStore
 import java.time.LocalDate
 import java.time.format.TextStyle
@@ -99,7 +99,7 @@ data class SummaryState(
                 val weekdayStats =
                     statistics.activitiesByWeekday.toSortedMap().mapValues { it.value.size }
                 runTransaction {
-                    columnSeries {
+                    columnModel {
                         series(weekDays(locale).map { weekdayStats[it] ?: 0 }.toList())
                     }
                     extras {
@@ -115,7 +115,7 @@ data class SummaryState(
                 val hourOfDayStats =
                     statistics.activitiesByHourOfDay.toSortedMap().mapValues { it.value.size }
                 runTransaction {
-                    columnSeries {
+                    columnModel {
                         series((0..<24).map { hourOfDayStats[it] ?: 0 })
                     }
                     extras {
