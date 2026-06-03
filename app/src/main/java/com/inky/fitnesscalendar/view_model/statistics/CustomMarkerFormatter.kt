@@ -4,14 +4,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.withStyle
-import com.inky.fitnesscalendar.data.measure.format
 import com.patrykandpatrick.vico.compose.cartesian.CartesianDrawingContext
 import com.patrykandpatrick.vico.compose.cartesian.marker.CartesianMarker
 import com.patrykandpatrick.vico.compose.cartesian.marker.DefaultCartesianMarker
 import com.patrykandpatrick.vico.compose.cartesian.marker.LineCartesianLayerMarkerTarget
-import kotlin.time.Duration.Companion.hours
 
-class TimeMarkerFormatter : DefaultCartesianMarker.ValueFormatter {
+/**
+ * Custom marker formatter that is a bit more versatile than vicos default marker formatter.
+ * It additionally supports displaying durations through the more generic formatting function and
+ * filtering out values
+ */
+class CustomMarkerFormatter(val formatValue: (Double) -> String) :
+    DefaultCartesianMarker.ValueFormatter {
     private fun AnnotatedString.Builder.append(text: String, color: Color) {
         withStyle(SpanStyle(color = color)) {
             append(text)
@@ -34,10 +38,7 @@ class TimeMarkerFormatter : DefaultCartesianMarker.ValueFormatter {
                     val lastIndex = columns.lastIndex
                     builder.append("(")
                     columns.forEachIndexed { index, column ->
-                        builder.append(
-                            column.entry.y.hours.format(),
-                            column.color
-                        )
+                        builder.append(formatValue(column.entry.y), column.color)
                         if (index != lastIndex) {
                             builder.append(", ")
                         }

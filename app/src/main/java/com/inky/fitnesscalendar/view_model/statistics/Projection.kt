@@ -1,11 +1,14 @@
 package com.inky.fitnesscalendar.view_model.statistics
 
 import android.content.Context
+import android.icu.text.DecimalFormat
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.ActivityStatistics
+import com.inky.fitnesscalendar.data.measure.format
 import com.patrykandpatrick.vico.compose.cartesian.marker.DefaultCartesianMarker
+import kotlin.time.Duration.Companion.hours
 
 /**
  * A Projection of [ActivityStatistics] to a value that can be displayed in the statistics view
@@ -98,11 +101,8 @@ enum class Projection(
     }
 
     fun markerFormatter(context: Context) = when (this) {
-        ByTotalTime, ByAverageTime -> TimeMarkerFormatter()
-        ByTotalActivities, ByAverageIntensity -> DefaultCartesianMarker.ValueFormatter.default(
-            decimalCount = 0
-        )
-
+        ByTotalTime, ByAverageTime -> CustomMarkerFormatter { it.hours.format() }
+        ByTotalActivities, ByAverageIntensity -> CustomMarkerFormatter { it.toInt().toString() }
         ByTotalDistance, ByAverageDistance -> unitFormatter(context.getString(R.string.unit_km))
         ByAverageSpeed -> unitFormatter(context.getString(R.string.unit_kmh))
         ByMaximumHeartRate, ByAverageHeartRate -> unitFormatter(context.getString(R.string.unit_bpm))
@@ -119,8 +119,11 @@ enum class Projection(
     }
 
     companion object {
-        fun unitFormatter(unit: String) =
-            DefaultCartesianMarker.ValueFormatter.default(decimalCount = 1, suffix = unit)
-
+        fun unitFormatter(unit: String): DefaultCartesianMarker.ValueFormatter {
+            val format = DecimalFormat("0.0 $unit")
+            return CustomMarkerFormatter {
+                format.format(it)
+            }
+        }
     }
 }
