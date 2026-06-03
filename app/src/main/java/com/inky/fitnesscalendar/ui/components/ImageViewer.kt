@@ -34,7 +34,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.core.content.FileProvider
 import androidx.core.net.toFile
-import coil.compose.AsyncImage
+import coil3.compose.AsyncImage
 import com.inky.fitnesscalendar.BuildConfig
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.ui.util.Icons
