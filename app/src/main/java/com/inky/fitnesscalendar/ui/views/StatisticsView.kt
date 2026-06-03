@@ -445,7 +445,7 @@ private fun rememberMarker(projection: Projection): CartesianMarker {
     val context = LocalContext.current
     return rememberDefaultCartesianMarker(
         label = rememberTextComponent(
-            style = TextStyle(color = MaterialTheme.colorScheme.onPrimaryContainer),
+            style = TextStyle(color = MaterialTheme.colorScheme.onBackground),
         ),
         labelPosition = DefaultCartesianMarker.LabelPosition.Top,
         valueFormatter = remember(projection) { projection.markerFormatter(context) },
