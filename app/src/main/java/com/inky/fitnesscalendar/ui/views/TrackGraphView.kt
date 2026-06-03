@@ -59,7 +59,7 @@ import com.patrykandpatrick.vico.compose.cartesian.data.CartesianLayerRangeProvi
 import com.patrykandpatrick.vico.compose.cartesian.data.CartesianValueFormatter
 import com.patrykandpatrick.vico.compose.cartesian.data.LineCartesianLayerDrawingModel
 import com.patrykandpatrick.vico.compose.cartesian.data.LineCartesianLayerModel
-import com.patrykandpatrick.vico.compose.cartesian.data.lineSeries
+import com.patrykandpatrick.vico.compose.cartesian.data.lineModel
 import com.patrykandpatrick.vico.compose.cartesian.layer.LineCartesianLayer
 import com.patrykandpatrick.vico.compose.cartesian.marker.CartesianMarker
 import com.patrykandpatrick.vico.compose.cartesian.marker.DefaultCartesianMarker
@@ -199,11 +199,11 @@ fun TrackGraph(
 
             modelProducer.runTransaction {
                 if (overlayValues != null) {
-                    lineSeries {
+                    lineModel {
                         series(x = overlayValues.keys, y = overlayValues.values)
                     }
                 }
-                lineSeries {
+                lineModel {
                     series(values.keys, values.values)
                 }
             }

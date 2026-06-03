@@ -14,7 +14,7 @@ import com.inky.fitnesscalendar.view_model.statistics.Period
 import com.inky.fitnesscalendar.view_model.statistics.Projection
 import com.patrykandpatrick.vico.compose.cartesian.AutoScrollCondition
 import com.patrykandpatrick.vico.compose.cartesian.data.CartesianChartModelProducer
-import com.patrykandpatrick.vico.compose.cartesian.data.lineSeries
+import com.patrykandpatrick.vico.compose.cartesian.data.lineModel
 import com.patrykandpatrick.vico.compose.common.data.ExtraStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -151,7 +151,7 @@ class StatisticsViewModel @Inject constructor(
             }
         }
         modelProducer.runTransaction {
-            lineSeries {
+            lineModel {
                 for (line in groupedDataPoints) {
                     if (line.isNotEmpty()) {
                         series(x = line.keys, y = line.values)

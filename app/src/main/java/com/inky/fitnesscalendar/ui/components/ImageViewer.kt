@@ -52,7 +52,7 @@ fun ImageViewer(
 ) {
     var zoom by remember { mutableFloatStateOf(1f) }
     var offset by remember { mutableStateOf(Offset.Zero) }
-    val transformState = rememberTransformableState { zoomChange, panChange, _ ->
+    val transformState = rememberTransformableState { _, zoomChange, panChange, _ ->
         zoom *= zoomChange
         zoom = min(max(zoom, 0.5f), 3f)
         offset += panChange
