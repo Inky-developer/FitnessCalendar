@@ -15,10 +15,10 @@ import com.inky.fitnesscalendar.ui.components.MosaicChartState
 import com.inky.fitnesscalendar.ui.components.PieChartEntry
 import com.inky.fitnesscalendar.ui.components.PieChartState
 import com.inky.fitnesscalendar.ui.components.calculateMosaicState
+import com.inky.fitnesscalendar.util.weekDays
 import com.patrykandpatrick.vico.compose.cartesian.data.CartesianChartModelProducer
 import com.patrykandpatrick.vico.compose.cartesian.data.columnSeries
 import com.patrykandpatrick.vico.compose.common.data.ExtraStore
-import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.format.TextStyle
 import java.util.Locale
@@ -94,19 +94,19 @@ data class SummaryState(
             })
             val feelLegendItems = Feel.entries.reversed()
 
+            val locale = Locale.getDefault()
             dayOfWeekModelProducer.apply {
                 val weekdayStats =
                     statistics.activitiesByWeekday.toSortedMap().mapValues { it.value.size }
                 runTransaction {
                     columnSeries {
-                        series(DayOfWeek.entries.map { weekdayStats[it] ?: 0 })
+                        series(weekDays(locale).map { weekdayStats[it] ?: 0 }.toList())
                     }
                     extras {
                         val locale = Locale.getDefault()
-                        it[xToLabelKey] =
-                            DayOfWeek.entries.withIndex().associate { (index, value) ->
-                                index to value.getDisplayName(TextStyle.SHORT, locale)
-                            }
+                        it[xToLabelKey] = weekDays(locale).mapIndexed { index, value ->
+                            index to value.getDisplayName(TextStyle.SHORT, locale)
+                        }.toMap()
                     }
                 }
             }

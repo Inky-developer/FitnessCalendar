@@ -1,5 +1,7 @@
 # Unreleased
 
+- Fix wrongly localized weekdays in the summary view
+
 # 2026.05.1
 
 - Add editable description to recordings
