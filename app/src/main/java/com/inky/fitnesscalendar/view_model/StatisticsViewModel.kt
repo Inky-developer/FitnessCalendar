@@ -150,6 +150,11 @@ class StatisticsViewModel @Inject constructor(
                 }.toMap()
             }
         }
+
+        if (groupedDataPoints.isEmpty()) {
+            return
+        }
+
         modelProducer.runTransaction {
             lineModel {
                 for (line in groupedDataPoints) {
