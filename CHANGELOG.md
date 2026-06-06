@@ -1,6 +1,8 @@
 # Unreleased
 
-- Fix wrongly localized weekdays in the summary view
+# 2026.06.1
+
+- Bugfixes
 
 # 2026.05.1
 

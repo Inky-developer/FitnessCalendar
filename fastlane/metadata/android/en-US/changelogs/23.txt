@@ -1,0 +1,1 @@
+- Fix wrongly localized weekdays in the summary view
