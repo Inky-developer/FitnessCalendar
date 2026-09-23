@@ -1,9 +1,6 @@
 package com.inky.fitnesscalendar.ui.views
 
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.safeContent
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -15,8 +12,6 @@ import com.inky.fitnesscalendar.data.gpx.TrackSvg
 import com.inky.fitnesscalendar.di.AppRepository
 import com.inky.fitnesscalendar.ui.components.Map
 import kotlinx.coroutines.flow.map
-import org.maplibre.compose.map.MapOptions
-import org.maplibre.compose.map.OrnamentOptions
 
 @Composable
 context(app: AppRepository)
@@ -42,14 +37,6 @@ private fun MapView(trackSvg: TrackSvg, onBack: () -> Unit) {
         modifier = Modifier
             .fillMaxSize()
     ) {
-        Map(
-            trackSvg = trackSvg,
-            options = MapOptions(
-                ornamentOptions = OrnamentOptions(
-                    padding = WindowInsets.safeContent.asPaddingValues(),
-                    isAttributionEnabled = false
-                )
-            ),
-        )
+        Map(trackSvg = trackSvg)
     }
 }

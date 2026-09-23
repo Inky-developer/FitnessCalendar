@@ -82,10 +82,7 @@ import com.inky.fitnesscalendar.util.asNonEmptyOrNull
 import com.inky.fitnesscalendar.util.toLocalDate
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
-import org.maplibre.compose.map.GestureOptions
-import org.maplibre.compose.map.MapOptions
-import org.maplibre.compose.map.OrnamentOptions
-import org.maplibre.compose.util.ClickResult
+import org.maplibre.compose.interaction.ClickResult
 
 @Composable
 context(app: AppRepository)
@@ -286,10 +283,7 @@ fun TrackDetailsData(
             onNavigateMap()
             ClickResult.Consume
         },
-        options = MapOptions(
-            gestureOptions = GestureOptions.AllDisabled,
-            ornamentOptions = OrnamentOptions.AllDisabled
-        ),
+        allowInteractions = false,
         modifier = Modifier
             .padding(all = 8.dp)
             .clip(shape)

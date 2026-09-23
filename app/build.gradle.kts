@@ -32,7 +32,7 @@ kotlin {
 
 android {
     namespace = "com.inky.fitnesscalendar"
-    compileSdk = 36
+    compileSdk = 37
 
     androidResources {
         @Suppress("UnstableApiUsage")
@@ -162,6 +162,7 @@ dependencies {
     implementation(libs.androidx.emoji2.emojipicker)
     implementation(libs.androidx.documentfile)
     implementation(libs.maplibre.compose)
+    runtimeOnly(libs.maplibre.compose.vulkan)
 
     ksp(libs.hilt.android.compiler)
     ksp(libs.androidx.room.compiler)

@@ -409,7 +409,6 @@ private fun Graph(
             marker = rememberMarker(projection),
         ),
         modelProducer = modelProducer,
-        animateIn = true,
         scrollState = scrollState,
         zoomState = rememberVicoZoomState(initialZoom = remember(period) { Zoom.x(period.numVisibleDays) }),
     )
