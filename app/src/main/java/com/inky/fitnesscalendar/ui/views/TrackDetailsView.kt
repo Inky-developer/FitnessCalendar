@@ -56,6 +56,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.inky.fitnesscalendar.R
+import com.inky.fitnesscalendar.data.Feel
 import com.inky.fitnesscalendar.data.ImageName
 import com.inky.fitnesscalendar.data.gpx.GpxTrackStats
 import com.inky.fitnesscalendar.data.gpx.TrackSvg
@@ -67,6 +68,7 @@ import com.inky.fitnesscalendar.repository.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.DescriptionTextInput
 import com.inky.fitnesscalendar.ui.components.EditableActivityImages
 import com.inky.fitnesscalendar.ui.components.FavoriteIcon
+import com.inky.fitnesscalendar.ui.components.FeelSelector
 import com.inky.fitnesscalendar.ui.components.ImageLimit
 import com.inky.fitnesscalendar.ui.components.ImageViewer
 import com.inky.fitnesscalendar.ui.components.Map
@@ -291,6 +293,8 @@ fun TrackDetailsData(
             .fillMaxWidth()
             .aspectRatio(4f / 3)
     )
+
+    FeelSelector(feel = state.editState.feel, onChange = state::setFeel)
 
     ActivityDescription(
         description = state.editState.description,
@@ -523,6 +527,10 @@ class DetailsState(
         editState = editState.copy(isFavorite = !editState.isFavorite)
     }
 
+    fun setFeel(feel: Feel) {
+        editState = editState.copy(feel = feel)
+    }
+
     fun getUpdatedActivity() = editState.getActivity(initialActivity)
 }
 
@@ -530,19 +538,22 @@ class DetailsState(
 data class DetailsEditState(
     val images: List<UserImage>,
     val description: String,
-    val isFavorite: Boolean
+    val isFavorite: Boolean,
+    val feel: Feel
 ) : Parcelable {
     constructor(richActivity: RichActivity) : this(
         images = richActivity.images,
         description = richActivity.activity.description,
-        isFavorite = richActivity.activity.favorite
+        isFavorite = richActivity.activity.favorite,
+        feel = richActivity.activity.feel
     )
 
     fun getActivity(initialActivity: RichActivity) = initialActivity.copy(
         images = images,
         activity = initialActivity.activity.copy(
             description = description,
-            favorite = isFavorite
+            favorite = isFavorite,
+            feel = feel
         )
     )
 }
