@@ -228,19 +228,7 @@ fun TrackGraph(
         listOfNotNull(overlayLayer, mainLayer).toTypedArray()
     }
 
-    // Vico has a bug where it crashes with Zoom.Content when the overlay gets added.
-    // As an ugly workaround, we make sure here to recalculate Zoom.Content when the overlay changes
-    val contentZoom = remember(overlay) {
-        Zoom { context, layerDimensions, bounds ->
-            val scalableContentWidth = layerDimensions.getScalableContentWidth(context)
-            if (scalableContentWidth == 0f) {
-                1f
-            } else {
-                (bounds.width - layerDimensions.unscalablePadding) / scalableContentWidth
-            }
-        }
-    }
-    val zoomState = rememberVicoZoomState(initialZoom = contentZoom)
+    val zoomState = rememberVicoZoomState(initialZoom = Zoom.Content)
     val verticalAxisLabel = stringResource(projection.verticalAxisLabel)
     val legendLabel = stringResource(R.string.legend_distance_km)
 
