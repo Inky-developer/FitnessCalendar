@@ -7,6 +7,8 @@ import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.SharedTransitionScope
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarResult
@@ -131,6 +133,10 @@ private fun AppNavigation(
         NavHost(
             navController = navController,
             startDestination = Views.Home,
+            // compose changed the defaults here which don't play well with the shared content animations
+            // so lets use the old fade animation
+            predictivePopEnterTransition = { fadeIn() },
+            predictivePopExitTransition = { fadeOut() },
         ) {
             composable<Views.Home> {
                 onCurrentView(Views.Home)
