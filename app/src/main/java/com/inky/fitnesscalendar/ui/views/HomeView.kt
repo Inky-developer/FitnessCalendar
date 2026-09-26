@@ -184,12 +184,12 @@ fun Home(
             StatisticsIfNotNull(
                 stringResource(R.string.last_seven_days),
                 weeklyStats,
-                onClick = { onNavigateStats(Period.Day) }
+                onClick = { onNavigateStats(Period.Week) }
             )
             StatisticsIfNotNull(
                 stringResource(R.string.four_weeks),
                 monthlyStats,
-                onClick = { onNavigateStats(Period.Week) }
+                onClick = { onNavigateStats(Period.Month) }
             )
         }
     }
