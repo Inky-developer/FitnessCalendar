@@ -1,5 +1,8 @@
 # Unreleased
 
+- Change intial statistic period to months
+- Bugfixes
+
 # 2026.06.1
 
 - Bugfixes

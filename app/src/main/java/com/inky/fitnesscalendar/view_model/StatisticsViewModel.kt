@@ -35,7 +35,7 @@ class StatisticsViewModel @Inject constructor(
     private var _graphState = MutableStateFlow<GraphState?>(null)
     val graphState get() = _graphState.asStateFlow()
 
-    private var initialPeriod: Period = Period.Week
+    private var initialPeriod: Period = Period.Month
     private var initialFilter: ActivityFilter = ActivityFilter()
 
     val modelProducer = CartesianChartModelProducer()
