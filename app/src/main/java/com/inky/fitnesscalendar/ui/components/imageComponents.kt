@@ -108,7 +108,11 @@ fun ActivityImages(
     val imageScale = if (images.size == 1) 1f else 0.9f
     BoxWithConstraints(modifier = modifier) {
         val imageWidth = this.maxWidth * imageScale
-        LazyRow(state = state, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+        LazyRow(
+            state = state,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            userScrollEnabled = state.canScrollForward || state.canScrollBackward
+        ) {
             items(images) { image ->
                 ActivityImage(
                     uri = image.name.getImageUri(),
