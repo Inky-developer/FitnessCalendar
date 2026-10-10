@@ -137,7 +137,6 @@ android {
         disable += "ChromeOsAbiSupport" // The app is still mostly intended for smartphones. Can add support for it later if someone needs it
         disable += "OldTargetApi" // Not relevant
         disable += "MissingTranslation" // Translations are done using weblate
-        disable += "LogNotTimber" // WTF is this even doing on my code?
     }
 }
 

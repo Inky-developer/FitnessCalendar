@@ -1,7 +1,6 @@
 package com.inky.fitnesscalendar.ui.components
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
@@ -26,6 +25,7 @@ import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.localPreferences
 import com.inky.fitnesscalendar.ui.util.sharedElement
 import com.inky.fitnesscalendar.ui.util.skipToLookaheadSize
+import org.maplibre.compose.camera.CameraFit
 import org.maplibre.compose.expressions.dsl.const
 import org.maplibre.compose.expressions.dsl.image
 import org.maplibre.compose.interaction.ClickResult
@@ -38,11 +38,12 @@ import org.maplibre.compose.map.MaplibreMap
 import org.maplibre.compose.map.rememberMapState
 import org.maplibre.compose.overlay.DisappearingCompassButton
 import org.maplibre.compose.overlay.DisappearingScaleBar
-import org.maplibre.compose.overlay.LocalCameraPadding
+import org.maplibre.compose.overlay.LocalViewportInsets
 import org.maplibre.compose.overlay.MapOverlay
 import org.maplibre.compose.sources.GeoJsonData
 import org.maplibre.compose.sources.rememberGeoJsonSource
 import org.maplibre.compose.style.BaseStyle
+import org.maplibre.compose.util.DpPadding
 import org.maplibre.spatialk.geojson.Feature
 import org.maplibre.spatialk.geojson.LineString
 import org.maplibre.spatialk.geojson.Point
@@ -121,7 +122,9 @@ fun Map(
         mapState.setCameraPosition(
             mapState.cameraForBounds(
                 boundingBox,
-                padding = PaddingValues(all = 32.dp)
+                fit = CameraFit(
+                    fitPadding = DpPadding(32.dp, 32.dp, 32.dp, 32.dp)
+                )
             )
         )
     }
@@ -142,14 +145,14 @@ fun Map(
         Box(
             Modifier
                 .fillMaxSize()
-                .padding(LocalCameraPadding.current)
-                .consumeWindowInsets(LocalCameraPadding.current)
+                .padding(LocalViewportInsets.current)
+                .consumeWindowInsets(LocalViewportInsets.current)
                 .windowInsetsPadding(WindowInsets.safeDrawing)
                 .padding(MapOverlay.Spacing),
         ) {
             DisappearingScaleBar(
-                metersPerDp = mapState.viewport?.metersPerDpAtTarget ?: 0.0,
-                zoom = mapState.cameraPosition.zoom,
+                metersPerDp = { mapState.viewport?.metersPerDpAtCenter ?: 0.0 },
+                zoom = { mapState.cameraPosition.zoom },
                 modifier = Modifier.align(Alignment.TopStart),
             )
 

@@ -32,7 +32,7 @@ screengrab = "2.1.1"
 # https://github.com/patrykandpatrick/vico/releases
 vico = "3.3.1"
 # https://github.com/maplibre/maplibre-compose/releases
-maplibre-compose = "0.17.0"
+maplibre-compose = "0.20.0"
 
 [libraries]
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
