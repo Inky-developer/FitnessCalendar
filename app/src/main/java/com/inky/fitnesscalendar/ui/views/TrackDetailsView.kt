@@ -251,7 +251,8 @@ private fun ConfirmUnsavedChangesOnBack(
 fun TrackDetailsData(
     state: DetailsState, onNavigateMap: () -> Unit, onNavigateGraph: (TrackGraphProjection) -> Unit
 ) {
-    var imagePopup by rememberSaveable { mutableStateOf<ImageName?>(null) }
+    var imagePopup by rememberSaveable { mutableStateOf<Int?>(null) }
+    val context = LocalContext.current
 
     val images = state.editState.images.asNonEmptyOrNull()
     if (images != null) {
@@ -267,12 +268,15 @@ fun TrackDetailsData(
         )
     }
 
-    imagePopup?.let { image ->
+    val imageIndex = imagePopup
+    if (images != null && imageIndex != null) {
         ImageViewer(
-            imageUri = image.getImageUri(),
+            imageUris = images.map { it.name.getImageUri(context) }.asNonEmptyOrNull()!!,
+            initialImageIndex = imageIndex,
             onDismiss = { imagePopup = null },
-            onDelete = {
-                state.removeImage(image)
+            onDelete = { uri ->
+                images.find { it.name.getImageUri(context) == uri }
+                    ?.let { state.removeImage(it.name) }
                 imagePopup = null
             }
         )

@@ -62,6 +62,7 @@ import com.inky.fitnesscalendar.ui.util.Icons
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.ui.util.sharedElement
+import com.inky.fitnesscalendar.util.asNonEmptyOrNull
 import com.inky.fitnesscalendar.util.toDate
 import kotlinx.coroutines.launch
 import java.time.Instant
@@ -295,7 +296,11 @@ fun DayViewInner(
 
     val imageUri = day.imageName?.getImageUri()
     if (showImageViewer && imageUri != null) {
-        ImageViewer(imageUri = imageUri, onDismiss = { showImageViewer = false })
+        ImageViewer(
+            imageUris = listOf(imageUri).asNonEmptyOrNull()!!,
+            initialImageIndex = 0,
+            onDismiss = { showImageViewer = false },
+        )
     }
 }
 

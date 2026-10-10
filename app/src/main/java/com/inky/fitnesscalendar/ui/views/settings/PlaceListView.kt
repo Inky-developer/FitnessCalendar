@@ -61,6 +61,7 @@ import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.components.getAppBarContainerColor
 import com.inky.fitnesscalendar.ui.util.Icons
 import com.inky.fitnesscalendar.ui.util.localDatabaseValues
+import com.inky.fitnesscalendar.util.asNonEmptyOrNull
 import kotlinx.coroutines.launch
 
 @Composable
@@ -323,7 +324,8 @@ private fun PlaceCard(
 
     if (showImageViewer && imageUri != null) {
         ImageViewer(
-            imageUri = imageUri,
+            imageUris = listOf(imageUri).asNonEmptyOrNull()!!,
+            initialImageIndex = 0,
             onDismiss = { showImageViewer = false },
         )
     }

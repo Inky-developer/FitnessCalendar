@@ -82,6 +82,7 @@ import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.horizontalOrderedTransitionSpec
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.ui.util.sharedElement
+import com.inky.fitnesscalendar.util.asNonEmptyOrNull
 import com.inky.fitnesscalendar.util.showRecordingNotification
 import com.inky.fitnesscalendar.view_model.HomeViewModel
 import com.inky.fitnesscalendar.view_model.statistics.Period
@@ -517,7 +518,11 @@ fun Today(
 
     val imageUri = day.imageName?.getImageUri()
     if (showImageViewer && imageUri != null) {
-        ImageViewer(imageUri = imageUri, onDismiss = { showImageViewer = false })
+        ImageViewer(
+            imageUris = listOf(imageUri).asNonEmptyOrNull()!!,
+            initialImageIndex = 0,
+            onDismiss = { showImageViewer = false },
+        )
     }
 }
 

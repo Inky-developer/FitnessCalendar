@@ -1,6 +1,5 @@
 package com.inky.fitnesscalendar.ui.components
 
-import android.net.Uri
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -79,7 +78,7 @@ fun ActivityCard(
     contentColor: Color = contentColorFor(containerColor)
 ) {
     var showContextMenu by rememberSaveable { mutableStateOf(false) }
-    var imageViewerUri by rememberSaveable { mutableStateOf<Uri?>(null) }
+    var imageViewerUriIndex by rememberSaveable { mutableStateOf<Int?>(null) }
 
     val title = remember(richActivity) { "${richActivity.type.emoji} ${richActivity.type.name}" }
     val time = remember(richActivity) {
@@ -149,7 +148,7 @@ fun ActivityCard(
             HorizontalDivider()
             ActivityImages(
                 images = images,
-                onClick = { imageViewerUri = it.getImageUri(context) },
+                onClick = { imageViewerUriIndex = it },
                 modifier = Modifier
                     .padding(all = 8.dp)
                     .applyIf(richActivity.activity.uid != null) {
@@ -169,10 +168,12 @@ fun ActivityCard(
         )
     }
 
-    imageViewerUri?.let {
+    imageViewerUriIndex?.let {
         ImageViewer(
-            imageUri = it,
-            onDismiss = { imageViewerUri = null })
+            imageUris = images.map { it.name.getImageUri(context) }.asNonEmptyOrNull()!!,
+            initialImageIndex = it,
+            onDismiss = { imageViewerUriIndex = null }
+        )
     }
 }
 

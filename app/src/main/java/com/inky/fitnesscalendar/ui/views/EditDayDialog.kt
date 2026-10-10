@@ -35,6 +35,7 @@ import com.inky.fitnesscalendar.ui.components.ImageViewer
 import com.inky.fitnesscalendar.ui.components.OptionGroup
 import com.inky.fitnesscalendar.ui.components.SelectImageDropdownMenuItem
 import com.inky.fitnesscalendar.ui.util.Icons
+import com.inky.fitnesscalendar.util.asNonEmptyOrNull
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 
@@ -135,7 +136,8 @@ fun EditDayDialog(
     val imageUri = editState.imageName?.getImageUri()
     if (showImageViewer && imageUri != null) {
         ImageViewer(
-            imageUri = imageUri,
+            imageUris = listOf(imageUri).asNonEmptyOrNull()!!,
+            initialImageIndex = 0,
             onDismiss = { showImageViewer = false },
             onDelete = {
                 showImageViewer = false

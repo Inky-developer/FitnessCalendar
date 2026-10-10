@@ -1,5 +1,6 @@
 # Unreleased
 
+- Improve image viewer
 - Change intial statistic period to months
 - Bugfixes
 

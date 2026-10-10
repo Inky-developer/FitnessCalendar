@@ -64,7 +64,6 @@ import coil3.compose.AsyncImagePainter
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.data.Feel
-import com.inky.fitnesscalendar.data.ImageName
 import com.inky.fitnesscalendar.data.Intensity
 import com.inky.fitnesscalendar.data.measure.format
 import com.inky.fitnesscalendar.data.measure.kilometers
@@ -200,7 +199,8 @@ fun NewActivity(
 
     val scrollState = rememberScrollState()
     var contextMenuOpen by rememberSaveable { mutableStateOf(false) }
-    var imageViewerImage by rememberSaveable { mutableStateOf<ImageName?>(null) }
+    var imageViewerIndex by rememberSaveable { mutableStateOf<Int?>(null) }
+    val context = LocalContext.current
 
     val isKeyboardVisible = WindowInsets.isImeVisible
     val showSaveButton by remember(editState) {
@@ -327,7 +327,7 @@ fun NewActivity(
                             onState(editState.copy(images = editState.images.filter { it.name != image }))
                         }
                     },
-                    onClick = { imageViewerImage = it },
+                    onClick = { imageViewerIndex = it },
                     modifier = Modifier
                         .padding(vertical = 4.dp)
                         .applyIf(editState.activityId != null) {
@@ -442,13 +442,19 @@ fun NewActivity(
             Spacer(modifier = Modifier.height(128.dp))
         }
 
-        imageViewerImage?.let { image ->
+        val viewerIndex = imageViewerIndex
+        val viewerImages = editState.images.asNonEmptyOrNull()
+        if (viewerIndex != null && viewerImages != null) {
             ImageViewer(
-                imageUri = image.getImageUri(),
-                onDismiss = { imageViewerImage = null },
-                onDelete = {
-                    onState(editState.copy(images = editState.images.filter { it.name != image }))
-                    imageViewerImage = null
+                imageUris = viewerImages.map { it.name.getImageUri(context) }
+                    .asNonEmptyOrNull()!!,
+                initialImageIndex = viewerIndex,
+                onDismiss = { imageViewerIndex = null },
+                onDelete = { uri ->
+                    onState(editState.copy(images = editState.images.filter {
+                        it.name.getImageUri(context) != uri
+                    }))
+                    imageViewerIndex = null
                 },
             )
         }

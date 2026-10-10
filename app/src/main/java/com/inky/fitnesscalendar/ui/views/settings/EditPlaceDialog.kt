@@ -40,6 +40,7 @@ import com.inky.fitnesscalendar.ui.components.OptionGroup
 import com.inky.fitnesscalendar.ui.components.SelectImageDropdownMenuItem
 import com.inky.fitnesscalendar.ui.components.optionGroupDefaultBackground
 import com.inky.fitnesscalendar.ui.util.Icons
+import com.inky.fitnesscalendar.util.asNonEmptyOrNull
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.launch
 
@@ -181,7 +182,8 @@ private fun EditPlaceDialog(initialPlace: Place?, onDismiss: () -> Unit, onSave:
     val imageUri = imageName?.getImageUri()
     if (showImageViewer && imageUri != null) {
         ImageViewer(
-            imageUri = imageUri,
+            imageUris = listOf(imageUri).asNonEmptyOrNull()!!,
+            initialImageIndex = 0,
             onDismiss = { showImageViewer = false },
             onDelete = {
                 imageName = null

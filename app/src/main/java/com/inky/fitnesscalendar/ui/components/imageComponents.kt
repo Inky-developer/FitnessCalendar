@@ -28,7 +28,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.BottomAppBarDefaults
@@ -93,6 +92,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
+import kotlin.time.Duration.Companion.milliseconds
 
 const val IMAGE_ASPECT_RATIO: Float = 4 / 3f
 
@@ -101,7 +101,7 @@ fun ActivityImages(
     images: NonEmptyList<UserImage>,
     modifier: Modifier = Modifier,
     state: LazyListState = rememberLazyListState(),
-    onClick: (ImageName) -> Unit = {},
+    onClick: (Int) -> Unit = {},
     onLongClick: ((ImageName) -> Unit)? = null,
     onState: ((ImageName, AsyncImagePainter.State) -> Unit)? = null,
 ) {
@@ -113,13 +113,14 @@ fun ActivityImages(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             userScrollEnabled = state.canScrollForward || state.canScrollBackward
         ) {
-            items(images) { image ->
+            items(images.size) { index ->
+                val image = images[index]
                 ActivityImage(
                     uri = image.name.getImageUri(),
                     modifier = Modifier.width(imageWidth),
                     horizontalBias = image.horizontalBias,
                     verticalBias = image.verticalBias,
-                    onClick = { onClick(image.name) },
+                    onClick = { onClick(index) },
                     onLongClick = onLongClick?.let { { it(image.name) } },
                     onState = { state -> onState?.let { it(image.name, state) } }
                 )
@@ -159,7 +160,7 @@ fun ActivityImage(
 fun EditableActivityImages(
     images: NonEmptyList<UserImage>,
     onChange: (UserImage) -> Unit,
-    onClick: (ImageName) -> Unit,
+    onClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
     onState: ((ImageName, AsyncImagePainter.State) -> Unit)? = null,
 ) {
@@ -417,7 +418,7 @@ private fun ExtractImageFromVideoPopup(
     var frameBitmap by rememberSaveable(videoUri) { mutableStateOf<Bitmap?>(null) }
 
     LaunchedEffect(videoUri) {
-        snapshotFlow { frameIndex }.debounce(50).collectLatest { frameIndex ->
+        snapshotFlow { frameIndex }.debounce(50.milliseconds).collectLatest { frameIndex ->
             loadingFrame = true
             try {
                 frameBitmap = retriever.getFrameAtIndex(frameIndex)
