@@ -42,6 +42,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -224,9 +225,12 @@ fun DayViewInner(
             }
         }
 
+        val containerColor =
+            day.feelBackgroundColor().compositeOver(MaterialTheme.colorScheme.surfaceContainer)
+
         Card(
             onClick = onEditDay,
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceContainer),
+            colors = CardDefaults.cardColors(containerColor = containerColor),
             modifier = Modifier
                 .padding(horizontal = 8.dp, vertical = 4.dp)
                 .fillMaxWidth()
@@ -283,11 +287,13 @@ fun DayViewInner(
                     ActivityCard(
                         richActivity = richActivity,
                         callbacks = activityCardCallbacks,
-                        modifier = Modifier.sharedBounds(
-                            SharedContentKey.ActivityCard(
-                                richActivity.activity.uid
+                        modifier = Modifier
+                            .sharedBounds(
+                                SharedContentKey.ActivityCard(
+                                    richActivity.activity.uid
+                                )
                             )
-                        )
+                            .padding(vertical = 4.dp)
                     )
                 }
             }

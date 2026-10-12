@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -20,16 +19,18 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
@@ -39,6 +40,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
@@ -48,7 +50,6 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.EpochDay
-import com.inky.fitnesscalendar.data.Feel
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
 import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.di.AppRepository
@@ -239,6 +240,7 @@ private fun ActivityList(
     LazyColumn(
         state = listState,
         contentPadding = PaddingValues(bottom = 128.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         item(contentType = -1) {
             Column(
@@ -289,25 +291,25 @@ private fun ActivityList(
 
 @Composable
 private fun DayRow(day: Day, onShowDay: () -> Unit, modifier: Modifier = Modifier) {
+    val backgroundColor =
+        day.feelBackgroundColor().compositeOver(MaterialTheme.colorScheme.secondaryContainer)
+
     Column(
         modifier = modifier
-            .background(MaterialTheme.colorScheme.secondaryContainer)
             .padding(horizontal = 8.dp)
             .fillMaxWidth()
             .clickable { onShowDay() }
+            .background(backgroundColor, shape = MaterialTheme.shapes.small)
     ) {
-        Row(
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Text(
-                LocalizationRepository.localDateFormatter.format(day.day.toLocalDate()),
-                style = MaterialTheme.typography.titleMedium,
-            )
-
-            if (day.feel != Feel.Ok) {
-                Text(day.feel.emoji, style = MaterialTheme.typography.titleMedium)
+        CompositionLocalProvider(LocalContentColor provides contentColorFor(backgroundColor)) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    LocalizationRepository.localDateFormatter.format(day.day.toLocalDate()),
+                    style = MaterialTheme.typography.titleMedium,
+                )
             }
         }
 
@@ -325,10 +327,6 @@ private fun DayRow(day: Day, onShowDay: () -> Unit, modifier: Modifier = Modifie
                 uri = day.imageName.getImageUri(),
                 modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
             )
-        }
-
-        if (day.description.isNotBlank() || day.imageName != null) {
-            HorizontalDivider()
         }
     }
 }

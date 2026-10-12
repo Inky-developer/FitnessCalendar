@@ -608,5 +608,6 @@ fun RecentActivity(
         callbacks = callbacks,
         containerColor = MaterialTheme.colorScheme.tertiaryContainer,
         contentColor = contentColorFor(MaterialTheme.colorScheme.tertiaryContainer),
+        modifier = Modifier.padding(vertical = 4.dp)
     )
 }

@@ -1,5 +1,7 @@
 package com.inky.fitnesscalendar.db.entities
 
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
@@ -15,4 +17,10 @@ data class Day(
     @ColumnInfo(name = "image_name") val imageName: ImageName? = null,
 ) {
     fun isDefault() = this == Day(day)
+
+    @Composable
+    fun feelBackgroundColor() = when (feel) {
+        Feel.Ok -> Color.Transparent
+        else -> feel.color().copy(alpha = 0.2f)
+    }
 }
