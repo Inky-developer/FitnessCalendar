@@ -261,13 +261,20 @@ private fun ActivityList(
         }
         for (item in listItems) {
             when (item) {
-                is ActivityListItem.DateHeader -> item(
+                is ActivityListItem.DateHeader -> stickyHeader(
                     key = item.day.day,
                     contentType = item.contentType
-                ) {
+                ) { index ->
+                    val isSticking by remember {
+                        derivedStateOf {
+                            val firstVisible = listState.layoutInfo.visibleItemsInfo.firstOrNull()
+                            firstVisible?.index == index && firstVisible.offset == -listState.layoutInfo.beforeContentPadding
+                        }
+                    }
                     DayRow(
                         item.day,
                         onShowDay = { onShowDay(item.day.day) },
+                        compact = isSticking,
                         modifier = Modifier.animateItem()
                     )
                 }
@@ -290,7 +297,12 @@ private fun ActivityList(
 }
 
 @Composable
-private fun DayRow(day: Day, onShowDay: () -> Unit, modifier: Modifier = Modifier) {
+private fun DayRow(
+    day: Day,
+    onShowDay: () -> Unit,
+    compact: Boolean,
+    modifier: Modifier = Modifier
+) {
     val backgroundColor =
         day.feelBackgroundColor().compositeOver(MaterialTheme.colorScheme.secondaryContainer)
 
@@ -313,20 +325,22 @@ private fun DayRow(day: Day, onShowDay: () -> Unit, modifier: Modifier = Modifie
             }
         }
 
-        if (day.description.isNotBlank()) {
-            Text(
-                day.description,
-                overflow = TextOverflow.Ellipsis,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(all = 8.dp)
-            )
-        }
+        AnimatedVisibility(!compact) {
+            if (day.description.isNotBlank()) {
+                Text(
+                    day.description,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(all = 8.dp)
+                )
+            }
 
-        if (day.imageName != null) {
-            ActivityImage(
-                uri = day.imageName.getImageUri(),
-                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-            )
+            if (day.imageName != null) {
+                ActivityImage(
+                    uri = day.imageName.getImageUri(),
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                )
+            }
         }
     }
 }
