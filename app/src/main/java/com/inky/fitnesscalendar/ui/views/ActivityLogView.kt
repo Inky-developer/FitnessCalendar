@@ -62,6 +62,7 @@ import com.inky.fitnesscalendar.ui.components.NewActivityFAB
 import com.inky.fitnesscalendar.ui.components.NoActivitiesInfoBox
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.components.getAppBarContainerColor
+import com.inky.fitnesscalendar.ui.util.CollapsibleStickyHeader
 import com.inky.fitnesscalendar.ui.util.Icons
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.sharedBounds
@@ -265,16 +266,11 @@ private fun ActivityList(
                     key = item.day.day,
                     contentType = item.contentType
                 ) { index ->
-                    val isSticking by remember {
-                        derivedStateOf {
-                            val firstVisible = listState.layoutInfo.visibleItemsInfo.firstOrNull()
-                            firstVisible?.index == index && firstVisible.offset == -listState.layoutInfo.beforeContentPadding
-                        }
-                    }
                     DayRow(
                         item.day,
+                        listState = listState,
+                        index = index,
                         onShowDay = { onShowDay(item.day.day) },
-                        compact = isSticking,
                         modifier = Modifier.animateItem()
                     )
                 }
@@ -299,33 +295,38 @@ private fun ActivityList(
 @Composable
 private fun DayRow(
     day: Day,
+    listState: LazyListState,
+    index: Int,
     onShowDay: () -> Unit,
-    compact: Boolean,
     modifier: Modifier = Modifier
 ) {
     val backgroundColor =
         day.feelBackgroundColor().compositeOver(MaterialTheme.colorScheme.secondaryContainer)
 
-    Column(
+    CollapsibleStickyHeader(
+        state = listState,
+        index = index,
+        shape = MaterialTheme.shapes.small,
+        padding = PaddingValues(horizontal = 8.dp),
         modifier = modifier
-            .padding(horizontal = 8.dp)
-            .fillMaxWidth()
             .clickable { onShowDay() }
-            .background(backgroundColor, shape = MaterialTheme.shapes.small)
-    ) {
-        CompositionLocalProvider(LocalContentColor provides contentColorFor(backgroundColor)) {
-            Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(
-                    LocalizationRepository.localDateFormatter.format(day.day.toLocalDate()),
-                    style = MaterialTheme.typography.titleMedium,
-                )
+            .background(backgroundColor),
+        contentHeader = {
+            CompositionLocalProvider(LocalContentColor provides contentColorFor(backgroundColor)) {
+                Box(
+                    contentAlignment = Alignment.Center,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(backgroundColor)
+                ) {
+                    Text(
+                        LocalizationRepository.localDateFormatter.format(day.day.toLocalDate()),
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                }
             }
-        }
-
-        AnimatedVisibility(!compact) {
+        },
+        contentBody = {
             if (day.description.isNotBlank()) {
                 Text(
                     day.description,
@@ -341,8 +342,8 @@ private fun DayRow(
                     modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                 )
             }
-        }
-    }
+        },
+    )
 }
 
 private fun getActivityIndex(data: ActivityListState.Data?, activityId: Int?): Int? {
