@@ -21,6 +21,6 @@ data class Day(
     @Composable
     fun feelBackgroundColor() = when (feel) {
         Feel.Ok -> Color.Transparent
-        else -> feel.color().copy(alpha = 0.2f)
+        else -> feel.color().copy(alpha = 0.35f)
     }
 }
