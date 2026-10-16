@@ -45,6 +45,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
@@ -397,12 +398,12 @@ fun Today(
     onNavigateToday: () -> Unit,
 ) {
     var showImageViewer by rememberSaveable { mutableStateOf(false) }
+    val containerColor =
+        day.feelBackgroundColor().compositeOver(MaterialTheme.colorScheme.secondaryContainer)
 
     Card(
         onClick = onNavigateToday,
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.secondaryContainer,
-        ),
+        colors = CardDefaults.cardColors(containerColor = containerColor),
         modifier = Modifier
             .padding(horizontal = 8.dp, vertical = 4.dp)
             .fillMaxWidth()
