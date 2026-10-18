@@ -1,16 +1,13 @@
 package com.inky.fitnesscalendar.data
 
-import android.os.Build
 import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.Locale
 
-@Config(sdk = [Build.VERSION_CODES.UPSIDE_DOWN_CAKE])
 @RunWith(RobolectricTestRunner::class)
 class LocalDateRangeTest {
     @Test

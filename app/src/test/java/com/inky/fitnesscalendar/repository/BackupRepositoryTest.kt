@@ -1,7 +1,6 @@
 package com.inky.fitnesscalendar.repository
 
 import android.content.Context
-import android.os.Build
 import androidx.core.net.toUri
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
@@ -19,10 +18,8 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
 import java.io.File
 
-@Config(sdk = [Build.VERSION_CODES.UPSIDE_DOWN_CAKE])
 @RunWith(RobolectricTestRunner::class)
 class BackupRepositoryTest {
     @Test

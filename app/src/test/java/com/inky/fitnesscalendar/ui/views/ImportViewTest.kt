@@ -1,6 +1,5 @@
 package com.inky.fitnesscalendar.ui.views
 
-import android.os.Build
 import android.os.Looper
 import androidx.compose.ui.semantics.SemanticsProperties
 import androidx.compose.ui.test.ExperimentalTestApi
@@ -31,11 +30,9 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 import org.robolectric.Shadows
-import org.robolectric.annotation.Config
 import org.robolectric.shadows.ShadowLog
 
 
-@Config(sdk = [Build.VERSION_CODES.UPSIDE_DOWN_CAKE])
 @RunWith(RobolectricTestRunner::class)
 class ImportViewTest {
     @get:Rule

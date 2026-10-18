@@ -1,6 +1,5 @@
 package com.inky.fitnesscalendar.ui.views
 
-import android.os.Build
 import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.hasTestTag
@@ -25,12 +24,10 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
 import java.time.LocalDate
 import java.time.LocalDateTime
 
 @OptIn(ExperimentalTestApi::class)
-@Config(sdk = [Build.VERSION_CODES.UPSIDE_DOWN_CAKE])
 @RunWith(RobolectricTestRunner::class)
 class EditActivityViewTest {
     @get:Rule

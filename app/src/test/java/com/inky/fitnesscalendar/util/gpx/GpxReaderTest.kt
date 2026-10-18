@@ -1,12 +1,10 @@
 package com.inky.fitnesscalendar.util.gpx
 
-import android.os.Build
 import kotlinx.serialization.json.Json
 import org.approvaltests.Approvals
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
 import java.io.ByteArrayInputStream
 
 const val GPX = """
@@ -52,7 +50,6 @@ const val GPX = """
 </gpx>
 """
 
-@Config(sdk = [Build.VERSION_CODES.UPSIDE_DOWN_CAKE])
 @RunWith(RobolectricTestRunner::class)
 class GpxReaderTest {
     @Test
