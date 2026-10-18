@@ -1,5 +1,7 @@
 # Unreleased
 
+# 2026.10.1
+
 - Improve how days are displayed in the activity log
 - Improve image viewer
 - Change intial statistic period to months
