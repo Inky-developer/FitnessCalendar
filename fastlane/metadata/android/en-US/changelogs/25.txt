@@ -1,0 +1,1 @@
+- Fix a visual bug in the activity list

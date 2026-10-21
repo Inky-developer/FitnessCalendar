@@ -1,5 +1,9 @@
 # Unreleased
 
+# 2026.10.2
+
+- Fix a visual bug in the activity list
+
 # 2026.10.1
 
 - Improve how days are displayed in the activity log
