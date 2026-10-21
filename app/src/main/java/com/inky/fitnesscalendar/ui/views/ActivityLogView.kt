@@ -327,19 +327,19 @@ private fun DayRow(
             }
         },
         contentBody = {
+            if (day.imageName != null) {
+                ActivityImage(
+                    uri = day.imageName.getImageUri(),
+                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                )
+            }
+
             if (day.description.isNotBlank()) {
                 Text(
                     day.description,
                     overflow = TextOverflow.Ellipsis,
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.padding(all = 8.dp)
-                )
-            }
-
-            if (day.imageName != null) {
-                ActivityImage(
-                    uri = day.imageName.getImageUri(),
-                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
                 )
             }
         },

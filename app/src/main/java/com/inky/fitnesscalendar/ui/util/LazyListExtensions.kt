@@ -44,7 +44,7 @@ import androidx.compose.ui.zIndex
 fun CollapsibleStickyHeader(
     state: LazyListState,
     index: Int,
-    contentHeader: @Composable ColumnScope.() -> Unit,
+    contentHeader: @Composable () -> Unit,
     contentBody: @Composable ColumnScope.() -> Unit,
     modifier: Modifier = Modifier,
     shape: Shape = RectangleShape,
@@ -121,9 +121,9 @@ private fun CollapsibleHeaderHeader(
 private fun CollapsibleHeaderBody(
     cover: Int?,
     onSizeChanged: (IntSize) -> Unit,
-    content: @Composable () -> Unit
+    content: @Composable ColumnScope.() -> Unit
 ) {
-    Box(
+    Column(
         modifier = Modifier
             .graphicsLayer {
                 if (cover != null) {
