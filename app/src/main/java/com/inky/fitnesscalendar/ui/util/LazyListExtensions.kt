@@ -50,7 +50,7 @@ fun CollapsibleStickyHeader(
     shape: Shape = RectangleShape,
     padding: PaddingValues = PaddingValues()
 ) {
-    // Works by translating the body down the amount of pixels it would have moved if it was non-sticky.
+    // Works by translating the body up the amount of pixels it would have moved if it was non-sticky.
     // Additionally, the next sticky header can bump into the (now clipped) body and move the header out of view.
     // To counteract this, the header is also translated, but downwards
     val layout by remember(state, index) {
@@ -62,8 +62,9 @@ fun CollapsibleStickyHeader(
                     coverPx = Integer.MAX_VALUE,
                     offset = item.offset
                 )
+            val spacing = state.layoutInfo.mainAxisItemSpacing
 
-            val cover = (item.size - (nextItem.offset - item.offset)).coerceAtLeast(0)
+            val cover = (item.size - (nextItem.offset - item.offset) + spacing).coerceAtLeast(0)
             HeaderLayout(coverPx = cover, offset = item.offset)
         }
     }
