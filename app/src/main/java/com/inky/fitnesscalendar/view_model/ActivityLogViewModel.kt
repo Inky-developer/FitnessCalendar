@@ -4,8 +4,8 @@ import android.content.Context
 import androidx.lifecycle.viewModelScope
 import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
-import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.db.entities.RichActivity
+import com.inky.fitnesscalendar.db.entities.RichDay
 import com.inky.fitnesscalendar.di.AppRepository
 import com.inky.fitnesscalendar.view_model.activity_log.ActivityListItem
 import com.inky.fitnesscalendar.view_model.activity_log.ActivityListState
@@ -66,7 +66,7 @@ class ActivityLogViewModel @Inject constructor(
      */
     private fun calculateActivityListItems(
         activities: List<RichActivity>,
-        allDays: Map<EpochDay, Day>,
+        allDays: Map<EpochDay, RichDay>,
         filteredDays: Set<EpochDay>,
     ): List<ActivityListItem> {
         val zoneId = ZoneId.systemDefault()
@@ -76,7 +76,7 @@ class ActivityLogViewModel @Inject constructor(
 
         val result = mutableListOf<ActivityListItem>()
         for (epochDay in orderedEpochDays) {
-            val day = allDays[epochDay] ?: Day(epochDay)
+            val day = allDays[epochDay] ?: RichDay(epochDay)
             result.add(ActivityListItem.DateHeader(day))
             for (activity in activitiesByDay[epochDay].orEmpty()) {
                 result.add(ActivityListItem.Activity(activity))

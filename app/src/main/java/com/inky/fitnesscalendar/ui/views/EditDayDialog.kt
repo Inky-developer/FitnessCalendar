@@ -25,6 +25,7 @@ import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.data.Feel
 import com.inky.fitnesscalendar.data.ImageName
 import com.inky.fitnesscalendar.db.entities.Day
+import com.inky.fitnesscalendar.db.entities.RichDay
 import com.inky.fitnesscalendar.di.AppRepository
 import com.inky.fitnesscalendar.ui.components.ActivityImage
 import com.inky.fitnesscalendar.ui.components.BaseEditDialog
@@ -60,12 +61,12 @@ fun EditDayDialog(
 @Composable
 context(app: AppRepository)
 fun EditDayDialog(
-    day: Day,
+    day: RichDay,
     onNavigateBack: () -> Unit
 ) {
     val scope = rememberCoroutineScope()
 
-    var editState by rememberSaveable(day) { mutableStateOf(EditDayState(day)) }
+    var editState by rememberSaveable(day.epochDay) { mutableStateOf(EditDayState(day.day)) }
     var showImageViewer by rememberSaveable { mutableStateOf(false) }
 
     BaseEditDialog(
@@ -73,7 +74,7 @@ fun EditDayDialog(
         onNavigateBack = onNavigateBack,
         onSave = {
             scope.launch {
-                app.db.saveDay(editState.toDay(day.day))
+                app.db.saveDay(editState.toDay(day.epochDay))
                 onNavigateBack()
             }
         },
@@ -102,7 +103,7 @@ fun EditDayDialog(
                         uri = imageUri,
                         onState = { state ->
                             if (state is AsyncImagePainter.State.Error) {
-                                editState = editState.copy(imageName = day.imageName)
+                                editState = editState.copy(imageName = day.day.imageName)
                             }
                         },
                         onClick = { showImageViewer = true },

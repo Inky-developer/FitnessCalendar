@@ -65,6 +65,7 @@ import com.inky.fitnesscalendar.data.Feel
 import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.db.entities.Recording
 import com.inky.fitnesscalendar.db.entities.RichActivity
+import com.inky.fitnesscalendar.db.entities.RichDay
 import com.inky.fitnesscalendar.db.entities.RichRecording
 import com.inky.fitnesscalendar.di.AppRepository
 import com.inky.fitnesscalendar.repository.LocalizationRepository
@@ -178,7 +179,7 @@ fun Home(
             )
             Today(
                 richActivities = activitiesToday ?: emptyList(),
-                day = day,
+                richDay = day,
                 onDay = { viewModel.updateDay(it) },
                 onEditDay = onEditDay,
                 onNavigateToday = onNavigateToday
@@ -392,11 +393,12 @@ fun Statistics(name: String, stats: ActivityStatistics, onClick: () -> Unit) {
 context(_: LocalizationRepository)
 fun Today(
     richActivities: List<RichActivity>,
-    day: Day,
+    richDay: RichDay,
     onDay: (Day) -> Unit,
     onEditDay: (EpochDay) -> Unit,
     onNavigateToday: () -> Unit,
 ) {
+    val day = richDay.day
     var showImageViewer by rememberSaveable { mutableStateOf(false) }
     val containerColor =
         day.feelBackgroundColor().compositeOver(MaterialTheme.colorScheme.secondaryContainer)

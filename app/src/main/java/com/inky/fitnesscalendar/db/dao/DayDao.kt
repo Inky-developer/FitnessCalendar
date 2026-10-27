@@ -10,6 +10,8 @@ import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.data.Feel
 import com.inky.fitnesscalendar.data.ImageName
 import com.inky.fitnesscalendar.db.entities.Day
+import com.inky.fitnesscalendar.db.entities.RichDay
+import com.inky.fitnesscalendar.db.entities.Steps
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -17,8 +19,9 @@ interface DayDao {
     @Query("SELECT image_name FROM Day WHERE image_name IS NOT NULL")
     suspend fun getImages(): List<ImageName>
 
-    @Query("SELECT * FROM Day ORDER BY day DESC")
-    fun getDays(): Flow<Map<@MapColumn(columnName = "day") EpochDay, Day>>
+    @Transaction
+    @Query("SELECT * FROM AllDaysView ORDER BY epoch_day DESC")
+    fun getDays(): Flow<Map<@MapColumn(columnName = "epoch_day") EpochDay, RichDay>>
 
     @Query(
         "SELECT day FROM Day WHERE " +
@@ -37,8 +40,9 @@ interface DayDao {
         hasImage: Boolean?
     ): Flow<List<EpochDay>>
 
-    @Query("SELECT * FROM Day WHERE day = :day")
-    fun get(day: EpochDay): Flow<Day?>
+    @Transaction
+    @Query("SELECT * FROM AllDaysView WHERE epoch_day = :day")
+    fun get(day: EpochDay): Flow<RichDay?>
 
     @Transaction
     suspend fun upsertOrDelete(day: Day) {
@@ -48,6 +52,19 @@ interface DayDao {
             internalUpsert(day)
         }
     }
+
+    @Query("SELECT * FROM Steps where day = :day AND frame = :frame")
+    suspend fun stepsAt(day: EpochDay, frame: Int): Steps?
+
+    @Transaction
+    suspend fun recordSteps(steps: Steps) {
+        val previousSteps = stepsAt(steps.day, steps.frame)?.steps ?: 0
+        val newSteps = Steps(steps.day, steps.frame, steps = previousSteps + steps.steps)
+        internalStepsUpsert(newSteps)
+    }
+
+    @Upsert
+    suspend fun internalStepsUpsert(steps: Steps)
 
     @Upsert
     suspend fun internalUpsert(day: Day)

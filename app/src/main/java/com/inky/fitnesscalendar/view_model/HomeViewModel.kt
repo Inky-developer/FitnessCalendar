@@ -9,6 +9,7 @@ import com.inky.fitnesscalendar.data.activity_filter.DateRangeOption
 import com.inky.fitnesscalendar.data.measure.Duration.Companion.until
 import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.db.entities.Recording
+import com.inky.fitnesscalendar.db.entities.RichDay
 import com.inky.fitnesscalendar.di.AppRepository
 import com.inky.fitnesscalendar.repository.RecordingRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -36,8 +37,8 @@ class HomeViewModel @Inject constructor(
     val monthStats = loadMonthStats()
     val activitiesToday = app.db.getDayActivities(EpochDay.today())
 
-    private val _today = MutableStateFlow(Day(day = EpochDay.today()))
-    val today: StateFlow<Day> = _today.asStateFlow()
+    private val _today = MutableStateFlow(RichDay(epochDay = EpochDay.today()))
+    val today: StateFlow<RichDay> = _today.asStateFlow()
 
     val mostRecentActivity = app.db.getMostRecentActivity().map { typeActivity ->
         if (typeActivity?.activity?.let { it.endTime.until(Date.from(Instant.now())).elapsedHours < 2.0 } == true) {

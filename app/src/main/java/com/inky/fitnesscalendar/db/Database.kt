@@ -24,13 +24,15 @@ import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.db.entities.FilterHistoryItem
 import com.inky.fitnesscalendar.db.entities.Place
 import com.inky.fitnesscalendar.db.entities.Recording
+import com.inky.fitnesscalendar.db.entities.Steps
 import com.inky.fitnesscalendar.db.entities.Track
+import com.inky.fitnesscalendar.db.views.AllDaysView
 import com.inky.fitnesscalendar.util.DATABASE_NAME
 
 private const val TAG = "Database"
 
 @Database(
-    version = 41,
+    version = 42,
     entities = [
         Activity::class,
         Recording::class,
@@ -41,6 +43,10 @@ private const val TAG = "Database"
         Place::class,
         ActivityTypeName::class,
         Track::class,
+        Steps::class,
+    ],
+    views = [
+        AllDaysView::class,
     ],
     autoMigrations = [
         AutoMigration(from = 2, to = 3),
@@ -71,7 +77,7 @@ private const val TAG = "Database"
         AutoMigration(from = 38, to = 39),
         AutoMigration(from = 39, to = 40),
         AutoMigration(from = 40, to = 41),
-
+        AutoMigration(from = 41, to = 42),
     ]
 )
 @TypeConverters(Converters::class)

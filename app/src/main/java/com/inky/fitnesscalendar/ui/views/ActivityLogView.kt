@@ -51,7 +51,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.data.activity_filter.ActivityFilter
-import com.inky.fitnesscalendar.db.entities.Day
+import com.inky.fitnesscalendar.db.entities.RichDay
 import com.inky.fitnesscalendar.di.AppRepository
 import com.inky.fitnesscalendar.repository.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivityCard
@@ -263,14 +263,14 @@ private fun ActivityList(
         for (item in listItems) {
             when (item) {
                 is ActivityListItem.DateHeader -> stickyHeader(
-                    key = item.day.day,
+                    key = item.day.epochDay,
                     contentType = item.contentType
                 ) { index ->
                     DayRow(
                         item.day,
                         listState = listState,
                         index = index,
-                        onShowDay = { onShowDay(item.day.day) },
+                        onShowDay = { onShowDay(item.day.epochDay) },
                         modifier = Modifier.animateItem()
                     )
                 }
@@ -294,12 +294,13 @@ private fun ActivityList(
 
 @Composable
 private fun DayRow(
-    day: Day,
+    richDay: RichDay,
     listState: LazyListState,
     index: Int,
     onShowDay: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val day = richDay.day
     val backgroundColor =
         day.feelBackgroundColor().compositeOver(MaterialTheme.colorScheme.secondaryContainer)
 

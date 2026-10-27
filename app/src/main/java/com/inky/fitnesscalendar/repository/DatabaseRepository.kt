@@ -22,6 +22,7 @@ import com.inky.fitnesscalendar.db.entities.ActivityTypeName
 import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.db.entities.Place
 import com.inky.fitnesscalendar.db.entities.RichActivity
+import com.inky.fitnesscalendar.db.entities.RichDay
 import com.inky.fitnesscalendar.db.entities.Track
 import com.inky.fitnesscalendar.db.generateSampleActivities
 import com.inky.fitnesscalendar.util.Ordering
@@ -186,7 +187,7 @@ class DatabaseRepository @Inject constructor(
         ).map { it.toSet() }
     }
 
-    fun getDay(day: EpochDay): Flow<Day> = dayDao.get(day).map { it ?: Day(day = day) }
+    fun getDay(day: EpochDay): Flow<RichDay> = dayDao.get(day).map { it ?: RichDay(epochDay = day) }
 
     fun getDayActivities(day: EpochDay) =
         getActivities(

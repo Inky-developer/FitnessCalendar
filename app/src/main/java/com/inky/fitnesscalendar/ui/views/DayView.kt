@@ -49,8 +49,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.DialogProperties
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.EpochDay
-import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.db.entities.RichActivity
+import com.inky.fitnesscalendar.db.entities.RichDay
 import com.inky.fitnesscalendar.di.AppRepository
 import com.inky.fitnesscalendar.repository.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivityCard
@@ -161,7 +161,7 @@ fun DayView(
 
                 if (day != null && activities != null) {
                     DayViewInner(
-                        day = day!!,
+                        richDay = day!!,
                         activities = activities!!,
                         activityCardCallbacks = activityCardCallbacks.copy(onFilterByType = null),
                         onEditDay = { onEditDay(actualEpochDay) },
@@ -196,12 +196,13 @@ fun DayView(
 @Composable
 context(_: LocalizationRepository)
 fun DayViewInner(
-    day: Day,
+    richDay: RichDay,
     activities: List<RichActivity>,
     activityCardCallbacks: ActivityCardCallbacks,
     onEditDay: () -> Unit,
     sharedElement: @Composable Modifier.(SharedContentKey) -> Modifier,
 ) {
+    val day = richDay.day
     var showImageViewer by rememberSaveable { mutableStateOf(false) }
     val scrollState = rememberScrollState()
 
