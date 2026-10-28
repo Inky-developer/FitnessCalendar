@@ -42,7 +42,7 @@ sealed interface Raises<in E> {
  * Immediately returns from the scope by throwing the given error
  */
 context(scope: Raises<E>)
-fun <T, E> raise(error: E): T = scope.raiseInternal(error)
+fun <E> raise(error: E): Nothing = scope.raiseInternal(error)
 
 /**
  * Either returns back the OK value or immediately returns from the block with the error

@@ -178,8 +178,9 @@ private fun TrackStepsPreference(app: AppRepository) {
             Preference.PREF_TRACK_STEPS.set(context, true)
         }
     }
-    PreferenceToggle(Preference.PREF_TRACK_STEPS) { state ->
-        if (!state) {
+    PreferenceToggle(Preference.PREF_TRACK_STEPS) { oldState, newState ->
+        val target = newState ?: oldState
+        if (!target) {
             return@PreferenceToggle false
         }
         val result = app.healthConnectRepository.checkHealthConnectAvailability()
@@ -192,7 +193,9 @@ private fun TrackStepsPreference(app: AppRepository) {
         if (healthPermission.status == PermissionStatus.Granted) {
             return@PreferenceToggle true
         }
-        healthPermission.launchPermissionRequest()
+        if (newState ?: false) {
+            healthPermission.launchPermissionRequest()
+        }
         false
     }
 }
@@ -200,7 +203,7 @@ private fun TrackStepsPreference(app: AppRepository) {
 @Composable
 private fun <T> PreferenceToggle(
     preference: Preference<Boolean, T>,
-    filter: ((Boolean) -> Boolean) = { it }
+    filter: ((Boolean, Boolean?) -> Boolean) = { old, new -> new ?: old }
 ) {
     val scope = rememberCoroutineScope()
     val resources = LocalResources.current
@@ -211,8 +214,8 @@ private fun <T> PreferenceToggle(
     val description =
         remember(preference) { preference.descriptionId?.let { resources.getString(it) } }
 
-    val onCheckedChange: (Boolean) -> Unit = {
-        scope.launch { preference.set(context, filter(it)) }
+    val onCheckedChange: (Boolean) -> Unit = { newValue ->
+        scope.launch { preference.set(context, filter(checked, newValue)) }
     }
 
     Row(
@@ -227,7 +230,7 @@ private fun <T> PreferenceToggle(
             Text(description ?: "", style = MaterialTheme.typography.bodyMedium)
         }
         Switch(
-            checked = filter(checked),
+            checked = filter(checked, null),
             onCheckedChange = onCheckedChange,
             modifier = Modifier.padding(start = 8.dp)
         )

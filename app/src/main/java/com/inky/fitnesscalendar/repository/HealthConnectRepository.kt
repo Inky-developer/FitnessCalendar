@@ -1,6 +1,7 @@
 package com.inky.fitnesscalendar.repository
 
 import android.content.Context
+import android.content.pm.PackageManager
 import androidx.compose.runtime.Composable
 import androidx.health.connect.client.HealthConnectClient
 import androidx.health.connect.client.records.StepsRecord
@@ -13,6 +14,7 @@ import com.inky.fitnesscalendar.util.result.Raises
 import com.inky.fitnesscalendar.util.result.TypedResult
 import com.inky.fitnesscalendar.util.result.asErr
 import com.inky.fitnesscalendar.util.result.asOk
+import com.inky.fitnesscalendar.util.result.raise
 import com.inky.fitnesscalendar.util.result.tryScope
 import com.inky.fitnesscalendar.util.result.unwrap
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -41,7 +43,7 @@ class HealthConnectRepository @Inject constructor(
     @Composable
     fun rememberPermissions(onGranted: () -> Unit) =
         rememberPermissionState(
-            "android.permission.health.READ_STEPS",
+            READ_STEPS_PERMISSION,
             onPermissionResult = { if (it) onGranted() }
         )
 
@@ -72,6 +74,9 @@ class HealthConnectRepository @Inject constructor(
     context(_: Raises<HealthConnectError>)
     private fun healthConnectClient(): HealthConnectClient {
         checkHealthConnectAvailability().unwrap()
+        if (context.checkSelfPermission(READ_STEPS_PERMISSION) != PackageManager.PERMISSION_GRANTED) {
+            raise(HealthConnectError.NoPermission)
+        }
         return HealthConnectClient.getOrCreate(context)
     }
 
@@ -79,6 +84,11 @@ class HealthConnectRepository @Inject constructor(
     enum class HealthConnectError {
         Unavailable,
         UpdateRequired,
+        NoPermission,
         Unknown
+    }
+
+    companion object {
+        const val READ_STEPS_PERMISSION = "android.permission.health.READ_STEPS"
     }
 }
