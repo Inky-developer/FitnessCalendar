@@ -201,11 +201,7 @@ class DatabaseRepository @Inject constructor(
     }
 
     suspend fun recordSteps(stepsEntries: List<Steps>) {
-        db.withTransaction {
-            for (steps in stepsEntries) {
-                dayDao.recordSteps(steps)
-            }
-        }
+        dayDao.upsertSteps(stepsEntries)
     }
 
     fun getPlace(id: Int) = placeDao.get(id)

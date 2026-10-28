@@ -56,15 +56,8 @@ interface DayDao {
     @Query("SELECT * FROM Steps where day = :day AND frame = :frame")
     suspend fun stepsAt(day: EpochDay, frame: Int): Steps?
 
-    @Transaction
-    suspend fun recordSteps(steps: Steps) {
-        val previousSteps = stepsAt(steps.day, steps.frame)?.steps ?: 0
-        val newSteps = Steps(steps.day, steps.frame, steps = previousSteps + steps.steps)
-        internalStepsUpsert(newSteps)
-    }
-
     @Upsert
-    suspend fun internalStepsUpsert(steps: Steps)
+    suspend fun upsertSteps(steps: List<Steps>)
 
     @Upsert
     suspend fun internalUpsert(day: Day)
