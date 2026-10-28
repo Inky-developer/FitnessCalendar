@@ -17,6 +17,9 @@ import com.inky.fitnesscalendar.ui.util.sharedElement
 
 @Composable
 fun StepsIcon(day: RichDay) {
+    if (day.steps.isEmpty()) {
+        return
+    }
     Row(
         verticalAlignment = Alignment.CenterVertically,
         modifier = Modifier
