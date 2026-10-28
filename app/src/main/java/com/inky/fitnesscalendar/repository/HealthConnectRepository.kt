@@ -10,6 +10,7 @@ import androidx.health.connect.client.time.TimeRangeFilter
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.rememberPermissionState
 import com.inky.fitnesscalendar.db.entities.Steps
+import com.inky.fitnesscalendar.preferences.Preference
 import com.inky.fitnesscalendar.util.result.Raises
 import com.inky.fitnesscalendar.util.result.TypedResult
 import com.inky.fitnesscalendar.util.result.asErr
@@ -48,8 +49,10 @@ class HealthConnectRepository @Inject constructor(
         )
 
     suspend fun synchronize(): TypedResult<Unit, HealthConnectError> = tryScope {
-        val stepData = aggregate()
-        db.recordSteps(stepData)
+        if (Preference.PREF_TRACK_STEPS.get(context)) {
+            val stepData = aggregate()
+            db.recordSteps(stepData)
+        }
     }
 
     context(_: Raises<HealthConnectError>)
@@ -89,6 +92,7 @@ class HealthConnectRepository @Inject constructor(
     }
 
     companion object {
+        // Manually defined here to avoid incompatibility with older android versions
         const val READ_STEPS_PERMISSION = "android.permission.health.READ_STEPS"
     }
 }
