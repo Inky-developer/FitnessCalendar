@@ -31,3 +31,5 @@ data class Steps(
         private fun frameAt(time: LocalTime): Int = time.toSecondOfDay().floorDiv(SECONDS_PER_FRAME)
     }
 }
+
+fun List<Steps>.totalSteps() = sumOf { it.steps }

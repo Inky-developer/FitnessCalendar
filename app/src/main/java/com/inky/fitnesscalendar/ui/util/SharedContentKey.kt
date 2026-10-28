@@ -3,6 +3,7 @@ package com.inky.fitnesscalendar.ui.util
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.ui.localSharedTransition
 
 sealed class SharedContentKey {
@@ -27,6 +28,8 @@ sealed class SharedContentKey {
     data object NoActivitiesInfoBox : SharedContentKey()
 
     data object Map : SharedContentKey()
+
+    data class StepsIcon(val day: EpochDay) : SharedContentKey()
 }
 
 

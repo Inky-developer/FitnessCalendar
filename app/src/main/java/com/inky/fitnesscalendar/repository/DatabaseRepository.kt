@@ -23,6 +23,7 @@ import com.inky.fitnesscalendar.db.entities.Day
 import com.inky.fitnesscalendar.db.entities.Place
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.db.entities.RichDay
+import com.inky.fitnesscalendar.db.entities.Steps
 import com.inky.fitnesscalendar.db.entities.Track
 import com.inky.fitnesscalendar.db.generateSampleActivities
 import com.inky.fitnesscalendar.util.Ordering
@@ -197,6 +198,14 @@ class DatabaseRepository @Inject constructor(
 
     suspend fun saveDay(day: Day) {
         dayDao.upsertOrDelete(day)
+    }
+
+    suspend fun recordSteps(stepsEntries: List<Steps>) {
+        db.withTransaction {
+            for (steps in stepsEntries) {
+                dayDao.recordSteps(steps)
+            }
+        }
     }
 
     fun getPlace(id: Int) = placeDao.get(id)

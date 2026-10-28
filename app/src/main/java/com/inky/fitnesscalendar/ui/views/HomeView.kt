@@ -68,6 +68,7 @@ import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.db.entities.RichDay
 import com.inky.fitnesscalendar.db.entities.RichRecording
 import com.inky.fitnesscalendar.di.AppRepository
+import com.inky.fitnesscalendar.preferences.Preference
 import com.inky.fitnesscalendar.repository.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivityCard
 import com.inky.fitnesscalendar.ui.components.ActivityCardCallbacks
@@ -77,6 +78,7 @@ import com.inky.fitnesscalendar.ui.components.DescriptionTextInput
 import com.inky.fitnesscalendar.ui.components.FeelSelector
 import com.inky.fitnesscalendar.ui.components.ImageViewer
 import com.inky.fitnesscalendar.ui.components.NewActivityFAB
+import com.inky.fitnesscalendar.ui.components.StepsIcon
 import com.inky.fitnesscalendar.ui.components.Timer
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.util.Icons
@@ -390,7 +392,7 @@ fun Statistics(name: String, stats: ActivityStatistics, onClick: () -> Unit) {
 }
 
 @Composable
-context(_: LocalizationRepository)
+context(app: AppRepository)
 fun Today(
     richActivities: List<RichActivity>,
     richDay: RichDay,
@@ -426,6 +428,9 @@ fun Today(
 
             Spacer(modifier = Modifier.weight(1f))
 
+            if (Preference.PREF_TRACK_STEPS.current) {
+                StepsIcon(richDay)
+            }
             CompactFeelSelector(
                 day.feel,
                 onFeel = { onDay(day.copy(feel = it)) },

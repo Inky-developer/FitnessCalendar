@@ -157,5 +157,11 @@ sealed class Preference<T, P>(
             titleId = R.string.map_provider_url
             descriptionId = R.string.map_provider_url_description
         }
+
+        val PREF_TRACK_STEPS =
+            PrimitivePreference.create("PREF_TRACK_STEPS", default = false).apply {
+                titleId = R.string.pref_track_steps_title
+                descriptionId = R.string.pref_track_steps_description
+            }
     }
 }

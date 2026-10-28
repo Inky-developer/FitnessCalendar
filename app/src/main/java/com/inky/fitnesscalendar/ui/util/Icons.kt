@@ -53,6 +53,7 @@ object Icons {
     val PlayArrowFilled = Icon(R.drawable.play_arrow_filled_24px)
     val ResetImage = Icon(R.drawable.reset_image_24px)
     val Share = Icon(R.drawable.share_24px)
+    val Step = Icon(R.drawable.step_24px)
     val Timer = Icon(R.drawable.timer_24px)
     val Warning = Icon(R.drawable.warning_24px)
 }

@@ -8,6 +8,7 @@ A private and offline by default activity tracker.
 
 ## Features
 - Track activities of all kinds
+- Track step data
 - Activity recording
 - Gpx import
 - Create custom activity types

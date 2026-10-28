@@ -43,8 +43,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionStatus
 import com.inky.fitnesscalendar.BuildConfig
 import com.inky.fitnesscalendar.R
+import com.inky.fitnesscalendar.di.AppRepository
 import com.inky.fitnesscalendar.preferences.Preference
 import com.inky.fitnesscalendar.repository.backup.BackupRepository
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
@@ -52,11 +55,12 @@ import com.inky.fitnesscalendar.ui.components.optionGroupDefaultBackground
 import com.inky.fitnesscalendar.ui.util.Icons
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.sharedBounds
+import com.inky.fitnesscalendar.util.result.isErr
 import com.inky.fitnesscalendar.view_model.SettingsViewModel
 import com.inky.fitnesscalendar.view_model.statistics.Projection
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun SettingsView(
     viewModel: SettingsViewModel = hiltViewModel(),
@@ -95,6 +99,8 @@ fun SettingsView(
             item {
                 ProjectionSelect()
                 PreferenceTextField(Preference.PREF_MAP_PROVIDER)
+                TrackStepsPreference(viewModel.app)
+
                 Setting(
                     title = stringResource(R.string.configure_activity_types),
                     onClick = onNavigateTypes
@@ -159,10 +165,42 @@ private fun Setting(
     }
 }
 
+
+@OptIn(ExperimentalPermissionsApi::class)
+@Composable
+private fun TrackStepsPreference(app: AppRepository) {
+    val scope = rememberCoroutineScope()
+    val context = LocalContext.current
+    val resources = LocalResources.current
+
+    val healthPermission = app.healthConnectRepository.rememberPermissions {
+        scope.launch {
+            Preference.PREF_TRACK_STEPS.set(context, true)
+        }
+    }
+    PreferenceToggle(Preference.PREF_TRACK_STEPS) { state ->
+        if (!state) {
+            return@PreferenceToggle false
+        }
+        val result = app.healthConnectRepository.checkHealthConnectAvailability()
+        if (result.isErr()) {
+            scope.launch {
+                app.snackbarHostState.showSnackbar(resources.getString(R.string.step_tracking_is_not_supported_on_this_device))
+            }
+            return@PreferenceToggle false
+        }
+        if (healthPermission.status == PermissionStatus.Granted) {
+            return@PreferenceToggle true
+        }
+        healthPermission.launchPermissionRequest()
+        false
+    }
+}
+
 @Composable
 private fun <T> PreferenceToggle(
     preference: Preference<Boolean, T>,
-    filter: ((Boolean) -> Boolean)? = null
+    filter: ((Boolean) -> Boolean) = { it }
 ) {
     val scope = rememberCoroutineScope()
     val resources = LocalResources.current
@@ -174,9 +212,7 @@ private fun <T> PreferenceToggle(
         remember(preference) { preference.descriptionId?.let { resources.getString(it) } }
 
     val onCheckedChange: (Boolean) -> Unit = {
-        if (filter == null || filter(it)) {
-            scope.launch { preference.set(context, it) }
-        }
+        scope.launch { preference.set(context, filter(it)) }
     }
 
     Row(
@@ -191,7 +227,7 @@ private fun <T> PreferenceToggle(
             Text(description ?: "", style = MaterialTheme.typography.bodyMedium)
         }
         Switch(
-            checked = checked,
+            checked = filter(checked),
             onCheckedChange = onCheckedChange,
             modifier = Modifier.padding(start = 8.dp)
         )

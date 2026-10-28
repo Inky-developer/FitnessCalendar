@@ -1,5 +1,7 @@
 # Unreleased
 
+- Optionally track steps
+
 # 2026.10.2
 
 - Fix a visual bug in the activity list

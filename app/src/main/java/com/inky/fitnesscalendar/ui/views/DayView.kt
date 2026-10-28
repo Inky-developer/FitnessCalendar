@@ -52,18 +52,19 @@ import com.inky.fitnesscalendar.data.EpochDay
 import com.inky.fitnesscalendar.db.entities.RichActivity
 import com.inky.fitnesscalendar.db.entities.RichDay
 import com.inky.fitnesscalendar.di.AppRepository
-import com.inky.fitnesscalendar.repository.LocalizationRepository
 import com.inky.fitnesscalendar.ui.components.ActivityCard
 import com.inky.fitnesscalendar.ui.components.ActivityCardCallbacks
 import com.inky.fitnesscalendar.ui.components.ActivityImage
 import com.inky.fitnesscalendar.ui.components.ImageViewer
 import com.inky.fitnesscalendar.ui.components.NewActivityFAB
+import com.inky.fitnesscalendar.ui.components.StepsIcon
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.util.Icons
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.sharedBounds
 import com.inky.fitnesscalendar.ui.util.sharedElement
 import com.inky.fitnesscalendar.util.asNonEmptyOrNull
+import com.inky.fitnesscalendar.util.result.isOk
 import com.inky.fitnesscalendar.util.toDate
 import kotlinx.coroutines.launch
 import java.time.Instant
@@ -194,7 +195,7 @@ fun DayView(
 }
 
 @Composable
-context(_: LocalizationRepository)
+context(app: AppRepository)
 fun DayViewInner(
     richDay: RichDay,
     activities: List<RichActivity>,
@@ -236,16 +237,18 @@ fun DayViewInner(
                 .padding(horizontal = 8.dp, vertical = 4.dp)
                 .fillMaxWidth()
         ) {
-            AnimatedContent(
-                targetState = day.feel,
-                label = stringResource(R.string.feel)
-            ) { feel ->
-                Row {
-                    Spacer(modifier = Modifier.weight(1f))
+            Row(modifier = Modifier.padding(horizontal = 8.dp, vertical = 8.dp)) {
+                if (app.healthConnectRepository.checkHealthConnectAvailability().isOk()) {
+                    StepsIcon(richDay)
+                }
+                Spacer(modifier = Modifier.weight(1f))
+                AnimatedContent(
+                    targetState = day.feel,
+                    label = stringResource(R.string.feel)
+                ) { feel ->
                     Text(
-                        feel.emoji, modifier = Modifier
-                            .padding(end = 8.dp, top = 8.dp)
-                            .sharedElement(SharedContentKey.DayFeel)
+                        feel.emoji,
+                        modifier = Modifier.sharedElement(SharedContentKey.DayFeel)
                     )
                 }
             }

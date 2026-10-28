@@ -21,7 +21,9 @@ import com.inky.fitnesscalendar.data.measure.metersPerSecond
 import com.inky.fitnesscalendar.data.measure.ms
 import com.inky.fitnesscalendar.repository.ImportRepository.ImportError
 import com.inky.fitnesscalendar.util.result.TypedResult
+import com.inky.fitnesscalendar.util.result.raise
 import com.inky.fitnesscalendar.util.result.tryScope
+import com.inky.fitnesscalendar.util.result.unwrap
 import kotlin.math.pow
 import kotlin.math.sqrt
 
