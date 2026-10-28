@@ -4,9 +4,6 @@ import android.content.Context
 import android.net.Uri
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
 import androidx.core.net.toUri
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
@@ -20,6 +17,7 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.stringSetPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.inky.fitnesscalendar.R
+import com.inky.fitnesscalendar.ui.util.localPreferences
 import com.inky.fitnesscalendar.view_model.statistics.Projection
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -35,19 +33,17 @@ sealed class Preference<T, P>(
     @StringRes var titleId: Int? = null,
     @StringRes var descriptionId: Int? = null,
 ) {
+    fun read(store: Preferences): T = store[key]?.let(::deserialize) ?: default
+
     fun flow(context: Context): Flow<T> {
-        return context.dataStore.data.map { store ->
-            store[key]?.let { deserialize(it) } ?: default
-        }
+        return context.dataStore.data.map(::read)
     }
 
     suspend fun get(context: Context): T {
         return flow(context).first()
     }
 
-    @Composable
-    fun collectAsState(context: Context = LocalContext.current) =
-        remember { flow(context) }.collectAsState(initial = default)
+    val current @Composable get() = read(localPreferences.current.store)
 
     suspend fun set(context: Context, value: T) = update(context) { value }
 

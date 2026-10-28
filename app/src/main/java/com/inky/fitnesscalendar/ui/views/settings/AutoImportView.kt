@@ -30,9 +30,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
+import com.inky.fitnesscalendar.preferences.Preference
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.util.Icons
-import com.inky.fitnesscalendar.ui.util.localPreferences
 import com.inky.fitnesscalendar.view_model.settings.AutoImportViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -83,7 +83,7 @@ fun AutoImportView(viewModel: AutoImportViewModel = hiltViewModel(), onBack: () 
 
 @Composable
 fun AutoImportList(onNewDir: (Uri) -> Unit, onRemoveDir: (Uri) -> Unit) {
-    val dirs = localPreferences.current.watchedFolders
+    val dirs = Preference.PREF_WATCHED_FOLDERS.current
 
     Surface(
         color = MaterialTheme.colorScheme.surfaceContainer,

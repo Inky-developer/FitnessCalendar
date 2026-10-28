@@ -20,9 +20,9 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.data.gpx.TrackSvg
+import com.inky.fitnesscalendar.preferences.Preference
 import com.inky.fitnesscalendar.ui.util.Icons
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
-import com.inky.fitnesscalendar.ui.util.localPreferences
 import com.inky.fitnesscalendar.ui.util.sharedElement
 import com.inky.fitnesscalendar.ui.util.skipToLookaheadSize
 import org.maplibre.compose.camera.CameraFit
@@ -75,7 +75,7 @@ fun Map(
         Feature(Point(latitude = point.latitude, longitude = point.longitude), null)
     }
 
-    val uri = localPreferences.current.mapProviderUrl.takeIf { it.isNotBlank() }
+    val uri = Preference.PREF_MAP_PROVIDER.current.takeIf { it.isNotBlank() }
     val baseStyle = uri?.let { BaseStyle.Uri(it) } ?: BaseStyle.Empty
     val mapState = rememberMapState(baseStyle = baseStyle) {
         if (uri == null) {

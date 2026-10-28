@@ -91,7 +91,6 @@ import com.inky.fitnesscalendar.ui.components.optionGroupDefaultBackground
 import com.inky.fitnesscalendar.ui.util.Icons
 import com.inky.fitnesscalendar.ui.util.SharedContentKey
 import com.inky.fitnesscalendar.ui.util.applyIf
-import com.inky.fitnesscalendar.ui.util.localPreferences
 import com.inky.fitnesscalendar.ui.util.sharedElement
 import com.inky.fitnesscalendar.util.Option
 import com.inky.fitnesscalendar.util.asNonEmptyOrNull
@@ -559,7 +558,7 @@ private fun RowScope.DateAndDurationInput(
     editState: ActivityEditState,
     onEnd: (LocalDateTime) -> Unit,
 ) {
-    val preferDuration = localPreferences.current.preferEndDateAsDuration
+    val preferDuration = Preference.PREF_PREFER_END_DATE_AS_DURATION.current
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
 

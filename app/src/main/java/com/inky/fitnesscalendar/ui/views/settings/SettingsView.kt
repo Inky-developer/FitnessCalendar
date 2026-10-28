@@ -167,7 +167,7 @@ private fun <T> PreferenceToggle(
     val scope = rememberCoroutineScope()
     val resources = LocalResources.current
     val context = LocalContext.current
-    val checked by preference.collectAsState()
+    val checked = preference.current
 
     val title = remember(preference) { preference.titleId?.let { resources.getString(it) } }
     val description =
@@ -202,7 +202,7 @@ private fun <T> PreferenceToggle(
 private fun ProjectionSelect() {
     val preference = Preference.PREF_STATS_PROJECTION
     var showModal by rememberSaveable { mutableStateOf(false) }
-    val selectedValue by preference.collectAsState()
+    val selectedValue = preference.current
 
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
@@ -273,7 +273,7 @@ private fun <T> PreferenceTextField(preference: Preference<String, T>) {
     val context = LocalContext.current
     val scope = rememberCoroutineScope()
     var showModal by rememberSaveable { mutableStateOf(false) }
-    val selectedValue by preference.collectAsState()
+    val selectedValue = preference.current
     Column(
         modifier = Modifier
             .clickable { showModal = true }

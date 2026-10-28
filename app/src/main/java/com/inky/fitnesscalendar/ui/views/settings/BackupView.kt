@@ -39,11 +39,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.inky.fitnesscalendar.R
+import com.inky.fitnesscalendar.preferences.Preference
 import com.inky.fitnesscalendar.repository.LocalizationRepository
 import com.inky.fitnesscalendar.repository.backup.BackupRepository
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.util.Icons
-import com.inky.fitnesscalendar.ui.util.localPreferences
 import com.inky.fitnesscalendar.view_model.settings.BackupViewModel
 import java.time.LocalDateTime
 
@@ -166,7 +166,7 @@ private fun BackupButton(
     backupInProgress: Boolean,
     onBackup: () -> Unit
 ) {
-    val backupDirectory = localPreferences.current.backupUri
+    val backupDirectory = Preference.PREF_BACKUP_URI.current
 
     Button(
         onClick = onBackup,
@@ -185,7 +185,7 @@ private fun BackupButton(
 
 @Composable
 private fun BackupDirectoryButton(onUri: (Uri?) -> Unit) {
-    val backupUri = localPreferences.current.backupUri
+    val backupUri = Preference.PREF_BACKUP_URI.current
 
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocumentTree(),
