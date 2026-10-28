@@ -176,6 +176,7 @@ private fun TrackStepsPreference(app: AppRepository) {
     val healthPermission = app.healthConnectRepository.rememberPermissions {
         scope.launch {
             Preference.PREF_TRACK_STEPS.set(context, true)
+            app.healthConnectRepository.synchronize()
         }
     }
     PreferenceToggle(Preference.PREF_TRACK_STEPS) { oldState, newState ->
