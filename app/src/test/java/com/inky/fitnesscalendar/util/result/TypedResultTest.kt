@@ -1,6 +1,7 @@
 package com.inky.fitnesscalendar.util.result
 
-import org.junit.Assert.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class TypedResultTest {
@@ -9,13 +10,14 @@ class TypedResultTest {
         val success = tryScope<Int, String> { 1 }
         assertEquals(1.asOk(), success)
 
-        val error = tryScope { raise("An error has occurred") }
+        val error = tryScope<Unit, String> { raise("An error has occurred") }
         assertEquals("An error has occurred".asErr(), error)
     }
 
     @Test
     fun testComposition() {
-        fun Raises<String>.bar(): Int {
+        context(_: Raises<String>)
+        fun bar(): Int {
             return 1
         }
 
@@ -54,11 +56,13 @@ class TypedResultTest {
         class IoError : AppError()
         class ValueError : AppError()
 
-        fun Raises<IoError>.doIo(fail: Boolean): String = if (fail) raise(IoError()) else {
+        context(_: Raises<IoError>)
+        fun doIo(fail: Boolean): String = if (fail) raise(IoError()) else {
             "Success"
         }
 
-        fun Raises<ValueError>.doSomethingWithInput(input: String): String = input.reversed()
+        context(_: Raises<ValueError>)
+        fun doSomethingWithInput(input: String): String = input.reversed()
 
         val result = tryScope {
             doSomethingWithInput(doIo(true))

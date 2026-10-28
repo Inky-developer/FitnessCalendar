@@ -12,6 +12,7 @@ import com.inky.fitnesscalendar.db.AppDatabase
 import com.inky.fitnesscalendar.db.entities.ActivityType
 import com.inky.fitnesscalendar.di.AppRepository
 import com.inky.fitnesscalendar.repository.DatabaseRepository
+import com.inky.fitnesscalendar.repository.HealthConnectRepository
 import com.inky.fitnesscalendar.repository.LocalizationRepositoryImpl
 import com.inky.fitnesscalendar.repository.RecordingRepository
 import com.inky.fitnesscalendar.ui.util.ProvideDatabaseValues
@@ -58,11 +59,13 @@ fun mockAppRepository(
     onCreate: (SupportSQLiteDatabase) -> Unit = {}
 ): AppRepository {
     val db = mockDatabase(context, onCreate)
+    val dbRepo = DatabaseRepository(context, db)
     val app = AppRepository(
         context = context,
-        db = DatabaseRepository(context, db),
+        db = dbRepo,
         localizationRepository = LocalizationRepositoryImpl(context),
-        recordingRepository = RecordingRepository(context, db)
+        recordingRepository = RecordingRepository(context, db),
+        healthConnectRepository = HealthConnectRepository(context, dbRepo)
     )
     for (activityType in mockActivityTypes) {
         runBlocking { app.db.saveActivityType(activityType) }
