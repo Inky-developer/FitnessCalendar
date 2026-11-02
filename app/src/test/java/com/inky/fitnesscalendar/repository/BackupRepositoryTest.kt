@@ -15,6 +15,7 @@ import com.inky.fitnesscalendar.util.copyFileToStorage
 import com.inky.fitnesscalendar.util.getOrCreateImagesDir
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
@@ -43,7 +44,8 @@ class BackupRepositoryTest {
 
         val emptyDb = mockDatabase(context)
         val repo = BackupRepository(emptyDb, context)
-        repo.restoreWithoutRestart(backupFile.toUri())
+        val error = repo.restoreWithoutRestart(backupFile.toUri())
+        assertNull(error)
 
         assertEquals(16, context.getOrCreateImagesDir().listFiles()!!.size)
 
@@ -60,6 +62,17 @@ class BackupRepositoryTest {
         println(restoredTypes)
         assertEquals("Activities should be equal", originalActivities, restoredActivities)
         assertEquals("Activity types should be equal", originalTypes, restoredTypes)
+    }
+
+    @Test
+    fun `restore invalid file should throw an error`() {
+        val context = ApplicationProvider.getApplicationContext<MainApp>()
+
+        val emptyBackupFile = File.createTempFile("backup", ".zip")
+        val emptyDb = mockDatabase(context)
+        val repo = BackupRepository(emptyDb, context)
+        val error = repo.restoreWithoutRestart(emptyBackupFile.toUri())
+        assertEquals(error, BackupRepository.RestoreError.InvalidBackupFile)
     }
 
     private fun createBackupFile(repo: BackupRepository): File {

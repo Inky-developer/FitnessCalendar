@@ -42,7 +42,8 @@ class BackupRepository @Inject constructor(
     }
 
     enum class RestoreError(@StringRes val msgID: Int) {
-        IOError(R.string.cannot_read_file)
+        IOError(R.string.cannot_read_file),
+        InvalidBackupFile(R.string.invalid_backup_file)
     }
 
     fun getLastBackup(directory: Uri): LocalDateTime? {
@@ -96,6 +97,11 @@ class BackupRepository @Inject constructor(
         try {
             context.contentResolver.openInputStream(uri).use { inputStream ->
                 val zip = ZipInputStream(inputStream)
+                shallowCheckZipLayout(zip)?.let { error -> return error }
+            }
+
+            context.contentResolver.openInputStream(uri).use { inputStream ->
+                val zip = ZipInputStream(inputStream)
                 val restorers = BACKUP_LOCATIONS.mapValues { it.value.restore(context, database) }
                 for (entry in zip.entries()) {
                     if (entry.isDirectory) continue
@@ -121,6 +127,21 @@ class BackupRepository @Inject constructor(
         val dirFile = DocumentFile.fromTreeUri(context, directory) ?: return null
         dirFile.findFile(BACKUP_NAME)?.delete()
         return dirFile.createFile("application/zip", BACKUP_NAME)?.uri
+    }
+
+    /**
+     * Shallow check that the rough structure matches
+     */
+    private fun shallowCheckZipLayout(zip: ZipInputStream): RestoreError? {
+        val dirs = zip.entries().asSequence().map { it.name.split('/')[0] }
+            .toSet()
+        val expectedDirs = BACKUP_LOCATIONS.keys
+        val errors = (dirs - expectedDirs) + (expectedDirs - dirs)
+        if (errors.isNotEmpty()) {
+            Log.e(TAG, "Invalid backup file, expected dirs: $expectedDirs, actual: $dirs")
+            return RestoreError.InvalidBackupFile
+        }
+        return null
     }
 
     companion object {
