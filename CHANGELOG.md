@@ -1,6 +1,7 @@
 # Unreleased
 
 - Optionally track steps
+- Compress images for smaller app data size. Existing images are not updated.
 
 # 2026.10.2
 

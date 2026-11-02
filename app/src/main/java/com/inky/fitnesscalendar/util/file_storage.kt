@@ -4,6 +4,7 @@ import android.content.ContentResolver
 import android.content.Context
 import android.graphics.Bitmap
 import android.net.Uri
+import android.os.Build
 import android.util.Log
 import androidx.core.net.toUri
 import java.io.File
@@ -31,8 +32,13 @@ fun Context.writeBitmapToStorage(bitmap: Bitmap): InternalFile? {
     val filename = UUID.randomUUID().toString()
     val file = File(cacheDir, filename)
 
+    val format = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        Bitmap.CompressFormat.WEBP_LOSSY
+    } else {
+        Bitmap.CompressFormat.WEBP
+    }
     val success = FileOutputStream(file).use {
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, it)
+        bitmap.compress(format, 80, it)
     }
 
     return if (success) {
