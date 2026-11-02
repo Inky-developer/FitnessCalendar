@@ -126,9 +126,16 @@ android {
     packaging {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
+            excludes += "/META-INF/*.version"
+            excludes += "/META-INF/*.kotlin_module"
+            excludes += "/kotlin/**"
+            excludes += "DebugProbesKt.bin"
         }
+        // Since this app is not distributed as bundle, try to compress its size by other means
         jniLibs {
-            // Since this app is not distributed as bundle, try to compress its size by other means
+            useLegacyPackaging = true
+        }
+        dex {
             useLegacyPackaging = true
         }
     }
