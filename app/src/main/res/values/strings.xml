@@ -358,4 +358,14 @@
     <string name="steps">steps</string>
     <string name="could_not_read_step_data">Could not read step data: %1$s</string>
     <string name="invalid_backup_file">Invalid backup file</string>
+    <string name="privacy">Privacy</string>
+    <string name="privacy_general_title">General</string>
+    <string name="privacy_general_text">%1$s does not share any personal data.\nIt can optionally connect to the internet if you specify a map provider URL.</string>
+    <string name="privacy_notification_permission_title">Notification Permission</string>
+    <string name="privacy_notification_permission_text">Optional permission. Notifications are sent out when recording activities.</string>
+    <string name="privacy_health_permissions_title">Health Permissions</string>
+    <string name="privacy_health_permissions_text">Optional permission. %1$s can count steps if configured to do so.</string>
+    <string name="privacy_contact_title">Contact</string>
+    <string name="privacy_contact_text">For any questions or requests, contact me by writing an email or creating an issue on the repository: </string>
+    <string name="github">Github</string>
 </resources>

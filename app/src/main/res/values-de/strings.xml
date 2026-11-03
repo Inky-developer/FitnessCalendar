@@ -357,4 +357,14 @@
     <string name="steps">Schritte</string>
     <string name="could_not_read_step_data">Konnte keine Schrittdaten lesen: %1$s</string>
     <string name="invalid_backup_file">Invalide Backupdatei</string>
+    <string name="privacy">Datenschutz</string>
+    <string name="privacy_general_title">Allgemein</string>
+    <string name="privacy_general_text">%1$s gibt keine persönlichen Daten weiter.\nOptional kann eine Verbindung zum Internet hergestellt werden, wenn du eine URL für einen Kartenanbieter angibst.</string>
+    <string name="privacy_notification_permission_title">Benachrichtigungsberechtigung</string>
+    <string name="privacy_notification_permission_text">Optionale Berechtigung. Benachrichtigungen werden während der Aufzeichnung von Aktivitäten angezeigt.</string>
+    <string name="privacy_health_permissions_title">Gesundheitsberechtigungen</string>
+    <string name="privacy_health_permissions_text">Optionale Berechtigung. %1$s kann Schritte zählen, wenn du das erlaubt hast.</string>
+    <string name="privacy_contact_title">Kontakt</string>
+    <string name="privacy_contact_text">Bei Fragen oder Anliegen kannst du mich per E-Mail kontaktieren oder ein Issue im Repository erstellen: </string>
+    <string name="github">Github</string>
 </resources>

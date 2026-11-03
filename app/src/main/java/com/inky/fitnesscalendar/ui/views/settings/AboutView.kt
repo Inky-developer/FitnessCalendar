@@ -20,6 +20,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.inky.fitnesscalendar.BuildConfig
+import com.inky.fitnesscalendar.PermissionsRationaleActivity
 import com.inky.fitnesscalendar.R
 import com.inky.fitnesscalendar.ui.components.defaultTopAppBarColors
 import com.inky.fitnesscalendar.ui.util.Icons
@@ -54,6 +55,17 @@ fun AboutView(onBack: () -> Unit) {
             Text(nameVersionText, modifier = Modifier.padding(all = 8.dp))
             Button(onClick = { openGithubRepo(context) }, modifier = Modifier.fillMaxWidth()) {
                 Text(stringResource(R.string.star_on_github))
+            }
+            Button(
+                onClick = {
+                    val intent = Intent(context, PermissionsRationaleActivity::class.java).apply {
+                        addFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT)
+                    }
+                    context.startActivity(intent)
+                },
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(stringResource(R.string.privacy))
             }
         }
     }
