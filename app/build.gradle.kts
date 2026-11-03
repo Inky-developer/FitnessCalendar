@@ -22,7 +22,7 @@ hilt {
 
 kotlin {
     compilerOptions {
-        jvmTarget.set(JvmTarget.JVM_17)
+        jvmTarget.set(JvmTarget.JVM_21)
         freeCompilerArgs.run {
             add("-XXLanguage:+PropertyParamAnnotationDefaultTargetMode")
             add("-XXLanguage:+ContextParameters")
@@ -95,8 +95,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.VERSION_21
+        targetCompatibility = JavaVersion.VERSION_21
     }
     testOptions {
         unitTests {
@@ -195,6 +195,7 @@ dependencies {
     testImplementation(libs.approvaltests)
     testImplementation(libs.robolectric)
     testImplementation(libs.androidx.core)
+    testImplementation(libs.androidx.espresso.core)
     testImplementation(libs.androidx.ui.test.junit4)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
